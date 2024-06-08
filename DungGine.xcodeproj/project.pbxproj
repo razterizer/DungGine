@@ -8,6 +8,7 @@
 
 /* Begin PBXFileReference section */
 		07E6EAC32C14CEA8007BBC6B /* libDungGine.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libDungGine.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		07E6EACA2C14CFD3007BBC6B /* BSPTree.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BSPTree.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -24,6 +25,7 @@
 		07E6EABA2C14CEA8007BBC6B = {
 			isa = PBXGroup;
 			children = (
+				07E6EACA2C14CFD3007BBC6B /* BSPTree.h */,
 				07E6EAC42C14CEA8007BBC6B /* Products */,
 			);
 			sourceTree = "<group>";
