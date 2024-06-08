@@ -148,15 +148,13 @@ namespace bsp
       };
     
       auto child_orientation = static_cast<Orientation>(1 - static_cast<int>(orientation));
-      if (split_length_0 >= min_room_length)
+      if (split_length_0 >= min_room_length && split_length_1 >= min_room_length)
       {
         auto& ch_0 = children[0] = std::make_unique<BSPNode>();
         ch_0->orientation = child_orientation;
         f_set_ch_size(ch_0.get(), split_length_0);
         ch_0->generate(min_room_length);
-      }
-      if (split_length_1 >= min_room_length)
-      {
+        
         auto& ch_1 = children[1] = std::make_unique<BSPNode>();
         ch_1->orientation = child_orientation;
         f_set_ch_size(ch_1.get(), split_length_1);
