@@ -7,6 +7,7 @@
 
 #pragma once
 #include <Termin8or/RC.h>
+#include <Termin8or/SpriteHandler.h>
 #include <Core/Rand.h>
 #include <Core/Math.h>
 #include <array>
@@ -68,6 +69,34 @@ namespace bsp
   //
   // So fractional lengths are calculated from left to right (column-wise)
   //   or up to down (row-wise).
+  
+  template<int NR, int NC>
+  void draw_room(SpriteHandler<NR, NC>& sh,
+                 int r, int c, int len_r, int len_c,
+                 Text::Color fg_color, Text::Color bg_color)
+  {
+    // len_r = 3, len_c = 2
+    // ###
+    // # #
+    // # #
+    // ###
+    //
+    // len_r = 4, len_c = 4 (smallest room size by default)
+    // #####
+    // #   #
+    // #   #
+    // #   #
+    // #####
+    
+    auto str_horiz = str::rep_char('#', len_c);
+    sh.write_buffer(str_horiz, r, c, fg_color, bg_color);
+    for (int i = r; i <= r + len_r; ++i)
+    {
+      sh.write_buffer("#", i, c, fg_color, bg_color);
+      sh.write_buffer("#", i, c + len_c, fg_color, bg_color);
+    }
+    sh.write_buffer(str_horiz, r + len_r, c, fg_color, bg_color);
+  }
 
   struct BSPNode final
   {
@@ -134,6 +163,42 @@ namespace bsp
         ch_1->generate(min_room_length);
       }
     }
+    
+    template<int NR, int NC>
+    void draw_blueprint(SpriteHandler<NR, NC>& sh,
+                        int r = 0, int c = 0,
+                        Text::Color fg_color = Text::Color::Black,
+                        Text::Color bg_color = Text::Color::Yellow) const
+    {
+      draw_room(sh, r, c, size_rows, size_cols, fg_color, bg_color);
+      int ch_r = 0;
+      int ch_c = 0;
+      int ch0_r_len = 0;
+      int ch0_c_len = 0;
+      if (children[0])
+      {
+        ch_r = r;
+        ch_c = c;
+        ch0_r_len = children[0]->size_rows;
+        ch0_c_len = children[0]->size_cols;
+        children[0]->draw_blueprint(sh, ch_r, ch_c, fg_color, bg_color);
+      }
+      if (children[1])
+      {
+        switch (orientation)
+        {
+          case Orientation::Vertical:
+            ch_r = r;
+            ch_c = c + ch0_c_len;
+            break;
+          case Orientation::Horizontal:
+            ch_r = r + ch0_r_len;
+            ch_c = c;
+            break;
+        }
+        children[1]->draw_blueprint(sh, ch_r, ch_c, fg_color, bg_color);
+      }
+    }
   };
 
   class BSPTree final
@@ -151,6 +216,15 @@ namespace bsp
       root.size_rows = world_size_rows;
       root.size_cols = world_size_cols;
       root.generate(min_room_length);
+    }
+    
+    template<int NR, int NC>
+    void draw_blueprint(SpriteHandler<NR, NC>& sh,
+                        int r0 = 0, int c0 = 0,
+                        Text::Color fg_color = Text::Color::Black,
+                        Text::Color bg_color = Text::Color::Yellow) const
+    {
+      root.draw_blueprint(sh, r0, c0, fg_color, bg_color);
     }
   };
   
