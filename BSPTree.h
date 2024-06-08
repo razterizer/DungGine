@@ -199,7 +199,30 @@ namespace bsp
         children[1]->draw_blueprint(sh, ch_r, ch_c, fg_color, bg_color);
       }
     }
+    
+    void print_tree(int level = 0, const std::string& indent = "") const
+    {
+      std::cout << indent << "Level: " << level << std::endl;
+      std::cout << indent << "Orientation: " << (orientation == Orientation::Vertical ? "V" : "H") << std::endl;
+      std::cout << indent << "Size: [" << size_rows << ", " << size_cols << "]" << std::endl;
+      
+      auto child_indent = indent + str::rep_char(' ', 2*(level + 1));
+      
+      std::cout << indent << "Child 0:" << std::endl;
+      if (children[0])
+        children[0]->print_tree(level + 1, child_indent);
+      else
+        std::cout << child_indent << "{}" << std::endl;
+      
+      std::cout << indent << "Child 1:" << std::endl;
+      if (children[1])
+        children[1]->print_tree(level + 1, child_indent);
+      else
+        std::cout << child_indent << "{}" << std::endl;
+    }
   };
+  
+  // //////////////////////////////////////////////////////////////
 
   class BSPTree final
   {
@@ -225,6 +248,11 @@ namespace bsp
                         Text::Color bg_color = Text::Color::Yellow) const
     {
       root.draw_blueprint(sh, r0, c0, fg_color, bg_color);
+    }
+    
+    void print_tree() const
+    {
+      root.print_tree();
     }
   };
   
