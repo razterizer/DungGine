@@ -231,20 +231,24 @@ namespace bsp
       }
     }
     
-    void pad_rooms(ttl::Rectangle bb, int min_room_length, int max_rnd_wall_padding)
+    void pad_rooms(ttl::Rectangle bb, int min_room_length, int min_rnd_wall_padding, int max_rnd_wall_padding)
     {
       if (!children[0] && !children[1])
       {
         std::array<int, 4> padding_nswe { 0, 0, 0, 0 }; // top, bottom, left, right
+        int num_tries = 0;
         do
         {
           for (int i = 0; i < 4; ++i)
-            padding_nswe[i] = rnd::rand_int(0, max_rnd_wall_padding);
+            padding_nswe[i] = rnd::rand_int(min_rnd_wall_padding, max_rnd_wall_padding);
           bb_leaf_room = bb;
           bb_leaf_room.r += padding_nswe[0];
           bb_leaf_room.r_len -= padding_nswe[0] + padding_nswe[1];
           bb_leaf_room.c += padding_nswe[2];
           bb_leaf_room.c_len -= padding_nswe[2] + padding_nswe[3];
+          if (num_tries > 20)
+            min_rnd_wall_padding = 0;
+          num_tries++;
         } while (bb_leaf_room.r_len < min_room_length || bb_leaf_room.c_len < min_room_length);
       }
       else
@@ -256,7 +260,7 @@ namespace bsp
           ch0_r_len = children[0]->size_rows;
           ch0_c_len = children[0]->size_cols;
           ttl::Rectangle bb_0 { bb.r, bb.c, ch0_r_len, ch0_c_len };
-          children[0]->pad_rooms(bb_0, min_room_length, max_rnd_wall_padding);
+          children[0]->pad_rooms(bb_0, min_room_length, min_rnd_wall_padding, max_rnd_wall_padding);
         }
         if (children[1])
         {
@@ -276,7 +280,7 @@ namespace bsp
           int ch1_r_len = children[1]->size_rows;
           int ch1_c_len = children[1]->size_cols;
           ttl::Rectangle bb_1 { ch1_r, ch1_c, ch1_r_len, ch1_c_len };
-          children[1]->pad_rooms(bb_1, min_room_length, max_rnd_wall_padding);
+          children[1]->pad_rooms(bb_1, min_room_length, min_rnd_wall_padding, max_rnd_wall_padding);
         }
       }
     }
@@ -304,10 +308,10 @@ namespace bsp
       m_root.generate(m_min_room_length);
     }
     
-    void pad_rooms(int max_rnd_wall_padding = 4)
+    void pad_rooms(int min_rnd_wall_padding = 1, int max_rnd_wall_padding = 4)
     {
       ttl::Rectangle bb { 0, 0, m_root.size_rows, m_root.size_cols };
-      m_root.pad_rooms(bb, m_min_room_length, max_rnd_wall_padding);
+      m_root.pad_rooms(bb, m_min_room_length, min_rnd_wall_padding, max_rnd_wall_padding);
     }
     
     template<int NR, int NC>
