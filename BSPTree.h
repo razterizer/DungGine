@@ -206,17 +206,16 @@ namespace bsp
       
       auto child_indent = indent + str::rep_char(' ', 2*(level + 1));
       
-      std::cout << indent << "Child 0:" << std::endl;
       if (children[0])
+      {
+        std::cout << indent << "Child 0:" << std::endl;
         children[0]->print_tree(level + 1, child_indent);
-      else
-        std::cout << child_indent << "{}" << std::endl;
-      
-      std::cout << indent << "Child 1:" << std::endl;
+      }
       if (children[1])
+      {
+        std::cout << indent << "Child 1:" << std::endl;
         children[1]->print_tree(level + 1, child_indent);
-      else
-        std::cout << child_indent << "{}" << std::endl;
+      }
     }
   };
   
