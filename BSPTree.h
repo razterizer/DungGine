@@ -197,17 +197,18 @@ namespace bsp
     
     template<int NR, int NC>
     void draw_rooms(SpriteHandler<NR, NC>& sh,
+                    int r0, int c0,
                     const styles::Style& room_style) const
     {
       if (!bb_leaf_room.is_empty())
         draw_box(sh,
-                 bb_leaf_room.r, bb_leaf_room.c, bb_leaf_room.r_len, bb_leaf_room.c_len,
+                 r0 + bb_leaf_room.r, c0 + bb_leaf_room.c, bb_leaf_room.r_len, bb_leaf_room.c_len,
                  room_style.fg_color, room_style.bg_color);
                  
       if (children[0])
-        children[0]->draw_rooms(sh, room_style);
+        children[0]->draw_rooms(sh, r0, c0, room_style);
       if (children[1])
-        children[1]->draw_rooms(sh, room_style);
+        children[1]->draw_rooms(sh, r0, c0, room_style);
     }
     
     void print_tree(int level = 0, const std::string& indent = "") const
@@ -322,7 +323,7 @@ namespace bsp
                     int r0 = 0, int c0 = 0,
                     const styles::Style& room_style = { Text::Color::White, Text::Color::DarkRed }) const
     {
-      m_root.draw_rooms(sh, room_style);
+      m_root.draw_rooms(sh, r0, c0, room_style);
     }
     
     void print_tree() const
