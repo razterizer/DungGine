@@ -73,7 +73,8 @@ namespace bsp
   template<int NR, int NC>
   void draw_box(SpriteHandler<NR, NC>& sh,
                 int r, int c, int len_r, int len_c,
-                Text::Color fg_color, Text::Color bg_color)
+                Text::Color fg_color, Text::Color bg_color,
+                bool filled = false)
   {
     // len_r = 3, len_c = 2
     // ###
@@ -92,8 +93,13 @@ namespace bsp
     sh.write_buffer(str_horiz, r, c, fg_color, bg_color);
     for (int i = r; i <= r + len_r; ++i)
     {
-      sh.write_buffer("#", i, c, fg_color, bg_color);
-      sh.write_buffer("#", i, c + len_c, fg_color, bg_color);
+      if (filled)
+        sh.write_buffer(str_horiz, i, c, fg_color, bg_color);
+      else
+      {
+        sh.write_buffer("#", i, c, fg_color, bg_color);
+        sh.write_buffer("#", i, c + len_c, fg_color, bg_color);
+      }
     }
     sh.write_buffer(str_horiz, r + len_r, c, fg_color, bg_color);
   }
