@@ -71,9 +71,9 @@ namespace bsp
   //   or up to down (row-wise).
   
   template<int NR, int NC>
-  void draw_room(SpriteHandler<NR, NC>& sh,
-                 int r, int c, int len_r, int len_c,
-                 Text::Color fg_color, Text::Color bg_color)
+  void draw_box(SpriteHandler<NR, NC>& sh,
+                int r, int c, int len_r, int len_c,
+                Text::Color fg_color, Text::Color bg_color)
   {
     // len_r = 3, len_c = 2
     // ###
@@ -109,9 +109,7 @@ namespace bsp
     int size_rows = 0;
     int size_cols = 0;
     
-    // Padding across wall. wall_padding[0] is the padding on the side of
-    //   child 0.
-    std::array<float, 2> wall_padding { 0, 0 };
+    ttl::Rectangle bb_leaf_room;
     
     std::array<std::unique_ptr<BSPNode>, 2> children;
     
@@ -164,11 +162,10 @@ namespace bsp
     
     template<int NR, int NC>
     void draw_blueprint(SpriteHandler<NR, NC>& sh,
-                        int r = 0, int c = 0,
-                        Text::Color fg_color = Text::Color::Black,
-                        Text::Color bg_color = Text::Color::Yellow) const
+                        int r, int c,
+                        const styles::Style& border_style) const
     {
-      draw_room(sh, r, c, size_rows, size_cols, fg_color, bg_color);
+      draw_box(sh, r, c, size_rows, size_cols, border_style.fg_color, border_style.bg_color);
       int ch_r = 0;
       int ch_c = 0;
       int ch0_r_len = 0;
@@ -179,7 +176,7 @@ namespace bsp
         ch_c = c;
         ch0_r_len = children[0]->size_rows;
         ch0_c_len = children[0]->size_cols;
-        children[0]->draw_blueprint(sh, ch_r, ch_c, fg_color, bg_color);
+        children[0]->draw_blueprint(sh, ch_r, ch_c, border_style);
       }
       if (children[1])
       {
@@ -194,8 +191,23 @@ namespace bsp
             ch_c = c;
             break;
         }
-        children[1]->draw_blueprint(sh, ch_r, ch_c, fg_color, bg_color);
+        children[1]->draw_blueprint(sh, ch_r, ch_c, border_style);
       }
+    }
+    
+    template<int NR, int NC>
+    void draw_rooms(SpriteHandler<NR, NC>& sh,
+                    const styles::Style& room_style) const
+    {
+      if (!bb_leaf_room.is_empty())
+        draw_box(sh,
+                 bb_leaf_room.r, bb_leaf_room.c, bb_leaf_room.r_len, bb_leaf_room.c_len,
+                 room_style.fg_color, room_style.bg_color);
+                 
+      if (children[0])
+        children[0]->draw_rooms(sh, room_style);
+      if (children[1])
+        children[1]->draw_rooms(sh, room_style);
     }
     
     void print_tree(int level = 0, const std::string& indent = "") const
@@ -217,39 +229,105 @@ namespace bsp
         children[1]->print_tree(level + 1, child_indent);
       }
     }
+    
+    void pad_rooms(ttl::Rectangle bb, int min_room_length, int max_rnd_wall_padding)
+    {
+      if (!children[0] && !children[1])
+      {
+        std::array<int, 4> padding_nswe { 0, 0, 0, 0 }; // top, bottom, left, right
+        do
+        {
+          for (int i = 0; i < 4; ++i)
+            padding_nswe[i] = rnd::rand_int(0, max_rnd_wall_padding);
+          bb_leaf_room = bb;
+          bb_leaf_room.r += padding_nswe[0];
+          bb_leaf_room.r_len -= padding_nswe[0] + padding_nswe[1];
+          bb_leaf_room.c += padding_nswe[2];
+          bb_leaf_room.c_len -= padding_nswe[2] + padding_nswe[3];
+        } while (bb_leaf_room.r_len < min_room_length || bb_leaf_room.c_len < min_room_length);
+      }
+      else
+      {
+        int ch0_r_len = 0;
+        int ch0_c_len = 0;
+        if (children[0])
+        {
+          ch0_r_len = children[0]->size_rows;
+          ch0_c_len = children[0]->size_cols;
+          ttl::Rectangle bb_0 { bb.r, bb.c, ch0_r_len, ch0_c_len };
+          children[0]->pad_rooms(bb_0, min_room_length, max_rnd_wall_padding);
+        }
+        if (children[1])
+        {
+          int ch1_r = 0;
+          int ch1_c = 0;
+          switch (orientation)
+          {
+            case Orientation::Vertical:
+              ch1_r = bb.r;
+              ch1_c = bb.c + ch0_c_len;
+              break;
+            case Orientation::Horizontal:
+              ch1_r = bb.r + ch0_r_len;
+              ch1_c = bb.c;
+              break;
+          }
+          int ch1_r_len = children[1]->size_rows;
+          int ch1_c_len = children[1]->size_cols;
+          ttl::Rectangle bb_1 { ch1_r, ch1_c, ch1_r_len, ch1_c_len };
+          children[1]->pad_rooms(bb_1, min_room_length, max_rnd_wall_padding);
+        }
+      }
+    }
   };
   
   // //////////////////////////////////////////////////////////////
 
   class BSPTree final
   {
-    BSPNode root;
+    BSPNode m_root;
+    int m_min_room_length = 4;
     
   public:
     BSPTree() = default;
+    BSPTree(int min_room_length)
+      : m_min_room_length(min_room_length)
+    {}
     
     void generate(int world_size_rows, int world_size_cols,
-                  Orientation first_split_orientation,
-                  int min_room_length = 4)
+                  Orientation first_split_orientation)
     {
-      root.orientation = first_split_orientation;
-      root.size_rows = world_size_rows;
-      root.size_cols = world_size_cols;
-      root.generate(min_room_length);
+      m_root.orientation = first_split_orientation;
+      m_root.size_rows = world_size_rows;
+      m_root.size_cols = world_size_cols;
+      m_root.generate(m_min_room_length);
+    }
+    
+    void pad_rooms(int max_rnd_wall_padding = 4)
+    {
+      ttl::Rectangle bb { 0, 0, m_root.size_rows, m_root.size_cols };
+      m_root.pad_rooms(bb, m_min_room_length, max_rnd_wall_padding);
     }
     
     template<int NR, int NC>
     void draw_blueprint(SpriteHandler<NR, NC>& sh,
                         int r0 = 0, int c0 = 0,
-                        Text::Color fg_color = Text::Color::Black,
-                        Text::Color bg_color = Text::Color::Yellow) const
+                        const styles::Style& border_style = { Text::Color::Black, Text::Color::Yellow }) const
     {
-      root.draw_blueprint(sh, r0, c0, fg_color, bg_color);
+      m_root.draw_blueprint(sh, r0, c0, border_style);
+    }
+    
+    template<int NR, int NC>
+    void draw_rooms(SpriteHandler<NR, NC>& sh,
+                    int r0 = 0, int c0 = 0,
+                    const styles::Style& room_style = { Text::Color::White, Text::Color::DarkRed }) const
+    {
+      m_root.draw_rooms(sh, room_style);
     }
     
     void print_tree() const
     {
-      root.print_tree();
+      m_root.print_tree();
     }
   };
   
