@@ -204,7 +204,7 @@ namespace bsp
       std::cout << indent << "Orientation: " << (orientation == Orientation::Vertical ? "V" : "H") << std::endl;
       std::cout << indent << "Size: [" << size_rows << ", " << size_cols << "]" << std::endl;
       
-      auto child_indent = indent + str::rep_char(' ', 2*(level + 1));
+      auto child_indent = indent + str::rep_char(' ', 2);
       
       if (children[0])
       {
