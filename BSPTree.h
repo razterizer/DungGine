@@ -169,9 +169,9 @@ namespace bsp
     }
     
     template<int NR, int NC>
-    void draw_blueprint(SpriteHandler<NR, NC>& sh,
-                        int r, int c,
-                        const styles::Style& border_style) const
+    void draw_regions(SpriteHandler<NR, NC>& sh,
+                      int r, int c,
+                      const styles::Style& border_style) const
     {
       draw_box(sh, r, c, size_rows, size_cols, border_style.fg_color, border_style.bg_color);
       int ch_r = 0;
@@ -184,7 +184,7 @@ namespace bsp
         ch_c = c;
         ch0_r_len = children[0]->size_rows;
         ch0_c_len = children[0]->size_cols;
-        children[0]->draw_blueprint(sh, ch_r, ch_c, border_style);
+        children[0]->draw_regions(sh, ch_r, ch_c, border_style);
       }
       if (children[1])
       {
@@ -199,7 +199,7 @@ namespace bsp
             ch_c = c;
             break;
         }
-        children[1]->draw_blueprint(sh, ch_r, ch_c, border_style);
+        children[1]->draw_regions(sh, ch_r, ch_c, border_style);
       }
     }
     
@@ -323,11 +323,11 @@ namespace bsp
     }
     
     template<int NR, int NC>
-    void draw_blueprint(SpriteHandler<NR, NC>& sh,
-                        int r0 = 0, int c0 = 0,
-                        const styles::Style& border_style = { Text::Color::Black, Text::Color::Yellow }) const
+    void draw_regions(SpriteHandler<NR, NC>& sh,
+                      int r0 = 0, int c0 = 0,
+                      const styles::Style& border_style = { Text::Color::Black, Text::Color::Yellow }) const
     {
-      m_root.draw_blueprint(sh, r0, c0, border_style);
+      m_root.draw_regions(sh, r0, c0, border_style);
     }
     
     template<int NR, int NC>
