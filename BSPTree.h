@@ -115,14 +115,24 @@ namespace bsp
     int size_rows = 0;
     int size_cols = 0;
     
+    ttl::Rectangle bb_region;
     ttl::Rectangle bb_leaf_room;
     
     std::array<std::unique_ptr<BSPNode>, 2> children;
     
+    ttl::Rectangle corridor; // Corridor between the children of this region.
+    bool has_corridor = false;
+    
+    int level = 0; // root = 0;
+    
+    // ///////////
+    
     bool is_leaf() const { return !children[0] && !children[1]; }
     
-    void generate(int min_room_length)
+    void generate(ttl::Rectangle bb, int lvl, int min_room_length)
     {
+      bb_region = bb;
+      level = lvl;
       split_fraction = rnd::rand();
       int split_length_0 = 0;
       int split_length_1 = 0;
@@ -159,48 +169,45 @@ namespace bsp
         auto& ch_0 = children[0] = std::make_unique<BSPNode>();
         ch_0->orientation = child_orientation;
         f_set_ch_size(ch_0.get(), split_length_0);
-        ch_0->generate(min_room_length);
+        int ch0_r_len = children[0]->size_rows;
+        int ch0_c_len = children[0]->size_cols;
+        ttl::Rectangle bb_0 { bb.r, bb.c, ch0_r_len, ch0_c_len };
+        ch_0->generate(bb_0, lvl + 1, min_room_length);
         
         auto& ch_1 = children[1] = std::make_unique<BSPNode>();
         ch_1->orientation = child_orientation;
         f_set_ch_size(ch_1.get(), split_length_1);
-        ch_1->generate(min_room_length);
+        int ch1_r = 0;
+        int ch1_c = 0;
+        switch (orientation)
+        {
+          case Orientation::Vertical:
+            ch1_r = bb.r;
+            ch1_c = bb.c + ch0_c_len;
+            break;
+          case Orientation::Horizontal:
+            ch1_r = bb.r + ch0_r_len;
+            ch1_c = bb.c;
+            break;
+        }
+        int ch1_r_len = children[1]->size_rows;
+        int ch1_c_len = children[1]->size_cols;
+        ttl::Rectangle bb_1 { ch1_r, ch1_c, ch1_r_len, ch1_c_len };
+        ch_1->generate(bb_1, lvl + 1, min_room_length);
       }
     }
     
     template<int NR, int NC>
     void draw_regions(SpriteHandler<NR, NC>& sh,
-                      int r, int c,
+                      int r0, int c0,
                       const styles::Style& border_style) const
     {
-      draw_box(sh, r, c, size_rows, size_cols, border_style.fg_color, border_style.bg_color);
-      int ch_r = 0;
-      int ch_c = 0;
-      int ch0_r_len = 0;
-      int ch0_c_len = 0;
+      draw_box(sh, r0 + bb_region.r, c0 + bb_region.c, bb_region.r_len, bb_region.c_len, border_style.fg_color, border_style.bg_color);
+      
       if (children[0])
-      {
-        ch_r = r;
-        ch_c = c;
-        ch0_r_len = children[0]->size_rows;
-        ch0_c_len = children[0]->size_cols;
-        children[0]->draw_regions(sh, ch_r, ch_c, border_style);
-      }
+        children[0]->draw_regions(sh, r0, c0, border_style);
       if (children[1])
-      {
-        switch (orientation)
-        {
-          case Orientation::Vertical:
-            ch_r = r;
-            ch_c = c + ch0_c_len;
-            break;
-          case Orientation::Horizontal:
-            ch_r = r + ch0_r_len;
-            ch_c = c;
-            break;
-        }
-        children[1]->draw_regions(sh, ch_r, ch_c, border_style);
-      }
+        children[1]->draw_regions(sh, r0, c0, border_style);
     }
     
     template<int NR, int NC>
@@ -219,7 +226,7 @@ namespace bsp
         children[1]->draw_rooms(sh, r0, c0, room_style);
     }
     
-    void print_tree(int level = 0, const std::string& indent = "") const
+    void print_tree(const std::string& indent = "") const
     {
       std::cout << indent << "Level: " << level << std::endl;
       std::cout << indent << "Orientation: " << (orientation == Orientation::Vertical ? "V" : "H") << std::endl;
@@ -230,18 +237,18 @@ namespace bsp
       if (children[0])
       {
         std::cout << indent << "Child 0:" << std::endl;
-        children[0]->print_tree(level + 1, child_indent);
+        children[0]->print_tree(child_indent);
       }
       if (children[1])
       {
         std::cout << indent << "Child 1:" << std::endl;
-        children[1]->print_tree(level + 1, child_indent);
+        children[1]->print_tree(child_indent);
       }
     }
     
-    void pad_rooms(ttl::Rectangle bb, int min_room_length, int min_rnd_wall_padding, int max_rnd_wall_padding)
+    void pad_rooms(int min_room_length, int min_rnd_wall_padding, int max_rnd_wall_padding)
     {
-      if (!children[0] && !children[1])
+      if (is_leaf())
       {
         std::array<int, 4> padding_nswe { 0, 0, 0, 0 }; // top, bottom, left, right
         int num_tries = 0;
@@ -249,7 +256,7 @@ namespace bsp
         {
           for (int i = 0; i < 4; ++i)
             padding_nswe[i] = rnd::rand_int(min_rnd_wall_padding, max_rnd_wall_padding);
-          bb_leaf_room = bb;
+          bb_leaf_room = bb_region;
           bb_leaf_room.r += padding_nswe[0];
           bb_leaf_room.r_len -= padding_nswe[0] + padding_nswe[1];
           bb_leaf_room.c += padding_nswe[2];
@@ -261,35 +268,76 @@ namespace bsp
       }
       else
       {
-        int ch0_r_len = 0;
-        int ch0_c_len = 0;
         if (children[0])
-        {
-          ch0_r_len = children[0]->size_rows;
-          ch0_c_len = children[0]->size_cols;
-          ttl::Rectangle bb_0 { bb.r, bb.c, ch0_r_len, ch0_c_len };
-          children[0]->pad_rooms(bb_0, min_room_length, min_rnd_wall_padding, max_rnd_wall_padding);
-        }
+          children[0]->pad_rooms(min_room_length, min_rnd_wall_padding, max_rnd_wall_padding);
         if (children[1])
+          children[1]->pad_rooms(min_room_length, min_rnd_wall_padding, max_rnd_wall_padding);
+      }
+    }
+    
+    void create_corridors(int min_corridor_half_width)
+    {
+      //        R
+      //     /     \
+      //    C0      C1
+      //   /  \    /  \
+      //  C00 C01 C10 C11 leafs
+      //
+      //        R
+      //     /     \
+      //    C0      C1
+      //   /  \    /  \
+      //  C00=C01 C10=C11 leafs
+      //
+      //        R
+      //     /     \
+      //    C0======C1
+      //   /  \    /  \
+      //  C00=C01 C10=C11 leafs
+      //
+      if (children[0])
+        children[0]->create_corridors(min_corridor_half_width);
+      if (children[1])
+        children[1]->create_corridors(min_corridor_half_width);
+      if (!is_leaf() && !has_corridor)
+      {
+        auto* ch_0 = children[0].get();
+        auto* ch_1 = children[1].get();
+        auto center_0 = (ch_0->is_leaf() ? ch_0->bb_leaf_room : ch_0->bb_region).center();
+        auto center_1 = (ch_1->is_leaf() ? ch_1->bb_leaf_room : ch_1->bb_region).center();
+        int r_avg = (center_0.r + center_1.r)/2;
+        int c_avg = (center_0.c + center_1.c)/2;
+        switch (orientation)
         {
-          int ch1_r = 0;
-          int ch1_c = 0;
-          switch (orientation)
-          {
-            case Orientation::Vertical:
-              ch1_r = bb.r;
-              ch1_c = bb.c + ch0_c_len;
-              break;
-            case Orientation::Horizontal:
-              ch1_r = bb.r + ch0_r_len;
-              ch1_c = bb.c;
-              break;
-          }
-          int ch1_r_len = children[1]->size_rows;
-          int ch1_c_len = children[1]->size_cols;
-          ttl::Rectangle bb_1 { ch1_r, ch1_c, ch1_r_len, ch1_c_len };
-          children[1]->pad_rooms(bb_1, min_room_length, min_rnd_wall_padding, max_rnd_wall_padding);
+          case Orientation::Vertical:
+            corridor.r = r_avg - min_corridor_half_width;
+            corridor.c = center_0.c;
+            corridor.r_len = 2*min_corridor_half_width;
+            corridor.c_len = center_1.c - center_0.c;
+            break;
+          case Orientation::Horizontal:
+            corridor.r = center_0.r;
+            corridor.c = c_avg - min_corridor_half_width;
+            corridor.r_len = center_1.r - center_0.r;
+            corridor.c_len = 2*min_corridor_half_width;
+            break;
         }
+        has_corridor = true;
+      }
+    }
+    
+    template<int NR, int NC>
+    void draw_corridors(SpriteHandler<NR, NC>& sh,
+                        int r0, int c0,
+                        const styles::Style& corridor_style) const
+    {
+      if (children[0])
+        children[0]->draw_corridors(sh, r0, c0, corridor_style);
+      if (children[1])
+        children[1]->draw_corridors(sh, r0, c0, corridor_style);
+      if (!is_leaf() && has_corridor)
+      {
+        draw_box(sh, r0 + corridor.r, c0 + corridor.c, corridor.r_len, corridor.c_len, corridor_style.fg_color, corridor_style.bg_color);
       }
     }
   };
@@ -313,13 +361,18 @@ namespace bsp
       m_root.orientation = first_split_orientation;
       m_root.size_rows = world_size_rows;
       m_root.size_cols = world_size_cols;
-      m_root.generate(m_min_room_length);
+      ttl::Rectangle bb { 0, 0, m_root.size_rows, m_root.size_cols };
+      m_root.generate(bb, 0, m_min_room_length);
     }
     
     void pad_rooms(int min_rnd_wall_padding = 1, int max_rnd_wall_padding = 4)
     {
-      ttl::Rectangle bb { 0, 0, m_root.size_rows, m_root.size_cols };
-      m_root.pad_rooms(bb, m_min_room_length, min_rnd_wall_padding, max_rnd_wall_padding);
+      m_root.pad_rooms(m_min_room_length, min_rnd_wall_padding, max_rnd_wall_padding);
+    }
+    
+    void create_corridors(int min_corridor_half_width = 1)
+    {
+      m_root.create_corridors(min_corridor_half_width);
     }
     
     template<int NR, int NC>
@@ -336,6 +389,14 @@ namespace bsp
                     const styles::Style& room_style = { Text::Color::White, Text::Color::DarkRed }) const
     {
       m_root.draw_rooms(sh, r0, c0, room_style);
+    }
+    
+    template<int NR, int NC>
+    void draw_corridors(SpriteHandler<NR, NC>& sh,
+                        int r0 = 0, int c0 = 0,
+                        const styles::Style& corridor_style = { Text::Color::Green, Text::Color::DarkGreen }) const
+    {
+      m_root.draw_corridors(sh, r0, c0, corridor_style);
     }
     
     void print_tree() const
