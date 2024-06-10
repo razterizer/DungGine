@@ -119,6 +119,8 @@ namespace bsp
     
     std::array<std::unique_ptr<BSPNode>, 2> children;
     
+    bool is_leaf() const { return !children[0] && !children[1]; }
+    
     void generate(int min_room_length)
     {
       split_fraction = rnd::rand();
