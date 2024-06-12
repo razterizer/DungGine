@@ -303,22 +303,26 @@ namespace bsp
       {
         auto* ch_0 = children[0].get();
         auto* ch_1 = children[1].get();
-        auto center_0 = (ch_0->is_leaf() ? ch_0->bb_leaf_room : ch_0->bb_region).center();
-        auto center_1 = (ch_1->is_leaf() ? ch_1->bb_leaf_room : ch_1->bb_region).center();
+        auto center_0 = ch_0->bb_region.center();
+        auto center_1 = ch_1->bb_region.center();
+        auto c_0 = ch_0->is_leaf() ? (ch_0->bb_leaf_room.right()) : center_0.c;
+        auto c_1 = ch_1->is_leaf() ? (ch_1->bb_leaf_room.left()) : center_1.c;
+        auto r_0 = ch_0->is_leaf() ? (ch_0->bb_leaf_room.bottom()) : center_0.r;
+        auto r_1 = ch_1->is_leaf() ? (ch_1->bb_leaf_room.top()) : center_1.r;
         int r_avg = (center_0.r + center_1.r)/2;
         int c_avg = (center_0.c + center_1.c)/2;
         switch (orientation)
         {
           case Orientation::Vertical:
             corridor.r = r_avg - min_corridor_half_width;
-            corridor.c = center_0.c;
+            corridor.c = c_0;
             corridor.r_len = 2*min_corridor_half_width;
-            corridor.c_len = center_1.c - center_0.c;
+            corridor.c_len = c_1 - c_0;
             break;
           case Orientation::Horizontal:
-            corridor.r = center_0.r;
+            corridor.r = r_0;
             corridor.c = c_avg - min_corridor_half_width;
-            corridor.r_len = center_1.r - center_0.r;
+            corridor.r_len = r_1 - r_0;
             corridor.c_len = 2*min_corridor_half_width;
             break;
         }
