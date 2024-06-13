@@ -344,6 +344,16 @@ namespace bsp
         draw_box(sh, r0 + corridor.r, c0 + corridor.c, corridor.r_len, corridor.c_len, corridor_style.fg_color, corridor_style.bg_color);
       }
     }
+    
+    void collect_leafs(std::vector<BSPNode*>& leafs)
+    {
+      if (is_leaf())
+        leafs.emplace_back(this);
+      if (children[0])
+        children[0]->collect_leafs(leafs);
+      if (children[1])
+        children[1]->collect_leafs(leafs);
+    }
   };
   
   // //////////////////////////////////////////////////////////////
@@ -352,6 +362,7 @@ namespace bsp
   {
     BSPNode m_root;
     int m_min_room_length = 4;
+    std::map<std::pair<BSPNode*, BSPNode*>, ttl::Rectangle> corridors;
     
   public:
     BSPTree() = default;
@@ -379,6 +390,124 @@ namespace bsp
       m_root.create_corridors(min_corridor_half_width);
     }
     
+    void create_corridors2(int min_corridor_half_width = 1)
+    {
+      std::vector<BSPNode*> leafs;
+      m_root.collect_leafs(leafs);
+      
+      for (auto* leaf_A : leafs)
+      {
+        for (auto* leaf_B : leafs)
+        {
+          if (leaf_A != leaf_B)
+          {
+          
+            auto try_make_horizontal_corridor = [&](auto* leaf_A, auto* leaf_B)
+            {
+              // Horizontal approach
+              auto bb_A = leaf_A->bb_leaf_room;
+              auto bb_B = leaf_B->bb_leaf_room;
+              if (bb_A.right() > bb_B.left())
+                return false;
+              
+              //
+              //    +------+
+              // ---|------|----
+              //    |      |
+              //    +------+
+              
+              int c0 = bb_A.right();
+              int c1 = bb_B.left();
+              int r0 = std::max(bb_A.top(), bb_B.top());
+              int r1 = std::min(bb_A.bottom(), bb_B.bottom());
+              if (r0 > r1)
+                return false;
+              bool collided = false;
+              for (auto* leaf_C : leafs)
+              {
+                auto bb_C = leaf_C->bb_leaf_room;
+                if (c0 <= bb_C.left() && bb_C.right() <= c1)
+                {
+                  if (bb_C.top() <= r0 && r1 <= bb_C.bottom())
+                    collided = true;
+                  else if (r0 <= bb_C.top() && bb_C.top() <= r1)
+                    collided = true;
+                  else if (r0 <= bb_C.bottom() && bb_C.bottom() <= r1)
+                    collided = true;
+                }
+                if (collided)
+                  break;
+              }
+              if (!collided)
+              {
+                auto key = std::pair { std::min(leaf_A, leaf_B), std::max(leaf_A, leaf_B) };
+                auto it = corridors.find(key);
+                if (it == corridors.end())
+                {
+                  corridors[key] = { (r0 + r1)/2, c0, 0, c1 - c0 };
+                  return true;
+                }
+              }
+              return false;
+            };
+            
+            auto try_make_vertical_corridor = [&](auto* leaf_A, auto* leaf_B)
+            {
+              // Horizontal approach
+              auto bb_A = leaf_A->bb_leaf_room;
+              auto bb_B = leaf_B->bb_leaf_room;
+              if (bb_A.bottom() > bb_B.top())
+                return false;
+              
+              //
+              //    +------+
+              // ---|------|----
+              //    |      |
+              //    +------+
+              
+              int r0 = bb_A.bottom();
+              int r1 = bb_B.top();
+              int c0 = std::max(bb_A.left(), bb_B.left());
+              int c1 = std::min(bb_A.right(), bb_B.right());
+              if (c0 > c1)
+                return false;
+              bool collided = false;
+              for (auto* leaf_C : leafs)
+              {
+                auto bb_C = leaf_C->bb_leaf_room;
+                if (r0 <= bb_C.top() && bb_C.bottom() <= r1)
+                {
+                  if (bb_C.left() <= c0 && c1 <= bb_C.right())
+                    collided = true;
+                  else if (c0 <= bb_C.left() && bb_C.left() <= c1)
+                    collided = true;
+                  else if (c0 <= bb_C.right() && bb_C.right() <= c1)
+                    collided = true;
+                }
+                if (collided)
+                  break;
+              }
+              if (!collided)
+              {
+                auto key = std::pair { std::min(leaf_A, leaf_B), std::max(leaf_A, leaf_B) };
+                auto it = corridors.find(key);
+                if (it == corridors.end())
+                {
+                  corridors[key] = { r0, (c0 + c1)/2, r1 - r0, 0 };
+                  return true;
+                }
+              }
+              return false;
+            };
+            
+            if (!try_make_horizontal_corridor(leaf_A, leaf_B))
+              try_make_vertical_corridor(leaf_A, leaf_B);
+
+          }
+        }
+      }
+    }
+    
     template<int NR, int NC>
     void draw_regions(SpriteHandler<NR, NC>& sh,
                       int r0 = 0, int c0 = 0,
@@ -401,6 +530,18 @@ namespace bsp
                         const styles::Style& corridor_style = { Text::Color::Green, Text::Color::DarkGreen }) const
     {
       m_root.draw_corridors(sh, r0, c0, corridor_style);
+    }
+    
+    template<int NR, int NC>
+    void draw_corridors2(SpriteHandler<NR, NC>& sh,
+                         int r0 = 0, int c0 = 0,
+                         const styles::Style& corridor_style = { Text::Color::Green, Text::Color::DarkGreen }) const
+    {
+      for (const auto& corr : corridors)
+      {
+        const auto& corridor = corr.second;
+        draw_box(sh, r0 + corridor.r, c0 + corridor.c, corridor.r_len, corridor.c_len, corridor_style.fg_color, corridor_style.bg_color);
+      }
     }
     
     void print_tree() const
