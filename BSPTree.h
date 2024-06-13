@@ -410,12 +410,6 @@ namespace bsp
               if (bb_A.right() > bb_B.left())
                 return false;
               
-              //
-              //    +------+
-              // ---|------|----
-              //    |      |
-              //    +------+
-              
               int c0 = bb_A.right();
               int c1 = bb_B.left();
               int r0 = std::max(bb_A.top(), bb_B.top());
@@ -444,7 +438,7 @@ namespace bsp
                 auto it = corridors.find(key);
                 if (it == corridors.end())
                 {
-                  corridors[key] = { (r0 + r1)/2, c0, 0, c1 - c0 };
+                  corridors[key] = { (r0 + r1)/2 - min_corridor_half_width, c0, 2*min_corridor_half_width, c1 - c0 };
                   return true;
                 }
               }
@@ -458,12 +452,6 @@ namespace bsp
               auto bb_B = leaf_B->bb_leaf_room;
               if (bb_A.bottom() > bb_B.top())
                 return false;
-              
-              //
-              //    +------+
-              // ---|------|----
-              //    |      |
-              //    +------+
               
               int r0 = bb_A.bottom();
               int r1 = bb_B.top();
@@ -493,7 +481,7 @@ namespace bsp
                 auto it = corridors.find(key);
                 if (it == corridors.end())
                 {
-                  corridors[key] = { r0, (c0 + c1)/2, r1 - r0, 0 };
+                  corridors[key] = { r0, (c0 + c1)/2 - min_corridor_half_width, r1 - r0, 2*min_corridor_half_width };
                   return true;
                 }
               }
