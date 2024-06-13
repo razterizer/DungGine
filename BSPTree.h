@@ -8,6 +8,7 @@
 #pragma once
 #include <Termin8or/RC.h>
 #include <Termin8or/SpriteHandler.h>
+#include <Termin8or/Drawing.h>
 #include <Core/Rand.h>
 #include <Core/Math.h>
 #include <array>
@@ -69,40 +70,6 @@ namespace bsp
   //
   // So fractional lengths are calculated from left to right (column-wise)
   //   or up to down (row-wise).
-  
-  template<int NR, int NC>
-  void draw_box(SpriteHandler<NR, NC>& sh,
-                int r, int c, int len_r, int len_c,
-                Text::Color fg_color, Text::Color bg_color,
-                bool filled = false)
-  {
-    // len_r = 3, len_c = 2
-    // ###
-    // # #
-    // # #
-    // ###
-    //
-    // len_r = 4, len_c = 4 (smallest room size by default)
-    // #####
-    // #   #
-    // #   #
-    // #   #
-    // #####
-    
-    auto str_horiz = str::rep_char('#', len_c);
-    sh.write_buffer(str_horiz, r, c, fg_color, bg_color);
-    for (int i = r; i <= r + len_r; ++i)
-    {
-      if (filled)
-        sh.write_buffer(str_horiz, i, c, fg_color, bg_color);
-      else
-      {
-        sh.write_buffer("#", i, c, fg_color, bg_color);
-        sh.write_buffer("#", i, c + len_c, fg_color, bg_color);
-      }
-    }
-    sh.write_buffer(str_horiz, r + len_r, c, fg_color, bg_color);
-  }
 
   struct BSPNode final
   {
@@ -202,7 +169,7 @@ namespace bsp
                       int r0, int c0,
                       const styles::Style& border_style) const
     {
-      draw_box(sh, r0 + bb_region.r, c0 + bb_region.c, bb_region.r_len, bb_region.c_len, border_style.fg_color, border_style.bg_color);
+      drawing::draw_box(sh, r0 + bb_region.r, c0 + bb_region.c, bb_region.r_len, bb_region.c_len, drawing::OutlineType::Hash, border_style);
       
       if (children[0])
         children[0]->draw_regions(sh, r0, c0, border_style);
@@ -216,9 +183,9 @@ namespace bsp
                     const styles::Style& room_style) const
     {
       if (!bb_leaf_room.is_empty())
-        draw_box(sh,
+        drawing::draw_box(sh,
                  r0 + bb_leaf_room.r, c0 + bb_leaf_room.c, bb_leaf_room.r_len, bb_leaf_room.c_len,
-                 room_style.fg_color, room_style.bg_color);
+                 drawing::OutlineType::Hash, room_style);
                  
       if (children[0])
         children[0]->draw_rooms(sh, r0, c0, room_style);
@@ -333,15 +300,16 @@ namespace bsp
     template<int NR, int NC>
     void draw_corridors(SpriteHandler<NR, NC>& sh,
                         int r0, int c0,
-                        const styles::Style& corridor_style) const
+                        const styles::Style& corridor_outline_style,
+                        const styles::Style& corridor_fill_style) const
     {
       if (children[0])
-        children[0]->draw_corridors(sh, r0, c0, corridor_style);
+        children[0]->draw_corridors(sh, r0, c0, corridor_outline_style, corridor_fill_style);
       if (children[1])
-        children[1]->draw_corridors(sh, r0, c0, corridor_style);
+        children[1]->draw_corridors(sh, r0, c0, corridor_outline_style, corridor_fill_style);
       if (!is_leaf() && has_corridor)
       {
-        draw_box(sh, r0 + corridor.r, c0 + corridor.c, corridor.r_len, corridor.c_len, corridor_style.fg_color, corridor_style.bg_color);
+        drawing::draw_box(sh, r0 + corridor.r, c0 + corridor.c, corridor.r_len, corridor.c_len, drawing::OutlineType::Hash, corridor_outline_style, corridor_fill_style);
       }
     }
     
@@ -515,20 +483,22 @@ namespace bsp
     template<int NR, int NC>
     void draw_corridors(SpriteHandler<NR, NC>& sh,
                         int r0 = 0, int c0 = 0,
-                        const styles::Style& corridor_style = { Text::Color::Green, Text::Color::DarkGreen }) const
+                        const styles::Style& corridor_outline_style = { Text::Color::Green, Text::Color::DarkGreen },
+                        const styles::Style& corridor_fill_style = { Text::Color::Black, Text::Color::Green }) const
     {
-      m_root.draw_corridors(sh, r0, c0, corridor_style);
+      m_root.draw_corridors(sh, r0, c0, corridor_outline_style, corridor_fill_style);
     }
     
     template<int NR, int NC>
     void draw_corridors2(SpriteHandler<NR, NC>& sh,
                          int r0 = 0, int c0 = 0,
-                         const styles::Style& corridor_style = { Text::Color::Green, Text::Color::DarkGreen }) const
+                         const styles::Style& corridor_outline_style = { Text::Color::Green, Text::Color::DarkGreen },
+                         const styles::Style& corridor_fill_style = { Text::Color::Black, Text::Color::Green }) const
     {
       for (const auto& corr : corridors)
       {
         const auto& corridor = corr.second;
-        draw_box(sh, r0 + corridor.r, c0 + corridor.c, corridor.r_len, corridor.c_len, corridor_style.fg_color, corridor_style.bg_color);
+        drawing::draw_box(sh, r0 + corridor.r, c0 + corridor.c, corridor.r_len, corridor.c_len, drawing::OutlineType::Hash, corridor_outline_style, corridor_fill_style);
       }
     }
     
