@@ -79,5 +79,6 @@ dungeon_engine.draw(sh);
 sh.print_screen_buffer(t, bg_color);
 ```
 
-<img width="570" alt="image" src="https://github.com/razterizer/DungGine/assets/32767250/ea038a05-6c62-4c9c-991c-a0d4068f22f8">
+<img width="560" alt="image" src="https://github.com/razterizer/DungGine/assets/32767250/7417d29d-1d2a-47b6-b926-31a9ae0177b2">
+
 
