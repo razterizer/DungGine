@@ -488,19 +488,19 @@ namespace dung
     }
     
     template<int NR, int NC>
-    void draw_corridors(SpriteHandler<NR, NC>& sh,
-                        int r0 = 0, int c0 = 0,
-                        const styles::Style& corridor_outline_style = { Text::Color::Green, Text::Color::DarkGreen },
-                        const styles::Style& corridor_fill_style = { Text::Color::Black, Text::Color::Green }) const
+    void draw_corridors_recursive(SpriteHandler<NR, NC>& sh,
+                                  int r0 = 0, int c0 = 0,
+                                  const styles::Style& corridor_outline_style = { Text::Color::Green, Text::Color::DarkGreen },
+                                  const styles::Style& corridor_fill_style = { Text::Color::Black, Text::Color::Green }) const
     {
       m_root.draw_corridors(sh, r0, c0, corridor_outline_style, corridor_fill_style);
     }
     
     template<int NR, int NC>
-    void draw_corridors2(SpriteHandler<NR, NC>& sh,
-                         int r0 = 0, int c0 = 0,
-                         const styles::Style& corridor_outline_style = { Text::Color::Green, Text::Color::DarkGreen },
-                         const styles::Style& corridor_fill_style = { Text::Color::Black, Text::Color::Green }) const
+    void draw_corridors_flat(SpriteHandler<NR, NC>& sh,
+                             int r0 = 0, int c0 = 0,
+                             const styles::Style& corridor_outline_style = { Text::Color::Green, Text::Color::DarkGreen },
+                             const styles::Style& corridor_fill_style = { Text::Color::Black, Text::Color::Green }) const
     {
       for (const auto& corr : corridors)
       {
