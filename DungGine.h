@@ -818,8 +818,7 @@ namespace dung
       
       void init_rand()
       {
-        //wall_type = rnd::rand_enum<WallType>();
-        wall_type = WallType::Masonry;
+        wall_type = rnd::rand_enum<WallType>();
         WallBasicType wall_basic_type = WallBasicType::Other;
         switch (wall_type)
         {
