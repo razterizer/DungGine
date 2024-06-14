@@ -11,12 +11,12 @@ This library is very new and currently only provides a class `BSPTree` that is r
 * `BSPTree.h`
   - `generate()` : Generates the BSP regions recursively.
   - `pad_rooms()` : Pads the regions into rooms.
-  - `create_corridors()` : Creates corridors. **Warning: Not working properly yet**.
-  - `ceate_corridors2()` : Non-recursive method of creating corridors. Much more robust than `ceate_corridors()` but is very greedy.
+  - `create_corridors_recursive()` : Creates bottom-up recursive corridors. **Warning: Not working properly yet**.
+  - `ceate_corridors_flat()` : Non-recursive method of creating corridors on leaf-level. Much more robust than `ceate_corridors()` but is very greedy at the moment.
   - `draw_regions()` : Draws the regions.
   - `draw_rooms()` : Draws the rooms.
-  - `draw_corridors()` : Draws the corridors.
-  - `draw_corridors2()` : Draws the non-recursive corridors.
+  - `draw_corridors_recursive()` : Draws the recursive corridors.
+  - `draw_corridors_flat()` : Draws the non-recursive corridors.
   - `print_tree()` : Debug printing of the tree.
 
 ## Examples
@@ -29,11 +29,11 @@ This library is very new and currently only provides a class `BSPTree` that is r
 
 <img width="560" alt="image" src="https://github.com/razterizer/DungGine/assets/32767250/b4b672a8-9ce5-4d74-8d71-c23b37ac1042">
 
-`BSPTree::draw_rooms()` followed by `BSPTree::draw_corridors()` **Warning: WIP. Not working properly yet.**
+`BSPTree::draw_rooms()` followed by `BSPTree::draw_corridors_recursive()` **Warning: WIP. Not working properly yet.**
 
 <img width="570" alt="image" src="https://github.com/razterizer/DungGine/assets/32767250/1f9223ce-94cb-46dc-88e0-c3c3446cdebf">
 
-`BSPTree::draw_rooms()` followed by `BSPTree::draw_corridors2()`
+`BSPTree::draw_rooms()` followed by `BSPTree::draw_corridors_flat()`
 
 <img width="573" alt="image" src="https://github.com/razterizer/DungGine/assets/32767250/fd23bf8e-17b2-4055-84d6-d6bdd87538ef">
 
