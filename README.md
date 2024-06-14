@@ -77,7 +77,7 @@ dungeon_engine.load_dungeon(&bsp_tree);
 dungeon_engine.style_dungeon();
 dungeon_engine.draw(sh);
 sh.print_screen_buffer(t, bg_color);
-``
+```
 
 <img width="570" alt="image" src="https://github.com/razterizer/DungGine/assets/32767250/ea038a05-6c62-4c9c-991c-a0d4068f22f8">
 
