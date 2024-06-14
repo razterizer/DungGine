@@ -471,6 +471,11 @@ namespace dung
       }
     }
     
+    std::map<std::pair<BSPNode*, BSPNode*>, ttl::Rectangle> get_flat_corridors() const
+    {
+      return corridors;
+    }
+    
     template<int NR, int NC>
     void draw_regions(SpriteHandler<NR, NC>& sh,
                       int r0 = 0, int c0 = 0,
