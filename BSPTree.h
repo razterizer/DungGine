@@ -15,7 +15,7 @@
 #include <memory>
 
 
-namespace bsp
+namespace dung
 {
 
   enum class Orientation { Vertical, Horizontal };
@@ -313,14 +313,14 @@ namespace bsp
       }
     }
     
-    void collect_leafs(std::vector<BSPNode*>& leafs)
+    void collect_leaves(std::vector<BSPNode*>& leaves)
     {
       if (is_leaf())
-        leafs.emplace_back(this);
+        leaves.emplace_back(this);
       if (children[0])
-        children[0]->collect_leafs(leafs);
+        children[0]->collect_leaves(leaves);
       if (children[1])
-        children[1]->collect_leafs(leafs);
+        children[1]->collect_leaves(leaves);
     }
   };
   
@@ -348,6 +348,13 @@ namespace bsp
       m_root.generate(bb, 0, m_min_room_length);
     }
     
+    std::vector<BSPNode*> fetch_leaves()
+    {
+      std::vector<BSPNode*> leaves;
+      m_root.collect_leaves(leaves);
+      return leaves;
+    }
+    
     void pad_rooms(int min_rnd_wall_padding = 1, int max_rnd_wall_padding = 4)
     {
       m_root.pad_rooms(m_min_room_length, min_rnd_wall_padding, max_rnd_wall_padding);
@@ -360,12 +367,12 @@ namespace bsp
     
     void create_corridors2(int min_corridor_half_width = 1)
     {
-      std::vector<BSPNode*> leafs;
-      m_root.collect_leafs(leafs);
+      std::vector<BSPNode*> leaves;
+      m_root.collect_leaves(leaves);
       
-      for (auto* leaf_A : leafs)
+      for (auto* leaf_A : leaves)
       {
-        for (auto* leaf_B : leafs)
+        for (auto* leaf_B : leaves)
         {
           if (leaf_A != leaf_B)
           {
@@ -385,7 +392,7 @@ namespace bsp
               if (r0 > r1)
                 return false;
               bool collided = false;
-              for (auto* leaf_C : leafs)
+              for (auto* leaf_C : leaves)
               {
                 auto bb_C = leaf_C->bb_leaf_room;
                 if (c0 <= bb_C.left() && bb_C.right() <= c1)
@@ -428,7 +435,7 @@ namespace bsp
               if (c0 > c1)
                 return false;
               bool collided = false;
-              for (auto* leaf_C : leafs)
+              for (auto* leaf_C : leaves)
               {
                 auto bb_C = leaf_C->bb_leaf_room;
                 if (r0 <= bb_C.top() && bb_C.bottom() <= r1)
