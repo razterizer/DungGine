@@ -18,6 +18,8 @@ This library is very new and currently only provides a class `BSPTree` that is r
   - `draw_corridors_recursive()` : Draws the recursive corridors.
   - `draw_corridors_flat()` : Draws the non-recursive corridors.
   - `print_tree()` : Debug printing of the tree.
+  - `fetch_leaves()` : Fetches the leaves of the BSP tree where the rooms are stored.
+  - `get_room_corridor_map()` : Function that retrieves the room and corridor relationship data structure.
 * `DungGine.h`
   - `load_dungeon(BSPTree*)` : Loads a generated BSP tree.
   - `style_dungeon()` : Performs automated styling of rooms in the dungeon / realm.
