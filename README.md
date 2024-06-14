@@ -36,3 +36,8 @@ This library is very new and currently only provides a class `BSPTree` that is r
 `BSPTree::draw_rooms()` followed by `BSPTree::draw_corridors2()`
 
 <img width="573" alt="image" src="https://github.com/razterizer/DungGine/assets/32767250/fd23bf8e-17b2-4055-84d6-d6bdd87538ef">
+
+Here's `DungGine::draw()` after call to `load_dungeon()` followed by `style_dungeon()` (which styles it randomly).
+
+<img width="570" alt="image" src="https://github.com/razterizer/DungGine/assets/32767250/ea038a05-6c62-4c9c-991c-a0d4068f22f8">
+
