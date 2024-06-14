@@ -360,12 +360,12 @@ namespace dung
       m_root.pad_rooms(m_min_room_length, min_rnd_wall_padding, max_rnd_wall_padding);
     }
     
-    void create_corridors(int min_corridor_half_width = 1)
+    void create_corridors_recursive(int min_corridor_half_width = 1)
     {
       m_root.create_corridors(min_corridor_half_width);
     }
     
-    void create_corridors2(int min_corridor_half_width = 1)
+    void create_corridors_flat(int min_corridor_half_width = 1)
     {
       std::vector<BSPNode*> leaves;
       m_root.collect_leaves(leaves);
