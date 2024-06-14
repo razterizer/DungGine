@@ -391,6 +391,10 @@ namespace dung
               int r1 = std::min(bb_A.bottom(), bb_B.bottom());
               if (r0 > r1)
                 return false;
+              if (bb_A.top() < bb_B.top() && bb_A.bottom() - bb_B.top() < 2*min_corridor_half_width + 1)
+                return false;
+              if (bb_B.top() < bb_A.top() && bb_B.bottom() - bb_A.top() < 2*min_corridor_half_width + 1)
+                return false;
               bool collided = false;
               for (auto* leaf_C : leaves)
               {
@@ -433,6 +437,10 @@ namespace dung
               int c0 = std::max(bb_A.left(), bb_B.left());
               int c1 = std::min(bb_A.right(), bb_B.right());
               if (c0 > c1)
+                return false;
+              if (bb_A.left() < bb_B.left() && bb_A.right() - bb_B.left() < 2*min_corridor_half_width + 1)
+                return false;
+              if (bb_B.left() < bb_A.left() && bb_B.right() - bb_A.left() < 2*min_corridor_half_width + 1)
                 return false;
               bool collided = false;
               for (auto* leaf_C : leaves)
