@@ -176,6 +176,22 @@ namespace dung
                           room_style.get_shadow_style(),
                           room_style.get_fill_char());
       }
+      
+      const auto& corridors = m_bsp_tree->get_flat_corridors();
+      for (const auto& cp : corridors)
+      {
+        const auto& bb = cp.second;
+        
+        drawing::draw_box(sh,
+                          r0 + bb.r, c0 + bb.c, bb.r_len, bb.c_len,
+                          WallType::Masonry4,
+                          { Text::Color::LightGray, Text::Color::Black }, //wall_palette[WallBasicType::Masonry],
+                          { Text::Color::DarkGray, Text::Color::LightGray },
+                          '8',
+                          shadow_type,
+                          { Text::Color::LightGray, Text::Color::DarkGray },
+                          '8');
+      }
     }
     
   };
