@@ -161,6 +161,17 @@ namespace dung
     template<int NR, int NC>
     void draw(SpriteHandler<NR, NC>& sh, int r0 = 0, int c0 = 0) const
     {
+      const auto& room_corridor_map = m_bsp_tree->get_room_corridor_map();
+      
+      for (const auto& cp : room_corridor_map)
+      {
+        auto* corr = cp.second;
+        auto door_pos_0 = corr->doors[0]->pos;
+        auto door_pos_1 = corr->doors[1]->pos;
+        sh.write_buffer("D", door_pos_0.r, door_pos_0.c, Text::Color::Black, Text::Color::Yellow);
+        sh.write_buffer("D", door_pos_1.r, door_pos_1.c, Text::Color::Black, Text::Color::Yellow);
+      }
+      
       auto shadow_type = rnd::rand_enum<ShadowType>(); // Random for now.
       for (const auto& room_pair : m_room_styles)
       {
@@ -177,10 +188,10 @@ namespace dung
                           room_style.get_fill_char());
       }
       
-      const auto& corridors = m_bsp_tree->get_flat_corridors();
-      for (const auto& cp : corridors)
+      for (const auto& cp : room_corridor_map)
       {
-        const auto& bb = cp.second;
+        auto* corr = cp.second;
+        const auto& bb = corr->bb;
         
         drawing::draw_box(sh,
                           r0 + bb.r, c0 + bb.c, bb.r_len, bb.c_len,

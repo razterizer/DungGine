@@ -325,12 +325,29 @@ namespace dung
   };
   
   // //////////////////////////////////////////////////////////////
+  
+  struct Door
+  {
+    RC pos;
+  };
+  
+  struct Corridor
+  {
+    ttl::Rectangle bb;
+    Orientation orientation = Orientation::Vertical;
+    std::array<Door*, 2> doors;
+  };
+  
+  // //////////////////////////////////////////////////////////////
 
   class BSPTree final
   {
     BSPNode m_root;
     int m_min_room_length = 4;
-    std::map<std::pair<BSPNode*, BSPNode*>, ttl::Rectangle> corridors;
+    
+    std::vector<std::unique_ptr<Corridor>> corridors;
+    std::vector<std::unique_ptr<Door>> doors;
+    std::map<std::pair<BSPNode*, BSPNode*>, Corridor*> room_corridor_map;
     
   public:
     BSPTree() = default;
@@ -414,10 +431,13 @@ namespace dung
               if (!collided)
               {
                 auto key = std::pair { std::min(leaf_A, leaf_B), std::max(leaf_A, leaf_B) };
-                auto it = corridors.find(key);
-                if (it == corridors.end())
+                auto it = room_corridor_map.find(key);
+                if (it == room_corridor_map.end())
                 {
-                  corridors[key] = { (r0 + r1)/2 - min_corridor_half_width, c0, 2*min_corridor_half_width, c1 - c0 };
+                  auto* corr = corridors.emplace_back(std::make_unique<Corridor>()).get();
+                  corr->bb = { (r0 + r1)/2 - min_corridor_half_width, c0, 2*min_corridor_half_width, c1 - c0 };
+                  corr->orientation = Orientation::Horizontal;
+                  room_corridor_map[key] = corr;
                   return true;
                 }
               }
@@ -461,10 +481,13 @@ namespace dung
               if (!collided)
               {
                 auto key = std::pair { std::min(leaf_A, leaf_B), std::max(leaf_A, leaf_B) };
-                auto it = corridors.find(key);
-                if (it == corridors.end())
+                auto it = room_corridor_map.find(key);
+                if (it == room_corridor_map.end())
                 {
-                  corridors[key] = { r0, (c0 + c1)/2 - min_corridor_half_width, r1 - r0, 2*min_corridor_half_width };
+                  auto* corr = corridors.emplace_back(std::make_unique<Corridor>()).get();
+                  corr->bb = { r0, (c0 + c1)/2 - min_corridor_half_width, r1 - r0, 2*min_corridor_half_width };
+                  corr->orientation = Orientation::Vertical;
+                  room_corridor_map[key] = corr;
                   return true;
                 }
               }
@@ -479,9 +502,38 @@ namespace dung
       }
     }
     
-    std::map<std::pair<BSPNode*, BSPNode*>, ttl::Rectangle> get_flat_corridors() const
+    void create_doors_flat()
     {
-      return corridors;
+      for (const auto& cp : room_corridor_map)
+      {
+        auto* door_0 = doors.emplace_back(std::make_unique<Door>()).get();
+        auto* door_1 = doors.emplace_back(std::make_unique<Door>()).get();
+        auto* corr = cp.second;
+        switch (corr->orientation)
+        {
+          case Orientation::Horizontal:
+          {
+            auto r_mid = corr->bb.r + corr->bb.r_len / 2;
+            door_0->pos = { r_mid, corr->bb.left() };
+            door_1->pos = { r_mid, corr->bb.right() };
+            break;
+          }
+          case Orientation::Vertical:
+          {
+            auto c_mid = corr->bb.c + corr->bb.c_len / 2;
+            door_0->pos = { corr->bb.top(), c_mid };
+            door_1->pos = { corr->bb.bottom(), c_mid };
+            break;
+          }
+        }
+        corr->doors[0] = door_0;
+        corr->doors[1] = door_1;
+      }
+    }
+    
+    std::map<std::pair<BSPNode*, BSPNode*>, Corridor*> get_room_corridor_map() const
+    {
+      return room_corridor_map;
     }
     
     template<int NR, int NC>
@@ -515,10 +567,10 @@ namespace dung
                              const styles::Style& corridor_outline_style = { Text::Color::Green, Text::Color::DarkGreen },
                              const styles::Style& corridor_fill_style = { Text::Color::Black, Text::Color::Green }) const
     {
-      for (const auto& corr : corridors)
+      for (const auto& corr : room_corridor_map)
       {
-        const auto& corridor = corr.second;
-        drawing::draw_box(sh, r0 + corridor.r, c0 + corridor.c, corridor.r_len, corridor.c_len, drawing::OutlineType::Hash, corridor_outline_style, corridor_fill_style);
+        const auto& bb = corr.second->bb;
+        drawing::draw_box(sh, r0 + bb.r, c0 + bb.c, bb.r_len, bb.c_len, drawing::OutlineType::Hash, corridor_outline_style, corridor_fill_style);
       }
     }
     
