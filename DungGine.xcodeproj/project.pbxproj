@@ -12,6 +12,7 @@
 		07E6EACC2C150C23007BBC6B /* LICENSE */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
 		07E6EACD2C150C23007BBC6B /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		07E6EAD62C1B53B8007BBC6B /* DungGine.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DungGine.h; sourceTree = "<group>"; };
+		07E6EAD72C1C2657007BBC6B /* DungGineStyles.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DungGineStyles.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -32,6 +33,7 @@
 				07E6EACD2C150C23007BBC6B /* README.md */,
 				07E6EACA2C14CFD3007BBC6B /* BSPTree.h */,
 				07E6EAD62C1B53B8007BBC6B /* DungGine.h */,
+				07E6EAD72C1C2657007BBC6B /* DungGineStyles.h */,
 				07E6EAC42C14CEA8007BBC6B /* Products */,
 			);
 			sourceTree = "<group>";
