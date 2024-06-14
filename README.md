@@ -81,4 +81,26 @@ sh.print_screen_buffer(t, bg_color);
 
 <img width="560" alt="image" src="https://github.com/razterizer/DungGine/assets/32767250/7417d29d-1d2a-47b6-b926-31a9ae0177b2">
 
+***
+
+```cpp
+dung::BSPTree bsp_tree { 4 }; // argument: `min_room_length = 4`.
+bsp_tree.generate(29, 79, dung::Orientation::Vertical); // arguments: world_size_rows, world_size_cols,
+                  first_split_orientation.
+bsp_tree.pad_rooms(4); // arguments: min_rnd_wall_padding = 4, [max_rnd_wall_padding = 4].
+bsp_tree.create_corridors_flat(1); // argument: min_corridor_half_width = 1, (1 means it will be three chars wide).
+bsp_tree.create_doors_flat(); // We also create doors here.
+
+Text t;
+SpriteHandler<NR, NC> sh;
+Text::Color bg_color = Text::Color::Default;
+
+dung::DungGine dungeon_engine;
+dungeon_engine.load_dungeon(&bsp_tree);
+dungeon_engine.style_dungeon();
+dungeon_engine.draw(sh);
+sh.print_screen_buffer(t, bg_color);
+```
+
+<img width="567" alt="image" src="https://github.com/razterizer/DungGine/assets/32767250/4900eaf9-11e1-4d47-9da5-af4bc5053803">
 
