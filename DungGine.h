@@ -217,6 +217,12 @@ namespace dung
     {
       const auto& room_corridor_map = m_bsp_tree->get_room_corridor_map();
       
+      if (m_player.is_spawned)
+      {
+        auto player_scr_pos = get_screen_pos(m_player.world_pos);
+        sh.write_buffer(std::string(1, m_player.character), player_scr_pos.r, player_scr_pos.c, m_player.style);
+      }
+      
       for (const auto& cp : room_corridor_map)
       {
         auto* corr = cp.second;
