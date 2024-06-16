@@ -213,7 +213,7 @@ namespace dung
     }
     
     template<int NR, int NC>
-    void draw(SpriteHandler<NR, NC>& sh, int r0 = 0, int c0 = 0) const
+    void draw(SpriteHandler<NR, NC>& sh) const
     {
       const auto& room_corridor_map = m_bsp_tree->get_room_corridor_map();
       
@@ -222,8 +222,10 @@ namespace dung
         auto* corr = cp.second;
         auto door_pos_0 = corr->doors[0]->pos;
         auto door_pos_1 = corr->doors[1]->pos;
-        sh.write_buffer("D", door_pos_0.r, door_pos_0.c, Text::Color::Black, Text::Color::Yellow);
-        sh.write_buffer("D", door_pos_1.r, door_pos_1.c, Text::Color::Black, Text::Color::Yellow);
+        auto door_scr_pos_0 = get_screen_pos(door_pos_0);
+        auto door_scr_pos_1 = get_screen_pos(door_pos_1);
+        sh.write_buffer("D", door_scr_pos_0.r, door_scr_pos_0.c, Text::Color::Black, Text::Color::Yellow);
+        sh.write_buffer("D", door_scr_pos_1.r, door_scr_pos_1.c, Text::Color::Black, Text::Color::Yellow);
       }
       
       auto shadow_type = rnd::rand_enum<ShadowType>(); // Random for now.
@@ -231,8 +233,9 @@ namespace dung
       {
         const auto& bb = room_pair.first->bb_leaf_room;
         const auto& room_style = room_pair.second;
+        auto bb_scr_pos = get_screen_pos(bb.pos());
         drawing::draw_box(sh,
-                          r0 + bb.r, c0 + bb.c, bb.r_len, bb.c_len,
+                          bb_scr_pos.r, bb_scr_pos.c, bb.r_len, bb.c_len,
                           room_style.wall_type,
                           room_style.wall_style,
                           room_style.get_fill_style(),
@@ -247,8 +250,9 @@ namespace dung
         auto* corr = cp.second;
         const auto& bb = corr->bb;
         
+        auto bb_scr_pos = get_screen_pos(bb.pos());
         drawing::draw_box(sh,
-                          r0 + bb.r, c0 + bb.c, bb.r_len, bb.c_len,
+                          bb_scr_pos.r, bb_scr_pos.c, bb.r_len, bb.c_len,
                           WallType::Masonry4,
                           { Text::Color::LightGray, Text::Color::Black }, //wall_palette[WallBasicType::Masonry],
                           { Text::Color::DarkGray, Text::Color::LightGray },
