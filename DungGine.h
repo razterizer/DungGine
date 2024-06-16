@@ -8,11 +8,13 @@
 #pragma once
 #include "BSPTree.h"
 #include "DungGineStyles.h"
+#include <Termin8or/Keyboard.h>
 
 
 namespace dung
 {
 
+  enum class ScrollMode { AlwaysInCentre, PageWise, WhenOutsideScreen };
 
   class DungGine
   {
@@ -155,7 +157,8 @@ namespace dung
     Player m_player;
     ttl::Rectangle m_screen_in_world;
     // Value between 0 and 1 where 1 means a full screen vertically or horizontally.
-    float t_scroll_amount = 0.5f; // Half the screen will be scrolled.
+    float t_scroll_amount = 0.5f; // Half the screen will be scrolled (when in PageWise scroll mode).
+    ScrollMode scroll_mode = ScrollMode::AlwaysInCentre;
     
     // (0,0) world pos
     // +--------------------+
@@ -261,11 +264,25 @@ namespace dung
       m_sun_t_offs = (static_cast<int>(sun_dir) - 1) / 8.f;
     }
     
-    void update(double sim_time_s)
+    void update(double sim_time_s, const keyboard::KeyPressData& kpd)
     {
       update_sun(static_cast<float>(sim_time_s));
       int sun_dir_idx = static_cast<int>(m_sun_dir) - 1;
       m_shadow_dir = static_cast<Direction>(((sun_dir_idx + 4) % 8) + 1);
+      
+      if (str::to_lower(kpd.curr_key) == 'a')
+        m_player.world_pos.c--;
+      else if (str::to_lower(kpd.curr_key) == 'd')
+        m_player.world_pos.c++;
+      else if (str::to_lower(kpd.curr_key) == 's')
+        m_player.world_pos.r++;
+      else if (str::to_lower(kpd.curr_key) == 'w')
+        m_player.world_pos.r--;
+        
+      if (scroll_mode == ScrollMode::AlwaysInCentre)
+      {
+        m_screen_in_world.set_pos(m_player.world_pos - m_screen_in_world.size()/2);
+      }
     }
     
     template<int NR, int NC>
