@@ -139,6 +139,35 @@ namespace dung
     
     std::map<BSPNode*, RoomStyle> m_room_styles;
     
+    struct Player
+    {
+      char character = '@';
+      Style style = { Text::Color::Magenta, Text::Color::White };
+      RC world_pos;
+      bool is_spawned = false;
+    };
+    
+    Player m_player;
+    RC m_screen_world_pos;
+    // Value between 0 and 1 where 1 means a full screen vertically or horizontally.
+    float t_scroll_amount = 0.5f; // Half the screen will be scrolled.
+    
+    // (0,0) world pos
+    // +--------------------+
+    // | (5,8) scr world pos|
+    // |    +-------+       |
+    // |    |       |       |
+    // |    |    @  |       |  <---- (8, 20) player world pos
+    // |    +-------+       |
+    // |                    |
+    // |                    |
+    // +--------------------+
+    
+    RC get_screen_pos(const RC& world_pos) const
+    {
+      return world_pos - m_screen_world_pos;
+    }
+    
   public:
     DungGine() = default;
     
