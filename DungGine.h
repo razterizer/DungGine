@@ -187,6 +187,31 @@ namespace dung
       }
     }
     
+    void set_player_character(char ch) { m_player.character = ch; }
+    void place_player(std::optional<RC> world_pos = std::nullopt)
+    {
+      const auto world_size = m_bsp_tree->get_world_size();
+    
+      if (world_pos.has_value())
+        m_player.world_pos = world_pos.value();
+      else
+        m_player.world_pos = world_size / 2;
+      
+      const auto& room_corridor_map = m_bsp_tree->get_room_corridor_map();
+      
+      do
+      {
+        for (const auto& cp : room_corridor_map)
+          if (cp.second->is_inside_corridor(m_player.world_pos))
+          {
+            m_player.is_spawned = true;
+            return;
+          }
+        m_player.world_pos += { rnd::rand_int(-1, +1), rnd::rand_int(-1, +1) };
+        m_player.world_pos = m_player.world_pos.clamp(0, world_size.r, 0, world_size.c);
+      } while (true);
+    }
+    
     template<int NR, int NC>
     void draw(SpriteHandler<NR, NC>& sh, int r0 = 0, int c0 = 0) const
     {
