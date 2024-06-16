@@ -153,7 +153,7 @@ namespace dung
     };
     
     Player m_player;
-    RC m_screen_world_pos;
+    ttl::Rectangle m_screen_in_world;
     // Value between 0 and 1 where 1 means a full screen vertically or horizontally.
     float t_scroll_amount = 0.5f; // Half the screen will be scrolled.
     
@@ -170,7 +170,7 @@ namespace dung
     
     RC get_screen_pos(const RC& world_pos) const
     {
-      return world_pos - m_screen_world_pos;
+      return world_pos - m_screen_in_world.pos();
     }
     
     void update_sun(float sim_time_s)
@@ -214,9 +214,10 @@ namespace dung
     }
     
     void set_player_character(char ch) { m_player.character = ch; }
-    void place_player(std::optional<RC> world_pos = std::nullopt)
+    void place_player(const RC& screen_size, std::optional<RC> world_pos = std::nullopt)
     {
       const auto world_size = m_bsp_tree->get_world_size();
+      m_screen_in_world.set_size(screen_size);
     
       if (world_pos.has_value())
         m_player.world_pos = world_pos.value();
@@ -231,6 +232,7 @@ namespace dung
           if (cp.second->is_inside_corridor(m_player.world_pos))
           {
             m_player.is_spawned = true;
+            m_screen_in_world.set_pos(m_player.world_pos - m_screen_in_world.size()/2);
             return;
           }
         m_player.world_pos += { rnd::rand_int(-1, +1), rnd::rand_int(-1, +1) };
