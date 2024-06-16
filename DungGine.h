@@ -139,6 +139,11 @@ namespace dung
     
     std::map<BSPNode*, RoomStyle> m_room_styles;
     
+    Direction m_sun_dir = Direction::E;
+    Direction m_shadow_dir = Direction::W;
+    float m_sun_minutes_per_day = 20.f;
+    float m_sun_t_offs = 0.f;
+    
     struct Player
     {
       char character = '@';
@@ -166,6 +171,27 @@ namespace dung
     RC get_screen_pos(const RC& world_pos) const
     {
       return world_pos - m_screen_world_pos;
+    }
+    
+    void update_sun(float sim_time_s)
+    {
+      float t_solar_period = std::fmod(m_sun_t_offs + (sim_time_s / 60.f) / m_sun_minutes_per_day, 1);
+      //int idx = static_cast<int>(m_sun_dir);
+      //idx += t_solar_period * (static_cast<float>(Direction::NUM_ITEMS) - 1.f);
+      static constexpr auto dp = 1.f/8.f; // solar period step (delta period).
+      for (int i = 0; i < 8; ++i)
+      {
+        // 2 means east: S(0), SE(1), E(2). The sun comes up from the east.
+        int curr_dir_idx = (i+2) % 8;
+        if ((static_cast<int>(m_sun_dir) - 1) != curr_dir_idx)
+        {
+          if (math::in_range<float>(t_solar_period, i*dp, (i+1)*dp, Range::ClosedOpen))
+          {
+            m_sun_dir = static_cast<Direction>(curr_dir_idx + 1);
+            break;
+          }
+        }
+      }
     }
     
   public:
@@ -212,6 +238,34 @@ namespace dung
       } while (true);
     }
     
+    // Randomizes the starting direction of the sun.
+    void configure_sun(float minutes_per_day)
+    {
+      Direction sun_dir = static_cast<Direction>(rnd::rand_int(0, 7) + 1);
+      configure_sun(sun_dir, minutes_per_day);
+    }
+    
+    void configure_sun(Direction sun_dir, float minutes_per_day)
+    {
+      if (sun_dir == Direction::None || sun_dir == Direction::NUM_ITEMS)
+      {
+        std::cerr << "ERROR: invalid value of sun direction supplied to function DungGine::configure_sun()!" << std::endl;
+        return;
+      }
+      m_sun_dir = sun_dir;
+      m_sun_minutes_per_day = minutes_per_day;
+      // None, S, SE, E, NE, N, NW, W, SW, NUM_ITEMS
+      // 0     1  2   3  4   5  6   7  8
+      m_sun_t_offs = (static_cast<int>(sun_dir) - 1) / 8.f;
+    }
+    
+    void update(double sim_time_s)
+    {
+      update_sun(static_cast<float>(sim_time_s));
+      int sun_dir_idx = static_cast<int>(m_sun_dir) - 1;
+      m_shadow_dir = static_cast<Direction>(((sun_dir_idx + 4) % 8) + 1);
+    }
+    
     template<int NR, int NC>
     void draw(SpriteHandler<NR, NC>& sh) const
     {
@@ -234,7 +288,7 @@ namespace dung
         sh.write_buffer("D", door_scr_pos_1.r, door_scr_pos_1.c, Text::Color::Black, Text::Color::Yellow);
       }
       
-      auto shadow_type = rnd::rand_enum<Direction>(); // Random for now.
+      auto shadow_type = m_shadow_dir;
       for (const auto& room_pair : m_room_styles)
       {
         const auto& bb = room_pair.first->bb_leaf_room;
