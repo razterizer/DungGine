@@ -20,7 +20,7 @@ namespace dung
     std::vector<BSPNode*> m_leaves;
     
     using WallType = drawing::OutlineType; //{ Hash, Masonry, Masonry1, Masonry2, Masonry3, Temple };
-    using ShadowType = drawing::ShadowType;
+    using Direction = drawing::Direction;
     using Style = styles::Style;
     enum class FloorType { None, Sand, Grass, Stone, Stone2, Water, Wood, NUM_ITEMS };
     
@@ -234,7 +234,7 @@ namespace dung
         sh.write_buffer("D", door_scr_pos_1.r, door_scr_pos_1.c, Text::Color::Black, Text::Color::Yellow);
       }
       
-      auto shadow_type = rnd::rand_enum<ShadowType>(); // Random for now.
+      auto shadow_type = rnd::rand_enum<Direction>(); // Random for now.
       for (const auto& room_pair : m_room_styles)
       {
         const auto& bb = room_pair.first->bb_leaf_room;
@@ -246,7 +246,7 @@ namespace dung
                           room_style.wall_style,
                           room_style.get_fill_style(),
                           room_style.get_fill_char(),
-                          room_style.is_underground ? ShadowType::None : shadow_type,
+                          room_style.is_underground ? Direction::None : shadow_type,
                           room_style.get_shadow_style(),
                           room_style.get_fill_char());
       }
