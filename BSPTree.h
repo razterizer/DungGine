@@ -372,6 +372,11 @@ namespace dung
       return leaves;
     }
     
+    RC get_world_size() const
+    {
+      return { m_root.size_rows, m_root.size_cols };
+    }
+    
     void pad_rooms(int min_rnd_wall_padding = 1, int max_rnd_wall_padding = 4)
     {
       m_root.pad_rooms(m_min_room_length, min_rnd_wall_padding, max_rnd_wall_padding);
