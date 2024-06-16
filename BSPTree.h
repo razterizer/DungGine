@@ -336,6 +336,11 @@ namespace dung
     ttl::Rectangle bb;
     Orientation orientation = Orientation::Vertical;
     std::array<Door*, 2> doors;
+    
+    bool is_inside_corridor(const RC& pos) const
+    {
+      return bb.is_inside_offs(pos, -1);
+    }
   };
   
   // //////////////////////////////////////////////////////////////
