@@ -62,7 +62,7 @@ bsp_tree.create_corridors(1); // argument: min_corridor_half_width = 1, (1 means
 
 Text t;
 SpriteHandler<NR, NC> sh;
-Text::Color bg_color = Text::Color::Magenta;
+Text::Color bg_color = Text::Color::Default;
 
 dung::DungGine dungeon_engine;
 dungeon_engine.load_dungeon(&bsp_tree);
@@ -98,5 +98,7 @@ dungeon_engine.draw(sh);
 sh.print_screen_buffer(t, bg_color);
 ```
 
-<img width="567" alt="image" src="https://github.com/razterizer/DungGine/assets/32767250/4900eaf9-11e1-4d47-9da5-af4bc5053803">
+<img width="566" alt="image" src="https://github.com/razterizer/DungGine/assets/32767250/b24d58d7-6ad5-4063-881d-650dd7bc905a">
 
+Note the playable character marked as a "@" in the centre of the screen.
+To move the character in a game loop, use function `update()` to allow keystrokes to be registered. Then control the character by pressing the ASWD keys. Press space-bar to open and close doors that you are located next to.
