@@ -268,6 +268,7 @@ namespace dung
   struct Door
   {
     RC pos;
+    bool is_open = false;
     BSPNode* room = nullptr;
     Corridor* corridor = nullptr;
   };
