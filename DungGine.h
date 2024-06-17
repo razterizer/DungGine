@@ -219,7 +219,7 @@ namespace dung
     }
     
     void set_player_character(char ch) { m_player.character = ch; }
-    void place_player(const RC& screen_size, std::optional<RC> world_pos = std::nullopt)
+    bool place_player(const RC& screen_size, std::optional<RC> world_pos = std::nullopt)
     {
       const auto world_size = m_bsp_tree->get_world_size();
       m_screen_in_world.set_size(screen_size);
@@ -231,6 +231,8 @@ namespace dung
       
       const auto& room_corridor_map = m_bsp_tree->get_room_corridor_map();
       
+      const int c_max_num_iters = 1e5;
+      int num_iters = 0;
       do
       {
         for (const auto& cp : room_corridor_map)
@@ -239,11 +241,12 @@ namespace dung
             m_player.is_spawned = true;
             m_player.curr_corridor = cp.second;
             m_screen_in_world.set_pos(m_player.world_pos - m_screen_in_world.size()/2);
-            return;
+            return true;
           }
-        m_player.world_pos += { rnd::rand_int(-1, +1), rnd::rand_int(-1, +1) };
+        m_player.world_pos += { rnd::rand_int(-2, +2), rnd::rand_int(-2, +2) };
         m_player.world_pos = m_player.world_pos.clamp(0, world_size.r, 0, world_size.c);
-      } while (true);
+      } while (++num_iters < c_max_num_iters);
+      return false;
     }
     
     // Randomizes the starting direction of the sun.
