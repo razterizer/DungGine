@@ -490,7 +490,7 @@ namespace dung
               room_0->doors.emplace_back(door_1);
               door_1->room = room_0;
             }
-            else if (room_1->bb_leaf_room.right() == corr->bb.right())
+            else if (room_1->bb_leaf_room.left() == corr->bb.right())
             {
               room_1->doors.emplace_back(door_1);
               door_1->room = room_1;
