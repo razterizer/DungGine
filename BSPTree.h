@@ -252,6 +252,13 @@ namespace dung
       if (children[1])
         children[1]->collect_leaves(leaves);
     }
+    
+    bool is_inside_room(const RC& pos) const
+    {
+      if (!is_leaf())
+        return false;
+      return bb_leaf_room.is_inside_offs(pos, -1);
+    }
   };
       
   // //////////////////////////////////////////////////////////////
