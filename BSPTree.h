@@ -527,16 +527,28 @@ namespace dung
             door_1->pos = { corr->bb.bottom(), c_mid };
             
             if (room_0->bb_leaf_room.bottom() == corr->bb.top())
+            {
               room_0->doors.emplace_back(door_0);
+              door_0->room = room_0;
+            }
             else if (room_1->bb_leaf_room.bottom() == corr->bb.top())
+            {
               room_1->doors.emplace_back(door_0);
+              door_0->room = room_1;
+            }
             else
               std::cerr << err_msg << std::endl;
               
             if (room_0->bb_leaf_room.top() == corr->bb.bottom())
+            {
               room_0->doors.emplace_back(door_1);
+              door_1->room = room_0;
+            }
             else if (room_1->bb_leaf_room.top() == corr->bb.bottom())
+            {
               room_1->doors.emplace_back(door_1);
+              door_1->room = room_1;
+            }
             else
               std::cerr << err_msg << std::endl;
             break;
