@@ -86,10 +86,7 @@ namespace dung
     ttl::Rectangle bb_leaf_room;
     
     std::array<std::unique_ptr<BSPNode>, 2> children;
-    
-    ttl::Rectangle corridor; // Corridor between the children of this region.
-    bool has_corridor = false;
-    
+        
     int level = 0; // root = 0;
     
     // ///////////
@@ -242,77 +239,6 @@ namespace dung
       }
     }
     
-    void create_corridors(int min_corridor_half_width)
-    {
-      //        R
-      //     /     \
-      //    C0      C1
-      //   /  \    /  \
-      //  C00 C01 C10 C11 leafs
-      //
-      //        R
-      //     /     \
-      //    C0      C1
-      //   /  \    /  \
-      //  C00=C01 C10=C11 leafs
-      //
-      //        R
-      //     /     \
-      //    C0======C1
-      //   /  \    /  \
-      //  C00=C01 C10=C11 leafs
-      //
-      if (children[0])
-        children[0]->create_corridors(min_corridor_half_width);
-      if (children[1])
-        children[1]->create_corridors(min_corridor_half_width);
-      if (!is_leaf() && !has_corridor)
-      {
-        auto* ch_0 = children[0].get();
-        auto* ch_1 = children[1].get();
-        auto center_0 = ch_0->bb_region.center();
-        auto center_1 = ch_1->bb_region.center();
-        auto c_0 = ch_0->is_leaf() ? (ch_0->bb_leaf_room.right()) : center_0.c;
-        auto c_1 = ch_1->is_leaf() ? (ch_1->bb_leaf_room.left()) : center_1.c;
-        auto r_0 = ch_0->is_leaf() ? (ch_0->bb_leaf_room.bottom()) : center_0.r;
-        auto r_1 = ch_1->is_leaf() ? (ch_1->bb_leaf_room.top()) : center_1.r;
-        int r_avg = (center_0.r + center_1.r)/2;
-        int c_avg = (center_0.c + center_1.c)/2;
-        switch (orientation)
-        {
-          case Orientation::Vertical:
-            corridor.r = r_avg - min_corridor_half_width;
-            corridor.c = c_0;
-            corridor.r_len = 2*min_corridor_half_width;
-            corridor.c_len = c_1 - c_0;
-            break;
-          case Orientation::Horizontal:
-            corridor.r = r_0;
-            corridor.c = c_avg - min_corridor_half_width;
-            corridor.r_len = r_1 - r_0;
-            corridor.c_len = 2*min_corridor_half_width;
-            break;
-        }
-        has_corridor = true;
-      }
-    }
-    
-    template<int NR, int NC>
-    void draw_corridors(SpriteHandler<NR, NC>& sh,
-                        int r0, int c0,
-                        const styles::Style& corridor_outline_style,
-                        const styles::Style& corridor_fill_style) const
-    {
-      if (children[0])
-        children[0]->draw_corridors(sh, r0, c0, corridor_outline_style, corridor_fill_style);
-      if (children[1])
-        children[1]->draw_corridors(sh, r0, c0, corridor_outline_style, corridor_fill_style);
-      if (!is_leaf() && has_corridor)
-      {
-        drawing::draw_box(sh, r0 + corridor.r, c0 + corridor.c, corridor.r_len, corridor.c_len, drawing::OutlineType::Hash, corridor_outline_style, corridor_fill_style);
-      }
-    }
-    
     void collect_leaves(std::vector<BSPNode*>& leaves)
     {
       if (is_leaf())
@@ -387,12 +313,7 @@ namespace dung
       m_root.pad_rooms(m_min_room_length, min_rnd_wall_padding, max_rnd_wall_padding);
     }
     
-    void create_corridors_recursive(int min_corridor_half_width = 1)
-    {
-      m_root.create_corridors(min_corridor_half_width);
-    }
-    
-    void create_corridors_flat(int min_corridor_half_width = 1)
+    void create_corridors(int min_corridor_half_width = 1)
     {
       std::vector<BSPNode*> leaves;
       m_root.collect_leaves(leaves);
@@ -512,7 +433,7 @@ namespace dung
       }
     }
     
-    void create_doors_flat()
+    void create_doors()
     {
       for (const auto& cp : room_corridor_map)
       {
@@ -563,19 +484,10 @@ namespace dung
     }
     
     template<int NR, int NC>
-    void draw_corridors_recursive(SpriteHandler<NR, NC>& sh,
-                                  int r0 = 0, int c0 = 0,
-                                  const styles::Style& corridor_outline_style = { Text::Color::Green, Text::Color::DarkGreen },
-                                  const styles::Style& corridor_fill_style = { Text::Color::Black, Text::Color::Green }) const
-    {
-      m_root.draw_corridors(sh, r0, c0, corridor_outline_style, corridor_fill_style);
-    }
-    
-    template<int NR, int NC>
-    void draw_corridors_flat(SpriteHandler<NR, NC>& sh,
-                             int r0 = 0, int c0 = 0,
-                             const styles::Style& corridor_outline_style = { Text::Color::Green, Text::Color::DarkGreen },
-                             const styles::Style& corridor_fill_style = { Text::Color::Black, Text::Color::Green }) const
+    void draw_corridors(SpriteHandler<NR, NC>& sh,
+                        int r0 = 0, int c0 = 0,
+                        const styles::Style& corridor_outline_style = { Text::Color::Green, Text::Color::DarkGreen },
+                        const styles::Style& corridor_fill_style = { Text::Color::Black, Text::Color::Green }) const
     {
       for (const auto& corr : room_corridor_map)
       {
