@@ -532,6 +532,15 @@ namespace dung
       return room_corridor_map;
     }
     
+    std::vector<Door*> fetch_doors() const
+    {
+      std::vector<Door*> doors_raw;
+      doors_raw.reserve(doors.size());
+      for (const auto& d : doors)
+        doors_raw.emplace_back(d.get());
+      return doors_raw;
+    }
+    
     template<int NR, int NC>
     void draw_regions(SpriteHandler<NR, NC>& sh,
                       int r0 = 0, int c0 = 0,
