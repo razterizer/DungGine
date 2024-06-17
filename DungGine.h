@@ -278,11 +278,11 @@ namespace dung
       
       auto is_inside_curr_bb = [&](int r, int c) -> bool
       {
-        if (m_player.curr_corridor != nullptr)
-          return m_player.curr_corridor->is_inside_corridor({r, c});
-        if (m_player.curr_room != nullptr)
-          return m_player.curr_room->is_inside_room({r, c});
-        return false; // Error state: Should never happen!
+        if (m_player.curr_corridor != nullptr && m_player.curr_corridor->is_inside_corridor({r, c}))
+          return true;
+        if (m_player.curr_room != nullptr && m_player.curr_room->is_inside_room({r, c}))
+          return true;
+        return false;
       };
       
       auto& curr_pos = m_player.world_pos;
