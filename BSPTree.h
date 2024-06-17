@@ -388,20 +388,35 @@ namespace dung
               if (bb_B.top() < bb_A.top() && bb_B.bottom() - bb_A.top() < 2*min_corridor_half_width + 1)
                 return false;
               bool collided = false;
+              auto collides_with_bb = [r0, r1, c0, c1](const ttl::Rectangle bb) -> bool
+              {
+                if (c0 <= bb.left() && bb.right() <= c1)
+                {
+                  if (bb.top() <= r0 && r1 <= bb.bottom())
+                    return true;
+                  if (r0 <= bb.top() && bb.top() <= r1)
+                    return true;
+                  if (r0 <= bb.bottom() && bb.bottom() <= r1)
+                    return true;
+                }
+                return false;
+              };
               for (auto* leaf_C : leaves)
               {
                 auto bb_C = leaf_C->bb_leaf_room;
-                if (c0 <= bb_C.left() && bb_C.right() <= c1)
-                {
-                  if (bb_C.top() <= r0 && r1 <= bb_C.bottom())
-                    collided = true;
-                  else if (r0 <= bb_C.top() && bb_C.top() <= r1)
-                    collided = true;
-                  else if (r0 <= bb_C.bottom() && bb_C.bottom() <= r1)
-                    collided = true;
-                }
+                collided = collides_with_bb(bb_C);
                 if (collided)
                   break;
+              }
+              if (!collided)
+              {
+                for (const auto& cp : room_corridor_map)
+                {
+                  auto bb_corr = cp.second->bb;
+                  collided = collides_with_bb(bb_corr);
+                  if (collided)
+                    break;
+                }
               }
               if (!collided)
               {
@@ -438,20 +453,35 @@ namespace dung
               if (bb_B.left() < bb_A.left() && bb_B.right() - bb_A.left() < 2*min_corridor_half_width + 1)
                 return false;
               bool collided = false;
+              auto collides_with_bb = [r0, r1, c0, c1](const ttl::Rectangle bb) -> bool
+              {
+                if (r0 <= bb.top() && bb.bottom() <= r1)
+                {
+                  if (bb.left() <= c0 && c1 <= bb.right())
+                    return true;
+                  if (c0 <= bb.left() && bb.left() <= c1)
+                    return true;
+                  if (c0 <= bb.right() && bb.right() <= c1)
+                    return true;
+                }
+                return false;
+              };
               for (auto* leaf_C : leaves)
               {
                 auto bb_C = leaf_C->bb_leaf_room;
-                if (r0 <= bb_C.top() && bb_C.bottom() <= r1)
-                {
-                  if (bb_C.left() <= c0 && c1 <= bb_C.right())
-                    collided = true;
-                  else if (c0 <= bb_C.left() && bb_C.left() <= c1)
-                    collided = true;
-                  else if (c0 <= bb_C.right() && bb_C.right() <= c1)
-                    collided = true;
-                }
+                collided = collides_with_bb(bb_C);
                 if (collided)
                   break;
+              }
+              if (!collided)
+              {
+                for (const auto& cp : room_corridor_map)
+                {
+                  auto bb_corr = cp.second->bb;
+                  collided = collides_with_bb(bb_corr);
+                  if (collided)
+                    break;
+                }
               }
               if (!collided)
               {
