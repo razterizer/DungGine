@@ -273,14 +273,36 @@ namespace dung
       int sun_dir_idx = static_cast<int>(m_sun_dir) - 1;
       m_shadow_dir = static_cast<Direction>(((sun_dir_idx + 4) % 8) + 1);
       
+      auto is_inside_curr_bb = [&](int r, int c) -> bool
+      {
+        if (m_player.curr_corridor != nullptr)
+          return m_player.curr_corridor->is_inside_corridor({r, c});
+        if (m_player.curr_room != nullptr)
+          return m_player.curr_room->is_inside_room({r, c});
+        return false; // Error state: Should never happen!
+      };
+      
+      auto& curr_pos = m_player.world_pos;
       if (str::to_lower(kpd.curr_key) == 'a')
-        m_player.world_pos.c--;
+      {
+        if (is_inside_curr_bb(curr_pos.r, curr_pos.c - 1))
+          curr_pos.c--;
+      }
       else if (str::to_lower(kpd.curr_key) == 'd')
-        m_player.world_pos.c++;
+      {
+        if (is_inside_curr_bb(curr_pos.r, curr_pos.c + 1))
+          curr_pos.c++;
+      }
       else if (str::to_lower(kpd.curr_key) == 's')
-        m_player.world_pos.r++;
+      {
+        if (is_inside_curr_bb(curr_pos.r + 1, curr_pos.c))
+          curr_pos.r++;
+      }
       else if (str::to_lower(kpd.curr_key) == 'w')
-        m_player.world_pos.r--;
+      {
+        if (is_inside_curr_bb(curr_pos.r - 1, curr_pos.c))
+          curr_pos.r--;
+      }
         
       if (scroll_mode == ScrollMode::AlwaysInCentre)
       {
