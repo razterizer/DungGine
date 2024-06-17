@@ -11,18 +11,19 @@ This library is very new and currently only provides a class `BSPTree` that is r
 * `BSPTree.h`
   - `generate()` : Generates the BSP regions recursively.
   - `pad_rooms()` : Pads the regions into rooms.
-  - `create_corridors_recursive()` : Creates bottom-up recursive corridors. **Warning: Not working properly yet**.
-  - `ceate_corridors_flat()` : Non-recursive method of creating corridors on leaf-level. Much more robust than `ceate_corridors()` but is very greedy at the moment.
+  - `ceate_corridors()` : Non-recursive method of creating corridors on leaf-level.
   - `draw_regions()` : Draws the regions.
   - `draw_rooms()` : Draws the rooms.
-  - `draw_corridors_recursive()` : Draws the recursive corridors.
-  - `draw_corridors_flat()` : Draws the non-recursive corridors.
+  - `draw_corridors()` : Draws the non-recursive corridors.
   - `print_tree()` : Debug printing of the tree.
   - `fetch_leaves()` : Fetches the leaves of the BSP tree where the rooms are stored.
   - `get_room_corridor_map()` : Function that retrieves the room and corridor relationship data structure.
 * `DungGine.h`
   - `load_dungeon(BSPTree*)` : Loads a generated BSP tree.
   - `style_dungeon()` : Performs automated styling of rooms in the dungeon / realm.
+  - `set_player_character()` : Sets the character of the playable character (pun intended).
+  - `place_player()` : Places the player near the middle of the realm in one of the corridors and centers the screen around the player.
+  - `update()` : Updating the state of the dungeon engine. Manages things such as the change of direction of the sun for the shadows of rooms that are not under the ground and key-presses for control of the playable character.
   - `draw()` : Draws the rooms of the dungeon / realm (will include drawing of corridors in the near(?) future).
 
 ## Examples
@@ -41,22 +42,10 @@ dung::BSPTree::draw_rooms()
 
 <img width="560" alt="image" src="https://github.com/razterizer/DungGine/assets/32767250/b4b672a8-9ce5-4d74-8d71-c23b37ac1042">
 
-***
 
 ```cpp
 dung::BSPTree::draw_rooms()
-dung::BSPTree::draw_corridors_recursive()
-```
-
-**Warning: WIP. Not working properly yet.**
-
-<img width="570" alt="image" src="https://github.com/razterizer/DungGine/assets/32767250/1f9223ce-94cb-46dc-88e0-c3c3446cdebf">
-
-***
-
-```cpp
-dung::BSPTree::draw_rooms()
-dung::BSPTree::draw_corridors_flat()
+dung::BSPTree::draw_corridors()
 ```
 
 <img width="573" alt="image" src="https://github.com/razterizer/DungGine/assets/32767250/fd23bf8e-17b2-4055-84d6-d6bdd87538ef">
@@ -68,7 +57,7 @@ dung::BSPTree bsp_tree { 4 }; // argument: `min_room_length = 4`.
 bsp_tree.generate(29, 79, dung::Orientation::Vertical); // arguments: world_size_rows, world_size_cols,
                   first_split_orientation.
 bsp_tree.pad_rooms(4); // arguments: min_rnd_wall_padding = 4, [max_rnd_wall_padding = 4].
-bsp_tree.create_corridors_flat(1); // argument: min_corridor_half_width = 1, (1 means it will be three chars wide).
+bsp_tree.create_corridors(1); // argument: min_corridor_half_width = 1, (1 means it will be three chars wide).
 
 Text t;
 SpriteHandler<NR, NC> sh;
@@ -90,8 +79,8 @@ dung::BSPTree bsp_tree { 4 }; // argument: `min_room_length = 4`.
 bsp_tree.generate(29, 79, dung::Orientation::Vertical); // arguments: world_size_rows, world_size_cols,
                   first_split_orientation.
 bsp_tree.pad_rooms(4); // arguments: min_rnd_wall_padding = 4, [max_rnd_wall_padding = 4].
-bsp_tree.create_corridors_flat(1); // argument: min_corridor_half_width = 1, (1 means it will be three chars wide).
-bsp_tree.create_doors_flat(); // We also create doors here.
+bsp_tree.create_corridors(1); // argument: min_corridor_half_width = 1, (1 means it will be three chars wide).
+bsp_tree.create_doors(); // We also create doors here.
 
 Text t;
 SpriteHandler<NR, NC> sh;
