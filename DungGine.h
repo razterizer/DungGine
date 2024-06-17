@@ -152,6 +152,8 @@ namespace dung
       Style style = { Text::Color::Magenta, Text::Color::White };
       RC world_pos;
       bool is_spawned = false;
+      BSPNode* curr_room = nullptr;
+      Corridor* curr_corridor = nullptr;
     };
     
     Player m_player;

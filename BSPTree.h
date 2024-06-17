@@ -70,6 +70,8 @@ namespace dung
   //
   // So fractional lengths are calculated from left to right (column-wise)
   //   or up to down (row-wise).
+  
+  struct Door;
 
   struct BSPNode final
   {
@@ -88,6 +90,8 @@ namespace dung
     std::array<std::unique_ptr<BSPNode>, 2> children;
         
     int level = 0; // root = 0;
+    
+    std::vector<Door*> doors;
     
     // ///////////
     
@@ -249,12 +253,16 @@ namespace dung
         children[1]->collect_leaves(leaves);
     }
   };
-  
+      
   // //////////////////////////////////////////////////////////////
+  
+  struct Corridor;
   
   struct Door
   {
     RC pos;
+    BSPNode* room = nullptr;
+    Corridor* corridor = nullptr;
   };
   
   struct Corridor
@@ -435,11 +443,16 @@ namespace dung
     
     void create_doors()
     {
-      for (const auto& cp : room_corridor_map)
+      for (auto& cp : room_corridor_map)
       {
+        auto* room_0 = cp.first.first;
+        auto* room_1 = cp.first.second;
         auto* door_0 = doors.emplace_back(std::make_unique<Door>()).get();
         auto* door_1 = doors.emplace_back(std::make_unique<Door>()).get();
         auto* corr = cp.second;
+        door_0->corridor = corr;
+        door_1->corridor = corr;
+        constexpr auto err_msg = "ERROR in BSPTree::create_doors() : Unable to find a door for room.";
         switch (corr->orientation)
         {
           case Orientation::Horizontal:
@@ -447,6 +460,32 @@ namespace dung
             auto r_mid = corr->bb.r + corr->bb.r_len / 2;
             door_0->pos = { r_mid, corr->bb.left() };
             door_1->pos = { r_mid, corr->bb.right() };
+            
+            if (room_0->bb_leaf_room.right() == corr->bb.left())
+            {
+              room_0->doors.emplace_back(door_0);
+              door_0->room = room_0;
+            }
+            else if (room_1->bb_leaf_room.right() == corr->bb.left())
+            {
+              room_1->doors.emplace_back(door_0);
+              door_0->room = room_1;
+            }
+            else
+              std::cerr << err_msg << std::endl;
+              
+            if (room_0->bb_leaf_room.left() == corr->bb.right())
+            {
+              room_0->doors.emplace_back(door_1);
+              door_1->room = room_0;
+            }
+            else if (room_1->bb_leaf_room.right() == corr->bb.right())
+            {
+              room_1->doors.emplace_back(door_1);
+              door_1->room = room_1;
+            }
+            else
+              std::cerr << err_msg << std::endl;
             break;
           }
           case Orientation::Vertical:
@@ -454,6 +493,20 @@ namespace dung
             auto c_mid = corr->bb.c + corr->bb.c_len / 2;
             door_0->pos = { corr->bb.top(), c_mid };
             door_1->pos = { corr->bb.bottom(), c_mid };
+            
+            if (room_0->bb_leaf_room.bottom() == corr->bb.top())
+              room_0->doors.emplace_back(door_0);
+            else if (room_1->bb_leaf_room.bottom() == corr->bb.top())
+              room_1->doors.emplace_back(door_0);
+            else
+              std::cerr << err_msg << std::endl;
+              
+            if (room_0->bb_leaf_room.top() == corr->bb.bottom())
+              room_0->doors.emplace_back(door_1);
+            else if (room_1->bb_leaf_room.top() == corr->bb.bottom())
+              room_1->doors.emplace_back(door_1);
+            else
+              std::cerr << err_msg << std::endl;
             break;
           }
         }
