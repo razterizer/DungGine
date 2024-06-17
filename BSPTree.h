@@ -280,6 +280,10 @@ namespace dung
     
     bool is_inside_corridor(const RC& pos) const
     {
+      if (orientation == Orientation::Vertical && bb.c_len < 2)
+        return bb.is_inside_offs(pos, -1, 0);
+      if (orientation == Orientation::Horizontal && bb.r_len < 2)
+        return bb.is_inside_offs(pos, 0, -1);
       return bb.is_inside_offs(pos, -1);
     }
   };
