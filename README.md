@@ -96,6 +96,7 @@ dungeon_engine.configure_sun(20.f);
 dungeon_engine.set_screen_scrolling_mode(ScrollMode::WhenOutsideScreen);
 
 // In game loop:
+sh.clear();
 dungeon_engine.update(get_sim_time_s(), kpd); // arg0 : time from game start, arg1 : keyboard::KeyPressData object.
 dungeon_engine.draw(sh);
 sh.print_screen_buffer(t, bg_color);
