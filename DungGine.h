@@ -306,6 +306,37 @@ namespace dung
         if (is_inside_curr_bb(curr_pos.r - 1, curr_pos.c))
           curr_pos.r--;
       }
+      else if (kpd.curr_key == ' ')
+      {
+        if (m_player.curr_corridor != nullptr)
+        {
+          auto* door_0 = m_player.curr_corridor->doors[0];
+          auto* door_1 = m_player.curr_corridor->doors[1];
+          if (door_0 != nullptr && distance(curr_pos, door_0->pos) == 1.f)
+            math::toggle(door_0->is_open);
+          else if (door_1 != nullptr && distance(curr_pos, door_1->pos) == 1.f)
+            math::toggle(door_1->is_open);
+        }
+      }
+      
+      if (m_player.curr_corridor != nullptr)
+      {
+        auto* door_0 = m_player.curr_corridor->doors[0];
+        auto* door_1 = m_player.curr_corridor->doors[1];
+        if (door_0 != nullptr && curr_pos == door_0->pos)
+          m_player.curr_room = door_0->room;
+        else if (door_1 != nullptr && curr_pos == door_1->pos)
+          m_player.curr_room = door_1->room;
+      }
+      if (m_player.curr_room != nullptr)
+      {
+        for (auto* door : m_player.curr_room->doors)
+          if (curr_pos == door->pos)
+          {
+            m_player.curr_corridor = door->corridor;
+            break;
+          }
+      }
         
       if (scroll_mode == ScrollMode::AlwaysInCentre)
       {
