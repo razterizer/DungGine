@@ -237,6 +237,7 @@ namespace dung
           if (cp.second->is_inside_corridor(m_player.world_pos))
           {
             m_player.is_spawned = true;
+            m_player.curr_corridor = cp.second;
             m_screen_in_world.set_pos(m_player.world_pos - m_screen_in_world.size()/2);
             return;
           }
