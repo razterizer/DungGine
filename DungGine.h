@@ -314,6 +314,7 @@ namespace dung
     void draw(SpriteHandler<NR, NC>& sh) const
     {
       const auto& room_corridor_map = m_bsp_tree->get_room_corridor_map();
+      const auto& door_vec = m_bsp_tree->fetch_doors();
       
       if (m_player.is_spawned)
       {
@@ -321,15 +322,11 @@ namespace dung
         sh.write_buffer(std::string(1, m_player.character), player_scr_pos.r, player_scr_pos.c, m_player.style);
       }
       
-      for (const auto& cp : room_corridor_map)
+      for (auto* door : door_vec)
       {
-        auto* corr = cp.second;
-        auto door_pos_0 = corr->doors[0]->pos;
-        auto door_pos_1 = corr->doors[1]->pos;
-        auto door_scr_pos_0 = get_screen_pos(door_pos_0);
-        auto door_scr_pos_1 = get_screen_pos(door_pos_1);
-        sh.write_buffer("D", door_scr_pos_0.r, door_scr_pos_0.c, Text::Color::Black, Text::Color::Yellow);
-        sh.write_buffer("D", door_scr_pos_1.r, door_scr_pos_1.c, Text::Color::Black, Text::Color::Yellow);
+        auto door_pos = door->pos;
+        auto door_scr_pos = get_screen_pos(door_pos);
+        sh.write_buffer(door->is_open ? "L" : "D", door_scr_pos.r, door_scr_pos.c, Text::Color::Black, Text::Color::Yellow);
       }
       
       auto shadow_type = m_shadow_dir;
