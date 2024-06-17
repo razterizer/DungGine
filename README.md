@@ -93,7 +93,7 @@ dungeon_engine.style_dungeon();
 if (!dungeon_engine.place_player(sh.size()))
   std::cerr << "ERROR : Unable to place the playable character!" << std::endl;
 dungeon_engine.configure_sun(20.f);
-dungeon_engine.set_screen_scrolling_mode(ScrollMode::WhenOutsideScreen);
+dungeon_engine.set_screen_scrolling_mode(ScreenScrollingMode::WhenOutsideScreen);
 
 // In game loop:
 sh.clear();

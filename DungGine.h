@@ -14,7 +14,7 @@
 namespace dung
 {
 
-  enum class ScrollMode { AlwaysInCentre, PageWise, WhenOutsideScreen };
+  enum class ScreenScrollingMode { AlwaysInCentre, PageWise, WhenOutsideScreen };
 
   class DungGine
   {
@@ -161,7 +161,7 @@ namespace dung
     // Value between 0 and 1 where 1 means a full screen vertically or horizontally.
     // Fraction of screen that will be scrolled (when in PageWise scroll mode).
     float t_scroll_amount = 0.2f;
-    ScrollMode scroll_mode = ScrollMode::AlwaysInCentre;
+    ScreenScrollingMode scr_scrolling_mode = ScreenScrollingMode::AlwaysInCentre;
     
     // (0,0) world pos
     // +--------------------+
@@ -271,10 +271,10 @@ namespace dung
       m_sun_t_offs = (static_cast<int>(sun_dir) - 1) / 8.f;
     }
     
-    void set_screen_scrolling_mode(ScrollMode mode, float t_page = 0.2f)
+    void set_screen_scrolling_mode(ScreenScrollingMode mode, float t_page = 0.2f)
     {
-      scroll_mode = mode;
-      if (mode == ScrollMode::PageWise)
+      scr_scrolling_mode = mode;
+      if (mode == ScreenScrollingMode::PageWise)
         t_scroll_amount = t_page;
     }
     
@@ -365,12 +365,12 @@ namespace dung
           }
       }
       
-      switch (scroll_mode)
+      switch (scr_scrolling_mode)
       {
-        case ScrollMode::AlwaysInCentre:
+        case ScreenScrollingMode::AlwaysInCentre:
           m_screen_in_world.set_pos(curr_pos - m_screen_in_world.size()/2);
           break;
-        case ScrollMode::PageWise:
+        case ScreenScrollingMode::PageWise:
         {
           int offs_v = -static_cast<int>(std::round(m_screen_in_world.r_len*t_scroll_amount));
           int offs_h = -static_cast<int>(std::round(m_screen_in_world.c_len*t_scroll_amount));
@@ -378,7 +378,7 @@ namespace dung
             m_screen_in_world.set_pos(curr_pos - m_screen_in_world.size()/2);
           break;
         }
-        case ScrollMode::WhenOutsideScreen:
+        case ScreenScrollingMode::WhenOutsideScreen:
           if (!m_screen_in_world.is_inside(curr_pos))
           {
             if (curr_pos.r < m_screen_in_world.top())
