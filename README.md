@@ -23,6 +23,8 @@ This library is very new and currently only provides a class `BSPTree` that is r
   - `style_dungeon()` : Performs automated styling of rooms in the dungeon / realm.
   - `set_player_character()` : Sets the character of the playable character (pun intended).
   - `place_player()` : Places the player near the middle of the realm in one of the corridors and centers the screen around the player.
+  - `configure_sun(Direction sun_dir, float minutes_per_day)` : Configures the speed of the solar day and the starting direction of the sun. Used for shadow movements for rooms over ground.
+  - `configure_sun(float minutes_per_day)` : Same as above but randomizes the initial direction of the sun.
   - `set_screen_scrolling_mode()` : Sets the screen scrolling mode to either `AlwaysInCentre`, `PageWise` or `WhenOutsideScreen`.
   - `update()` : Updating the state of the dungeon engine. Manages things such as the change of direction of the sun for the shadows of rooms that are not under the ground and key-presses for control of the playable character.
   - `draw()` : Draws the rooms of the dungeon / realm (will include drawing of corridors in the near(?) future).
