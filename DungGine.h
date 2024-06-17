@@ -317,6 +317,17 @@ namespace dung
           else if (door_1 != nullptr && distance(curr_pos, door_1->pos) == 1.f)
             math::toggle(door_1->is_open);
         }
+        if (m_player.curr_room != nullptr)
+        {
+          for (auto* door : m_player.curr_room->doors)
+          {
+            if (distance(curr_pos, door->pos) == 1.f)
+            {
+              math::toggle(door->is_open);
+              break;
+            }
+          }
+        }
       }
       
       if (m_player.curr_corridor != nullptr)
