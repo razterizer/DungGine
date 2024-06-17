@@ -308,16 +308,24 @@ namespace dung
       }
       else if (kpd.curr_key == ' ')
       {
-        if (m_player.curr_corridor != nullptr)
+        if (m_player.curr_corridor != nullptr && m_player.curr_corridor->is_inside_corridor(curr_pos))
         {
           auto* door_0 = m_player.curr_corridor->doors[0];
           auto* door_1 = m_player.curr_corridor->doors[1];
-          if (door_0 != nullptr && distance(curr_pos, door_0->pos) == 1.f)
-            math::toggle(door_0->is_open);
-          else if (door_1 != nullptr && distance(curr_pos, door_1->pos) == 1.f)
-            math::toggle(door_1->is_open);
+          if (door_0 != nullptr)
+          {
+            auto dst = distance(curr_pos, door_0->pos);
+            if (dst == 1.f)
+              math::toggle(door_0->is_open);
+          }
+          if (door_1 != nullptr)
+          {
+            auto dst = distance(curr_pos, door_1->pos);
+            if (dst == 1.f)
+              math::toggle(door_1->is_open);
+          }
         }
-        if (m_player.curr_room != nullptr)
+        else if (m_player.curr_room != nullptr && m_player.curr_room->is_inside_room(curr_pos))
         {
           for (auto* door : m_player.curr_room->doors)
           {
