@@ -62,7 +62,7 @@ bsp_tree.create_corridors(1); // argument: min_corridor_half_width = 1, (1 means
 
 Text t;
 SpriteHandler<NR, NC> sh;
-Text::Color bg_color = Text::Color::Default;
+Text::Color bg_color = Text::Color::Magenta;
 
 dung::DungGine dungeon_engine;
 dungeon_engine.load_dungeon(&bsp_tree);
@@ -77,7 +77,7 @@ sh.print_screen_buffer(t, bg_color);
 
 ```cpp
 dung::BSPTree bsp_tree { 4 }; // argument: `min_room_length = 4`.
-bsp_tree.generate(29, 79, dung::Orientation::Vertical); // arguments: world_size_rows, world_size_cols,
+bsp_tree.generate(200, 400, dung::Orientation::Vertical); // arguments: world_size_rows, world_size_cols,
                   first_split_orientation.
 bsp_tree.pad_rooms(4); // arguments: min_rnd_wall_padding = 4, [max_rnd_wall_padding = 4].
 bsp_tree.create_corridors(1); // argument: min_corridor_half_width = 1, (1 means it will be three chars wide).
@@ -85,11 +85,15 @@ bsp_tree.create_doors(); // We also create doors here.
 
 Text t;
 SpriteHandler<NR, NC> sh;
-Text::Color bg_color = Text::Color::Default;
+Text::Color bg_color = Text::Color::Black;
 
 dung::DungGine dungeon_engine;
 dungeon_engine.load_dungeon(&bsp_tree);
 dungeon_engine.style_dungeon();
+if (!dungeon_engine.place_player(sh.size()))
+  std::cerr << "ERROR : Unable to place the playable character!" << std::endl;
+dungeon_engine.configure_sun(20.f);
+      
 dungeon_engine.draw(sh);
 sh.print_screen_buffer(t, bg_color);
 ```
