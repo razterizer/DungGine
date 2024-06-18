@@ -154,6 +154,7 @@ namespace dung
       bool is_spawned = false;
       BSPNode* curr_room = nullptr;
       Corridor* curr_corridor = nullptr;
+      std::vector<int> keys;
     };
     
     Player m_player;
