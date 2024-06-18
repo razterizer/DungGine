@@ -798,4 +798,23 @@ namespace dung
     },
   };
   
+  inline std::vector<Text::Color> key_fg_palette
+  {
+    Text::Color::Black,
+    Text::Color::DarkRed,
+    Text::Color::DarkGreen,
+    Text::Color::DarkYellow,
+    Text::Color::DarkBlue,
+    Text::Color::DarkMagenta,
+    Text::Color::DarkCyan,
+    Text::Color::LightGray,
+    Text::Color::DarkGray,
+    Text::Color::Red,
+    Text::Color::Green,
+    Text::Color::Yellow,
+    Text::Color::Blue,
+    Text::Color::Magenta,
+    Text::Color::Cyan,
+    Text::Color::White,
+  };
 }
