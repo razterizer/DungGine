@@ -154,7 +154,7 @@ namespace dung
       bool is_spawned = false;
       BSPNode* curr_room = nullptr;
       Corridor* curr_corridor = nullptr;
-      std::vector<int> keys;
+      std::vector<Key> keys;
     };
     
     Player m_player;
@@ -174,6 +174,8 @@ namespace dung
     // |                    |
     // |                    |
     // +--------------------+
+    
+    std::vector<Key> all_keys;
     
     RC get_screen_pos(const RC& world_pos) const
     {
@@ -270,6 +272,18 @@ namespace dung
       // None, S, SE, E, NE, N, NW, W, SW, NUM_ITEMS
       // 0     1  2   3  4   5  6   7  8
       m_sun_t_offs = (static_cast<int>(sun_dir) - 1) / 8.f;
+    }
+    
+    void place_keys()
+    {
+      const auto& door_vec = m_bsp_tree->fetch_doors();
+      for (auto* d : door_vec)
+      {
+        if (d->is_locked)
+        {
+          all_keys.emplace_back(d->key.key_id);
+        }
+      }
     }
     
     void set_screen_scrolling_mode(ScreenScrollingMode mode, float t_page = 0.2f)
