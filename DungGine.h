@@ -146,6 +146,17 @@ namespace dung
     float m_sun_minutes_per_day = 20.f;
     float m_sun_t_offs = 0.f;
     
+    struct Item
+    {
+      RC pos; // world pos
+      bool picked_up = false;
+    };
+  
+    struct Key : Item
+    {
+      int key_id = 0;
+    };
+    
     struct Player
     {
       char character = '@';
@@ -274,14 +285,24 @@ namespace dung
       m_sun_t_offs = (static_cast<int>(sun_dir) - 1) / 8.f;
     }
     
-    void place_keys()
+    void place_keys(const RC& screen_size)
     {
       const auto& door_vec = m_bsp_tree->fetch_doors();
       for (auto* d : door_vec)
       {
         if (d->is_locked)
         {
-          all_keys.emplace_back(d->key.key_id);
+          Key key;
+          key.key_id = d->key_id;
+          do
+          {
+            key.pos = 
+            {
+              rnd::rand_int(0, screen_size.r_len), 
+              rnd::rand_int(0, screen_size.c_len)
+            };
+          } while (false); // fix condition that checks if in a room.
+          all_keys.emplace_back(key);
         }
       }
     }
