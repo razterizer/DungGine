@@ -457,7 +457,7 @@ namespace dung
           continue;
         auto door_pos = door->pos;
         auto door_scr_pos = get_screen_pos(door_pos);
-        sh.write_buffer(door->is_open ? "L" : (door->is_locked ? "G" : "D"), door_scr_pos.r, door_scr_pos.c, Text::Color::Black, Text::Color::Yellow);
+        sh.write_buffer(door->is_open || !door->is_door ? "L" : (door->is_locked ? "G" : "D"), door_scr_pos.r, door_scr_pos.c, Text::Color::Black, Text::Color::Yellow);
       }
       
       auto shadow_type = m_shadow_dir;
