@@ -103,8 +103,10 @@ namespace dung
       {
         case Orientation::Vertical:
         {
-          bool top_door_open = doors[0]->pos.r < doors[1]->pos.r ? doors[0]->is_open : doors[1]->is_open;
-          bool bottom_door_open = doors[0]->pos.r < doors[1]->pos.r ? doors[1]->is_open : doors[0]->is_open;
+          bool top_door_open = doors[0]->pos.r < doors[1]->pos.r ? 
+            f_open_or_no_door(doors[0]) : f_open_or_no_door(doors[1]);
+          bool bottom_door_open = doors[0]->pos.r < doors[1]->pos.r ? 
+            f_open_or_no_door(doors[1]) : f_open_or_no_door(doors[0]);
           int top_offs = top_door_open ? 0 : -1;
           int bottom_offs = bottom_door_open ? 0 : -1;
           if (bb.c_len < 2)
