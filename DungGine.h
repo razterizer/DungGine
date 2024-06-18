@@ -471,7 +471,7 @@ namespace dung
       {
         auto door_pos = door->pos;
         auto door_scr_pos = get_screen_pos(door_pos);
-        std::string door_ch = "_";
+        std::string door_ch = "^";
         if (door->is_door)
         {
           if (door->is_open)
