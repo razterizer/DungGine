@@ -522,9 +522,10 @@ namespace dung
       }
     }
     
-    void create_doors(bool allow_locked_doors, bool allow_passageways)
+    void create_doors(int max_num_locked_doors, bool allow_passageways)
     {
       int key_id_ctr = 0;
+      int num_locked_doors = 0;
       for (auto& cp : room_corridor_map)
       {
         auto* room_0 = cp.first.first;
@@ -543,12 +544,17 @@ namespace dung
           door_1->is_door = true;
         }
         
-        if (allow_locked_doors)
+        if (num_locked_doors < max_num_locked_doors)
         {
           if (door_0->is_door)
             door_0->is_locked = rnd::rand_bool();
           if (door_1->is_door && (door_0->is_door && !door_0->is_locked))
             door_1->is_locked = rnd::rand_bool();
+            
+          if (door_0->is_locked)
+            num_locked_doors++;
+          if (door_1->is_locked)
+            num_locked_doors++;
             
           door_0->key_id = key_id_ctr++;
           door_1->key_id = key_id_ctr++;
