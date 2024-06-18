@@ -522,7 +522,7 @@ namespace dung
       }
     }
     
-    void create_doors()
+    void create_doors(bool allow_locked_doors, bool allow_passageways)
     {
       int key_id_ctr = 0;
       for (auto& cp : room_corridor_map)
@@ -531,13 +531,29 @@ namespace dung
         auto* room_1 = cp.first.second;
         auto* door_0 = doors.emplace_back(std::make_unique<Door>()).get();
         auto* door_1 = doors.emplace_back(std::make_unique<Door>()).get();
-        door_0->is_door = rnd::rand_bool();
-        door_1->is_door = rnd::rand_bool();
-        door_0->is_locked = rnd::rand_bool();
-        if (door_0->is_door && !door_0->is_locked)
-          door_1->is_locked = rnd::rand_bool();
-        door_0->key_id = key_id_ctr++;
-        door_1->key_id = key_id_ctr++;
+        
+        if (allow_passageways)
+        {
+          door_0->is_door = rnd::rand_bool();
+          door_1->is_door = rnd::rand_bool();
+        }
+        else
+        {
+          door_0->is_door = true;
+          door_1->is_door = true;
+        }
+        
+        if (allow_locked_doors)
+        {
+          if (door_0->is_door)
+            door_0->is_locked = rnd::rand_bool();
+          if (door_1->is_door && (door_0->is_door && !door_0->is_locked))
+            door_1->is_locked = rnd::rand_bool();
+            
+          door_0->key_id = key_id_ctr++;
+          door_1->key_id = key_id_ctr++;
+        }
+        
         auto* corr = cp.second;
         door_0->corridor = corr;
         door_1->corridor = corr;
