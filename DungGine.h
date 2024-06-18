@@ -231,10 +231,11 @@ namespace dung
       }
     }
     
+    // #NOTE: Only for unwalled area!
     bool is_inside_any_room(const RC& pos)
     {
       for (auto* leaf : m_leaves)
-        if (leaf->bb_leaf_room.is_inside(pos))
+        if (leaf->bb_leaf_room.is_inside_offs(pos, -1))
           return true;
       return false;
     }
