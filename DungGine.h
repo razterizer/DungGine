@@ -181,6 +181,7 @@ namespace dung
       BSPNode* curr_room = nullptr;
       Corridor* curr_corridor = nullptr;
       std::vector<Key> keys;
+      bool show_inventory = false;
     };
     
     Player m_player;
@@ -417,6 +418,12 @@ namespace dung
                                       "You picked up a key!", MessageHandler::Level::Guide);
         }
       }
+      else if (str::to_lower(kpd.curr_key) == 'i')
+      {
+        math::toggle(m_player.show_inventory);
+      }
+      
+      // Update current room and current corridor.
       
       if (m_player.curr_corridor != nullptr)
       {
@@ -436,6 +443,8 @@ namespace dung
             break;
           }
       }
+      
+      // Scrolling mode.
       
       switch (scr_scrolling_mode)
       {
@@ -475,6 +484,12 @@ namespace dung
       const auto& door_vec = m_bsp_tree->fetch_doors();
       
       message_handler->update(sh, static_cast<float>(sim_time_s), true);
+      
+      if (m_player.show_inventory)
+      {
+        sh.write_buffer(str::adjust_str("Inventory", str::Adjustment::Center, NC - 1), 4, 0, Text::Color::White, Text::Color::Transparent2);
+        drawing::draw_box(sh, 2, 2, NR - 5, NC - 5, drawing::OutlineType::Line, { Text::Color::White, Text::Color::DarkGray }, { Text::Color::White, Text::Color::DarkGray }, ' ');
+      }
       
       if (m_player.is_spawned)
       {
