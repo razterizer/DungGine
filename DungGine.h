@@ -453,11 +453,19 @@ namespace dung
       
       for (auto* door : door_vec)
       {
-        if (!door->is_door)
-          continue;
         auto door_pos = door->pos;
         auto door_scr_pos = get_screen_pos(door_pos);
-        sh.write_buffer(door->is_open || !door->is_door ? "L" : (door->is_locked ? "G" : "D"), door_scr_pos.r, door_scr_pos.c, Text::Color::Black, Text::Color::Yellow);
+        std::string door_ch = "_";
+        if (door->is_door)
+        {
+          if (door->is_open)
+            door_ch = "L";
+          else if (door->is_locked)
+            door_ch = "G";
+          else
+            door_ch = "D";
+        }
+        sh.write_buffer(door_ch, door_scr_pos.r, door_scr_pos.c, Text::Color::Black, Text::Color::Yellow);
       }
       
       auto shadow_type = m_shadow_dir;
