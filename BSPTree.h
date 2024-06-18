@@ -115,8 +115,10 @@ namespace dung
         }
         case Orientation::Horizontal:
         {
-          bool left_door_open = doors[0]->pos.c < doors[1]->pos.c ? doors[0]->is_open : doors[1]->is_open;
-          bool right_door_open = doors[0]->pos.c < doors[1]->pos.c ? doors[1]->is_open : doors[0]->is_open;
+          bool left_door_open = doors[0]->pos.c < doors[1]->pos.c ? 
+            f_open_or_no_door(doors[0]) : f_open_or_no_door(doors[1]);
+          bool right_door_open = doors[0]->pos.c < doors[1]->pos.c ? 
+            f_open_or_no_door(doors[1]) : f_open_or_no_door(doors[0]);
           int left_offs = left_door_open ? 0 : -1;
           int right_offs = right_door_open ? 0 : -1;
           if (bb.r_len < 2)
