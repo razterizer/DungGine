@@ -203,7 +203,7 @@ namespace dung
     
     std::vector<Key> all_keys;
     
-    MessageHandler message_handler;
+    std::unique_ptr<MessageHandler> message_handler;
     
     RC get_screen_pos(const RC& world_pos) const
     {
@@ -240,7 +240,7 @@ namespace dung
     }
     
   public:
-    DungGine() = default;
+    DungGine() : message_handler(std::make_unique<MessageHandler>()) {}
     
     void load_dungeon(BSPTree* bsp_tree)
     {
@@ -412,7 +412,7 @@ namespace dung
         {
           m_player.keys.emplace_back(key);
           key.picked_up = true;
-          message_handler.add_message(static_cast<float>(sim_time_s),
+          message_handler->add_message(static_cast<float>(sim_time_s),
                                       "You picked up a key!", MessageHandler::Level::Guide);
         }
       }
@@ -468,12 +468,12 @@ namespace dung
     }
     
     template<int NR, int NC>
-    void draw(SpriteHandler<NR, NC>& sh, double sim_time_s)
+    void draw(SpriteHandler<NR, NC>& sh, double sim_time_s) const
     {
       const auto& room_corridor_map = m_bsp_tree->get_room_corridor_map();
       const auto& door_vec = m_bsp_tree->fetch_doors();
       
-      message_handler.update(sh, static_cast<float>(sim_time_s));
+      message_handler->update(sh, static_cast<float>(sim_time_s));
       
       if (m_player.is_spawned)
       {
