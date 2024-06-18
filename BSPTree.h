@@ -77,7 +77,12 @@ namespace dung
   struct Door
   {
     RC pos;
+    
+    bool is_door = false;
     bool is_open = false;
+    bool is_locked = false;
+    int key_id = 0;
+    
     BSPNode* room = nullptr;
     Corridor* corridor = nullptr;
   };
@@ -509,12 +514,19 @@ namespace dung
     
     void create_doors()
     {
+      int key_id_ctr = 0;
       for (auto& cp : room_corridor_map)
       {
         auto* room_0 = cp.first.first;
         auto* room_1 = cp.first.second;
         auto* door_0 = doors.emplace_back(std::make_unique<Door>()).get();
         auto* door_1 = doors.emplace_back(std::make_unique<Door>()).get();
+        door_0->is_door = rnd::rand_bool();
+        door_1->is_door = rnd::rand_bool();
+        door_0->is_locked = rnd::rand_bool();
+        door_1->is_locked = rnd::rand_bool();
+        door_0->key_id = key_id_ctr++;
+        door_1->key_id = key_id_ctr++;
         auto* corr = cp.second;
         door_0->corridor = corr;
         door_1->corridor = corr;
