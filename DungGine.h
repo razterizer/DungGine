@@ -406,6 +406,15 @@ namespace dung
             }
           }
         }
+
+        for (auto& key : all_keys)
+        if (key.pos == curr_pos)
+        {
+          m_player.keys.emplace_back(key);
+          key.picked_up = true;
+          message_handler.add_message(static_cast<float>(sim_time_s),
+                                      "You picked up a key!", MessageHandler::Level::Guide);
+        }
       }
       
       if (m_player.curr_corridor != nullptr)
