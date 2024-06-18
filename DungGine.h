@@ -150,11 +150,25 @@ namespace dung
     {
       RC pos; // world pos
       bool picked_up = false;
+      Style style;
+      char character = '?';
     };
   
     struct Key : Item
     {
+      Key()
+      {
+        character = 'F';
+        style.fg_color = Text::Color::Green;
+        style.bg_color = Text::Color::Transparent2;
+      }
+      
       int key_id = 0;
+      
+      void randomize_fg_color()
+      {
+        style.fg_color = Text::get_random_color(key_fg_palette);
+      }
     };
     
     struct Player
@@ -293,8 +307,9 @@ namespace dung
       m_sun_t_offs = (static_cast<int>(sun_dir) - 1) / 8.f;
     }
     
-    bool place_keys(const RC& screen_size)
+    bool place_keys()
     {
+      const auto world_size = m_bsp_tree->get_world_size();
       const auto& door_vec = m_bsp_tree->fetch_doors();
       const int c_max_num_iters = 1e5;
       int num_iters = 0;
@@ -304,14 +319,15 @@ namespace dung
         {
           Key key;
           key.key_id = d->key_id;
+          key.randomize_fg_color();
           do
           {
             key.pos =
             {
-              rnd::rand_int(0, screen_size.r),
-              rnd::rand_int(0, screen_size.c)
+              rnd::rand_int(0, world_size.r),
+              rnd::rand_int(0, world_size.c)
             };
-          } while (num_iters++ < c_max_num_iters || !is_inside_any_room(key.pos));
+          } while (num_iters++ < c_max_num_iters && !is_inside_any_room(key.pos));
           
           if (!is_inside_any_room(key.pos))
             return false;
@@ -466,6 +482,14 @@ namespace dung
             door_ch = "D";
         }
         sh.write_buffer(door_ch, door_scr_pos.r, door_scr_pos.c, Text::Color::Black, Text::Color::Yellow);
+      }
+      
+      for (const auto& key : all_keys)
+      {
+        if (key.picked_up)
+          continue;
+        auto key_scr_pos = get_screen_pos(key.pos);
+        sh.write_buffer("F", key_scr_pos.r, key_scr_pos.c, key.style);
       }
       
       auto shadow_type = m_shadow_dir;
