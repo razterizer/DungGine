@@ -534,7 +534,8 @@ namespace dung
         door_0->is_door = rnd::rand_bool();
         door_1->is_door = rnd::rand_bool();
         door_0->is_locked = rnd::rand_bool();
-        door_1->is_locked = rnd::rand_bool();
+        if (door_0->is_door && !door_0->is_locked)
+          door_1->is_locked = rnd::rand_bool();
         door_0->key_id = key_id_ctr++;
         door_1->key_id = key_id_ctr++;
         auto* corr = cp.second;
