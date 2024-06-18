@@ -309,7 +309,7 @@ namespace dung
               rnd::rand_int(0, screen_size.r_len), 
               rnd::rand_int(0, screen_size.c_len)
             };
-          } while (false); // fix condition that checks if in a room.
+          } while (!is_inside_any_room()); // fix condition that checks if in a room.
           all_keys.emplace_back(key);
         }
       }
