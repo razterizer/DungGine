@@ -489,7 +489,7 @@ namespace dung
         if (key.picked_up)
           continue;
         auto key_scr_pos = get_screen_pos(key.pos);
-        sh.write_buffer("F", key_scr_pos.r, key_scr_pos.c, key.style);
+        sh.write_buffer(std::string(1, key.character), key_scr_pos.r, key_scr_pos.c, key.style);
       }
       
       auto shadow_type = m_shadow_dir;
