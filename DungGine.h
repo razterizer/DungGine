@@ -217,7 +217,7 @@ namespace dung
     bool is_inside_any_room(const RC& pos)
     {
       for (auto* leaf : m_leaves)
-        if (leaf->bb_leaf_room.is_inside(pos);
+        if (leaf->bb_leaf_room.is_inside(pos))
           return true;
       return false;
     }
@@ -293,9 +293,11 @@ namespace dung
       m_sun_t_offs = (static_cast<int>(sun_dir) - 1) / 8.f;
     }
     
-    void place_keys(const RC& screen_size)
+    bool place_keys(const RC& screen_size)
     {
       const auto& door_vec = m_bsp_tree->fetch_doors();
+      const int c_max_num_iters = 1e5;
+      int num_iters = 0;
       for (auto* d : door_vec)
       {
         if (d->is_locked)
@@ -304,15 +306,20 @@ namespace dung
           key.key_id = d->key_id;
           do
           {
-            key.pos = 
+            key.pos =
             {
-              rnd::rand_int(0, screen_size.r_len), 
-              rnd::rand_int(0, screen_size.c_len)
+              rnd::rand_int(0, screen_size.r),
+              rnd::rand_int(0, screen_size.c)
             };
-          } while (!is_inside_any_room()); // fix condition that checks if in a room.
+          } while (num_iters++ < c_max_num_iters || !is_inside_any_room(key.pos));
+          
+          if (!is_inside_any_room(key.pos))
+            return false;
+            
           all_keys.emplace_back(key);
         }
       }
+      return true;
     }
     
     void set_screen_scrolling_mode(ScreenScrollingMode mode, float t_page = 0.2f)

@@ -101,10 +101,6 @@ namespace dung
     
     bool is_inside_corridor(const RC& pos) const
     {
-      auto f_open_or_no_door = [](Door* door)
-      {
-        return !door->is_door || door->is_open;
-      };
       switch (orientation)
       {
         case Orientation::Vertical:
