@@ -85,6 +85,11 @@ namespace dung
     
     BSPNode* room = nullptr;
     Corridor* corridor = nullptr;
+    
+    bool open_or_no_door() const
+    {
+      return !is_door || is_open;
+    };
   };
   
   struct Corridor
@@ -104,9 +109,9 @@ namespace dung
         case Orientation::Vertical:
         {
           bool top_door_open = doors[0]->pos.r < doors[1]->pos.r ? 
-            f_open_or_no_door(doors[0]) : f_open_or_no_door(doors[1]);
+            doors[0]->open_or_no_door() : doors[1]->open_or_no_door();
           bool bottom_door_open = doors[0]->pos.r < doors[1]->pos.r ? 
-            f_open_or_no_door(doors[1]) : f_open_or_no_door(doors[0]);
+            doors[1]->open_or_no_door() : doors[0]->open_or_no_door();
           int top_offs = top_door_open ? 0 : -1;
           int bottom_offs = bottom_door_open ? 0 : -1;
           if (bb.c_len < 2)
@@ -116,9 +121,9 @@ namespace dung
         case Orientation::Horizontal:
         {
           bool left_door_open = doors[0]->pos.c < doors[1]->pos.c ? 
-            f_open_or_no_door(doors[0]) : f_open_or_no_door(doors[1]);
+            doors[0]->open_or_no_door() : doors[1]->open_or_no_door();
           bool right_door_open = doors[0]->pos.c < doors[1]->pos.c ? 
-            f_open_or_no_door(doors[1]) : f_open_or_no_door(doors[0]);
+            doors[1]->open_or_no_door() : doors[0]->open_or_no_door();
           int left_offs = left_door_open ? 0 : -1;
           int right_offs = right_door_open ? 0 : -1;
           if (bb.r_len < 2)
@@ -319,7 +324,7 @@ namespace dung
         return false;
       for (auto* d : doors)
       {
-        if (d->is_open && pos == d->pos)
+        if (d->open_or_no_door() && pos == d->pos)
           return true;
       }
       return bb_leaf_room.is_inside_offs(pos, -1);
