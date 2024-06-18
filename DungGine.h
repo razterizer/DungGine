@@ -214,6 +214,14 @@ namespace dung
       }
     }
     
+    bool is_inside_any_room(const RC& pos)
+    {
+      for (auto* leaf : m_leaves)
+        if (leaf->bb_leaf_room.is_inside(pos);
+          return true;
+      return false;
+    }
+    
   public:
     DungGine() = default;
     
