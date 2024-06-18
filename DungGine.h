@@ -9,6 +9,7 @@
 #include "BSPTree.h"
 #include "DungGineStyles.h"
 #include <Termin8or/Keyboard.h>
+#include <Termin8or/MessageHandler.h>
 
 
 namespace dung
@@ -201,6 +202,8 @@ namespace dung
     // +--------------------+
     
     std::vector<Key> all_keys;
+    
+    MessageHandler message_handler;
     
     RC get_screen_pos(const RC& world_pos) const
     {
@@ -456,10 +459,12 @@ namespace dung
     }
     
     template<int NR, int NC>
-    void draw(SpriteHandler<NR, NC>& sh) const
+    void draw(SpriteHandler<NR, NC>& sh, double sim_time_s)
     {
       const auto& room_corridor_map = m_bsp_tree->get_room_corridor_map();
       const auto& door_vec = m_bsp_tree->fetch_doors();
+      
+      message_handler.update(sh, static_cast<float>(sim_time_s));
       
       if (m_player.is_spawned)
       {
