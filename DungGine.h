@@ -173,8 +173,8 @@ namespace dung
       BSPNode* curr_room = nullptr;
       Corridor* curr_corridor = nullptr;
       
-      std::vector<Key> keys;
-      std::vector<Lamp> lamps;
+      std::vector<int> key_idcs;
+      std::vector<int> lamp_idcs;
       bool show_inventory = false;
       RC line_of_sight;
     };
@@ -435,21 +435,23 @@ namespace dung
           }
         }
 
-        for (auto& key : all_keys)
+        for (size_t key_idx = 0; key_idx < all_keys.size(); ++key_idx)
         {
+          auto& key = all_keys[key_idx];
           if (key.pos == curr_pos)
           {
-            m_player.keys.emplace_back(key);
+            m_player.key_idcs.emplace_back(key_idx);
             key.picked_up = true;
             message_handler->add_message(static_cast<float>(sim_time_s),
                                          "You picked up a key!", MessageHandler::Level::Guide);
           }
         }
-        for (auto& lamp : all_lamps)
+        for (size_t lamp_idx = 0; lamp_idx < all_lamps.size(); ++lamp_idx)
         {
+          auto& lamp = all_lamps[lamp_idx];
           if (lamp.pos == curr_pos)
           {
-            m_player.lamps.emplace_back(lamp);
+            m_player.lamp_idcs.emplace_back(lamp_idx);
             lamp.picked_up = true;
             message_handler->add_message(static_cast<float>(sim_time_s),
                                          "You picked up a lamp!", MessageHandler::Level::Guide);
