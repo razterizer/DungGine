@@ -134,6 +134,7 @@ namespace dung
       Style style;
       char character = '?';
       bool fog_of_war = true;
+      float weight = 0.f; // kg-ish.
     };
   
     struct Key : Item
@@ -143,6 +144,7 @@ namespace dung
         character = 'F';
         style.fg_color = Color::Green;
         style.bg_color = Color::Transparent2;
+        weight = 0.1f;
       }
       
       int key_id = 0;
@@ -160,6 +162,7 @@ namespace dung
         character = 'Y';
         style.fg_color = Color::Yellow;
         style.bg_color = Color::Transparent2;
+        weight = 0.4f;
       }
       enum class LampType { Isotropic, Directional, NUM_ITEMS };
       LampType type = LampType::Isotropic;
@@ -180,6 +183,7 @@ namespace dung
       int inv_select_idx = -1;
       bool show_inventory = false;
       RC line_of_sight;
+      float weight_capacity = 50.f;
       
       bool using_key_id(const std::vector<Key>& all_keys, int key_id) const
       {
