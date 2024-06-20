@@ -10,7 +10,8 @@ This library is very new and currently only provides a class `BSPTree` that is r
 
 * `BSPTree.h`
   - `BSPTree(int min_room_length)` : The constructor.
-  - `generate()` : Generates the BSP regions recursively.
+  - `generate(int world_size_rows, int world_size_cols,
+                  Orientation first_split_orientation)` : Generates the BSP regions recursively.
   - `pad_rooms()` : Pads the regions into rooms.
   - `ceate_corridors()` : Non-recursive method of creating corridors on leaf-level.
   - `draw_regions()` : Draws the regions.
