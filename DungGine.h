@@ -440,7 +440,7 @@ namespace dung
         for (size_t key_idx = 0; key_idx < all_keys.size(); ++key_idx)
         {
           auto& key = all_keys[key_idx];
-          if (key.pos == curr_pos)
+          if (key.pos == curr_pos && !key.picked_up)
           {
             m_player.key_idcs.emplace_back(key_idx);
             key.picked_up = true;
@@ -451,7 +451,7 @@ namespace dung
         for (size_t lamp_idx = 0; lamp_idx < all_lamps.size(); ++lamp_idx)
         {
           auto& lamp = all_lamps[lamp_idx];
-          if (lamp.pos == curr_pos)
+          if (lamp.pos == curr_pos && !lamp.picked_up)
           {
             m_player.lamp_idcs.emplace_back(lamp_idx);
             lamp.picked_up = true;
