@@ -180,6 +180,15 @@ namespace dung
       int inv_select_idx = -1;
       bool show_inventory = false;
       RC line_of_sight;
+      
+      bool using_key_id(const std::vector<Key>& all_keys, int key_id) const
+      {
+        auto N = static_cast<int>(key_idcs.size());
+        if (math::in_range<int>(inv_select_idx, 0, N, Range::ClosedOpen))
+          if (all_keys[key_idcs[inv_select_idx]].key_id == key_id)
+            return true;
+        return false;
+      }
     };
     
     Player m_player;
@@ -442,25 +451,49 @@ namespace dung
         }
         else
         {
+          auto f_alter_door_states = [&](Door* door)
+          {
+            if (door != nullptr && door->is_door && distance(curr_pos, door->pos) == 1.f)
+            {
+              if (door->is_locked)
+              {
+                if (m_player.using_key_id(all_keys, door->key_id))
+                {
+                  // Currently doesn't support locking the door again.
+                  // Not sure if we need that. Maybe do it in the far future...
+                  door->is_locked = false;
+                  
+                  message_handler->add_message(static_cast<float>(sim_time_s),
+                                               "The door is unlocked!",
+                                               MessageHandler::Level::Guide);
+                }
+                else
+                {
+                  message_handler->add_message(static_cast<float>(sim_time_s),
+                                               "The door is locked. You need key:" + std::to_string(door->key_id) + "!",
+                                               MessageHandler::Level::Guide);
+                }
+              }
+              else
+                math::toggle(door->is_open);
+              return true;
+            }
+            return false;
+          };
+          
           if (m_player.curr_corridor != nullptr && m_player.curr_corridor->is_inside_corridor(curr_pos))
           {
             auto* door_0 = m_player.curr_corridor->doors[0];
             auto* door_1 = m_player.curr_corridor->doors[1];
-            if (door_0 != nullptr && (!door_0->is_locked && door_0->is_door) && distance(curr_pos, door_0->pos) == 1.f)
-              math::toggle(door_0->is_open);
-            if (door_1 != nullptr && (!door_1->is_locked && door_1->is_door) && distance(curr_pos, door_1->pos) == 1.f)
-              math::toggle(door_1->is_open);
+            
+            f_alter_door_states(door_0);
+            f_alter_door_states(door_1);
           }
           else if (m_player.curr_room != nullptr && m_player.curr_room->is_inside_room(curr_pos))
           {
             for (auto* door : m_player.curr_room->doors)
-            {
-              if ((!door->is_locked && door->is_door) && distance(curr_pos, door->pos) == 1.f)
-              {
-                math::toggle(door->is_open);
+              if (f_alter_door_states(door))
                 break;
-              }
-            }
           }
           
           for (size_t key_idx = 0; key_idx < all_keys.size(); ++key_idx)
