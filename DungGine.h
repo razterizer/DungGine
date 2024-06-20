@@ -152,7 +152,17 @@ namespace dung
       }
     };
     
-    enum class LampType { None, Isotropic, Directional };
+    struct Lamp : Item
+    {
+      Lamp()
+      {
+        character = 'Y';
+        style.fg_color = Color::Yellow;
+        style.bg_color = Color::Transparent2;
+      }
+      enum class LampType { Isotropic, Directional, NUM_ITEMS };
+      LampType type = LampType::Isotropic;
+    };
     
     struct Player
     {
@@ -162,10 +172,11 @@ namespace dung
       bool is_spawned = false;
       BSPNode* curr_room = nullptr;
       Corridor* curr_corridor = nullptr;
+      
       std::vector<Key> keys;
+      std::vector<Lamp> lamps;
       bool show_inventory = false;
       RC line_of_sight;
-      LampType lamp = LampType::None;
     };
     
     Player m_player;
@@ -187,6 +198,7 @@ namespace dung
     // +--------------------+
     
     std::vector<Key> all_keys;
+    std::vector<Lamp> all_lamps;
     
     std::unique_ptr<MessageHandler> message_handler;
     bool use_fog_of_war = false;
@@ -327,6 +339,32 @@ namespace dung
             
           all_keys.emplace_back(key);
         }
+      }
+      return true;
+    }
+    
+    bool place_lamps(int num_lamps)
+    {
+      const auto world_size = m_bsp_tree->get_world_size();
+      const int c_max_num_iters = 1e5;
+      int num_iters = 0;
+      for (int lamp_idx = 0; lamp_idx < num_lamps; ++lamp_idx)
+      {
+        Lamp lamp;
+        lamp.type = rnd::rand_enum<Lamp::LampType>();
+        do
+        {
+          lamp.pos =
+          {
+            rnd::rand_int(0, world_size.r),
+            rnd::rand_int(0, world_size.c)
+          };
+        } while (num_iters++ < c_max_num_iters && !is_inside_any_room(lamp.pos));
+        
+        if (!is_inside_any_room(lamp.pos))
+          return false;
+        
+        all_lamps.emplace_back(lamp);
       }
       return true;
     }
@@ -597,6 +635,14 @@ namespace dung
           continue;
         auto key_scr_pos = get_screen_pos(key.pos);
         sh.write_buffer(std::string(1, key.character), key_scr_pos.r, key_scr_pos.c, key.style);
+      }
+      
+      for (const auto& lamp : all_lamps)
+      {
+        if (lamp.picked_up)
+          continue;
+        auto lamp_scr_pos = get_screen_pos(lamp.pos);
+        sh.write_buffer(std::string(1, lamp.character), lamp_scr_pos.r, lamp_scr_pos.c, lamp.style);
       }
       
       auto shadow_type = m_shadow_dir;
