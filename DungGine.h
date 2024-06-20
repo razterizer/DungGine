@@ -173,6 +173,8 @@ namespace dung
       }
     };
     
+    enum class LampType { None, Isotropic, Directional };
+    
     struct Player
     {
       char character = '@';
@@ -184,6 +186,7 @@ namespace dung
       std::vector<Key> keys;
       bool show_inventory = false;
       RC line_of_sight;
+      LampType lamp = LampType::None;
     };
     
     Player m_player;
