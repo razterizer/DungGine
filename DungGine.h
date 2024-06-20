@@ -30,7 +30,7 @@ namespace dung
     struct RoomStyle
     {
       WallType wall_type = WallType::Hash;
-      Style wall_style { Text::Color::DarkGray, Text::Color::LightGray };
+      Style wall_style { Color::DarkGray, Color::LightGray };
       FloorType floor_type = FloorType::None;
       bool is_underground = true;
       
@@ -92,24 +92,24 @@ namespace dung
         switch (floor_type)
         {
           case FloorType::Sand:
-            style = { Text::Color::DarkYellow, Text::Color::Yellow };
+            style = { Color::DarkYellow, Color::Yellow };
             break;
           case FloorType::Grass:
-            style = { Text::Color::DarkGreen, Text::Color::Green };
+            style = { Color::DarkGreen, Color::Green };
             break;
           case FloorType::Stone:
           case FloorType::Stone2:
-            style = { Text::Color::DarkGray, Text::Color::LightGray };
+            style = { Color::DarkGray, Color::LightGray };
             break;
           case FloorType::Water:
-            style = { Text::Color::DarkBlue, Text::Color::Blue };
+            style = { Color::DarkBlue, Color::Blue };
             break;
           case FloorType::Wood:
-            style = { Text::Color::DarkRed, Text::Color::Yellow };
+            style = { Color::DarkRed, Color::Yellow };
             break;
           case FloorType::None:
           default:
-            style = { Text::Color::Black, Text::Color::LightGray };
+            style = { Color::Black, Color::LightGray };
             break;
         }
         if (is_underground)
@@ -122,19 +122,19 @@ namespace dung
         switch (floor_type)
         {
           case FloorType::Sand:
-            return { Text::Color::Yellow, Text::Color::DarkYellow };
+            return { Color::Yellow, Color::DarkYellow };
           case FloorType::Grass:
-            return { Text::Color::Green, Text::Color::DarkGreen };
+            return { Color::Green, Color::DarkGreen };
           case FloorType::Stone:
           case FloorType::Stone2:
-            return { Text::Color::LightGray, Text::Color::DarkGray };
+            return { Color::LightGray, Color::DarkGray };
           case FloorType::Water:
-            return { Text::Color::Blue, Text::Color::DarkBlue };
+            return { Color::Blue, Color::DarkBlue };
           case FloorType::Wood:
-            return { Text::Color::Red, Text::Color::DarkYellow };
+            return { Color::Red, Color::DarkYellow };
           case FloorType::None:
           default:
-            return { Text::Color::Black, Text::Color::DarkGray };
+            return { Color::Black, Color::DarkGray };
             break;
         }
       }
@@ -161,15 +161,15 @@ namespace dung
       Key()
       {
         character = 'F';
-        style.fg_color = Text::Color::Green;
-        style.bg_color = Text::Color::Transparent2;
+        style.fg_color = Color::Green;
+        style.bg_color = Color::Transparent2;
       }
       
       int key_id = 0;
       
       void randomize_fg_color()
       {
-        style.fg_color = Text::get_random_color(key_fg_palette);
+        style.fg_color = color::get_random_color(key_fg_palette);
       }
     };
     
@@ -178,7 +178,7 @@ namespace dung
     struct Player
     {
       char character = '@';
-      Style style = { Text::Color::Magenta, Text::Color::White };
+      Style style = { Color::Magenta, Color::White };
       RC world_pos;
       bool is_spawned = false;
       BSPNode* curr_room = nullptr;
@@ -585,8 +585,8 @@ namespace dung
       
       if (m_player.show_inventory)
       {
-        sh.write_buffer(str::adjust_str("Inventory", str::Adjustment::Center, NC - 1), 4, 0, Text::Color::White, Text::Color::Transparent2);
-        drawing::draw_box(sh, 2, 2, NR - 5, NC - 5, drawing::OutlineType::Line, { Text::Color::White, Text::Color::DarkGray }, { Text::Color::White, Text::Color::DarkGray }, ' ');
+        sh.write_buffer(str::adjust_str("Inventory", str::Adjustment::Center, NC - 1), 4, 0, Color::White, Color::Transparent2);
+        drawing::draw_box(sh, 2, 2, NR - 5, NC - 5, drawing::OutlineType::Line, { Color::White, Color::DarkGray }, { Color::White, Color::DarkGray }, ' ');
       }
       
       if (m_player.is_spawned)
@@ -609,7 +609,7 @@ namespace dung
           else
             door_ch = "D";
         }
-        sh.write_buffer(door_ch, door_scr_pos.r, door_scr_pos.c, Text::Color::Black, (use_fog_of_war && door->fog_of_war) ? Text::Color::Black : Text::Color::Yellow);
+        sh.write_buffer(door_ch, door_scr_pos.r, door_scr_pos.c, Color::Black, (use_fog_of_war && door->fog_of_war) ? Color::Black : Color::Yellow);
       }
       
       for (const auto& key : all_keys)
@@ -636,7 +636,7 @@ namespace dung
             for (int c = 0; c <= bb.c_len; ++c)
             {
               if (room->fog_of_war[r * (bb.c_len + 1) + c])
-                sh.write_buffer(".", bb_scr_pos.r + r, bb_scr_pos.c + c, Text::Color::Black, Text::Color::Black);
+                sh.write_buffer(".", bb_scr_pos.r + r, bb_scr_pos.c + c, Color::Black, Color::Black);
             }
           }
         }
@@ -666,7 +666,7 @@ namespace dung
             for (int c = 0; c <= bb.c_len; ++c)
             {
               if (corr->fog_of_war[r * (bb.c_len + 1) + c])
-                sh.write_buffer(".", bb_scr_pos.r + r, bb_scr_pos.c + c, Text::Color::Black, Text::Color::Black);
+                sh.write_buffer(".", bb_scr_pos.r + r, bb_scr_pos.c + c, Color::Black, Color::Black);
             }
           }
         }
@@ -674,11 +674,11 @@ namespace dung
         drawing::draw_box(sh,
                           bb_scr_pos.r, bb_scr_pos.c, bb.r_len, bb.c_len,
                           WallType::Masonry4,
-                          { Text::Color::LightGray, Text::Color::Black }, //wall_palette[WallBasicType::Masonry],
-                          { Text::Color::DarkGray, Text::Color::LightGray },
+                          { Color::LightGray, Color::Black }, //wall_palette[WallBasicType::Masonry],
+                          { Color::DarkGray, Color::LightGray },
                           '8',
                           shadow_type,
-                          { Text::Color::LightGray, Text::Color::DarkGray },
+                          { Color::LightGray, Color::DarkGray },
                           '8');
       }
     }

@@ -673,7 +673,7 @@ namespace dung
     template<int NR, int NC>
     void draw_regions(SpriteHandler<NR, NC>& sh,
                       int r0 = 0, int c0 = 0,
-                      const styles::Style& border_style = { Text::Color::Black, Text::Color::Yellow }) const
+                      const styles::Style& border_style = { Color::Black, Color::Yellow }) const
     {
       m_root.draw_regions(sh, r0, c0, border_style);
     }
@@ -681,7 +681,7 @@ namespace dung
     template<int NR, int NC>
     void draw_rooms(SpriteHandler<NR, NC>& sh,
                     int r0 = 0, int c0 = 0,
-                    const styles::Style& room_style = { Text::Color::White, Text::Color::DarkRed }) const
+                    const styles::Style& room_style = { Color::White, Color::DarkRed }) const
     {
       m_root.draw_rooms(sh, r0, c0, room_style);
     }
@@ -689,8 +689,8 @@ namespace dung
     template<int NR, int NC>
     void draw_corridors(SpriteHandler<NR, NC>& sh,
                         int r0 = 0, int c0 = 0,
-                        const styles::Style& corridor_outline_style = { Text::Color::Green, Text::Color::DarkGreen },
-                        const styles::Style& corridor_fill_style = { Text::Color::Black, Text::Color::Green }) const
+                        const styles::Style& corridor_outline_style = { Color::Green, Color::DarkGreen },
+                        const styles::Style& corridor_fill_style = { Color::Black, Color::Green }) const
     {
       for (const auto& corr : room_corridor_map)
       {

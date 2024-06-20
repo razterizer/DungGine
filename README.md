@@ -66,7 +66,7 @@ bsp_tree.create_corridors(1); // argument: min_corridor_half_width = 1, (1 means
 
 Text t;
 SpriteHandler<NR, NC> sh;
-Text::Color bg_color = Text::Color::Default;
+Color bg_color = Color::Default;
 
 dung::DungGine dungeon_engine;
 dungeon_engine.load_dungeon(&bsp_tree);
@@ -89,7 +89,7 @@ bsp_tree.create_doors(); // We also create doors here.
 
 Text t;
 SpriteHandler<NR, NC> sh;
-Text::Color bg_color = Text::Color::Black;
+Color bg_color = Color::Black;
 
 dung::DungGine dungeon_engine;
 dungeon_engine.load_dungeon(&bsp_tree);
