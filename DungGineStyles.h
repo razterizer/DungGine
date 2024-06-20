@@ -11,6 +11,31 @@
 
 namespace dung
 {
+
+  std::vector<Text::Color> bright_colors
+  {
+    Text::Color::White,
+    Text::Color::LightGray,
+    Text::Color::DarkGray,
+    Text::Color::Cyan,
+    Text::Color::Magenta,
+    Text::Color::Yellow,
+    Text::Color::Red,
+    Text::Color::Green,
+    Text::Color::Blue,
+  };
+  std::vector<Text::Color> dark_colors
+  {
+    Text::Color::LightGray,
+    Text::Color::DarkGray,
+    Text::Color::Black,
+    Text::Color::DarkCyan,
+    Text::Color::DarkMagenta,
+    Text::Color::DarkYellow,
+    Text::Color::DarkRed,
+    Text::Color::DarkGreen,
+    Text::Color::DarkBlue,
+  };
   
   enum class WallBasicType { Masonry, Temple, Other };
   
