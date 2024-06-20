@@ -7,12 +7,13 @@
 
 #pragma once
 #include <Termin8or/Styles.h>
+#include <Core/StlUtils.h>
 
 
 namespace dung
 {
 
-  std::vector<Text::Color> bright_colors
+  std::vector<Text::Color> colors_bright
   {
     Text::Color::White,
     Text::Color::LightGray,
@@ -24,7 +25,7 @@ namespace dung
     Text::Color::Green,
     Text::Color::Blue,
   };
-  std::vector<Text::Color> dark_colors
+  std::vector<Text::Color> colors_dark
   {
     Text::Color::LightGray,
     Text::Color::DarkGray,
@@ -36,6 +37,31 @@ namespace dung
     Text::Color::DarkGreen,
     Text::Color::DarkBlue,
   };
+  
+  enum class ShadeType { Bright, Dark };
+  // #NOTE: Returns Text::Color::Default if no matching color was found.
+  Text::Color find_color_shade(Text::Color color, ShadeType shade)
+  {
+    int idx = -1;
+    switch (shade)
+    {
+      case ShadeType::Bright:
+        idx = stlutils::find_idx(colors_bright, color);
+        if (0 <= idx)
+          return colors_dark[idx];
+        if (stlutils::contains(colors_bright, color))
+          return color;
+        break;
+      case ShadeType::Dark:
+        idx = stlutils::find_idx(colors_dark, color);
+        if (0 <= idx)
+          return colors_bright[idx];
+        if (stlutils::contains(colors_dark, color))
+          return color;
+        break;
+    }
+    return Text::Color::Default;
+  }
   
   enum class WallBasicType { Masonry, Temple, Other };
   
