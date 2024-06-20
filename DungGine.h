@@ -25,7 +25,7 @@ namespace dung
     using WallType = drawing::OutlineType; //{ Hash, Masonry, Masonry1, Masonry2, Masonry3, Temple };
     using Direction = drawing::Direction;
     using Style = styles::Style;
-    using HiliteFGStyle = styles::HiliteFGStyle;
+    using HiliteSelectFGStyle = styles::HiliteSelectFGStyle;
     enum class FloorType { None, Sand, Grass, Stone, Stone2, Water, Wood, NUM_ITEMS };
     
     struct RoomStyle
@@ -176,7 +176,8 @@ namespace dung
       
       std::vector<int> key_idcs;
       std::vector<int> lamp_idcs;
-      int inv_sel_idx = 0;
+      int inv_hilite_idx = 0;
+      int inv_select_idx = -1;
       bool show_inventory = false;
       RC line_of_sight;
     };
@@ -414,8 +415,8 @@ namespace dung
       {
         if (m_player.show_inventory)
         {
-          m_player.inv_sel_idx++;
-          m_player.inv_sel_idx = m_player.inv_sel_idx % (m_player.key_idcs.size() + m_player.lamp_idcs.size());
+          m_player.inv_hilite_idx++;
+          m_player.inv_hilite_idx = m_player.inv_hilite_idx % (m_player.key_idcs.size() + m_player.lamp_idcs.size());
         }
         else if (is_inside_curr_bb(curr_pos.r + 1, curr_pos.c))
           curr_pos.r++;
@@ -424,56 +425,65 @@ namespace dung
       {
         if (m_player.show_inventory)
         {
-          m_player.inv_sel_idx--;
-          if (m_player.inv_sel_idx < 0)
-            m_player.inv_sel_idx = static_cast<int>(m_player.key_idcs.size() + m_player.lamp_idcs.size()) - 1;
+          m_player.inv_hilite_idx--;
+          if (m_player.inv_hilite_idx < 0)
+            m_player.inv_hilite_idx = static_cast<int>(m_player.key_idcs.size() + m_player.lamp_idcs.size()) - 1;
         }
         else if (is_inside_curr_bb(curr_pos.r - 1, curr_pos.c))
           curr_pos.r--;
       }
       else if (kpd.curr_key == ' ')
       {
-        if (m_player.curr_corridor != nullptr && m_player.curr_corridor->is_inside_corridor(curr_pos))
+        if (m_player.show_inventory)
         {
-          auto* door_0 = m_player.curr_corridor->doors[0];
-          auto* door_1 = m_player.curr_corridor->doors[1];
-          if (door_0 != nullptr && (!door_0->is_locked && door_0->is_door) && distance(curr_pos, door_0->pos) == 1.f)
-            math::toggle(door_0->is_open);
-          if (door_1 != nullptr && (!door_1->is_locked && door_1->is_door) && distance(curr_pos, door_1->pos) == 1.f)
-            math::toggle(door_1->is_open);
+          int& select_idx = m_player.inv_select_idx;
+          const int hilite_idx = m_player.inv_hilite_idx;
+          select_idx = (select_idx == -1) ? hilite_idx : -1;
         }
-        else if (m_player.curr_room != nullptr && m_player.curr_room->is_inside_room(curr_pos))
+        else
         {
-          for (auto* door : m_player.curr_room->doors)
+          if (m_player.curr_corridor != nullptr && m_player.curr_corridor->is_inside_corridor(curr_pos))
           {
-            if ((!door->is_locked && door->is_door) && distance(curr_pos, door->pos) == 1.f)
+            auto* door_0 = m_player.curr_corridor->doors[0];
+            auto* door_1 = m_player.curr_corridor->doors[1];
+            if (door_0 != nullptr && (!door_0->is_locked && door_0->is_door) && distance(curr_pos, door_0->pos) == 1.f)
+              math::toggle(door_0->is_open);
+            if (door_1 != nullptr && (!door_1->is_locked && door_1->is_door) && distance(curr_pos, door_1->pos) == 1.f)
+              math::toggle(door_1->is_open);
+          }
+          else if (m_player.curr_room != nullptr && m_player.curr_room->is_inside_room(curr_pos))
+          {
+            for (auto* door : m_player.curr_room->doors)
             {
-              math::toggle(door->is_open);
-              break;
+              if ((!door->is_locked && door->is_door) && distance(curr_pos, door->pos) == 1.f)
+              {
+                math::toggle(door->is_open);
+                break;
+              }
             }
           }
-        }
-
-        for (size_t key_idx = 0; key_idx < all_keys.size(); ++key_idx)
-        {
-          auto& key = all_keys[key_idx];
-          if (key.pos == curr_pos && !key.picked_up)
+          
+          for (size_t key_idx = 0; key_idx < all_keys.size(); ++key_idx)
           {
-            m_player.key_idcs.emplace_back(key_idx);
-            key.picked_up = true;
-            message_handler->add_message(static_cast<float>(sim_time_s),
-                                         "You picked up a key!", MessageHandler::Level::Guide);
+            auto& key = all_keys[key_idx];
+            if (key.pos == curr_pos && !key.picked_up)
+            {
+              m_player.key_idcs.emplace_back(key_idx);
+              key.picked_up = true;
+              message_handler->add_message(static_cast<float>(sim_time_s),
+                                           "You picked up a key!", MessageHandler::Level::Guide);
+            }
           }
-        }
-        for (size_t lamp_idx = 0; lamp_idx < all_lamps.size(); ++lamp_idx)
-        {
-          auto& lamp = all_lamps[lamp_idx];
-          if (lamp.pos == curr_pos && !lamp.picked_up)
+          for (size_t lamp_idx = 0; lamp_idx < all_lamps.size(); ++lamp_idx)
           {
-            m_player.lamp_idcs.emplace_back(lamp_idx);
-            lamp.picked_up = true;
-            message_handler->add_message(static_cast<float>(sim_time_s),
-                                         "You picked up a lamp!", MessageHandler::Level::Guide);
+            auto& lamp = all_lamps[lamp_idx];
+            if (lamp.pos == curr_pos && !lamp.picked_up)
+            {
+              m_player.lamp_idcs.emplace_back(lamp_idx);
+              lamp.picked_up = true;
+              message_handler->add_message(static_cast<float>(sim_time_s),
+                                           "You picked up a lamp!", MessageHandler::Level::Guide);
+            }
           }
         }
       }
@@ -639,7 +649,7 @@ namespace dung
         const int c_category = 4;
         const int c_item = 6;
         Style style_category { Color::White, Color::Transparent2 };
-        HiliteFGStyle style_item { Color::DarkGreen, Color::Transparent2, Color::Green };
+        HiliteSelectFGStyle style_item { Color::DarkGreen, Color::Transparent2, Color::Green, Color::DarkBlue, Color::Blue };
         sh.write_buffer("Keys:", r++, c_category, style_category);
         auto num_inv_keys = static_cast<int>(m_player.key_idcs.size());
         for (int inv_key_idx = 0; inv_key_idx < num_inv_keys; ++inv_key_idx)
@@ -647,7 +657,8 @@ namespace dung
           auto key_idx = m_player.key_idcs[inv_key_idx];
           const auto& key = all_keys[key_idx];
           sh.write_buffer("Key:" + std::to_string(key.key_id), r++, c_item,
-            style_item.get_style(m_player.inv_sel_idx == inv_key_idx));
+            style_item.get_style(m_player.inv_hilite_idx == inv_key_idx,
+                                 m_player.inv_select_idx == inv_key_idx));
         }
         r++;
         sh.write_buffer("Lamps:", r++, c_category, style_category);
@@ -657,7 +668,8 @@ namespace dung
           auto lamp_idx = m_player.lamp_idcs[inv_lamp_idx];
           //const auto& lamp = all_lamps[lamp_idx];
           sh.write_buffer("Lamp:" + std::to_string(lamp_idx), r++, c_item,
-            style_item.get_style(m_player.inv_sel_idx == num_inv_keys + inv_lamp_idx));
+            style_item.get_style(m_player.inv_hilite_idx == num_inv_keys + inv_lamp_idx,
+                                 m_player.inv_select_idx == num_inv_keys + inv_lamp_idx));
         }
         
         drawing::draw_box(sh, 2, 2, NR - 5, NC - 5, drawing::OutlineType::Line, { Color::White, Color::DarkGray }, { Color::White, Color::DarkGray }, ' ');
