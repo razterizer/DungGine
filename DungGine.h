@@ -176,6 +176,7 @@ namespace dung
       
       std::vector<int> key_idcs;
       std::vector<int> lamp_idcs;
+      int inv_sel_idx = 0;
       bool show_inventory = false;
       RC line_of_sight;
     };
