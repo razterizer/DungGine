@@ -394,22 +394,22 @@ namespace dung
       };
       
       auto& curr_pos = m_player.world_pos;
-      if (str::to_lower(kpd.curr_key) == 'a')
+      if (str::to_lower(kpd.curr_key) == 'a' || kpd.curr_special_key == keyboard::SpecialKey::Left)
       {
         if (is_inside_curr_bb(curr_pos.r, curr_pos.c - 1))
           curr_pos.c--;
       }
-      else if (str::to_lower(kpd.curr_key) == 'd')
+      else if (str::to_lower(kpd.curr_key) == 'd' || kpd.curr_special_key == keyboard::SpecialKey::Right)
       {
         if (is_inside_curr_bb(curr_pos.r, curr_pos.c + 1))
           curr_pos.c++;
       }
-      else if (str::to_lower(kpd.curr_key) == 's')
+      else if (str::to_lower(kpd.curr_key) == 's' || kpd.curr_special_key == keyboard::SpecialKey::Down)
       {
         if (is_inside_curr_bb(curr_pos.r + 1, curr_pos.c))
           curr_pos.r++;
       }
-      else if (str::to_lower(kpd.curr_key) == 'w')
+      else if (str::to_lower(kpd.curr_key) == 'w' || kpd.curr_special_key == keyboard::SpecialKey::Up)
       {
         if (is_inside_curr_bb(curr_pos.r - 1, curr_pos.c))
           curr_pos.r--;
