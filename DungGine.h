@@ -445,6 +445,16 @@ namespace dung
                                          "You picked up a key!", MessageHandler::Level::Guide);
           }
         }
+        for (auto& lamp : all_lamps)
+        {
+          if (lamp.pos == curr_pos)
+          {
+            m_player.lamps.emplace_back(lamp);
+            lamp.picked_up = true;
+            message_handler->add_message(static_cast<float>(sim_time_s),
+                                         "You picked up a lamp!", MessageHandler::Level::Guide);
+          }
+        }
       }
       else if (str::to_lower(kpd.curr_key) == 'i')
       {
