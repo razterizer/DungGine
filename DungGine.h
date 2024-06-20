@@ -92,17 +92,17 @@ namespace dung
         switch (floor_type)
         {
           case FloorType::Sand:
-            style = { Color::DarkYellow, Color::Yellow };
+            style = styles::make_shaded_style(Color::Yellow, color::ShadeType::Bright);
             break;
           case FloorType::Grass:
-            style = { Color::DarkGreen, Color::Green };
+            style = styles::make_shaded_style(Color::Green, color::ShadeType::Bright);
             break;
           case FloorType::Stone:
           case FloorType::Stone2:
-            style = { Color::DarkGray, Color::LightGray };
+            style = styles::make_shaded_style(Color::LightGray, color::ShadeType::Bright);
             break;
           case FloorType::Water:
-            style = { Color::DarkBlue, Color::Blue };
+            style = styles::make_shaded_style(Color::Blue, color::ShadeType::Bright);
             break;
           case FloorType::Wood:
             style = { Color::DarkRed, Color::Yellow };
@@ -113,31 +113,10 @@ namespace dung
             break;
         }
         if (is_underground)
-          std::swap(style.fg_color, style.bg_color);
+          style.swap();
         return style;
       }
-      
-      Style get_shadow_style() const
-      {
-        switch (floor_type)
-        {
-          case FloorType::Sand:
-            return { Color::Yellow, Color::DarkYellow };
-          case FloorType::Grass:
-            return { Color::Green, Color::DarkGreen };
-          case FloorType::Stone:
-          case FloorType::Stone2:
-            return { Color::LightGray, Color::DarkGray };
-          case FloorType::Water:
-            return { Color::Blue, Color::DarkBlue };
-          case FloorType::Wood:
-            return { Color::Red, Color::DarkYellow };
-          case FloorType::None:
-          default:
-            return { Color::Black, Color::DarkGray };
-            break;
-        }
-      }
+
     };
     
     std::map<BSPNode*, RoomStyle> m_room_styles;
@@ -648,7 +627,7 @@ namespace dung
                           room_style.get_fill_style(),
                           room_style.get_fill_char(),
                           room_style.is_underground ? Direction::None : shadow_type,
-                          room_style.get_shadow_style(),
+                          styles::shade_style(room_style.get_fill_style(), color::ShadeType::Dark),
                           room_style.get_fill_char());
       }
       
