@@ -183,6 +183,7 @@ namespace dung
       Corridor* curr_corridor = nullptr;
       std::vector<Key> keys;
       bool show_inventory = false;
+      RC line_of_sight;
     };
     
     Player m_player;
