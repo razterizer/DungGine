@@ -12,56 +12,6 @@
 
 namespace dung
 {
-
-  std::vector<Color> colors_bright
-  {
-    Color::White,
-    Color::LightGray,
-    Color::DarkGray,
-    Color::Cyan,
-    Color::Magenta,
-    Color::Yellow,
-    Color::Red,
-    Color::Green,
-    Color::Blue,
-  };
-  std::vector<Color> colors_dark
-  {
-    Color::LightGray,
-    Color::DarkGray,
-    Color::Black,
-    Color::DarkCyan,
-    Color::DarkMagenta,
-    Color::DarkYellow,
-    Color::DarkRed,
-    Color::DarkGreen,
-    Color::DarkBlue,
-  };
-  
-  enum class ShadeType { Bright, Dark };
-  // #NOTE: Returns Color::Default if no matching color was found.
-  Color find_color_shade(Color color, ShadeType shade)
-  {
-    int idx = -1;
-    switch (shade)
-    {
-      case ShadeType::Bright:
-        idx = stlutils::find_idx(colors_bright, color);
-        if (0 <= idx)
-          return colors_dark[idx];
-        if (stlutils::contains(colors_bright, color))
-          return color;
-        break;
-      case ShadeType::Dark:
-        idx = stlutils::find_idx(colors_dark, color);
-        if (0 <= idx)
-          return colors_bright[idx];
-        if (stlutils::contains(colors_dark, color))
-          return color;
-        break;
-    }
-    return Color::Default;
-  }
   
   enum class WallBasicType { Masonry, Temple, Other };
   
