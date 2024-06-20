@@ -109,7 +109,7 @@ namespace dung
             break;
           case FloorType::None:
           default:
-            style = { Color::Black, Color::LightGray };
+            style = { Color::DarkGray, Color::LightGray };
             break;
         }
         if (is_underground)
