@@ -453,8 +453,9 @@ namespace dung
       // Fog of war
       if (use_fog_of_war)
       {
+        const auto c_fow_dist = 2.3f;
         for (auto& key : all_keys)
-          if (distance(key.pos, curr_pos) <= 1.f)
+          if (distance(key.pos, curr_pos) <= c_fow_dist)
             key.fog_of_war = false;
         
         ttl::Rectangle bb;
@@ -465,58 +466,77 @@ namespace dung
         {
           if (fog_of_war == nullptr)
             return;
+          if (p.r < 0 || p.c < 0 || p.r > bb.r_len || p.c > bb.c_len)
+            return;
+          // ex:
+          // +---+
+          // |   |
+          // +---+
+          // r_len = 2, c_len = 4
+          // FOW size = 3*5
+          // idx = 0 .. 14
+          // r = 2, c = 4 => idx = r * (c_len + 1) + c = 2*5 + 4 = 14.
           int idx = p.r * (size.c + 1) + p.c;
           if (0 <= idx && idx < fog_of_war->size())
             (*fog_of_war)[idx] = false;
         };
         
-        bool is_inside_corridor = m_player.curr_corridor != nullptr && m_player.curr_corridor->is_inside_corridor(curr_pos);
-        bool is_inside_room = m_player.curr_room != nullptr && m_player.curr_room->is_inside_room(curr_pos);
+        auto update_fow = [&]() // #FIXME: FHXFTW
+        {
+          local_pos = curr_pos - bb.pos();
+          size = bb.size();
+          
+          //    ###
+          //   #####
+          //    ###
+          set_fow_pos(local_pos);
+          for (int c = -1; c <= +1; ++c)
+          {
+            set_fow_pos(local_pos + RC { -1, c });
+            set_fow_pos(local_pos + RC { +1, c });
+          }
+          for (int c = -2; c <= +2; ++c)
+            set_fow_pos(local_pos + RC { 0, c });
+          
+          int r_room = -1;
+          int c_room = -1;
+          if (curr_pos.r - bb.top() <= 1)
+            r_room = 0;
+          else if (bb.bottom() - curr_pos.r <= 1)
+            r_room = bb.r_len;
+          if (curr_pos.c - bb.left() <= 1)
+            c_room = 0;
+          else if (bb.right() - curr_pos.c <= 1)
+            c_room = bb.c_len;
+          
+          if (r_room >= 0 && c_room >= 0)
+            set_fow_pos({ r_room, c_room });
+        };
         
-        if (is_inside_corridor)
+        if (m_player.curr_corridor != nullptr && m_player.curr_corridor->is_inside_corridor(curr_pos))
         {
           bb = m_player.curr_corridor->bb;
           fog_of_war = &m_player.curr_corridor->fog_of_war;
           
           auto* door_0 = m_player.curr_corridor->doors[0];
           auto* door_1 = m_player.curr_corridor->doors[1];
-          if (distance(door_0->pos, curr_pos) <= 1.f)
+          update_fow();
+          
+          if (distance(door_0->pos, curr_pos) <= c_fow_dist)
             door_0->fog_of_war = false;
-          if (distance(door_1->pos, curr_pos) <= 1.f)
+          if (distance(door_1->pos, curr_pos) <= c_fow_dist)
             door_1->fog_of_war = false;
         }
-        if (is_inside_room)
+        if (m_player.curr_room != nullptr && m_player.curr_room->is_inside_room(curr_pos))
         {
           bb = m_player.curr_room->bb_leaf_room;
           fog_of_war = &m_player.curr_room->fog_of_war;
+          update_fow();
           
           for (auto* door : m_player.curr_room->doors)
-            if (distance(door->pos, curr_pos) <= 1.f)
+            if (distance(door->pos, curr_pos) <= c_fow_dist)
               door->fog_of_war = false;
         }
-        
-        local_pos = curr_pos - bb.pos();
-        size = bb.size();
-        
-        set_fow_pos(local_pos);
-        set_fow_pos(local_pos + RC { -1, 0 });
-        set_fow_pos(local_pos + RC { +1, 0 });
-        set_fow_pos(local_pos + RC { 0, -1 });
-        set_fow_pos(local_pos + RC { 0, +1 });
-        
-        int r_room = -1;
-        int c_room = -1;
-        if (curr_pos.r - bb.top() == 1)
-          r_room = 0;
-        else if (curr_pos.r - bb.bottom() == -1)
-          r_room = bb.r_len;
-        if (curr_pos.c - bb.left() == 1)
-          c_room = 0;
-        else if (curr_pos.c - bb.right() == -1)
-          c_room = bb.c_len;
-        
-        if (r_room >= 0 && c_room >= 0)
-          set_fow_pos({ r_room, c_room });
       }
       
       // Scrolling mode.
