@@ -153,6 +153,7 @@ namespace dung
       bool picked_up = false;
       Style style;
       char character = '?';
+      bool fog_of_war = true;
     };
   
     struct Key : Item
@@ -205,6 +206,7 @@ namespace dung
     std::vector<Key> all_keys;
     
     std::unique_ptr<MessageHandler> message_handler;
+    bool use_fog_of_war = false;
     
     RC get_screen_pos(const RC& world_pos) const
     {
@@ -242,7 +244,10 @@ namespace dung
     }
     
   public:
-    DungGine() : message_handler(std::make_unique<MessageHandler>()) {}
+    DungGine(bool use_fow)
+      : message_handler(std::make_unique<MessageHandler>())
+      , use_fog_of_war(use_fow)
+    {}
     
     void load_dungeon(BSPTree* bsp_tree)
     {
@@ -410,12 +415,14 @@ namespace dung
         }
 
         for (auto& key : all_keys)
-        if (key.pos == curr_pos)
         {
-          m_player.keys.emplace_back(key);
-          key.picked_up = true;
-          message_handler->add_message(static_cast<float>(sim_time_s),
-                                      "You picked up a key!", MessageHandler::Level::Guide);
+          if (key.pos == curr_pos)
+          {
+            m_player.keys.emplace_back(key);
+            key.picked_up = true;
+            message_handler->add_message(static_cast<float>(sim_time_s),
+                                         "You picked up a key!", MessageHandler::Level::Guide);
+          }
         }
       }
       else if (str::to_lower(kpd.curr_key) == 'i')
@@ -424,7 +431,6 @@ namespace dung
       }
       
       // Update current room and current corridor.
-      
       if (m_player.curr_corridor != nullptr)
       {
         auto* door_0 = m_player.curr_corridor->doors[0];
@@ -444,8 +450,76 @@ namespace dung
           }
       }
       
-      // Scrolling mode.
+      // Fog of war
+      if (use_fog_of_war)
+      {
+        for (auto& key : all_keys)
+          if (distance(key.pos, curr_pos) <= 1.f)
+            key.fog_of_war = false;
+        
+        ttl::Rectangle bb;
+        RC local_pos;
+        RC size;
+        bool_vector* fog_of_war = nullptr;
+        auto set_fow_pos = [&](const RC& p)
+        {
+          if (fog_of_war == nullptr)
+            return;
+          int idx = p.r * (size.c + 1) + p.c;
+          if (0 <= idx && idx < fog_of_war->size())
+            (*fog_of_war)[idx] = false;
+        };
+        
+        bool is_inside_corridor = m_player.curr_corridor != nullptr && m_player.curr_corridor->is_inside_corridor(curr_pos);
+        bool is_inside_room = m_player.curr_room != nullptr && m_player.curr_room->is_inside_room(curr_pos);
+        
+        if (is_inside_corridor)
+        {
+          bb = m_player.curr_corridor->bb;
+          fog_of_war = &m_player.curr_corridor->fog_of_war;
+          
+          auto* door_0 = m_player.curr_corridor->doors[0];
+          auto* door_1 = m_player.curr_corridor->doors[1];
+          if (distance(door_0->pos, curr_pos) <= 1.f)
+            door_0->fog_of_war = false;
+          if (distance(door_1->pos, curr_pos) <= 1.f)
+            door_1->fog_of_war = false;
+        }
+        if (is_inside_room)
+        {
+          bb = m_player.curr_room->bb_leaf_room;
+          fog_of_war = &m_player.curr_room->fog_of_war;
+          
+          for (auto* door : m_player.curr_room->doors)
+            if (distance(door->pos, curr_pos) <= 1.f)
+              door->fog_of_war = false;
+        }
+        
+        local_pos = curr_pos - bb.pos();
+        size = bb.size();
+        
+        set_fow_pos(local_pos);
+        set_fow_pos(local_pos + RC { -1, 0 });
+        set_fow_pos(local_pos + RC { +1, 0 });
+        set_fow_pos(local_pos + RC { 0, -1 });
+        set_fow_pos(local_pos + RC { 0, +1 });
+        
+        int r_room = -1;
+        int c_room = -1;
+        if (curr_pos.r - bb.top() == 1)
+          r_room = 0;
+        else if (curr_pos.r - bb.bottom() == -1)
+          r_room = bb.r_len;
+        if (curr_pos.c - bb.left() == 1)
+          c_room = 0;
+        else if (curr_pos.c - bb.right() == -1)
+          c_room = bb.c_len;
+        
+        if (r_room >= 0 && c_room >= 0)
+          set_fow_pos({ r_room, c_room });
+      }
       
+      // Scrolling mode.
       switch (scr_scrolling_mode)
       {
         case ScreenScrollingMode::AlwaysInCentre:
@@ -511,12 +585,12 @@ namespace dung
           else
             door_ch = "D";
         }
-        sh.write_buffer(door_ch, door_scr_pos.r, door_scr_pos.c, Text::Color::Black, Text::Color::Yellow);
+        sh.write_buffer(door_ch, door_scr_pos.r, door_scr_pos.c, Text::Color::Black, (use_fog_of_war && door->fog_of_war) ? Text::Color::Black : Text::Color::Yellow);
       }
       
       for (const auto& key : all_keys)
       {
-        if (key.picked_up)
+        if (key.picked_up || (use_fog_of_war && key.fog_of_war))
           continue;
         auto key_scr_pos = get_screen_pos(key.pos);
         sh.write_buffer(std::string(1, key.character), key_scr_pos.r, key_scr_pos.c, key.style);
@@ -525,9 +599,24 @@ namespace dung
       auto shadow_type = m_shadow_dir;
       for (const auto& room_pair : m_room_styles)
       {
-        const auto& bb = room_pair.first->bb_leaf_room;
+        auto* room = room_pair.first;
+        const auto& bb = room->bb_leaf_room;
         const auto& room_style = room_pair.second;
         auto bb_scr_pos = get_screen_pos(bb.pos());
+        
+        // Fog of war
+        if (use_fog_of_war)
+        {
+          for (int r = 0; r <= bb.r_len; ++r)
+          {
+            for (int c = 0; c <= bb.c_len; ++c)
+            {
+              if (room->fog_of_war[r * (bb.c_len + 1) + c])
+                sh.write_buffer(".", bb_scr_pos.r + r, bb_scr_pos.c + c, Text::Color::Black, Text::Color::Black);
+            }
+          }
+        }
+        
         drawing::draw_box(sh,
                           bb_scr_pos.r, bb_scr_pos.c, bb.r_len, bb.c_len,
                           room_style.wall_type,
@@ -543,8 +632,21 @@ namespace dung
       {
         auto* corr = cp.second;
         const auto& bb = corr->bb;
-        
         auto bb_scr_pos = get_screen_pos(bb.pos());
+        
+        // Fog of war
+        if (use_fog_of_war)
+        {
+          for (int r = 0; r <= bb.r_len; ++r)
+          {
+            for (int c = 0; c <= bb.c_len; ++c)
+            {
+              if (corr->fog_of_war[r * (bb.c_len + 1) + c])
+                sh.write_buffer(".", bb_scr_pos.r + r, bb_scr_pos.c + c, Text::Color::Black, Text::Color::Black);
+            }
+          }
+        }
+        
         drawing::draw_box(sh,
                           bb_scr_pos.r, bb_scr_pos.c, bb.r_len, bb.c_len,
                           WallType::Masonry4,

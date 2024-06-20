@@ -11,6 +11,7 @@
 #include <Termin8or/Drawing.h>
 #include <Core/Rand.h>
 #include <Core/Math.h>
+#include <Core/bool_vector.h>
 #include <array>
 #include <memory>
 
@@ -87,6 +88,8 @@ namespace dung
     BSPNode* room = nullptr;
     Corridor* corridor = nullptr;
     
+    bool fog_of_war = true;
+    
     bool open_or_no_door() const
     {
       return !is_door || is_open;
@@ -98,6 +101,8 @@ namespace dung
     ttl::Rectangle bb;
     Orientation orientation = Orientation::Vertical;
     std::array<Door*, 2> doors;
+    
+    bool_vector fog_of_war;
     
     bool is_inside_corridor(const RC& pos) const
     {
@@ -154,6 +159,8 @@ namespace dung
     int level = 0; // root = 0;
     
     std::vector<Door*> doors;
+    
+    bool_vector fog_of_war;
     
     // ///////////
     
@@ -295,6 +302,8 @@ namespace dung
             min_rnd_wall_padding = 0;
           num_tries++;
         } while (bb_leaf_room.r_len < min_room_length || bb_leaf_room.c_len < min_room_length);
+        
+        fog_of_war.resize((bb_leaf_room.r_len + 1) * (bb_leaf_room.c_len + 1), true);
       }
       else
       {
@@ -325,6 +334,13 @@ namespace dung
           return true;
       }
       return bb_leaf_room.is_inside_offs(pos, -1);
+    }
+    
+    bool is_in_corner_of_room(const RC& pos) const
+    {
+      if (pos.r - bb_leaf_room.top() == 1 || pos.r - bb_leaf_room.bottom() == -1)
+        return pos.c - bb_leaf_room.left() == 1 || pos.c - bb_leaf_room.right() == -1;
+      return false;
     }
   };
       
@@ -442,6 +458,7 @@ namespace dung
                   auto* corr = corridors.emplace_back(std::make_unique<Corridor>()).get();
                   corr->bb = { (r0 + r1)/2 - min_corridor_half_width, c0, 2*min_corridor_half_width, c1 - c0 };
                   corr->orientation = Orientation::Horizontal;
+                  corr->fog_of_war.resize((corr->bb.r_len + 1) * (corr->bb.c_len + 1), true);
                   room_corridor_map[key] = corr;
                   return true;
                 }
@@ -507,6 +524,7 @@ namespace dung
                   auto* corr = corridors.emplace_back(std::make_unique<Corridor>()).get();
                   corr->bb = { r0, (c0 + c1)/2 - min_corridor_half_width, r1 - r0, 2*min_corridor_half_width };
                   corr->orientation = Orientation::Vertical;
+                  corr->fog_of_war.resize((corr->bb.r_len + 1) * (corr->bb.c_len + 1), true);
                   room_corridor_map[key] = corr;
                   return true;
                 }
