@@ -412,12 +412,23 @@ namespace dung
       }
       else if (str::to_lower(kpd.curr_key) == 's' || kpd.curr_special_key == keyboard::SpecialKey::Down)
       {
-        if (is_inside_curr_bb(curr_pos.r + 1, curr_pos.c))
+        if (m_player.show_inventory)
+        {
+          m_player.inv_sel_idx++;
+          m_player.inv_sel_idx = m_player.inv_sel_idx % (m_player.key_idcs.size() + m_player.lamp_idcs.size());
+        }
+        else if (is_inside_curr_bb(curr_pos.r + 1, curr_pos.c))
           curr_pos.r++;
       }
       else if (str::to_lower(kpd.curr_key) == 'w' || kpd.curr_special_key == keyboard::SpecialKey::Up)
       {
-        if (is_inside_curr_bb(curr_pos.r - 1, curr_pos.c))
+        if (m_player.show_inventory)
+        {
+          m_player.inv_sel_idx--;
+          if (m_player.inv_sel_idx < 0)
+            m_player.inv_sel_idx = static_cast<int>(m_player.key_idcs.size() + m_player.lamp_idcs.size()) - 1;
+        }
+        else if (is_inside_curr_bb(curr_pos.r - 1, curr_pos.c))
           curr_pos.r--;
       }
       else if (kpd.curr_key == ' ')
