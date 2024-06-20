@@ -25,6 +25,7 @@ namespace dung
     using WallType = drawing::OutlineType; //{ Hash, Masonry, Masonry1, Masonry2, Masonry3, Temple };
     using Direction = drawing::Direction;
     using Style = styles::Style;
+    using HiliteFGStyle = styles::HiliteFGStyle;
     enum class FloorType { None, Sand, Grass, Stone, Stone2, Water, Wood, NUM_ITEMS };
     
     struct RoomStyle
