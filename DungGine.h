@@ -634,6 +634,32 @@ namespace dung
       if (m_player.show_inventory)
       {
         sh.write_buffer(str::adjust_str("Inventory", str::Adjustment::Center, NC - 1), 4, 0, Color::White, Color::Transparent2);
+        
+        int r = 6;
+        const int c_category = 4;
+        const int c_item = 6;
+        Style style_category { Color::White, Color::Transparent2 };
+        HiliteFGStyle style_item { Color::DarkGreen, Color::Transparent2, Color::Green };
+        sh.write_buffer("Keys:", r++, c_category, style_category);
+        auto num_inv_keys = static_cast<int>(m_player.key_idcs.size());
+        for (int inv_key_idx = 0; inv_key_idx < num_inv_keys; ++inv_key_idx)
+        {
+          auto key_idx = m_player.key_idcs[inv_key_idx];
+          const auto& key = all_keys[key_idx];
+          sh.write_buffer("Key:" + std::to_string(key.key_id), r++, c_item,
+            style_item.get_style(m_player.inv_sel_idx == inv_key_idx));
+        }
+        r++;
+        sh.write_buffer("Lamps:", r++, c_category, style_category);
+        auto num_inv_lamps = static_cast<int>(m_player.lamp_idcs.size());
+        for (int inv_lamp_idx = 0; inv_lamp_idx < num_inv_lamps; ++inv_lamp_idx)
+        {
+          auto lamp_idx = m_player.lamp_idcs[inv_lamp_idx];
+          //const auto& lamp = all_lamps[lamp_idx];
+          sh.write_buffer("Lamp:" + std::to_string(lamp_idx), r++, c_item,
+            style_item.get_style(m_player.inv_sel_idx == num_inv_keys + inv_lamp_idx));
+        }
+        
         drawing::draw_box(sh, 2, 2, NR - 5, NC - 5, drawing::OutlineType::Line, { Color::White, Color::DarkGray }, { Color::White, Color::DarkGray }, ' ');
       }
       
