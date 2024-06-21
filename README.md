@@ -4,7 +4,7 @@
 This is a header only library.
 The engine works very well together with the `GameEngine` class of lib [`Termin8or`](https://github.com/razterizer/Termin8or).
 
-This library is very new and currently only provides a class `BSPTree` that is responsible for creating the rooms in the "dungeon".
+This library is very new and currently only provides two classes: `BSPTree` that is responsible for creating the rooms, corridors and doors in the "dungeon", and then there is the class `DungGine` that is the dungeon game engine itself.
 
 ## Headers
 
