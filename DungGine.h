@@ -420,6 +420,37 @@ namespace dung
       {
         if (m_player.show_inventory)
         {
+          std::string msg = "You dropped an item: ";
+          if (m_player.inv_select_idx >= 0)
+          {
+            if (m_player.inv_select_idx < m_player.key_idcs.size())
+            {
+              auto key_idx = m_player.key_idcs[m_player.inv_select_idx];
+              auto& key = all_keys[key_idx];
+              key.picked_up = false;
+              key.pos = curr_pos;
+              stlutils::erase(m_player.key_idcs, key_idx);
+              msg += "key:" + std::to_string(key.key_id) + "!";
+            }
+            else if (m_player.inv_select_idx < m_player.key_idcs.size() + m_player.lamp_idcs.size())
+            {
+              auto lamp_idx = m_player.lamp_idcs[m_player.inv_select_idx - m_player.key_idcs.size()];
+              auto& lamp = all_lamps[lamp_idx];
+              lamp.picked_up = false;
+              lamp.pos = curr_pos;
+              stlutils::erase(m_player.lamp_idcs, lamp_idx);
+              msg += "lamp:" + std::to_string(lamp_idx) + "!";
+            }
+            else
+            {
+              msg += "Invalid Item!";
+              std::cerr << "ERROR: Attempted to drop invalid item!" << std::endl;
+            }
+            m_player.inv_select_idx = -1;
+          }
+          message_handler->add_message(static_cast<float>(sim_time_s),
+                                               msg,
+                                               MessageHandler::Level::Guide);
         }
         else if (is_inside_curr_bb(curr_pos.r, curr_pos.c + 1))
           curr_pos.c++;
