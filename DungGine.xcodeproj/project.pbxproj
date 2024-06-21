@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXFileReference section */
+		07C2A7842C2616FC00869A56 /* RoomStyle.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RoomStyle.h; sourceTree = "<group>"; };
 		07E6EAC32C14CEA8007BBC6B /* libDungGine.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libDungGine.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		07E6EACA2C14CFD3007BBC6B /* BSPTree.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BSPTree.h; sourceTree = "<group>"; };
 		07E6EACC2C150C23007BBC6B /* LICENSE */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
@@ -34,6 +35,7 @@
 				07E6EACA2C14CFD3007BBC6B /* BSPTree.h */,
 				07E6EAD62C1B53B8007BBC6B /* DungGine.h */,
 				07E6EAD72C1C2657007BBC6B /* DungGineStyles.h */,
+				07C2A7842C2616FC00869A56 /* RoomStyle.h */,
 				07E6EAC42C14CEA8007BBC6B /* Products */,
 			);
 			sourceTree = "<group>";
