@@ -10,6 +10,7 @@
 #include "DungGineStyles.h"
 #include "RoomStyle.h"
 #include "Items.h"
+#include "Player.h"
 #include <Termin8or/Keyboard.h>
 #include <Termin8or/MessageHandler.h>
 
@@ -30,33 +31,6 @@ namespace dung
     Direction m_shadow_dir = Direction::W;
     float m_sun_minutes_per_day = 20.f;
     float m_sun_t_offs = 0.f;
-    
-    struct Player
-    {
-      char character = '@';
-      Style style = { Color::Magenta, Color::White };
-      RC pos;
-      bool is_spawned = false;
-      BSPNode* curr_room = nullptr;
-      Corridor* curr_corridor = nullptr;
-      
-      std::vector<int> key_idcs;
-      std::vector<int> lamp_idcs;
-      int inv_hilite_idx = 0;
-      int inv_select_idx = -1;
-      bool show_inventory = false;
-      RC line_of_sight;
-      float weight_capacity = 50.f;
-      
-      bool using_key_id(const std::vector<Key>& all_keys, int key_id) const
-      {
-        auto N = static_cast<int>(key_idcs.size());
-        if (math::in_range<int>(inv_select_idx, 0, N, Range::ClosedOpen))
-          if (all_keys[key_idcs[inv_select_idx]].key_id == key_id)
-            return true;
-        return false;
-      }
-    };
     
     Player m_player;
     ttl::Rectangle m_screen_in_world;
