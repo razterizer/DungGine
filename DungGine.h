@@ -91,6 +91,39 @@ namespace dung
       return false;
     }
     
+    template<int NR, int NC>
+    void draw_inventory(SpriteHandler<NR, NC>& sh) const
+    {
+      int r = 6;
+      const int c_category = 4;
+      const int c_item = 6;
+      Style style_category { Color::White, Color::Transparent2 };
+      HiliteSelectFGStyle style_item { Color::DarkGreen, Color::Transparent2, Color::Green, Color::DarkBlue, Color::Blue };
+      sh.write_buffer("Keys:", r++, c_category, style_category);
+      auto num_inv_keys = static_cast<int>(m_player.key_idcs.size());
+      for (int inv_key_idx = 0; inv_key_idx < num_inv_keys; ++inv_key_idx)
+      {
+        auto key_idx = m_player.key_idcs[inv_key_idx];
+        const auto& key = all_keys[key_idx];
+        sh.write_buffer("Key:" + std::to_string(key.key_id), r++, c_item,
+                        style_item.get_style(m_player.inv_hilite_idx == inv_key_idx,
+                                             m_player.inv_select_idx == inv_key_idx));
+      }
+      r++;
+      sh.write_buffer("Lamps:", r++, c_category, style_category);
+      auto num_inv_lamps = static_cast<int>(m_player.lamp_idcs.size());
+      for (int inv_lamp_idx = 0; inv_lamp_idx < num_inv_lamps; ++inv_lamp_idx)
+      {
+        auto lamp_idx = m_player.lamp_idcs[inv_lamp_idx];
+        //const auto& lamp = all_lamps[lamp_idx];
+        sh.write_buffer("Lamp:" + std::to_string(lamp_idx), r++, c_item,
+                        style_item.get_style(m_player.inv_hilite_idx == num_inv_keys + inv_lamp_idx,
+                                             m_player.inv_select_idx == num_inv_keys + inv_lamp_idx));
+      }
+      
+      drawing::draw_box(sh, 2, 2, NR - 5, NC - 5, drawing::OutlineType::Line, { Color::White, Color::DarkGray }, { Color::White, Color::DarkGray }, ' ');
+    }
+    
   public:
     DungGine(bool use_fow)
       : message_handler(std::make_unique<MessageHandler>())
@@ -538,6 +571,7 @@ namespace dung
       }
     }
     
+    
     template<int NR, int NC>
     void draw(SpriteHandler<NR, NC>& sh, double sim_time_s) const
     {
@@ -550,34 +584,7 @@ namespace dung
       {
         sh.write_buffer(str::adjust_str("Inventory", str::Adjustment::Center, NC - 1), 4, 0, Color::White, Color::Transparent2);
         
-        int r = 6;
-        const int c_category = 4;
-        const int c_item = 6;
-        Style style_category { Color::White, Color::Transparent2 };
-        HiliteSelectFGStyle style_item { Color::DarkGreen, Color::Transparent2, Color::Green, Color::DarkBlue, Color::Blue };
-        sh.write_buffer("Keys:", r++, c_category, style_category);
-        auto num_inv_keys = static_cast<int>(m_player.key_idcs.size());
-        for (int inv_key_idx = 0; inv_key_idx < num_inv_keys; ++inv_key_idx)
-        {
-          auto key_idx = m_player.key_idcs[inv_key_idx];
-          const auto& key = all_keys[key_idx];
-          sh.write_buffer("Key:" + std::to_string(key.key_id), r++, c_item,
-            style_item.get_style(m_player.inv_hilite_idx == inv_key_idx,
-                                 m_player.inv_select_idx == inv_key_idx));
-        }
-        r++;
-        sh.write_buffer("Lamps:", r++, c_category, style_category);
-        auto num_inv_lamps = static_cast<int>(m_player.lamp_idcs.size());
-        for (int inv_lamp_idx = 0; inv_lamp_idx < num_inv_lamps; ++inv_lamp_idx)
-        {
-          auto lamp_idx = m_player.lamp_idcs[inv_lamp_idx];
-          //const auto& lamp = all_lamps[lamp_idx];
-          sh.write_buffer("Lamp:" + std::to_string(lamp_idx), r++, c_item,
-            style_item.get_style(m_player.inv_hilite_idx == num_inv_keys + inv_lamp_idx,
-                                 m_player.inv_select_idx == num_inv_keys + inv_lamp_idx));
-        }
-        
-        drawing::draw_box(sh, 2, 2, NR - 5, NC - 5, drawing::OutlineType::Line, { Color::White, Color::DarkGray }, { Color::White, Color::DarkGray }, ' ');
+        draw_inventory(sh);
       }
       
       if (m_player.is_spawned)
