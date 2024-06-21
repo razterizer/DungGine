@@ -9,6 +9,7 @@
 #include "BSPTree.h"
 #include "DungGineStyles.h"
 #include "RoomStyle.h"
+#include "Items.h"
 #include <Termin8or/Keyboard.h>
 #include <Termin8or/MessageHandler.h>
 
@@ -29,47 +30,6 @@ namespace dung
     Direction m_shadow_dir = Direction::W;
     float m_sun_minutes_per_day = 20.f;
     float m_sun_t_offs = 0.f;
-    
-    struct Item
-    {
-      RC pos; // world pos
-      bool picked_up = false;
-      Style style;
-      char character = '?';
-      bool fog_of_war = true;
-      float weight = 0.f; // kg-ish.
-    };
-  
-    struct Key : Item
-    {
-      Key()
-      {
-        character = 'F';
-        style.fg_color = Color::Green;
-        style.bg_color = Color::Transparent2;
-        weight = 0.1f;
-      }
-      
-      int key_id = 0;
-      
-      void randomize_fg_color()
-      {
-        style.fg_color = color::get_random_color(key_fg_palette);
-      }
-    };
-    
-    struct Lamp : Item
-    {
-      Lamp()
-      {
-        character = 'Y';
-        style.fg_color = Color::Yellow;
-        style.bg_color = Color::Transparent2;
-        weight = 0.4f;
-      }
-      enum class LampType { Isotropic, Directional, NUM_ITEMS };
-      LampType type = LampType::Isotropic;
-    };
     
     struct Player
     {
