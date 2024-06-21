@@ -257,9 +257,9 @@ namespace dung
       {
         if (m_player.show_inventory)
         {
-          std::string msg = "You dropped an item: ";
           if (m_player.inv_select_idx >= 0)
           {
+            std::string msg = "You dropped an item: ";
             if (m_player.inv_select_idx < m_player.key_idcs.size())
             {
               auto key_idx = m_player.key_idcs[m_player.inv_select_idx];
@@ -284,10 +284,10 @@ namespace dung
               std::cerr << "ERROR: Attempted to drop invalid item!" << std::endl;
             }
             m_player.inv_select_idx = -1;
+            message_handler->add_message(static_cast<float>(sim_time_s),
+                                         msg,
+                                         MessageHandler::Level::Guide);
           }
-          message_handler->add_message(static_cast<float>(sim_time_s),
-                                               msg,
-                                               MessageHandler::Level::Guide);
         }
         else if (is_inside_curr_bb(curr_pos.r, curr_pos.c + 1))
           curr_pos.c++;
