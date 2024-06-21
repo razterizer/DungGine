@@ -35,7 +35,7 @@ namespace dung
     {
       char character = '@';
       Style style = { Color::Magenta, Color::White };
-      RC world_pos;
+      RC pos;
       bool is_spawned = false;
       BSPNode* curr_room = nullptr;
       Corridor* curr_corridor = nullptr;
@@ -146,9 +146,9 @@ namespace dung
       m_screen_in_world.set_size(screen_size);
     
       if (world_pos.has_value())
-        m_player.world_pos = world_pos.value();
+        m_player.pos = world_pos.value();
       else
-        m_player.world_pos = world_size / 2;
+        m_player.pos = world_size / 2;
       
       const auto& room_corridor_map = m_bsp_tree->get_room_corridor_map();
       
@@ -157,15 +157,15 @@ namespace dung
       do
       {
         for (const auto& cp : room_corridor_map)
-          if (cp.second->is_inside_corridor(m_player.world_pos))
+          if (cp.second->is_inside_corridor(m_player.pos))
           {
             m_player.is_spawned = true;
             m_player.curr_corridor = cp.second;
-            m_screen_in_world.set_pos(m_player.world_pos - m_screen_in_world.size()/2);
+            m_screen_in_world.set_pos(m_player.pos - m_screen_in_world.size()/2);
             return true;
           }
-        m_player.world_pos += { rnd::rand_int(-2, +2), rnd::rand_int(-2, +2) };
-        m_player.world_pos = m_player.world_pos.clamp(0, world_size.r, 0, world_size.c);
+        m_player.pos += { rnd::rand_int(-2, +2), rnd::rand_int(-2, +2) };
+        m_player.pos = m_player.pos.clamp(0, world_size.r, 0, world_size.c);
       } while (++num_iters < c_max_num_iters);
       return false;
     }
@@ -270,7 +270,7 @@ namespace dung
         return false;
       };
       
-      auto& curr_pos = m_player.world_pos;
+      auto& curr_pos = m_player.pos;
       if (str::to_lower(kpd.curr_key) == 'a' || kpd.curr_special_key == keyboard::SpecialKey::Left)
       {
         if (m_player.show_inventory)
@@ -608,7 +608,7 @@ namespace dung
       
       if (m_player.is_spawned)
       {
-        auto player_scr_pos = get_screen_pos(m_player.world_pos);
+        auto player_scr_pos = get_screen_pos(m_player.pos);
         sh.write_buffer(std::string(1, m_player.character), player_scr_pos.r, player_scr_pos.c, m_player.style);
       }
       
