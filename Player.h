@@ -35,6 +35,16 @@ namespace dung
           return true;
       return false;
     }
+    
+    int num_items() const
+    {
+      return static_cast<int>(key_idcs.size() + lamp_idcs.size());
+    }
+    
+    int last_item_idx() const
+    {
+      return num_items() - 1;
+    }
   };
   
 }
