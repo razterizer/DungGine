@@ -261,8 +261,6 @@ namespace dung
           if (!is_inside_any_room(key.pos))
             return false;
             
-          if (m_player.key_idcs.size() < 25)
-            m_player.key_idcs.emplace_back(all_keys.size());
           all_keys.emplace_back(key);
         }
       }
@@ -290,8 +288,6 @@ namespace dung
         if (!is_inside_any_room(lamp.pos))
           return false;
         
-        if (m_player.num_items() < 40)
-          m_player.lamp_idcs.emplace_back(all_lamps.size());
         all_lamps.emplace_back(lamp);
       }
       return true;
