@@ -94,34 +94,72 @@ namespace dung
     template<int NR, int NC>
     void draw_inventory(SpriteHandler<NR, NC>& sh) const
     {
-      int r = 6;
+      const int x = -5;
+      const int y = -2;
+      const int z = 4;
+      ttl::Rectangle bb_inv { 2, 2, NR + x, NC - 5 };
+      static int r_offs = 0;
       const int c_category = 4;
       const int c_item = 6;
+      const int r_min = bb_inv.top() + z;
+      const int r_max = bb_inv.bottom() + y;
+      int r = r_min + r_offs;
       Style style_category { Color::White, Color::Transparent2 };
       HiliteSelectFGStyle style_item { Color::DarkGreen, Color::Transparent2, Color::Green, Color::DarkBlue, Color::Blue };
-      sh.write_buffer("Keys:", r++, c_category, style_category);
+      
       auto num_inv_keys = static_cast<int>(m_player.key_idcs.size());
+      auto num_inv_lamps = static_cast<int>(m_player.lamp_idcs.size());
+      
+      std::vector<std::pair<std::string, bool>> items;
+      items.emplace_back(std::make_pair("Keys:", false));
       for (int inv_key_idx = 0; inv_key_idx < num_inv_keys; ++inv_key_idx)
       {
         auto key_idx = m_player.key_idcs[inv_key_idx];
         const auto& key = all_keys[key_idx];
-        sh.write_buffer("Key:" + std::to_string(key.key_id), r++, c_item,
-                        style_item.get_style(m_player.inv_hilite_idx == inv_key_idx,
-                                             m_player.inv_select_idx == inv_key_idx));
+        items.emplace_back(make_pair("  Key:" + std::to_string(key.key_id), true));
       }
-      r++;
-      sh.write_buffer("Lamps:", r++, c_category, style_category);
-      auto num_inv_lamps = static_cast<int>(m_player.lamp_idcs.size());
+      items.emplace_back(std::make_pair("", false));
+      items.emplace_back(std::make_pair("Lamps:", false));
       for (int inv_lamp_idx = 0; inv_lamp_idx < num_inv_lamps; ++inv_lamp_idx)
       {
         auto lamp_idx = m_player.lamp_idcs[inv_lamp_idx];
-        //const auto& lamp = all_lamps[lamp_idx];
-        sh.write_buffer("Lamp:" + std::to_string(lamp_idx), r++, c_item,
-                        style_item.get_style(m_player.inv_hilite_idx == num_inv_keys + inv_lamp_idx,
-                                             m_player.inv_select_idx == num_inv_keys + inv_lamp_idx));
+        items.emplace_back(std::make_pair("  Lamp:" + std::to_string(lamp_idx), true));
       }
       
-      drawing::draw_box(sh, 2, 2, NR - 5, NC - 5, drawing::OutlineType::Line, { Color::White, Color::DarkGray }, { Color::White, Color::DarkGray }, ' ');
+      auto num_items = static_cast<int>(items.size());
+      int num_non_items = 0;
+      for (int item_idx = 0; item_idx < num_items; ++item_idx)
+      {
+        const auto& i = items[item_idx];
+        if (!i.second)
+          num_non_items++;
+        int adj_item_idx = item_idx - num_non_items;
+        if (r_min <= r && r <= r_max)
+        {
+            Style style = style_category;
+            if (i.second)
+              style = style_item.get_style(m_player.inv_hilite_idx == adj_item_idx,
+                                           m_player.inv_select_idx == adj_item_idx);
+            sh.write_buffer(i.first, r, c_item, style);
+            if (m_player.inv_hilite_idx == adj_item_idx && m_player.inv_hilite_idx < m_player.last_item_idx())
+            {
+              if (r == r_min)
+                r_offs++;
+              else if (r == r_max)
+                r_offs--;
+            }
+        }
+        else
+        {
+          if (m_player.inv_hilite_idx == 0)
+            r_offs = 0;
+          else if (m_player.inv_hilite_idx == m_player.last_item_idx())
+            r_offs = x - m_player.num_items() + NR + y - (z - 1) - num_non_items;
+        }
+        r++;
+      }
+      
+      drawing::draw_box(sh, bb_inv, drawing::OutlineType::Line, { Color::White, Color::DarkGray }, { Color::White, Color::DarkGray }, ' ');
     }
     
   public:
@@ -223,6 +261,8 @@ namespace dung
           if (!is_inside_any_room(key.pos))
             return false;
             
+          if (m_player.key_idcs.size() < 25)
+            m_player.key_idcs.emplace_back(all_keys.size());
           all_keys.emplace_back(key);
         }
       }
@@ -250,6 +290,8 @@ namespace dung
         if (!is_inside_any_room(lamp.pos))
           return false;
         
+        if (m_player.num_items() < 40)
+          m_player.lamp_idcs.emplace_back(all_lamps.size());
         all_lamps.emplace_back(lamp);
       }
       return true;
