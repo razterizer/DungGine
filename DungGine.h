@@ -101,7 +101,6 @@ namespace dung
       const int z = 4;
       ttl::Rectangle bb_inv { 2, 2, NR + x, NC - 5 };
       static int r_offs = 0;
-      const int c_category = 4;
       const int c_item = 6;
       const int r_min = bb_inv.top() + z;
       const int r_max = bb_inv.bottom() + y;
