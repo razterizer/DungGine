@@ -94,6 +94,8 @@ namespace dung
     template<int NR, int NC>
     void draw_inventory(SpriteHandler<NR, NC>& sh) const
     {
+      sh.write_buffer(str::adjust_str("Inventory", str::Adjustment::Center, NC - 1), 4, 0, Color::White, Color::Transparent2);
+    
       const int x = -5;
       const int y = -2;
       const int z = 4;
@@ -619,11 +621,7 @@ namespace dung
       message_handler->update(sh, static_cast<float>(sim_time_s), true);
       
       if (m_player.show_inventory)
-      {
-        sh.write_buffer(str::adjust_str("Inventory", str::Adjustment::Center, NC - 1), 4, 0, Color::White, Color::Transparent2);
-        
         draw_inventory(sh);
-      }
       
       if (m_player.is_spawned)
       {
