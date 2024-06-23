@@ -745,7 +745,8 @@ namespace dung
                           room_style.get_fill_char(),
                           room_style.is_underground ? Direction::None : shadow_type,
                           styles::shade_style(room_style.get_fill_style(), color::ShadeType::Dark),
-                          room_style.get_fill_char());
+                          room_style.get_fill_char(),
+                          room->light);
       }
       
       for (const auto& cp : room_corridor_map)
@@ -775,7 +776,8 @@ namespace dung
                           '8',
                           shadow_type,
                           { Color::LightGray, Color::DarkGray },
-                          '8');
+                          '8',
+                          corr->light);
       }
     }
     
