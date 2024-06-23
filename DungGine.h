@@ -700,7 +700,7 @@ namespace dung
           else
             door_ch = "D";
         }
-        sh.write_buffer(door_ch, door_scr_pos.r, door_scr_pos.c, Color::Black, (use_fog_of_war && door->fog_of_war) ? Color::Black : Color::Yellow);
+        sh.write_buffer(door_ch, door_scr_pos.r, door_scr_pos.c, Color::Black, (use_fog_of_war && door->fog_of_war) ? Color::Black : (door->light ? Color::Yellow : Color::DarkYellow));
       }
       
       for (const auto& key : all_keys)
