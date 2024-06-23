@@ -89,6 +89,7 @@ namespace dung
     Corridor* corridor = nullptr;
     
     bool fog_of_war = true;
+    bool light = false;
     
     bool open_or_no_door() const
     {
@@ -103,6 +104,7 @@ namespace dung
     std::array<Door*, 2> doors;
     
     bool_vector fog_of_war;
+    bool_vector light;
     
     bool is_inside_corridor(const RC& pos) const
     {
@@ -161,6 +163,7 @@ namespace dung
     std::vector<Door*> doors;
     
     bool_vector fog_of_war;
+    bool_vector light;
     
     // ///////////
     
@@ -303,7 +306,9 @@ namespace dung
           num_tries++;
         } while (bb_leaf_room.r_len < min_room_length || bb_leaf_room.c_len < min_room_length);
         
-        fog_of_war.resize((bb_leaf_room.r_len + 1) * (bb_leaf_room.c_len + 1), true);
+        size_t surf_area = (bb_leaf_room.r_len + 1) * (bb_leaf_room.c_len + 1);
+        fog_of_war.resize(surf_area, true);
+        light.resize(surf_area, false);
       }
       else
       {
@@ -451,7 +456,9 @@ namespace dung
                   auto* corr = corridors.emplace_back(std::make_unique<Corridor>()).get();
                   corr->bb = { (r0 + r1)/2 - min_corridor_half_width, c0, 2*min_corridor_half_width, c1 - c0 };
                   corr->orientation = Orientation::Horizontal;
-                  corr->fog_of_war.resize((corr->bb.r_len + 1) * (corr->bb.c_len + 1), true);
+                  size_t surf_area = (corr->bb.r_len + 1) * (corr->bb.c_len + 1);
+                  corr->fog_of_war.resize(surf_area, true);
+                  corr->light.resize(surf_area, false);
                   room_corridor_map[key] = corr;
                   return true;
                 }
@@ -517,7 +524,9 @@ namespace dung
                   auto* corr = corridors.emplace_back(std::make_unique<Corridor>()).get();
                   corr->bb = { r0, (c0 + c1)/2 - min_corridor_half_width, r1 - r0, 2*min_corridor_half_width };
                   corr->orientation = Orientation::Vertical;
-                  corr->fog_of_war.resize((corr->bb.r_len + 1) * (corr->bb.c_len + 1), true);
+                  size_t surf_area = (corr->bb.r_len + 1) * (corr->bb.c_len + 1);
+                  corr->fog_of_war.resize(surf_area, true);
+                  corr->light.resize(surf_area, false);
                   room_corridor_map[key] = corr;
                   return true;
                 }
