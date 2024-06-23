@@ -167,20 +167,22 @@ namespace dung
       drawing::draw_box(sh, bb_inv, drawing::OutlineType::Line, { Color::White, Color::DarkGray }, { Color::White, Color::DarkGray }, ' ');
     }
     
-    void do_fog_of_war(const RC& curr_pos)
+    template<typename Lambda>
+    void update_field(const RC& curr_pos, Lambda get_field_ptr, bool clear_val)
     {
       const auto c_fow_dist = 2.3f;
       for (auto& key : all_keys)
         if (distance(key.pos, curr_pos) <= c_fow_dist)
-          key.fog_of_war = false;
+          *get_field_ptr(&key) = clear_val;
       
       ttl::Rectangle bb;
       RC local_pos;
       RC size;
-      bool_vector* fog_of_war = nullptr;
-      auto set_fow_pos = [&](const RC& p)
+      bool_vector* field = nullptr;
+      
+      auto set_field = [&](const RC& p)
       {
-        if (fog_of_war == nullptr)
+        if (field == nullptr)
           return;
         if (p.r < 0 || p.c < 0 || p.r > bb.r_len || p.c > bb.c_len)
           return;
@@ -193,11 +195,11 @@ namespace dung
         // idx = 0 .. 14
         // r = 2, c = 4 => idx = r * (c_len + 1) + c = 2*5 + 4 = 14.
         int idx = p.r * (size.c + 1) + p.c;
-        if (0 <= idx && idx < fog_of_war->size())
-          (*fog_of_war)[idx] = false;
+        if (0 <= idx && idx < field->size())
+          (*field)[idx] = clear_val;
       };
       
-      auto update_fow = [&]() // #FIXME: FHXFTW
+      auto update_rect_field = [&]() // #FIXME: FHXFTW
       {
         local_pos = curr_pos - bb.pos();
         size = bb.size();
@@ -205,14 +207,14 @@ namespace dung
         //    ###
         //   #####
         //    ###
-        set_fow_pos(local_pos);
+        set_field(local_pos);
         for (int c = -1; c <= +1; ++c)
         {
-          set_fow_pos(local_pos + RC { -1, c });
-          set_fow_pos(local_pos + RC { +1, c });
+          set_field(local_pos + RC { -1, c });
+          set_field(local_pos + RC { +1, c });
         }
         for (int c = -2; c <= +2; ++c)
-          set_fow_pos(local_pos + RC { 0, c });
+          set_field(local_pos + RC { 0, c });
         
         int r_room = -1;
         int c_room = -1;
@@ -226,32 +228,32 @@ namespace dung
           c_room = bb.c_len;
         
         if (r_room >= 0 && c_room >= 0)
-          set_fow_pos({ r_room, c_room });
+          set_field({ r_room, c_room });
       };
       
       if (m_player.curr_corridor != nullptr && m_player.curr_corridor->is_inside_corridor(curr_pos))
       {
         bb = m_player.curr_corridor->bb;
-        fog_of_war = &m_player.curr_corridor->fog_of_war;
+        field = get_field_ptr(m_player.curr_corridor);
         
         auto* door_0 = m_player.curr_corridor->doors[0];
         auto* door_1 = m_player.curr_corridor->doors[1];
-        update_fow();
+        update_rect_field();
         
         if (distance(door_0->pos, curr_pos) <= c_fow_dist)
-          door_0->fog_of_war = false;
+          *get_field_ptr(door_0) = clear_val;
         if (distance(door_1->pos, curr_pos) <= c_fow_dist)
-          door_1->fog_of_war = false;
+          *get_field_ptr(door_1) = clear_val;
       }
       if (m_player.curr_room != nullptr && m_player.curr_room->is_inside_room(curr_pos))
       {
         bb = m_player.curr_room->bb_leaf_room;
-        fog_of_war = &m_player.curr_room->fog_of_war;
-        update_fow();
+        field = get_field_ptr(m_player.curr_room);
+        update_rect_field();
         
         for (auto* door : m_player.curr_room->doors)
           if (distance(door->pos, curr_pos) <= c_fow_dist)
-            door->fog_of_war = false;
+            *get_field_ptr(door) = clear_val;
       }
     }
     
@@ -583,7 +585,9 @@ namespace dung
       
       // Fog of war
       if (use_fog_of_war)
-        do_fog_of_war(curr_pos);
+        update_field(curr_pos,
+                     [](auto obj) { return &obj->fog_of_war; },
+                     false);
       
       // Scrolling mode.
       switch (scr_scrolling_mode)
