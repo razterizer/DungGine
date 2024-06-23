@@ -705,7 +705,7 @@ namespace dung
       
       for (const auto& key : all_keys)
       {
-        if (key.picked_up || (use_fog_of_war && key.fog_of_war))
+        if (key.picked_up || (use_fog_of_war && key.fog_of_war) || !key.light)
           continue;
         auto key_scr_pos = get_screen_pos(key.pos);
         sh.write_buffer(std::string(1, key.character), key_scr_pos.r, key_scr_pos.c, key.style);
