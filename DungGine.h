@@ -624,10 +624,9 @@ namespace dung
                   
       // Light
       auto* lamp = m_player.get_selected_lamp(all_lamps);
+      clear_field([](auto obj) { return &obj->light; }, false);
       if (lamp != nullptr)
       {
-        clear_field([](auto obj) { return &obj->light; }, false);
-        
         update_field(curr_pos,
                      [](auto obj) { return &obj->light; },
                      true);
