@@ -36,6 +36,23 @@ namespace dung
       return false;
     }
     
+    const Key* get_selected_key(const std::vector<Key>& all_keys) const
+    {
+      auto N = static_cast<int>(key_idcs.size());
+      if (math::in_range<int>(inv_select_idx, 0, N, Range::ClosedOpen))
+        return &all_keys[key_idcs[inv_select_idx]];
+      return nullptr;
+    }
+    
+    const Lamp* get_selected_lamp(const std::vector<Lamp>& all_lamps) const
+    {
+      auto Nk = static_cast<int>(key_idcs.size());
+      auto Nl = static_cast<int>(lamp_idcs.size());
+      if (math::in_range<int>(inv_select_idx, Nk, Nk + Nl, Range::ClosedOpen))
+        return &all_lamps[lamp_idcs[inv_select_idx - Nk]];
+      return nullptr;
+    }
+    
     int num_items() const
     {
       return static_cast<int>(key_idcs.size() + lamp_idcs.size());
