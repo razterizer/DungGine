@@ -572,6 +572,10 @@ namespace dung
             auto& key = all_keys[key_idx];
             if (key.pos == curr_pos && !key.picked_up)
             {
+              if (m_player.key_idcs.size() <= m_player.inv_select_idx)
+                m_player.inv_select_idx++;
+              if (m_player.key_idcs.size() <= m_player.inv_hilite_idx)
+                m_player.inv_hilite_idx++;
               m_player.key_idcs.emplace_back(key_idx);
               key.picked_up = true;
               message_handler->add_message(static_cast<float>(sim_time_s),
