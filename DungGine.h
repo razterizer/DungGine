@@ -168,12 +168,45 @@ namespace dung
     }
     
     template<typename Lambda>
-    void update_field(const RC& curr_pos, Lambda get_field_ptr, bool clear_val)
+    void clear_field(Lambda get_field_ptr, bool clear_val)
+    {
+      for (auto& key : all_keys)
+        *get_field_ptr(&key) = clear_val;
+      
+      ttl::Rectangle bb;
+      bool_vector* field = nullptr;
+      
+      if (m_player.curr_corridor != nullptr)
+      {
+        bb = m_player.curr_corridor->bb;
+        field = get_field_ptr(m_player.curr_corridor);
+        
+        auto* door_0 = m_player.curr_corridor->doors[0];
+        auto* door_1 = m_player.curr_corridor->doors[1];
+        stlutils::memset(*field, clear_val);
+        
+        *get_field_ptr(door_0) = clear_val;
+        *get_field_ptr(door_1) = clear_val;
+      }
+      if (m_player.curr_room != nullptr)
+      {
+        bb = m_player.curr_room->bb_leaf_room;
+        field = get_field_ptr(m_player.curr_room);
+        stlutils::memset(*field, clear_val);
+        
+        for (auto* door : m_player.curr_room->doors)
+          *get_field_ptr(door) = clear_val;
+      }
+
+    }
+    
+    template<typename Lambda>
+    void update_field(const RC& curr_pos, Lambda get_field_ptr, bool set_val)
     {
       const auto c_fow_dist = 2.3f;
       for (auto& key : all_keys)
         if (distance(key.pos, curr_pos) <= c_fow_dist)
-          *get_field_ptr(&key) = clear_val;
+          *get_field_ptr(&key) = set_val;
       
       ttl::Rectangle bb;
       RC local_pos;
@@ -196,7 +229,7 @@ namespace dung
         // r = 2, c = 4 => idx = r * (c_len + 1) + c = 2*5 + 4 = 14.
         int idx = p.r * (size.c + 1) + p.c;
         if (0 <= idx && idx < field->size())
-          (*field)[idx] = clear_val;
+          (*field)[idx] = set_val;
       };
       
       auto update_rect_field = [&]() // #FIXME: FHXFTW
@@ -241,9 +274,9 @@ namespace dung
         update_rect_field();
         
         if (distance(door_0->pos, curr_pos) <= c_fow_dist)
-          *get_field_ptr(door_0) = clear_val;
+          *get_field_ptr(door_0) = set_val;
         if (distance(door_1->pos, curr_pos) <= c_fow_dist)
-          *get_field_ptr(door_1) = clear_val;
+          *get_field_ptr(door_1) = set_val;
       }
       if (m_player.curr_room != nullptr && m_player.curr_room->is_inside_room(curr_pos))
       {
@@ -253,7 +286,7 @@ namespace dung
         
         for (auto* door : m_player.curr_room->doors)
           if (distance(door->pos, curr_pos) <= c_fow_dist)
-            *get_field_ptr(door) = clear_val;
+            *get_field_ptr(door) = set_val;
       }
     }
     
