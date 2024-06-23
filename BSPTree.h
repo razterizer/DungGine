@@ -335,13 +335,6 @@ namespace dung
       }
       return bb_leaf_room.is_inside_offs(pos, -1);
     }
-    
-    bool is_in_corner_of_room(const RC& pos) const
-    {
-      if (pos.r - bb_leaf_room.top() == 1 || pos.r - bb_leaf_room.bottom() == -1)
-        return pos.c - bb_leaf_room.left() == 1 || pos.c - bb_leaf_room.right() == -1;
-      return false;
-    }
   };
       
   // //////////////////////////////////////////////////////////////
