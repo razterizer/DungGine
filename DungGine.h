@@ -621,6 +621,17 @@ namespace dung
         update_field(curr_pos,
                      [](auto obj) { return &obj->fog_of_war; },
                      false);
+                  
+      // Light
+      auto* lamp = m_player.get_selected_lamp(all_lamps);
+      if (lamp != nullptr)
+      {
+        clear_field([](auto obj) { return &obj->light; }, false);
+        
+        update_field(curr_pos,
+                     [](auto obj) { return &obj->light; },
+                     true);
+      }
       
       // Scrolling mode.
       switch (scr_scrolling_mode)
