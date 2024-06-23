@@ -51,6 +51,10 @@ namespace dung
     // +--------------------+
     
     std::vector<Key> all_keys;
+    // Lamps illuminate items and NPCs. If you've already discovered an item or
+    //   NPC using a lamp (and after FOW been cleared),
+    //   then they will still be visible when the room is not lit.
+    // Lamps will not work in surface level rooms.
     std::vector<Lamp> all_lamps;
     
     std::unique_ptr<MessageHandler> message_handler;
