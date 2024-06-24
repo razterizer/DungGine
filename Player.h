@@ -6,6 +6,8 @@
 //
 
 #pragma once
+#include <Core/StlUtils.h>
+
 
 namespace dung
 {
@@ -34,6 +36,13 @@ namespace dung
         if (all_keys[key_idcs[inv_select_idx]].key_id == key_id)
           return true;
       return false;
+    }
+    
+    void remove_key_by_key_id(std::vector<Key>& all_keys, int key_id)
+    {
+      stlutils::erase_if(key_idcs, [&](int key_idx) { return all_keys[key_idx].key_id == key_id; });
+      stlutils::erase_if(all_keys, [&](const auto& key) { return key.key_id == key_id; });
+      inv_select_idx = -1;
     }
     
     const Key* get_selected_key(const std::vector<Key>& all_keys) const
