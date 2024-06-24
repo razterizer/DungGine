@@ -99,6 +99,14 @@ namespace dung
       return false;
     }
     
+    bool is_underground(BSPNode* leaf)
+    {
+      auto it = m_room_styles.find(leaf);
+      if (it != m_room_styles.end())
+        return it->second.is_underground;
+      return false;
+    }
+        
     template<int NR, int NC>
     void draw_inventory(SpriteHandler<NR, NC>& sh) const
     {
