@@ -430,11 +430,22 @@ namespace dung
         lamp.type = rnd::rand_enum<Lamp::LampType>();
         do
         {
-          lamp.pos =
+          if (lamp_idx == 0 && num_iters < 50)
           {
-            rnd::rand_int(0, world_size.r),
-            rnd::rand_int(0, world_size.c)
-          };
+            lamp.pos =
+            {
+              rnd::rand_int(m_player.pos.r - 20, m_player.pos.r + 20),
+              rnd::rand_int(m_player.pos.c - 20, m_player.pos.c + 20)
+            };
+          }
+          else
+          {
+            lamp.pos =
+            {
+              rnd::rand_int(0, world_size.r),
+              rnd::rand_int(0, world_size.c)
+            };
+          }
         } while (num_iters++ < c_max_num_iters && !is_inside_any_room(lamp.pos));
         
         BSPNode* leaf = nullptr;
