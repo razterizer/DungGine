@@ -406,8 +406,12 @@ namespace dung
             };
           } while (num_iters++ < c_max_num_iters && !is_inside_any_room(key.pos));
           
-          if (!is_inside_any_room(key.pos))
+          BSPNode* leaf = nullptr;
+          if (!is_inside_any_room(key.pos, &leaf))
             return false;
+            
+          if (leaf != nullptr)
+            key.is_underground = is_underground(leaf);
             
           all_keys.emplace_back(key);
         }
@@ -433,8 +437,12 @@ namespace dung
           };
         } while (num_iters++ < c_max_num_iters && !is_inside_any_room(lamp.pos));
         
-        if (!is_inside_any_room(lamp.pos))
+        BSPNode* leaf = nullptr;
+        if (!is_inside_any_room(lamp.pos, &leaf))
           return false;
+          
+        if (leaf != nullptr)
+          lamp.is_underground = is_underground(leaf);
         
         all_lamps.emplace_back(lamp);
       }
