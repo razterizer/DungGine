@@ -19,6 +19,7 @@ namespace dung
     bool fog_of_war = true;
     bool light = false;
     float weight = 0.f; // kg-ish.
+    bool is_underground = false;
   };
   
   struct Key : Item
