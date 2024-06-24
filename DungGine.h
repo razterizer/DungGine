@@ -184,6 +184,9 @@ namespace dung
     {
       for (auto& key : all_keys)
         *get_field_ptr(&key) = clear_val;
+        
+      for (auto& lamp : all_lamps)
+        *get_field_ptr(&lamp) = clear_val;
       
       ttl::Rectangle bb;
       bool_vector* field = nullptr;
