@@ -581,6 +581,11 @@ namespace dung
                   // Not sure if we need that. Maybe do it in the far future...
                   door->is_locked = false;
                   
+                  m_player.remove_key_by_key_id(all_keys, door->key_id);
+                  message_handler->add_message(static_cast<float>(sim_time_s),
+                                               "You cast a vanishing spell on the key!",
+                                               MessageHandler::Level::Guide);
+                  
                   message_handler->add_message(static_cast<float>(sim_time_s),
                                                "The door is unlocked!",
                                                MessageHandler::Level::Guide);
