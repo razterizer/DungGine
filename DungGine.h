@@ -216,9 +216,14 @@ namespace dung
     void update_field(const RC& curr_pos, Lambda get_field_ptr, bool set_val)
     {
       const auto c_fow_dist = 2.3f;
+      
       for (auto& key : all_keys)
         if (distance(key.pos, curr_pos) <= c_fow_dist)
           *get_field_ptr(&key) = set_val;
+          
+      for (auto& lamp : all_lamps)
+        if (distance(lamp.pos, curr_pos) <= c_fow_dist)
+          *get_field_ptr(&lamp) = set_val;
       
       ttl::Rectangle bb;
       RC local_pos;
