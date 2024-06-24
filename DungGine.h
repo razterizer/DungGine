@@ -749,7 +749,7 @@ namespace dung
       
       for (const auto& lamp : all_lamps)
       {
-        if (lamp.picked_up)
+        if (lamp.picked_up || (use_fog_of_war && lamp.fog_of_war))
           continue;
         auto lamp_scr_pos = get_screen_pos(lamp.pos);
         sh.write_buffer(std::string(1, lamp.character), lamp_scr_pos.r, lamp_scr_pos.c, lamp.style);
