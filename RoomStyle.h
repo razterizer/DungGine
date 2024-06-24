@@ -34,8 +34,10 @@ namespace dung
         case WallType::Masonry3:
         case WallType::Masonry4:
           wall_basic_type = WallBasicType::Masonry;
+          break;
         case WallType::Temple:
           wall_basic_type = WallBasicType::Temple;
+          break;
         case WallType::Line:
         case WallType::Hash:
         default:
@@ -43,7 +45,10 @@ namespace dung
           break;
       }
       wall_style = styles::get_random_style(wall_palette[wall_basic_type]);
-      floor_type = rnd::rand_enum<FloorType>();
+      do
+      {
+        floor_type = rnd::rand_enum<FloorType>();
+      } while (floor_type == FloorType::None);
       is_underground = rnd::rand_bool();
     }
     
