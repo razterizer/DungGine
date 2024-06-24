@@ -62,6 +62,20 @@ namespace dung
     {
       return num_items() - 1;
     }
+    
+    bool is_inside_curr_room() const
+    {
+      if (curr_room != nullptr)
+        return curr_room->bb_leaf_room.is_inside_offs(pos, -1);
+      return false;
+    }
+    
+    bool is_inside_curr_corridor() const
+    {
+      if (curr_corridor != nullptr)
+        return curr_corridor->is_inside_corridor(pos);
+      return false;
+    }
   };
   
 }
