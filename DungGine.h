@@ -87,11 +87,15 @@ namespace dung
     }
     
     // #NOTE: Only for unwalled area!
-    bool is_inside_any_room(const RC& pos)
+    bool is_inside_any_room(const RC& pos, BSPNode** room_node = nullptr)
     {
       for (auto* leaf : m_leaves)
         if (leaf->bb_leaf_room.is_inside_offs(pos, -1))
+        {
+          if (room_node != nullptr)
+            *room_node = leaf;
           return true;
+        }
       return false;
     }
     
