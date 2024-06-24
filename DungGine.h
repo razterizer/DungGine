@@ -493,6 +493,10 @@ namespace dung
               auto& key = all_keys[key_idx];
               key.picked_up = false;
               key.pos = curr_pos;
+              if (m_player.is_inside_curr_room())
+                key.is_underground = is_underground(m_player.curr_room);
+              else if (m_player.is_inside_curr_corridor())
+                key.is_underground = true;
               stlutils::erase(m_player.key_idcs, key_idx);
               msg += "key:" + std::to_string(key.key_id) + "!";
             }
@@ -502,6 +506,10 @@ namespace dung
               auto& lamp = all_lamps[lamp_idx];
               lamp.picked_up = false;
               lamp.pos = curr_pos;
+              if (m_player.is_inside_curr_room())
+                lamp.is_underground = is_underground(m_player.curr_room);
+              else if (m_player.is_inside_curr_corridor())
+                lamp.is_underground = true;
               stlutils::erase(m_player.lamp_idcs, lamp_idx);
               msg += "lamp:" + std::to_string(lamp_idx) + "!";
             }
