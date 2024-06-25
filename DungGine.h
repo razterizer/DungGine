@@ -26,6 +26,7 @@ namespace dung
     std::vector<BSPNode*> m_leaves;
     
     std::map<BSPNode*, RoomStyle> m_room_styles;
+    std::map<Corridor*, RoomStyle> m_corridor_styles;
     
     Direction m_sun_dir = Direction::E;
     Direction m_shadow_dir = Direction::W;
@@ -103,6 +104,14 @@ namespace dung
     {
       auto it = m_room_styles.find(leaf);
       if (it != m_room_styles.end())
+        return it->second.is_underground;
+      return false;
+    }
+    
+    bool is_underground(Corridor* corr)
+    {
+      auto it = m_corridor_styles.find(corr);
+      if (it != m_corridor_styles.end())
         return it->second.is_underground;
       return false;
     }
@@ -329,6 +338,17 @@ namespace dung
         RoomStyle room_style;
         room_style.init_rand();
         m_room_styles[leaf] = room_style;
+      }
+      
+      const auto& room_corridor_map = m_bsp_tree->get_room_corridor_map();
+      for (const auto& cp : room_corridor_map)
+      {
+        RoomStyle room_style;
+        room_style.is_underground = is_underground(cp.first.first) || is_underground(cp.first.second);
+        room_style.wall_type = WallType::Masonry4;
+        room_style.wall_style = { Color::LightGray, Color::Black }; //wall_palette[WallBasicType::Masonry]
+        room_style.floor_type = FloorType::Stone2;
+        m_corridor_styles[cp.second] = room_style;
       }
     }
     
@@ -804,10 +824,11 @@ namespace dung
                           room->light);
       }
       
-      for (const auto& cp : room_corridor_map)
+      for (const auto& corr_pair : m_corridor_styles)
       {
-        auto* corr = cp.second;
+        auto* corr = corr_pair.first;
         const auto& bb = corr->bb;
+        const auto& corr_style = corr_pair.second;
         auto bb_scr_pos = get_screen_pos(bb.pos());
         
         // Fog of war
@@ -825,13 +846,13 @@ namespace dung
         
         drawing::draw_box(sh,
                           bb_scr_pos.r, bb_scr_pos.c, bb.r_len, bb.c_len,
-                          WallType::Masonry4,
-                          { Color::LightGray, Color::Black }, //wall_palette[WallBasicType::Masonry],
-                          { Color::DarkGray, Color::LightGray },
-                          '8',
-                          shadow_type,
-                          { Color::LightGray, Color::DarkGray },
-                          '8',
+                          corr_style.wall_type,
+                          corr_style.wall_style,
+                          corr_style.get_fill_style(),
+                          corr_style.get_fill_char(),
+                          corr_style.is_underground ? Direction::None : shadow_type,
+                          styles::shade_style(corr_style.get_fill_style(), color::ShadeType::Dark, true),
+                          corr_style.get_fill_char(),
                           corr->light);
       }
     }
