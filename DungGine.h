@@ -136,20 +136,33 @@ namespace dung
       auto num_inv_keys = static_cast<int>(m_player.key_idcs.size());
       auto num_inv_lamps = static_cast<int>(m_player.lamp_idcs.size());
       
+      auto f_format_item_str = [](std::string& item_str, float weight)
+      {
+        std::ostringstream oss;
+        oss << std::setprecision(1) << weight;
+        std::string weight_str = oss.str() + " kg";
+        item_str += str::rep_char(' ', 30 - static_cast<int>(item_str.size()) - static_cast<int>(weight_str.size())) + weight_str;
+      };
+      
       std::vector<std::pair<std::string, bool>> items;
       items.emplace_back(std::make_pair("Keys:", false));
       for (int inv_key_idx = 0; inv_key_idx < num_inv_keys; ++inv_key_idx)
       {
         auto key_idx = m_player.key_idcs[inv_key_idx];
         const auto& key = all_keys[key_idx];
-        items.emplace_back(make_pair("  Key:" + std::to_string(key.key_id), true));
+        std::string item_str = "  Key:" + std::to_string(key.key_id);
+        f_format_item_str(item_str, key.weight);
+        items.emplace_back(make_pair(item_str, true));
       }
       items.emplace_back(std::make_pair("", false));
       items.emplace_back(std::make_pair("Lamps:", false));
       for (int inv_lamp_idx = 0; inv_lamp_idx < num_inv_lamps; ++inv_lamp_idx)
       {
         auto lamp_idx = m_player.lamp_idcs[inv_lamp_idx];
-        items.emplace_back(std::make_pair("  Lamp:" + std::to_string(lamp_idx), true));
+        const auto& lamp = all_lamps[lamp_idx];
+        std::string item_str = "  Lamp:" + std::to_string(lamp_idx);
+        f_format_item_str(item_str, lamp.weight);
+        items.emplace_back(std::make_pair(item_str, true));
       }
       
       auto num_items = static_cast<int>(items.size());
