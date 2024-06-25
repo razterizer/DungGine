@@ -353,6 +353,7 @@ namespace dung
     }
     
     void set_player_character(char ch) { m_player.character = ch; }
+    void set_player_style(const Style& style) { m_player.style = style; }
     bool place_player(const RC& screen_size, std::optional<RC> world_pos = std::nullopt)
     {
       const auto world_size = m_bsp_tree->get_world_size();
