@@ -136,12 +136,18 @@ namespace dung
       auto num_inv_keys = static_cast<int>(m_player.key_idcs.size());
       auto num_inv_lamps = static_cast<int>(m_player.lamp_idcs.size());
       
-      auto f_format_item_str = [](std::string& item_str, float weight)
+      auto f_format_item_str = [](std::string& item_str, float weight, float price)
       {
         std::ostringstream oss;
         oss << std::setprecision(1) << weight;
         std::string weight_str = oss.str() + " kg";
         item_str += str::rep_char(' ', 30 - static_cast<int>(item_str.size()) - static_cast<int>(weight_str.size())) + weight_str;
+        
+        oss.str("");
+        oss.clear();
+        oss << std::setprecision(2) << std::fixed << price;
+        std::string price_str = oss.str() + " FK"; // Fantasy-Kronor.
+        item_str += str::rep_char(' ', 50 - static_cast<int>(item_str.size()) - static_cast<int>(price_str.size())) + price_str;
       };
       
       std::vector<std::pair<std::string, bool>> items;
@@ -151,7 +157,7 @@ namespace dung
         auto key_idx = m_player.key_idcs[inv_key_idx];
         const auto& key = all_keys[key_idx];
         std::string item_str = "  Key:" + std::to_string(key.key_id);
-        f_format_item_str(item_str, key.weight);
+        f_format_item_str(item_str, key.weight, key.price);
         items.emplace_back(make_pair(item_str, true));
       }
       items.emplace_back(std::make_pair("", false));
@@ -161,7 +167,7 @@ namespace dung
         auto lamp_idx = m_player.lamp_idcs[inv_lamp_idx];
         const auto& lamp = all_lamps[lamp_idx];
         std::string item_str = "  Lamp:" + std::to_string(lamp_idx);
-        f_format_item_str(item_str, lamp.weight);
+        f_format_item_str(item_str, lamp.weight, lamp.price);
         items.emplace_back(std::make_pair(item_str, true));
       }
       
