@@ -174,7 +174,7 @@ namespace dung
                       int r0, int c0,
                       const styles::Style& border_style) const
     {
-      drawing::draw_box(sh, r0 + bb_region.r, c0 + bb_region.c, bb_region.r_len, bb_region.c_len, drawing::OutlineType::Hash, border_style);
+      drawing::draw_box_outline(sh, r0 + bb_region.r, c0 + bb_region.c, bb_region.r_len, bb_region.c_len, drawing::OutlineType::Hash, border_style);
       
       if (children[0])
         children[0]->draw_regions(sh, r0, c0, border_style);
@@ -188,9 +188,11 @@ namespace dung
                     const styles::Style& room_style) const
     {
       if (!bb_leaf_room.is_empty())
-        drawing::draw_box(sh,
+      {
+        drawing::draw_box_outline(sh,
                  r0 + bb_leaf_room.r, c0 + bb_leaf_room.c, bb_leaf_room.r_len, bb_leaf_room.c_len,
                  drawing::OutlineType::Hash, room_style);
+      }
                  
       if (children[0])
         children[0]->draw_rooms(sh, r0, c0, room_style);
@@ -629,7 +631,8 @@ namespace dung
       for (const auto& corr : room_corridor_map)
       {
         const auto& bb = corr.second->bb;
-        drawing::draw_box(sh, r0 + bb.r, c0 + bb.c, bb.r_len, bb.c_len, drawing::OutlineType::Hash, corridor_outline_style, corridor_fill_style);
+        drawing::draw_box_outline(sh, r0 + bb.r, c0 + bb.c, bb.r_len, bb.c_len, drawing::OutlineType::Hash, corridor_outline_style);
+        drawing::draw_box(sh, r0 + bb.r, c0 + bb.c, bb.r_len, bb.c_len, corridor_fill_style);
       }
     }
     

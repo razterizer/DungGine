@@ -204,7 +204,8 @@ namespace dung
         r++;
       }
       
-      drawing::draw_box(sh, bb_inv, drawing::OutlineType::Line, { Color::White, Color::DarkGray }, { Color::White, Color::DarkGray }, ' ');
+      drawing::draw_box_outline(sh, bb_inv, drawing::OutlineType::Line, { Color::White, Color::DarkGray });
+      drawing::draw_box(sh, bb_inv, { Color::White, Color::DarkGray }, ' ');
     }
     
     template<typename Lambda>
@@ -832,10 +833,13 @@ namespace dung
           }
         }
         
+        drawing::draw_box_outline(sh,
+                                  bb_scr_pos.r, bb_scr_pos.c, bb.r_len, bb.c_len,
+                                  room_style.wall_type,
+                                  room_style.wall_style,
+                                  room->light);
         drawing::draw_box(sh,
                           bb_scr_pos.r, bb_scr_pos.c, bb.r_len, bb.c_len,
-                          room_style.wall_type,
-                          room_style.wall_style,
                           room_style.get_fill_style(),
                           room_style.get_fill_char(),
                           room_style.is_underground ? Direction::None : shadow_type,
@@ -864,10 +868,14 @@ namespace dung
           }
         }
         
+        
+        drawing::draw_box_outline(sh,
+                                  bb_scr_pos.r, bb_scr_pos.c, bb.r_len, bb.c_len,
+                                  corr_style.wall_type,
+                                  corr_style.wall_style,
+                                  corr->light);
         drawing::draw_box(sh,
                           bb_scr_pos.r, bb_scr_pos.c, bb.r_len, bb.c_len,
-                          corr_style.wall_type,
-                          corr_style.wall_style,
                           corr_style.get_fill_style(),
                           corr_style.get_fill_char(),
                           corr_style.is_underground ? Direction::None : shadow_type,
