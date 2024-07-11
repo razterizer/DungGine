@@ -768,7 +768,7 @@ namespace dung
       const auto& room_corridor_map = m_bsp_tree->get_room_corridor_map();
       const auto& door_vec = m_bsp_tree->fetch_doors();
       
-      message_handler->update(sh, static_cast<float>(sim_time_s), true);
+      message_handler->update(sh, static_cast<float>(sim_time_s));
       
       if (m_player.show_inventory)
         draw_inventory(sh);
