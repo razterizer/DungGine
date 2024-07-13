@@ -19,6 +19,15 @@ namespace dung
 {
 
   enum class ScreenScrollingMode { AlwaysInCentre, PageWise, WhenOutsideScreen };
+  
+  struct DungGineTextureParams
+  {
+    double dt_anim_s = 0.1;
+    std::vector<std::string> texture_file_names_surface_level_fill;
+    std::vector<std::string> texture_file_names_surface_level_shadow;
+    std::vector<std::string> texture_file_names_underground_fill;
+    std::vector<std::string> texture_file_names_underground_shadow;
+  };
 
   class DungGine
   {
@@ -60,6 +69,17 @@ namespace dung
     
     std::unique_ptr<MessageHandler> message_handler;
     bool use_fog_of_war = false;
+    
+    double dt_texture_anim_s = 0.1;
+    double texture_anim_time_stamp = 0.;
+    unsigned short texture_anim_ctr = 0;
+    std::vector<drawing::Texture> texture_sl_fill;
+    std::vector<drawing::Texture> texture_sl_shadow;
+    std::vector<drawing::Texture> texture_ug_fill;
+    std::vector<drawing::Texture> texture_ug_shadow;
+    drawing::Texture texture_empty;
+    
+    // /////////////////////
     
     RC get_screen_pos(const RC& world_pos) const
     {
@@ -340,10 +360,20 @@ namespace dung
     }
     
   public:
-    DungGine(bool use_fow)
+    DungGine(const std::string& exe_folder, bool use_fow, DungGineTextureParams texture_params = {})
       : message_handler(std::make_unique<MessageHandler>())
       , use_fog_of_war(use_fow)
-    {}
+      , dt_texture_anim_s(texture_params.dt_anim_s)
+    {
+      for (const auto& fn : texture_params.texture_file_names_surface_level_fill)
+        texture_sl_fill.emplace_back().load(folder::join_path({ exe_folder, fn }));
+      for (const auto& fn : texture_params.texture_file_names_surface_level_shadow)
+        texture_sl_shadow.emplace_back().load(folder::join_path({ exe_folder, fn }));
+      for (const auto& fn : texture_params.texture_file_names_underground_fill)
+        texture_ug_fill.emplace_back().load(folder::join_path({ exe_folder, fn }));
+      for (const auto& fn : texture_params.texture_file_names_underground_shadow)
+        texture_ug_shadow.emplace_back().load(folder::join_path({ exe_folder, fn }));
+    }
     
     void load_dungeon(BSPTree* bsp_tree)
     {
@@ -838,14 +868,46 @@ namespace dung
                                   room_style.wall_type,
                                   room_style.wall_style,
                                   room->light);
-        drawing::draw_box(sh,
-                          bb_scr_pos.r, bb_scr_pos.c, bb.r_len, bb.c_len,
-                          room_style.get_fill_style(),
-                          room_style.get_fill_char(),
-                          room_style.is_underground ? Direction::None : shadow_type,
-                          styles::shade_style(room_style.get_fill_style(), color::ShadeType::Dark),
-                          room_style.get_fill_char(),
-                          room->light);
+                                  
+        if (room_style.is_underground ? texture_ug_fill.empty() : texture_sl_fill.empty())
+        {
+          drawing::draw_box(sh,
+                            bb_scr_pos.r, bb_scr_pos.c, bb.r_len, bb.c_len,
+                            room_style.get_fill_style(),
+                            room_style.get_fill_char(),
+                            room_style.is_underground ? Direction::None : shadow_type,
+                            styles::shade_style(room_style.get_fill_style(), color::ShadeType::Dark),
+                            room_style.get_fill_char(),
+                            room->light);
+        }
+        else
+        {
+          if (real_time_s - texture_anim_time_stamp > dt_texture_anim_s)
+          {
+            texture_anim_ctr++;
+            texture_anim_time_stamp = real_time_s;
+          }
+          
+          auto f_fetch_texture = [&](const auto& texture_vector) -> const drawing::Texture&
+          {
+            if (texture_vector.empty())
+              return texture_empty;
+            return texture_vector[texture_anim_ctr % texture_vector.size()];
+          };
+          
+          const auto& texture_fill = room_style.is_underground ?
+            f_fetch_texture(texture_ug_fill) : f_fetch_texture(texture_sl_fill);
+          const auto& texture_shadow = room_style.is_underground ?
+            f_fetch_texture(texture_ug_shadow) : f_fetch_texture(texture_sl_shadow);
+        
+          drawing::draw_box_textured(sh,
+                                     bb_scr_pos.r, bb_scr_pos.c, bb.r_len, bb.c_len,
+                                     room_style.is_underground ? Direction::None : shadow_type,
+                                     texture_fill,
+                                     texture_shadow,
+                                     room->light,
+                                     room_style.is_underground);
+        }
       }
       
       for (const auto& corr_pair : m_corridor_styles)
