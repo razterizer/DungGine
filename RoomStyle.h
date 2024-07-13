@@ -22,6 +22,7 @@ namespace dung
     Style wall_style { Color::DarkGray, Color::LightGray };
     FloorType floor_type = FloorType::None;
     bool is_underground = true;
+    RC tex_pos;
     
     void init_rand()
     {
