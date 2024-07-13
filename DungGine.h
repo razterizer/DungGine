@@ -387,6 +387,19 @@ namespace dung
       {
         RoomStyle room_style;
         room_style.init_rand();
+        
+        const auto& fill_textures = room_style.is_underground ? texture_ug_fill : texture_sl_fill;
+        if (!fill_textures.empty())
+        {
+          // #NOTE: Here we assume all textures in the animation batch are of the same size.
+          const auto& tex = fill_textures.front();
+          if (tex.size.r >= leaf->bb_leaf_room.r_len && tex.size.c >= leaf->bb_leaf_room.c_len)
+          {
+            room_style.tex_pos.r = rnd::rand_int(0, tex.size.r - leaf->bb_leaf_room.r_len);
+            room_style.tex_pos.c = rnd::rand_int(0, tex.size.c - leaf->bb_leaf_room.c_len);
+          }
+        }
+        
         m_room_styles[leaf] = room_style;
       }
       
@@ -906,7 +919,8 @@ namespace dung
                                      texture_fill,
                                      texture_shadow,
                                      room->light,
-                                     room_style.is_underground);
+                                     room_style.is_underground,
+                                     room_style.tex_pos);
         }
       }
       
