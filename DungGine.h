@@ -66,9 +66,9 @@ namespace dung
       return world_pos - m_screen_in_world.pos();
     }
     
-    void update_sun(float sim_time_s)
+    void update_sun(float real_time_s)
     {
-      float t_solar_period = std::fmod(m_sun_t_offs + (sim_time_s / 60.f) / m_sun_minutes_per_day, 1);
+      float t_solar_period = std::fmod(m_sun_t_offs + (real_time_s / 60.f) / m_sun_minutes_per_day, 1);
       //int idx = static_cast<int>(m_sun_dir);
       //idx += t_solar_period * (static_cast<float>(Direction::NUM_ITEMS) - 1.f);
       static constexpr auto dp = 1.f/8.f; // solar period step (delta period).
@@ -508,9 +508,9 @@ namespace dung
         t_scroll_amount = t_page;
     }
     
-    void update(double sim_time_s, const keyboard::KeyPressData& kpd)
+    void update(double real_time_s, const keyboard::KeyPressData& kpd)
     {
-      update_sun(static_cast<float>(sim_time_s));
+      update_sun(static_cast<float>(real_time_s));
       int sun_dir_idx = static_cast<int>(m_sun_dir) - 1;
       m_shadow_dir = static_cast<Direction>(((sun_dir_idx + 4) % 8) + 1);
       
@@ -571,7 +571,7 @@ namespace dung
               std::cerr << "ERROR: Attempted to drop invalid item!" << std::endl;
             }
             m_player.inv_select_idx = -1;
-            message_handler->add_message(static_cast<float>(sim_time_s),
+            message_handler->add_message(static_cast<float>(real_time_s),
                                          msg,
                                          MessageHandler::Level::Guide);
           }
@@ -623,17 +623,17 @@ namespace dung
                   door->is_locked = false;
                   
                   m_player.remove_key_by_key_id(all_keys, door->key_id);
-                  message_handler->add_message(static_cast<float>(sim_time_s),
+                  message_handler->add_message(static_cast<float>(real_time_s),
                                                "You cast a vanishing spell on the key!",
                                                MessageHandler::Level::Guide);
                   
-                  message_handler->add_message(static_cast<float>(sim_time_s),
+                  message_handler->add_message(static_cast<float>(real_time_s),
                                                "The door is unlocked!",
                                                MessageHandler::Level::Guide);
                 }
                 else
                 {
-                  message_handler->add_message(static_cast<float>(sim_time_s),
+                  message_handler->add_message(static_cast<float>(real_time_s),
                                                "The door is locked. You need key:" + std::to_string(door->key_id) + "!",
                                                MessageHandler::Level::Guide);
                 }
@@ -671,7 +671,7 @@ namespace dung
                 m_player.inv_hilite_idx++;
               m_player.key_idcs.emplace_back(key_idx);
               key.picked_up = true;
-              message_handler->add_message(static_cast<float>(sim_time_s),
+              message_handler->add_message(static_cast<float>(real_time_s),
                                            "You picked up a key!", MessageHandler::Level::Guide);
             }
           }
@@ -682,7 +682,7 @@ namespace dung
             {
               m_player.lamp_idcs.emplace_back(lamp_idx);
               lamp.picked_up = true;
-              message_handler->add_message(static_cast<float>(sim_time_s),
+              message_handler->add_message(static_cast<float>(real_time_s),
                                            "You picked up a lamp!", MessageHandler::Level::Guide);
             }
           }
@@ -763,12 +763,12 @@ namespace dung
     
     
     template<int NR, int NC>
-    void draw(SpriteHandler<NR, NC>& sh, double sim_time_s) const
+    void draw(SpriteHandler<NR, NC>& sh, double real_time_s)
     {
       const auto& room_corridor_map = m_bsp_tree->get_room_corridor_map();
       const auto& door_vec = m_bsp_tree->fetch_doors();
       
-      message_handler->update(sh, static_cast<float>(sim_time_s));
+      message_handler->update(sh, static_cast<float>(real_time_s));
       
       if (m_player.show_inventory)
         draw_inventory(sh);
