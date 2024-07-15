@@ -13,7 +13,8 @@ This library is very new and currently only provides two classes: `BSPTree` that
   - `generate(int world_size_rows, int world_size_cols,
                   Orientation first_split_orientation)` : Generates the BSP regions recursively.
   - `pad_rooms(int min_rnd_wall_padding = 1, int max_rnd_wall_padding = 4)` : Pads the regions into rooms.
-  - `ceate_corridors(int min_corridor_half_width = 1)` : Non-recursive method of creating corridors on leaf-level.
+  - `create_corridors(int min_corridor_half_width = 1)` : Non-recursive method of creating corridors on leaf-level.
+  - `create_doors(int max_num_locked_doors, bool allow_passageways)` : Creates doors between rooms and corridors. You need to first have called `generate()`, `pad_rooms()` and `create_corridors()` before calling this function.
   - `draw_regions()` : Draws the regions.
   - `draw_rooms()` : Draws the rooms.
   - `draw_corridors()` : Draws the non-recursive corridors.
