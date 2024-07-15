@@ -576,7 +576,7 @@ namespace dung
               if (m_player.is_inside_curr_room())
                 key.is_underground = is_underground(m_player.curr_room);
               else if (m_player.is_inside_curr_corridor())
-                key.is_underground = true;
+                key.is_underground = true; // #FIXME.
               stlutils::erase(m_player.key_idcs, key_idx);
               msg += "key:" + std::to_string(key.key_id) + "!";
             }
@@ -589,7 +589,7 @@ namespace dung
               if (m_player.is_inside_curr_room())
                 lamp.is_underground = is_underground(m_player.curr_room);
               else if (m_player.is_inside_curr_corridor())
-                lamp.is_underground = true;
+                lamp.is_underground = true; // #FIXME.
               stlutils::erase(m_player.lamp_idcs, lamp_idx);
               msg += "lamp:" + std::to_string(lamp_idx) + "!";
             }
@@ -826,7 +826,7 @@ namespace dung
       
       for (const auto& key : all_keys)
       {
-        if (key.picked_up || (use_fog_of_war && key.fog_of_war) || (key.is_underground && !key.light))
+        if (key.picked_up || (use_fog_of_war && key.fog_of_war) || ((key.is_underground || m_sun_dir == SolarDirection::Nadir) && !key.light))
           continue;
         auto key_scr_pos = get_screen_pos(key.pos);
         sh.write_buffer(std::string(1, key.character), key_scr_pos.r, key_scr_pos.c, key.style);
