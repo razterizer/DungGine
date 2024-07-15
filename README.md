@@ -15,7 +15,8 @@ This library is very new and currently only provides two classes: `BSPTree` that
   - `pad_rooms(int min_rnd_wall_padding = 1, int max_rnd_wall_padding = 4)` : Pads the regions into rooms.
   - `create_corridors(int min_corridor_half_width = 1)` : Non-recursive method of creating corridors on leaf-level.
   - `create_doors(int max_num_locked_doors, bool allow_passageways)` : Creates doors between rooms and corridors. You need to first have called `generate()`, `pad_rooms()` and `create_corridors()` before calling this function.
-  - `draw_regions()` : Draws the regions.
+  - `draw_regions(SpriteHandler<NR, NC>& sh, int r0 = 0, int c0 = 0,
+    const styles::Style& border_style = { Color::Black, Color::Yellow })` : Draws the regions.
   - `draw_rooms()` : Draws the rooms.
   - `draw_corridors()` : Draws the non-recursive corridors.
   - `print_tree()` : Debug printing of the tree.
