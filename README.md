@@ -78,7 +78,7 @@ Color bg_color = Color::Default;
 dung::DungGine dungeon_engine;
 dungeon_engine.load_dungeon(&bsp_tree);
 dungeon_engine.style_dungeon();
-dungeon_engine.draw(sh);
+dungeon_engine.draw(sh, get_real_time_s());
 sh.print_screen_buffer(t, bg_color);
 ```
 
