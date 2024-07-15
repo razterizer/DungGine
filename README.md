@@ -20,6 +20,7 @@ This library is very new and currently only provides two classes: `BSPTree` that
   - `print_tree()` : Debug printing of the tree.
   - `fetch_leaves()` : Fetches the leaves of the BSP tree where the rooms are stored.
   - `get_room_corridor_map()` : Function that retrieves the room and corridor relationship data structure.
+  - `get_world_size()` : Gets the world size.
 * `DungGine.h`
   - `load_dungeon(BSPTree*)` : Loads a generated BSP tree.
   - `style_dungeon()` : Performs automated styling of rooms in the dungeon / realm.
