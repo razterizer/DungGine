@@ -30,8 +30,8 @@ This library is very new and currently only provides two classes: `BSPTree` that
   - `set_player_character(char ch)` : Sets the character of the playable character (pun intended).
   -  `set_player_style(const Style& style)` : Sets the style (fg/bg color) of the playable character.
   - `place_player(const RC& screen_size, std::optional<RC> world_pos = std::nullopt)` : Places the player near the middle of the realm in one of the corridors and centers the screen around the player.
-  - `configure_sun(Direction sun_dir, float minutes_per_day)` : Configures the speed of the solar day and the starting direction of the sun. Used for shadow movements for rooms over ground.
-  - `configure_sun(float minutes_per_day)` : Same as above but randomizes the initial direction of the sun.
+  - `configure_sun(float sun_t_offs, float minutes_per_day, Latitude latitude = Latitude::High, Season season = Season::Spring)` : Configures the speed of the solar day and the starting direction of the sun. Used for shadow movements for rooms over ground.
+  - `configure_sun(float minutes_per_day, Latitude latitude = Latitude::High, Season season = Season::Spring)` : Same as above but randomizes the initial direction of the sun.
   - `place_keys()` : Places the keys in rooms, randomly all over the world.
   - `place_lamps(int num_lamps)` : Places `num_lamps` lamps in rooms, randomly all over the world.
   - `set_screen_scrolling_mode(ScreenScrollingMode mode, float t_page = 0.2f)` : Sets the screen scrolling mode to either `AlwaysInCentre`, `PageWise` or `WhenOutsideScreen`. `t_page` is used with `PageWise` mode.

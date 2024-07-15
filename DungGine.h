@@ -11,6 +11,7 @@
 #include "RoomStyle.h"
 #include "Items.h"
 #include "Player.h"
+#include "SolarMotionPatterns.h"
 #include <Termin8or/Keyboard.h>
 #include <Termin8or/MessageHandler.h>
 
@@ -37,8 +38,10 @@ namespace dung
     std::map<BSPNode*, RoomStyle> m_room_styles;
     std::map<Corridor*, RoomStyle> m_corridor_styles;
     
-    Direction m_sun_dir = Direction::E;
-    Direction m_shadow_dir = Direction::W;
+    SolarDirection m_sun_dir = SolarDirection::E;
+    Latitude m_latitude = Latitude::High;
+    Season m_season = Season::Spring;
+    SolarMotionPatterns m_solar_motion;
     float m_sun_minutes_per_day = 20.f;
     float m_sun_t_offs = 0.f;
     
@@ -90,21 +93,8 @@ namespace dung
     {
       float t_solar_period = std::fmod(m_sun_t_offs + (real_time_s / 60.f) / m_sun_minutes_per_day, 1);
       //int idx = static_cast<int>(m_sun_dir);
-      //idx += t_solar_period * (static_cast<float>(Direction::NUM_ITEMS) - 1.f);
-      static constexpr auto dp = 1.f/8.f; // solar period step (delta period).
-      for (int i = 0; i < 8; ++i)
-      {
-        // 2 means east: S(0), SE(1), E(2). The sun comes up from the east.
-        int curr_dir_idx = (i+2) % 8;
-        if ((static_cast<int>(m_sun_dir) - 1) != curr_dir_idx)
-        {
-          if (math::in_range<float>(t_solar_period, i*dp, (i+1)*dp, Range::ClosedOpen))
-          {
-            m_sun_dir = static_cast<Direction>(curr_dir_idx + 1);
-            break;
-          }
-        }
-      }
+      //idx += t_solar_period * (static_cast<float>(SolarDirection::NUM_ITEMS) - 1.f);
+      m_sun_dir = m_solar_motion.get_solar_direction(m_latitude, m_season, t_solar_period);
     }
     
     // #NOTE: Only for unwalled area!
@@ -448,24 +438,21 @@ namespace dung
     }
     
     // Randomizes the starting direction of the sun.
-    void configure_sun(float minutes_per_day)
+    void configure_sun(float minutes_per_day,
+                       Latitude latitude = Latitude::High, Season season = Season::Spring)
     {
-      Direction sun_dir = static_cast<Direction>(rnd::rand_int(0, 7) + 1);
-      configure_sun(sun_dir, minutes_per_day);
+      float sun_dir = rnd::rand();
+      configure_sun(sun_dir, minutes_per_day, latitude, season);
     }
     
-    void configure_sun(Direction sun_dir, float minutes_per_day)
+    void configure_sun(float sun_t_offs, float minutes_per_day,
+                       Latitude latitude = Latitude::High, Season season = Season::Spring)
     {
-      if (sun_dir == Direction::None || sun_dir == Direction::NUM_ITEMS)
-      {
-        std::cerr << "ERROR: invalid value of sun direction supplied to function DungGine::configure_sun()!" << std::endl;
-        return;
-      }
-      m_sun_dir = sun_dir;
+      m_latitude = latitude;
+      m_season = season;
       m_sun_minutes_per_day = minutes_per_day;
-      // None, S, SE, E, NE, N, NW, W, SW, NUM_ITEMS
-      // 0     1  2   3  4   5  6   7  8
-      m_sun_t_offs = (static_cast<int>(sun_dir) - 1) / 8.f;
+      m_sun_t_offs = math::clamp(sun_t_offs, 0.f, 1.f);
+      m_sun_dir = m_solar_motion.get_solar_direction(m_latitude, m_season, m_sun_t_offs);
     }
     
     bool place_keys()
@@ -554,8 +541,6 @@ namespace dung
     void update(double real_time_s, const keyboard::KeyPressData& kpd)
     {
       update_sun(static_cast<float>(real_time_s));
-      int sun_dir_idx = static_cast<int>(m_sun_dir) - 1;
-      m_shadow_dir = static_cast<Direction>(((sun_dir_idx + 4) % 8) + 1);
       
       auto is_inside_curr_bb = [&](int r, int c) -> bool
       {
@@ -855,7 +840,7 @@ namespace dung
         sh.write_buffer(std::string(1, lamp.character), lamp_scr_pos.r, lamp_scr_pos.c, lamp.style);
       }
       
-      auto shadow_type = m_shadow_dir;
+      auto shadow_type = m_sun_dir;
       for (const auto& room_pair : m_room_styles)
       {
         auto* room = room_pair.first;
@@ -888,7 +873,7 @@ namespace dung
                             bb_scr_pos.r, bb_scr_pos.c, bb.r_len, bb.c_len,
                             room_style.get_fill_style(),
                             room_style.get_fill_char(),
-                            room_style.is_underground ? Direction::None : shadow_type,
+                            room_style.is_underground ? SolarDirection::Nadir : shadow_type,
                             styles::shade_style(room_style.get_fill_style(), color::ShadeType::Dark),
                             room_style.get_fill_char(),
                             room->light);
@@ -915,7 +900,7 @@ namespace dung
         
           drawing::draw_box_textured(sh,
                                      bb_scr_pos.r, bb_scr_pos.c, bb.r_len, bb.c_len,
-                                     room_style.is_underground ? Direction::None : shadow_type,
+                                     room_style.is_underground ? SolarDirection::Nadir : shadow_type,
                                      texture_fill,
                                      texture_shadow,
                                      room->light,
@@ -954,7 +939,7 @@ namespace dung
                           bb_scr_pos.r, bb_scr_pos.c, bb.r_len, bb.c_len,
                           corr_style.get_fill_style(),
                           corr_style.get_fill_char(),
-                          corr_style.is_underground ? Direction::None : shadow_type,
+                          corr_style.is_underground ? SolarDirection::Nadir : shadow_type,
                           styles::shade_style(corr_style.get_fill_style(), color::ShadeType::Dark, true),
                           corr_style.get_fill_char(),
                           corr->light);
