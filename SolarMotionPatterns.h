@@ -145,7 +145,7 @@ namespace dung
   
     SolarDirection get_solar_direction(Latitude latitude, Season season, float sun_t)
     {
-      int idx = math::roundI(c_num_phases*sun_t);
+      int idx = math::roundI((c_num_phases - 1)*sun_t);
       switch (latitude)
       {
         case Latitude::Polar:
