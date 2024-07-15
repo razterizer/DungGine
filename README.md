@@ -24,15 +24,19 @@ This library is very new and currently only provides two classes: `BSPTree` that
   - `get_world_size()` : Gets the world size.
   - `fetch_doors()` : Gets a vector of pointers to all doors.
 * `DungGine.h`
-  - `load_dungeon(BSPTree*)` : Loads a generated BSP tree.
+  - `DungGine(const std::string& exe_folder, bool use_fow, DungGineTextureParams texture_params = {})` : The constructor.
+  - `load_dungeon(BSPTree* bsp_tree)` : Loads a generated BSP tree.
   - `style_dungeon()` : Performs automated styling of rooms in the dungeon / realm.
-  - `set_player_character()` : Sets the character of the playable character (pun intended).
-  - `place_player()` : Places the player near the middle of the realm in one of the corridors and centers the screen around the player.
+  - `set_player_character(char ch)` : Sets the character of the playable character (pun intended).
+  -  `set_player_style(const Style& style)` : Sets the style (fg/bg color) of the playable character.
+  - `place_player(const RC& screen_size, std::optional<RC> world_pos = std::nullopt)` : Places the player near the middle of the realm in one of the corridors and centers the screen around the player.
   - `configure_sun(Direction sun_dir, float minutes_per_day)` : Configures the speed of the solar day and the starting direction of the sun. Used for shadow movements for rooms over ground.
   - `configure_sun(float minutes_per_day)` : Same as above but randomizes the initial direction of the sun.
-  - `set_screen_scrolling_mode()` : Sets the screen scrolling mode to either `AlwaysInCentre`, `PageWise` or `WhenOutsideScreen`.
-  - `update()` : Updating the state of the dungeon engine. Manages things such as the change of direction of the sun for the shadows of rooms that are not under the ground and key-presses for control of the playable character.
-  - `draw()` : Draws the rooms of the dungeon / realm (will include drawing of corridors in the near(?) future).
+  - `place_keys()` : Places the keys in rooms, randomly all over the world.
+  - `place_lamps(int num_lamps)` : Places `num_lamps` lamps in rooms, randomly all over the world.
+  - `set_screen_scrolling_mode(ScreenScrollingMode mode, float t_page = 0.2f)` : Sets the screen scrolling mode to either `AlwaysInCentre`, `PageWise` or `WhenOutsideScreen`. `t_page` is used with `PageWise` mode.
+  - `update(double real_time_s, const keyboard::KeyPressData& kpd)` : Updating the state of the dungeon engine. Manages things such as the change of direction of the sun for the shadows of rooms that are not under the ground and key-presses for control of the playable character.
+  - `draw(SpriteHandler<NR, NC>& sh, double real_time_s)` : Draws the rooms of the dungeon / realm (will include drawing of corridors in the near(?) future).
 
 ## Examples
 
