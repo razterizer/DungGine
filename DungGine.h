@@ -43,7 +43,9 @@ namespace dung
     Season m_season = Season::Spring;
     SolarMotionPatterns m_solar_motion;
     float m_sun_minutes_per_day = 20.f;
-    float m_sun_t_offs = 0.f;
+    float m_sun_day_t_offs = 0.f;
+    float m_sun_minutes_per_year = 120.f;
+    float m_sun_year_t_offs = 0.f;
     
     Player m_player;
     ttl::Rectangle m_screen_in_world;
@@ -91,10 +93,11 @@ namespace dung
     
     void update_sun(float real_time_s)
     {
-      float t_solar_period = std::fmod(m_sun_t_offs + (real_time_s / 60.f) / m_sun_minutes_per_day, 1);
-      //int idx = static_cast<int>(m_sun_dir);
-      //idx += t_solar_period * (static_cast<float>(SolarDirection::NUM_ITEMS) - 1.f);
+      float t_solar_period = std::fmod(m_sun_day_t_offs + (real_time_s / 60.f) / m_sun_minutes_per_day, 1);
       m_sun_dir = m_solar_motion.get_solar_direction(m_latitude, m_season, t_solar_period);
+      
+      float t_season_period = std::fmod(m_sun_year_t_offs + (real_time_s / 60.f) / m_sun_minutes_per_day, 1);
+      m_season = static_cast<Season>(math::roundI(7*t_season_period));
     }
     
     // #NOTE: Only for unwalled area!
@@ -437,22 +440,27 @@ namespace dung
       return false;
     }
     
-    // Randomizes the starting direction of the sun.
-    void configure_sun(float minutes_per_day,
-                       Latitude latitude = Latitude::High, Season season = Season::Spring)
+    // Randomizes the starting direction of the sun and the starting season.
+    void configure_sun_rand(float minutes_per_day = 20.f, float minutes_per_year = 120.f,
+                            Latitude latitude = Latitude::High)
     {
-      float sun_dir = rnd::rand();
-      configure_sun(sun_dir, minutes_per_day, latitude, season);
+      configure_sun(rnd::rand(), minutes_per_day, 
+                    static_cast<Season>(rnd::rand_int(0, 7)), minutes_per_year,
+                    latitude);
     }
     
-    void configure_sun(float sun_t_offs, float minutes_per_day,
-                       Latitude latitude = Latitude::High, Season season = Season::Spring)
+    void configure_sun(float sun_day_t_offs = 0.f, float minutes_per_day = 20.f,
+                       Season start_season = Season::Spring, float minutes_per_year = 120.f,
+                       Latitude latitude = Latitude::High)
     {
       m_latitude = latitude;
-      m_season = season;
+      m_season = start_season;
+      m_sun_year_t_offs = static_cast<float>(start_season)/7;
+      m_sun_minutes_per_year = minutes_per_year;
+      
       m_sun_minutes_per_day = minutes_per_day;
-      m_sun_t_offs = math::clamp(sun_t_offs, 0.f, 1.f);
-      m_sun_dir = m_solar_motion.get_solar_direction(m_latitude, m_season, m_sun_t_offs);
+      m_sun_day_t_offs = math::clamp(sun_day_t_offs, 0.f, 1.f);
+      m_sun_dir = m_solar_motion.get_solar_direction(m_latitude, m_season, m_sun_day_t_offs);
     }
     
     bool place_keys()
