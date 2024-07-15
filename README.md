@@ -87,29 +87,35 @@ sh.print_screen_buffer(t, bg_color);
 ***
 
 ```cpp
+// Declarations
 dung::BSPTree bsp_tree { 4 }; // argument: `min_room_length = 4`.
-bsp_tree.generate(200, 400, dung::Orientation::Vertical); // arguments: world_size_rows, world_size_cols,
-                  first_split_orientation.
-bsp_tree.pad_rooms(4); // arguments: min_rnd_wall_padding = 4, [max_rnd_wall_padding = 4].
-bsp_tree.create_corridors(1); // argument: min_corridor_half_width = 1, (1 means it will be three chars wide).
-bsp_tree.create_doors(); // We also create doors here.
-
+dung::DungGineTextureParams texture_params;
+std::unique_ptr<dung::DungGine> dungeon_engine;
 Text t;
 SpriteHandler<NR, NC> sh;
 Color bg_color = Color::Black;
 
-dung::DungGine dungeon_engine;
+// Initializations
+bsp_tree.generate(200, 400, dung::Orientation::Vertical); // arguments: world_size_rows, world_size_cols,
+                  first_split_orientation.
+bsp_tree.pad_rooms(4); // arguments: min_rnd_wall_padding = 4, [max_rnd_wall_padding = 4].
+bsp_tree.create_corridors(1); // argument: min_corridor_half_width = 1, (1 means it will be three chars wide).
+bsp_tree.create_doors(100, true); // We also create doors here. Arguments: max_num_locked_doors, allow_passageways.
+
+dungeon_engine = std::make_unique<dung::DungGine>(get_exe_folder(), true); // arguments: exe_folder, use_fow, texture_params.
 dungeon_engine.load_dungeon(&bsp_tree);
 dungeon_engine.style_dungeon();
 if (!dungeon_engine.place_player(sh.size()))
   std::cerr << "ERROR : Unable to place the playable character!" << std::endl;
 dungeon_engine.configure_sun(20.f);
+dungeon_engine->place_keys();
+dungeon_engine->place_lamps(20);
 dungeon_engine.set_screen_scrolling_mode(ScreenScrollingMode::WhenOutsideScreen);
 
 // In game loop:
 sh.clear();
-dungeon_engine.update(get_sim_time_s(), kpd); // arg0 : time from game start, arg1 : keyboard::KeyPressData object.
-dungeon_engine.draw(sh);
+dungeon_engine->update(get_real_time_s(), kpd); // arg0 : time from game start, arg1 : keyboard::KeyPressData object.
+dungeon_engine->draw(sh, get_real_time_s());
 sh.print_screen_buffer(t, bg_color);
 ```
 
@@ -117,3 +123,48 @@ sh.print_screen_buffer(t, bg_color);
 
 Note the playable character marked as a "@" in the centre of the screen.
 To move the character in a game loop, use function `update()` to allow keystrokes to be registered. Then control the character by pressing the ASWD keys. Press space-bar to open and close doors that you are located next to.
+
+***
+
+```cpp
+// Declarations
+dung::BSPTree bsp_tree { 4 }; // argument: `min_room_length = 4`.
+dung::DungGineTextureParams texture_params;
+std::unique_ptr<dung::DungGine> dungeon_engine;
+Text t;
+SpriteHandler<NR, NC> sh;
+Color bg_color = Color::Black;
+
+// Initializations
+bsp_tree.generate(200, 400, dung::Orientation::Vertical); // arguments: world_size_rows, world_size_cols,
+                  first_split_orientation.
+bsp_tree.pad_rooms(4); // arguments: min_rnd_wall_padding = 4, [max_rnd_wall_padding = 4].
+bsp_tree.create_corridors(1); // argument: min_corridor_half_width = 1, (1 means it will be three chars wide).
+bsp_tree.create_doors(100, true); // We also create doors here. Arguments: max_num_locked_doors, allow_passageways.
+
+texture_params.dt_anim_s = 0.5;
+auto f_tex_path = [](const auto& filename)
+{
+return folder::join_path({ "textures", filename });
+};
+texture_params.texture_file_names_surface_level_fill.emplace_back(f_tex_path("texture_sl_fill_0.tex"));
+texture_params.texture_file_names_surface_level_fill.emplace_back(f_tex_path("texture_sl_fill_1.tex"));
+texture_params.texture_file_names_surface_level_shadow.emplace_back(f_tex_path("texture_sl_shadow_0.tex"));
+texture_params.texture_file_names_surface_level_shadow.emplace_back(f_tex_path("texture_sl_shadow_1.tex"));
+
+dungeon_engine = std::make_unique<dung::DungGine>(get_exe_folder(), true, texture_params); // arguments: exe_folder, use_fow, texture_params.
+dungeon_engine.load_dungeon(&bsp_tree);
+dungeon_engine.style_dungeon();
+if (!dungeon_engine.place_player(sh.size()))
+  std::cerr << "ERROR : Unable to place the playable character!" << std::endl;
+dungeon_engine.configure_sun(20.f);
+dungeon_engine->place_keys();
+dungeon_engine->place_lamps(20);
+dungeon_engine.set_screen_scrolling_mode(ScreenScrollingMode::WhenOutsideScreen);
+
+// In game loop:
+sh.clear();
+dungeon_engine->update(get_real_time_s(), kpd); // arg0 : time from game start, arg1 : keyboard::KeyPressData object.
+dungeon_engine->draw(sh, get_real_time_s());
+sh.print_screen_buffer(t, bg_color);
+```
