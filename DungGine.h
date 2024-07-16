@@ -397,8 +397,10 @@ namespace dung
         auto world_size = m_bsp_tree->get_world_size();
         auto lat_offs = static_cast<int>(m_latitude);
         auto long_offs = static_cast<int>(m_longitude);
-        auto lat_idx = math::roundI(4*leaf->bb_leaf_room.r/world_size.r);
-        auto long_idx = math::roundI(15*leaf->bb_leaf_room.c/world.size.c);
+        const auto& bb = leaf->bb_leaf_room;
+        RC cp { bb.r + bb.r_len/2, bb.c + bb.c_len };
+        auto lat_idx = math::roundI(4*cp.r/world_size.r);
+        auto long_idx = math::roundI(15*cp.c/world.size.c);
         room_style.latitude = static_cast<Latitude>((lat_offs + lat_idx) % 4);
         room_style.longitude = static_cast<Longitude>((long_offs + long_idx) % 15);
         
