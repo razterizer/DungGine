@@ -12,16 +12,20 @@ namespace dung
 {
   
   using SolarDirection = drawing::SolarDirection;
-  enum class Latitude { Polar, High, Equator };
+  enum class Latitude { NorthPole, NorthernHemisphere, Equator, SouthernHemisphere, SouthPole };
+  // These are global seasons and uses the northern hemisphere as a reference frame.
   enum class Season { Winter, EarlySpring, Spring, EarlySummer, Summer, LateSummer, Autumn, LateAutumn };
   
   class SolarMotionPatterns
   {
     static constexpr int c_num_phases = 16;
+    
     // Well, you can't really have north on the north pole and vice versa,
     //   but since north maps to the up direction in the world,
     //   it is a hack that works.
-    const std::array<SolarDirection, c_num_phases> sun_motion_polar_winter
+    
+    // North Pole : Winter, Spring/Autumn, Summer.
+    const std::array<SolarDirection, c_num_phases> np_winter
     {
       SolarDirection::Nadir,
       SolarDirection::Nadir,
@@ -41,7 +45,27 @@ namespace dung
       SolarDirection::Nadir,
     };
     
-    const std::array<SolarDirection, c_num_phases> sun_motion_polar_summer
+    const std::array<SolarDirection, c_num_phases> np_spring_autumn
+    {
+      SolarDirection::E_Low,
+      SolarDirection::E_Low,
+      SolarDirection::SE_Low,
+      SolarDirection::SE_Low,
+      SolarDirection::S_Low,
+      SolarDirection::S_Low,
+      SolarDirection::SW_Low,
+      SolarDirection::SW_Low,
+      SolarDirection::W_Low,
+      SolarDirection::W_Low,
+      SolarDirection::NW_Low,
+      SolarDirection::NW_Low,
+      SolarDirection::N_Low,
+      SolarDirection::N_Low,
+      SolarDirection::NE_Low,
+      SolarDirection::NE_Low,
+    };
+    
+    const std::array<SolarDirection, c_num_phases> np_summer
     {
       SolarDirection::E,
       SolarDirection::E,
@@ -61,7 +85,8 @@ namespace dung
       SolarDirection::NE,
     };
     
-    const std::array<SolarDirection, c_num_phases> sun_motion_high_winter
+    // Northern Hemisphere : Winter, Spring/Autumn, Summer.
+    const std::array<SolarDirection, c_num_phases> nh_winter
     {
       SolarDirection::E_Low,
       SolarDirection::SE,
@@ -81,7 +106,7 @@ namespace dung
       SolarDirection::Nadir,
     };
     
-    const std::array<SolarDirection, c_num_phases> sun_motion_high_spring_autumn
+    const std::array<SolarDirection, c_num_phases> nh_spring_autumn
     {
       SolarDirection::E_Low,
       SolarDirection::E,
@@ -101,7 +126,7 @@ namespace dung
       SolarDirection::Nadir,
     };
     
-    const std::array<SolarDirection, c_num_phases> sun_motion_high_summer
+    const std::array<SolarDirection, c_num_phases> nh_summer
     {
       SolarDirection::E_Low,
       SolarDirection::E_Low,
@@ -121,7 +146,8 @@ namespace dung
       SolarDirection::Nadir,
     };
     
-    const std::array<SolarDirection, c_num_phases> sun_motion_equator
+    // Equator
+    const std::array<SolarDirection, c_num_phases> equator
     {
       SolarDirection::E_Low,
       SolarDirection::E,
@@ -140,6 +166,69 @@ namespace dung
       SolarDirection::Nadir,
       SolarDirection::Nadir,
     };
+    
+    // South Pole : Winter, Spring/Autumn, Summer.
+    const std::array<SolarDirection, c_num_phases> sp_winter
+    {
+      SolarDirection::E,
+      SolarDirection::E,
+      SolarDirection::NE,
+      SolarDirection::NE,
+      SolarDirection::N,
+      SolarDirection::N,
+      SolarDirection::NW,
+      SolarDirection::NW,
+      SolarDirection::W,
+      SolarDirection::W,
+      SolarDirection::SW,
+      SolarDirection::SW,
+      SolarDirection::S,
+      SolarDirection::S,
+      SolarDirection::SE,
+      SolarDirection::SE,
+    };
+    
+    const std::array<SolarDirection, c_num_phases> sp_spring_autumn
+    {
+      SolarDirection::E_Low,
+      SolarDirection::E_Low,
+      SolarDirection::NE_Low,
+      SolarDirection::NE_Low,
+      SolarDirection::N_Low,
+      SolarDirection::N_Low,
+      SolarDirection::NW_Low,
+      SolarDirection::NW_Low,
+      SolarDirection::W_Low,
+      SolarDirection::W_Low,
+      SolarDirection::SW_Low,
+      SolarDirection::SW_Low,
+      SolarDirection::S_Low,
+      SolarDirection::S_Low,
+      SolarDirection::SE_Low,
+      SolarDirection::SE_Low,
+    };
+    
+    const std::array<SolarDirection, c_num_phases> sp_summer
+    {
+      SolarDirection::Nadir,
+      SolarDirection::Nadir,
+      SolarDirection::Nadir,
+      SolarDirection::Nadir,
+      SolarDirection::Nadir,
+      SolarDirection::Nadir,
+      SolarDirection::Nadir,
+      SolarDirection::Nadir,
+      SolarDirection::Nadir,
+      SolarDirection::Nadir,
+      SolarDirection::Nadir,
+      SolarDirection::Nadir,
+      SolarDirection::Nadir,
+      SolarDirection::Nadir,
+      SolarDirection::Nadir,
+      SolarDirection::Nadir,
+    };
+    
+    
     
   public:
   
@@ -148,21 +237,22 @@ namespace dung
       int idx = math::roundI((c_num_phases - 1)*sun_t);
       switch (latitude)
       {
-        case Latitude::Polar:
+        case Latitude::NorthPole:
           switch (season)
           {
+            case Season::Spring:
+            case Season::Autumn:
+              return np_spring_autumn[idx];
+            case Season::LateAutumn:
             case Season::Winter:
             case Season::EarlySpring:
-            case Season::Autumn:
-            case Season::LateAutumn:
-              return sun_motion_polar_winter[idx];
-            case Season::Spring:
+              return np_winter[idx];
             case Season::EarlySummer:
             case Season::Summer:
             case Season::LateSummer:
-              return sun_motion_polar_summer[idx];
+              return np_summer[idx];
           }
-        case Latitude::High:
+        case Latitude::NorthernHemisphere:
           switch (season)
           {
             case Season::EarlySpring:
@@ -171,14 +261,31 @@ namespace dung
             case Season::LateSummer:
             case Season::Autumn:
             case Season::LateAutumn:
-              return sun_motion_high_spring_autumn[idx];
+              return nh_spring_autumn[idx];
             case Season::Winter:
-              return sun_motion_high_winter[idx];
+              return nh_winter[idx];
             case Season::Summer:
-              return sun_motion_high_summer[idx];
+              return nh_summer[idx];
           }
         case Latitude::Equator:
-          return sun_motion_equator[idx];
+          return equator[idx];
+        case Latitude::NorthernHemisphere:
+          return SolarDirection::Nadir; // Placeholder.
+        case Latitude::SouthPole:
+          switch (season)
+          {
+            case Season::Spring:
+            case Season::Autumn:
+              return sp_spring_autumn[idx];
+            case Season::LateAutumn:
+            case Season::Winter:
+            case Season::EarlySpring:
+              return sp_winter[idx];
+            case Season::EarlySummer:
+            case Season::Summer:
+            case Season::LateSummer:
+              return sp_summer[idx];
+          }
       }
     }
   };
