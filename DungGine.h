@@ -39,7 +39,7 @@ namespace dung
     std::map<Corridor*, RoomStyle> m_corridor_styles;
     
     SolarDirection m_sun_dir = SolarDirection::E;
-    Latitude m_latitude = Latitude::High;
+    Latitude m_latitude = Latitude::NorthernHemisphere;
     Season m_season = Season::Spring;
     SolarMotionPatterns m_solar_motion;
     float m_sun_minutes_per_day = 20.f;
@@ -442,7 +442,7 @@ namespace dung
     
     // Randomizes the starting direction of the sun and the starting season.
     void configure_sun_rand(float minutes_per_day = 20.f, float minutes_per_year = 120.f,
-                            Latitude latitude = Latitude::High)
+                            Latitude latitude = Latitude::NorthernHemisphere)
     {
       configure_sun(rnd::rand(), minutes_per_day, 
                     static_cast<Season>(rnd::rand_int(0, 7)), minutes_per_year,
@@ -451,7 +451,7 @@ namespace dung
     
     void configure_sun(float sun_day_t_offs = 0.f, float minutes_per_day = 20.f,
                        Season start_season = Season::Spring, float minutes_per_year = 120.f,
-                       Latitude latitude = Latitude::High)
+                       Latitude latitude = Latitude::NorthernHemisphere)
     {
       m_latitude = latitude;
       m_season = start_season;
