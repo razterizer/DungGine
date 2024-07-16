@@ -15,6 +15,8 @@ namespace dung
   using Style = styles::Style;
   using HiliteSelectFGStyle = styles::HiliteSelectFGStyle;
   enum class FloorType { None, Sand, Grass, Stone, Stone2, Water, Wood, NUM_ITEMS };
+  Latitude latitude = Latitude::NorthernHemisphere;
+  Longitude longitude = Longitude::F;
   
   struct RoomStyle
   {
