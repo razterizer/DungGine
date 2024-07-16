@@ -15,10 +15,22 @@ namespace dung
   enum class Latitude { NorthPole, NorthernHemisphere, Equator, SouthernHemisphere, SouthPole };
   enum class Longitude
   {
-    Front, // -45° to 45° (45W to 45E)
-    East,  // 45° to 135° (45E to 135E)
-    Back,  // 135° to 225° (135E to 135W)
-    West   // 225° to 315° (135W to 45W)
+    F,     // 0° (Front)
+    FFE,   // 22.5° (Front Front East)
+    FE,    // 45° (Front East)
+    FEE,   // 67.5° (Front East East)
+    E,     // 90° (East)
+    EEB,   // 112.5° (East East Back)
+    EB,    // 135° (East Back)
+    EBB,   // 157.5° (East Back Back)
+    B,     // 180° (Back)
+    BBE,   // -157.5° (Back Back East)
+    BE,    // -135° (Back East)
+    BEE,   // -112.5° (Back East East)
+    W,     // -90° (West)
+    WFF,   // -67.5° (West Front Front)
+    WF,    // -45° (West Front)
+    WFFF   // -22.5° (West Front Front Front)
   };
   // These are global seasons and uses the northern hemisphere as a reference frame.
   enum class Season { Winter, EarlySpring, Spring, EarlySummer, Summer, LateSummer, Autumn, LateAutumn };
