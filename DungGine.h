@@ -848,7 +848,13 @@ namespace dung
       
       for (const auto& key : all_keys)
       {
-        if (key.picked_up || (use_fog_of_war && key.fog_of_war) || ((key.is_underground || m_sun_dir == SolarDirection::Nadir) && !key.light))
+        bool is_night = m_sun_dir == SolarDirection::Nadir;
+        auto it = m_room_styles.find(leaf);
+        if (it != m_room_styles.end())
+          if (m_solar_motion.get_solar_direction(it->second.latitude, it->second.longitude, m_season, t_solar_period) == SolarDirection::Nadir)
+            is_night = true;
+        
+        if (key.picked_up || (use_fog_of_war && key.fog_of_war) || ((key.is_underground || is_night) && !key.light))
           continue;
         auto key_scr_pos = get_screen_pos(key.pos);
         sh.write_buffer(std::string(1, key.character), key_scr_pos.r, key_scr_pos.c, key.style);
@@ -869,6 +875,7 @@ namespace dung
         const auto& bb = room->bb_leaf_room;
         const auto& room_style = room_pair.second;
         auto bb_scr_pos = get_screen_pos(bb.pos());
+        shadow_type = m_solar_motion.get_solar_direction(room_style.latitude, room_style.longitude, m_season, t_solar_period);
         
         // Fog of war
         if (use_fog_of_war)
