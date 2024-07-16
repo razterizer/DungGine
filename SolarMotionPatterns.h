@@ -312,9 +312,10 @@ namespace dung
     
   public:
   
-    SolarDirection get_solar_direction(Latitude latitude, Season season, float sun_t)
+    SolarDirection get_solar_direction(Latitude latitude, Longitude longitude, Season season, float sun_t)
     {
-      int idx = math::roundI((c_num_phases - 1)*sun_t);
+      int long_offs = static_cast<int>(longitude);
+      int idx = (math::roundI((c_num_phases - 1)*sun_t) + long_offs) % c_num_phases;
       switch (latitude)
       {
         case Latitude::NorthPole:
