@@ -13,6 +13,13 @@ namespace dung
   
   using SolarDirection = drawing::SolarDirection;
   enum class Latitude { NorthPole, NorthernHemisphere, Equator, SouthernHemisphere, SouthPole };
+  enum class Longitude
+  {
+    Front, // -45° to 45° (45W to 45E)
+    East,  // 45° to 135° (45E to 135E)
+    Back,  // 135° to 225° (135E to 135W)
+    West   // 225° to 315° (135W to 45W)
+  };
   // These are global seasons and uses the northern hemisphere as a reference frame.
   enum class Season { Winter, EarlySpring, Spring, EarlySummer, Summer, LateSummer, Autumn, LateAutumn };
   
