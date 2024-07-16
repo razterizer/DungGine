@@ -6,6 +6,7 @@
 //
 
 #pragma once
+#include "SolarMotionPatterns.h"
 
 namespace dung
 {
@@ -15,8 +16,6 @@ namespace dung
   using Style = styles::Style;
   using HiliteSelectFGStyle = styles::HiliteSelectFGStyle;
   enum class FloorType { None, Sand, Grass, Stone, Stone2, Water, Wood, NUM_ITEMS };
-  Latitude latitude = Latitude::NorthernHemisphere;
-  Longitude longitude = Longitude::F;
   
   struct RoomStyle
   {
@@ -25,6 +24,8 @@ namespace dung
     FloorType floor_type = FloorType::None;
     bool is_underground = true;
     RC tex_pos;
+    Latitude latitude = Latitude::NorthernHemisphere;
+    Longitude longitude = Longitude::F;
     
     void init_rand()
     {

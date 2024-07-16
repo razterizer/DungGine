@@ -47,6 +47,7 @@ namespace dung
     float m_sun_day_t_offs = 0.f;
     float m_sun_minutes_per_year = 120.f;
     float m_sun_year_t_offs = 0.f;
+    float m_t_solar_period = 0.f;
     
     Player m_player;
     ttl::Rectangle m_screen_in_world;
@@ -94,8 +95,8 @@ namespace dung
     
     void update_sun(float real_time_s)
     {
-      float t_solar_period = std::fmod(m_sun_day_t_offs + (real_time_s / 60.f) / m_sun_minutes_per_day, 1);
-      m_sun_dir = m_solar_motion.get_solar_direction(m_latitude, m_longitude, m_season, t_solar_period);
+      m_t_solar_period = std::fmod(m_sun_day_t_offs + (real_time_s / 60.f) / m_sun_minutes_per_day, 1);
+      m_sun_dir = m_solar_motion.get_solar_direction(m_latitude, m_longitude, m_season, m_t_solar_period);
       
       float t_season_period = std::fmod(m_sun_year_t_offs + (real_time_s / 60.f) / m_sun_minutes_per_day, 1);
       m_season = static_cast<Season>(math::roundI(7*t_season_period));
@@ -400,7 +401,7 @@ namespace dung
         const auto& bb = leaf->bb_leaf_room;
         RC cp { bb.r + bb.r_len/2, bb.c + bb.c_len };
         auto lat_idx = math::roundI(4*cp.r/world_size.r);
-        auto long_idx = math::roundI(15*cp.c/world.size.c);
+        auto long_idx = math::roundI(15*cp.c/world_size.c);
         room_style.latitude = static_cast<Latitude>((lat_offs + lat_idx) % 4);
         room_style.longitude = static_cast<Longitude>((long_offs + long_idx) % 15);
         
@@ -474,7 +475,7 @@ namespace dung
       
       m_sun_minutes_per_day = minutes_per_day;
       m_sun_day_t_offs = math::clamp(sun_day_t_offs, 0.f, 1.f);
-      m_sun_dir = m_solar_motion.get_solar_direction(m_latitude, m_season, m_sun_day_t_offs);
+      m_sun_dir = m_solar_motion.get_solar_direction(m_latitude, m_longitude, m_season, m_sun_day_t_offs);
     }
     
     bool place_keys()
@@ -504,7 +505,10 @@ namespace dung
             return false;
             
           if (leaf != nullptr)
+          {
+            key.curr_room = leaf;
             key.is_underground = is_underground(leaf);
+          }
             
           all_keys.emplace_back(key);
         }
@@ -596,9 +600,17 @@ namespace dung
               key.picked_up = false;
               key.pos = curr_pos;
               if (m_player.is_inside_curr_room())
+              {
                 key.is_underground = is_underground(m_player.curr_room);
+                key.curr_room = m_player.curr_room;
+                key.curr_corridor = nullptr;
+              }
               else if (m_player.is_inside_curr_corridor())
-                key.is_underground = true; // #FIXME.
+              {
+                key.is_underground = is_underground(m_player.curr_corridor);
+                key.curr_room = nullptr;
+                key.curr_corridor = m_player.curr_corridor;
+              }
               stlutils::erase(m_player.key_idcs, key_idx);
               msg += "key:" + std::to_string(key.key_id) + "!";
             }
@@ -609,9 +621,17 @@ namespace dung
               lamp.picked_up = false;
               lamp.pos = curr_pos;
               if (m_player.is_inside_curr_room())
+              {
                 lamp.is_underground = is_underground(m_player.curr_room);
+                lamp.curr_room = m_player.curr_room;
+                lamp.curr_corridor = nullptr;
+              }
               else if (m_player.is_inside_curr_corridor())
-                lamp.is_underground = true; // #FIXME.
+              {
+                lamp.is_underground = is_underground(m_player.curr_corridor);
+                lamp.curr_room = nullptr;
+                lamp.curr_corridor = m_player.curr_corridor;
+              }
               stlutils::erase(m_player.lamp_idcs, lamp_idx);
               msg += "lamp:" + std::to_string(lamp_idx) + "!";
             }
@@ -849,10 +869,21 @@ namespace dung
       for (const auto& key : all_keys)
       {
         bool is_night = m_sun_dir == SolarDirection::Nadir;
-        auto it = m_room_styles.find(leaf);
-        if (it != m_room_styles.end())
-          if (m_solar_motion.get_solar_direction(it->second.latitude, it->second.longitude, m_season, t_solar_period) == SolarDirection::Nadir)
+        auto f_set_night = [&](const RoomStyle& rs)
+        {
+          if (m_solar_motion.get_solar_direction(rs.latitude, rs.longitude, m_season, m_t_solar_period) == SolarDirection::Nadir)
             is_night = true;
+        };
+
+        auto itr = m_room_styles.find(key.curr_room);
+        if (itr != m_room_styles.end())
+          f_set_night(itr->second);
+        else
+        {
+          auto itc = m_corridor_styles.find(key.curr_corridor);
+          if (itc != m_corridor_styles.end())
+            f_set_night(itc->second);
+        }
         
         if (key.picked_up || (use_fog_of_war && key.fog_of_war) || ((key.is_underground || is_night) && !key.light))
           continue;
@@ -875,7 +906,7 @@ namespace dung
         const auto& bb = room->bb_leaf_room;
         const auto& room_style = room_pair.second;
         auto bb_scr_pos = get_screen_pos(bb.pos());
-        shadow_type = m_solar_motion.get_solar_direction(room_style.latitude, room_style.longitude, m_season, t_solar_period);
+        shadow_type = m_solar_motion.get_solar_direction(room_style.latitude, room_style.longitude, m_season, m_t_solar_period);
         
         // Fog of war
         if (use_fog_of_war)

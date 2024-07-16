@@ -21,6 +21,8 @@ namespace dung
     float weight = 0.f; // kg-ish.
     float price = 0.f;  // SEK-ish.
     bool is_underground = false;
+    BSPNode* curr_room = nullptr;
+    Corridor* curr_corridor = nullptr;
   };
   
   struct Key : Item
