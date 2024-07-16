@@ -40,6 +40,7 @@ namespace dung
     
     SolarDirection m_sun_dir = SolarDirection::E;
     Latitude m_latitude = Latitude::NorthernHemisphere;
+    Longitude m_longitude = Longitude::F;
     Season m_season = Season::Spring;
     SolarMotionPatterns m_solar_motion;
     float m_sun_minutes_per_day = 20.f;
@@ -94,7 +95,7 @@ namespace dung
     void update_sun(float real_time_s)
     {
       float t_solar_period = std::fmod(m_sun_day_t_offs + (real_time_s / 60.f) / m_sun_minutes_per_day, 1);
-      m_sun_dir = m_solar_motion.get_solar_direction(m_latitude, m_season, t_solar_period);
+      m_sun_dir = m_solar_motion.get_solar_direction(m_latitude, m_longitude, m_season, t_solar_period);
       
       float t_season_period = std::fmod(m_sun_year_t_offs + (real_time_s / 60.f) / m_sun_minutes_per_day, 1);
       m_season = static_cast<Season>(math::roundI(7*t_season_period));
@@ -442,18 +443,21 @@ namespace dung
     
     // Randomizes the starting direction of the sun and the starting season.
     void configure_sun_rand(float minutes_per_day = 20.f, float minutes_per_year = 120.f,
-                            Latitude latitude = Latitude::NorthernHemisphere)
+                            Latitude latitude = Latitude::NorthernHemisphere,
+                            Longitude longitude = Longitude::F)
     {
       configure_sun(rnd::rand(), minutes_per_day, 
                     static_cast<Season>(rnd::rand_int(0, 7)), minutes_per_year,
-                    latitude);
+                    latitude, longitude);
     }
     
     void configure_sun(float sun_day_t_offs = 0.f, float minutes_per_day = 20.f,
                        Season start_season = Season::Spring, float minutes_per_year = 120.f,
-                       Latitude latitude = Latitude::NorthernHemisphere)
+                       Latitude latitude = Latitude::NorthernHemisphere,
+                       Longitude longitude = Longitude::F)
     {
       m_latitude = latitude;
+      m_longitude = longitude;
       m_season = start_season;
       m_sun_year_t_offs = static_cast<float>(start_season)/7;
       m_sun_minutes_per_year = minutes_per_year;
