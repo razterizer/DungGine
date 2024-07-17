@@ -379,6 +379,19 @@ namespace dung
     
     void style_dungeon()
     {
+      auto world_size = m_bsp_tree->get_world_size();
+      auto lat_offs = static_cast<int>(m_latitude);
+      auto long_offs = static_cast<int>(m_longitude);
+      
+      auto f_calc_lat_long = [&world_size, lat_offs, long_offs](auto& room_style, const ttl::Rectangle& bb)
+      {
+        RC cp { bb.r + bb.r_len/2, bb.c + bb.c_len };
+        auto lat_idx = math::roundI(4*cp.r/world_size.r);
+        auto long_idx = math::roundI(15*cp.c/world_size.c);
+        room_style.latitude = static_cast<Latitude>((lat_offs + lat_idx) % 4);
+        room_style.longitude = static_cast<Longitude>((long_offs + long_idx) % 15);
+      };
+      
       for (auto* leaf : m_leaves)
       {
         RoomStyle room_style;
@@ -396,15 +409,7 @@ namespace dung
           }
         }
         
-        auto world_size = m_bsp_tree->get_world_size();
-        auto lat_offs = static_cast<int>(m_latitude);
-        auto long_offs = static_cast<int>(m_longitude);
-        const auto& bb = leaf->bb_leaf_room;
-        RC cp { bb.r + bb.r_len/2, bb.c + bb.c_len };
-        auto lat_idx = math::roundI(4*cp.r/world_size.r);
-        auto long_idx = math::roundI(15*cp.c/world_size.c);
-        room_style.latitude = static_cast<Latitude>((lat_offs + lat_idx) % 4);
-        room_style.longitude = static_cast<Longitude>((long_offs + long_idx) % 15);
+        f_calc_lat_long(room_style, leaf->bb_leaf_room);
         
         m_room_styles[leaf] = room_style;
       }
@@ -417,6 +422,9 @@ namespace dung
         room_style.wall_type = WallType::Masonry4;
         room_style.wall_style = { Color::LightGray, Color::Black }; //wall_palette[WallBasicType::Masonry]
         room_style.floor_type = FloorType::Stone2;
+        
+        f_calc_lat_long(room_style, cp.second->bb);
+        
         m_corridor_styles[cp.second] = room_style;
       }
     }
@@ -977,12 +985,15 @@ namespace dung
         }
       }
       
+      shadow_type = m_sun_dir;
       for (const auto& corr_pair : m_corridor_styles)
       {
         auto* corr = corr_pair.first;
         const auto& bb = corr->bb;
         const auto& corr_style = corr_pair.second;
         auto bb_scr_pos = get_screen_pos(bb.pos());
+        if (m_use_per_room_lat_long_for_sun_dir)
+          shadow_type = m_solar_motion.get_solar_direction(corr_style.latitude, corr_style.longitude, m_season, m_t_solar_period);
         
         // Fog of war
         if (use_fog_of_war)
