@@ -38,6 +38,7 @@ namespace dung
     std::map<BSPNode*, RoomStyle> m_room_styles;
     std::map<Corridor*, RoomStyle> m_corridor_styles;
     
+    bool m_use_per_room_lat_long_for_sun_dir = true;
     SolarDirection m_sun_dir = SolarDirection::E;
     Latitude m_latitude = Latitude::NorthernHemisphere;
     Longitude m_longitude = Longitude::F;
@@ -455,17 +456,19 @@ namespace dung
     // Randomizes the starting direction of the sun and the starting season.
     void configure_sun_rand(float minutes_per_day = 20.f, float minutes_per_year = 120.f,
                             Latitude latitude = Latitude::NorthernHemisphere,
-                            Longitude longitude = Longitude::F)
+                            Longitude longitude = Longitude::F,
+                            bool use_per_room_lat_long_for_sun_dir = true)
     {
       configure_sun(rnd::rand(), minutes_per_day, 
                     static_cast<Season>(rnd::rand_int(0, 7)), minutes_per_year,
-                    latitude, longitude);
+                    latitude, longitude, use_per_room_lat_long_for_sun_dir);
     }
     
     void configure_sun(float sun_day_t_offs = 0.f, float minutes_per_day = 20.f,
                        Season start_season = Season::Spring, float minutes_per_year = 120.f,
                        Latitude latitude = Latitude::NorthernHemisphere,
-                       Longitude longitude = Longitude::F)
+                       Longitude longitude = Longitude::F,
+                       bool use_per_room_lat_long_for_sun_dir = true)
     {
       m_latitude = latitude;
       m_longitude = longitude;
@@ -476,6 +479,7 @@ namespace dung
       m_sun_minutes_per_day = minutes_per_day;
       m_sun_day_t_offs = math::clamp(sun_day_t_offs, 0.f, 1.f);
       m_sun_dir = m_solar_motion.get_solar_direction(m_latitude, m_longitude, m_season, m_sun_day_t_offs);
+      m_use_per_room_lat_long_for_sun_dir = use_per_room_lat_long_for_sun_dir;
     }
     
     bool place_keys()
@@ -869,20 +873,23 @@ namespace dung
       for (const auto& key : all_keys)
       {
         bool is_night = m_sun_dir == SolarDirection::Nadir;
-        auto f_set_night = [&](const RoomStyle& rs)
+        if (m_use_per_room_lat_long_for_sun_dir)
         {
-          if (m_solar_motion.get_solar_direction(rs.latitude, rs.longitude, m_season, m_t_solar_period) == SolarDirection::Nadir)
-            is_night = true;
-        };
-
-        auto itr = m_room_styles.find(key.curr_room);
-        if (itr != m_room_styles.end())
-          f_set_night(itr->second);
-        else
-        {
-          auto itc = m_corridor_styles.find(key.curr_corridor);
-          if (itc != m_corridor_styles.end())
-            f_set_night(itc->second);
+          auto f_set_night = [&](const RoomStyle& rs)
+          {
+            if (m_solar_motion.get_solar_direction(rs.latitude, rs.longitude, m_season, m_t_solar_period) == SolarDirection::Nadir)
+              is_night = true;
+          };
+          
+          auto itr = m_room_styles.find(key.curr_room);
+          if (itr != m_room_styles.end())
+            f_set_night(itr->second);
+          else
+          {
+            auto itc = m_corridor_styles.find(key.curr_corridor);
+            if (itc != m_corridor_styles.end())
+              f_set_night(itc->second);
+          }
         }
         
         if (key.picked_up || (use_fog_of_war && key.fog_of_war) || ((key.is_underground || is_night) && !key.light))
@@ -906,7 +913,8 @@ namespace dung
         const auto& bb = room->bb_leaf_room;
         const auto& room_style = room_pair.second;
         auto bb_scr_pos = get_screen_pos(bb.pos());
-        shadow_type = m_solar_motion.get_solar_direction(room_style.latitude, room_style.longitude, m_season, m_t_solar_period);
+        if (m_use_per_room_lat_long_for_sun_dir)
+          shadow_type = m_solar_motion.get_solar_direction(room_style.latitude, room_style.longitude, m_season, m_t_solar_period);
         
         // Fog of war
         if (use_fog_of_war)
