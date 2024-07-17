@@ -380,16 +380,20 @@ namespace dung
     void style_dungeon()
     {
       auto world_size = m_bsp_tree->get_world_size();
-      auto lat_offs = static_cast<int>(m_latitude);
+      // Default lat_offs = 0 @ Latitude::Equator.
+      auto lat_offs = static_cast<int>(m_latitude) - static_cast<int>(Latitude::Equator);
+      // Default long_offs = 0 @ Longitude::F.
       auto long_offs = static_cast<int>(m_longitude);
       
       auto f_calc_lat_long = [&world_size, lat_offs, long_offs](auto& room_style, const ttl::Rectangle& bb)
       {
+        const auto num_lat = static_cast<int>(Latitude::NUM_ITEMS);
+        const auto num_long = static_cast<int>(Longitude::NUM_ITEMS);
         RC cp { bb.r + bb.r_len/2, bb.c + bb.c_len };
-        auto lat_idx = math::roundI(4*cp.r/world_size.r);
-        auto long_idx = math::roundI(15*cp.c/world_size.c);
-        room_style.latitude = static_cast<Latitude>((lat_offs + lat_idx) % 4);
-        room_style.longitude = static_cast<Longitude>((long_offs + long_idx) % 15);
+        auto lat_idx = math::roundI((num_lat - 1)*cp.r/world_size.r);
+        auto long_idx = math::roundI((num_long - 1)*cp.c/world_size.c);
+        room_style.latitude = static_cast<Latitude>((lat_offs + lat_idx) % num_lat);
+        room_style.longitude = static_cast<Longitude>((long_offs + long_idx) % num_long);
       };
       
       for (auto* leaf : m_leaves)

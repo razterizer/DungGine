@@ -12,7 +12,7 @@ namespace dung
 {
   
   using SolarDirection = drawing::SolarDirection;
-  enum class Latitude { NorthPole, NorthernHemisphere, Equator, SouthernHemisphere, SouthPole };
+  enum class Latitude { NorthPole, NorthernHemisphere, Equator, SouthernHemisphere, SouthPole, NUM_ITEMS };
   enum class Longitude
   {
     F,     // 0° (Front)
@@ -30,10 +30,11 @@ namespace dung
     W,     // -90° (West)
     WFW,   // -67.5° (West Front West)
     FW,    // -45° (Front West)
-    FFW    // -22.5° (Front Front West)
+    FFW,   // -22.5° (Front Front West)
+    NUM_ITEMS
   };
   // These are global seasons and uses the northern hemisphere as a reference frame.
-  enum class Season { Winter, EarlySpring, Spring, EarlySummer, Summer, LateSummer, Autumn, LateAutumn };
+  enum class Season { Winter, EarlySpring, Spring, EarlySummer, Summer, LateSummer, Autumn, LateAutumn, NUM_ITEMS };
   
   class SolarMotionPatterns
   {
@@ -332,6 +333,8 @@ namespace dung
             case Season::Summer:
             case Season::LateSummer:
               return np_summer[idx];
+            case Season::NUM_ITEMS: // Error state
+              return SolarDirection::Nadir;
           }
         case Latitude::NorthernHemisphere:
           switch (season)
@@ -347,6 +350,8 @@ namespace dung
               return nh_winter[idx];
             case Season::Summer:
               return nh_summer[idx];
+            case Season::NUM_ITEMS: // Error state
+              return SolarDirection::Nadir;
           }
         case Latitude::Equator:
           return equator[idx];
@@ -364,6 +369,8 @@ namespace dung
               return sh_winter[idx];
             case Season::Summer:
               return sh_summer[idx];
+            case Season::NUM_ITEMS: // Error state
+              return SolarDirection::Nadir;
           }
         case Latitude::SouthPole:
           switch (season)
@@ -379,7 +386,11 @@ namespace dung
             case Season::Summer:
             case Season::LateSummer:
               return sp_summer[idx];
+            case Season::NUM_ITEMS: // Error state
+              return SolarDirection::Nadir;
           }
+        case Latitude::NUM_ITEMS: // Error state
+          return SolarDirection::Nadir;
       }
     }
   };
