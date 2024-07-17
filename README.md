@@ -42,6 +42,12 @@ See the next section for a summary over these two classes.
   - `update(double real_time_s, const keyboard::KeyPressData& kpd)` : Updating the state of the dungeon engine. Manages things such as the change of direction of the sun for the shadows of rooms that are not under the ground and key-presses for control of the playable character.
   - `draw(SpriteHandler<NR, NC>& sh, double real_time_s)` : Draws the rooms of the dungeon / realm (will include drawing of corridors in the near(?) future).
 
+## Texturing
+
+Texturing done using the editor [`TextUR`](https://github.com/razterizer/TextUR).
+Use the `TextUR` command line argument `-c` to convert a normal/fill texture to a shadow texture.
+`DungGine` supports texture animations.
+
 ## Examples
 
 ```cpp
