@@ -390,8 +390,8 @@ namespace dung
         const auto num_lat = static_cast<int>(Latitude::NUM_ITEMS);
         const auto num_long = static_cast<int>(Longitude::NUM_ITEMS);
         RC cp { bb.r + bb.r_len/2, bb.c + bb.c_len };
-        auto lat_idx = math::roundI((num_lat - 1)*cp.r/world_size.r);
-        auto long_idx = math::roundI((num_long - 1)*cp.c/world_size.c);
+        auto lat_idx = math::clamp(static_cast<int>(num_lat*cp.r/world_size.r), 0, num_lat - 1);
+        auto long_idx = math::clamp(static_cast<int>(num_long*cp.c/world_size.c), 0, num_long - 1);
         room_style.latitude = static_cast<Latitude>((lat_offs + lat_idx) % num_lat);
         room_style.longitude = static_cast<Longitude>((long_offs + long_idx) % num_long);
       };
