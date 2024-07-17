@@ -30,8 +30,9 @@ This library is very new and currently only provides two classes: `BSPTree` that
   - `set_player_character(char ch)` : Sets the character of the playable character (pun intended).
   -  `set_player_style(const Style& style)` : Sets the style (fg/bg color) of the playable character.
   - `place_player(const RC& screen_size, std::optional<RC> world_pos = std::nullopt)` : Places the player near the middle of the realm in one of the corridors and centers the screen around the player.
-  - `configure_sun(float sun_t_offs, float minutes_per_day, Latitude latitude = Latitude::High, Season season = Season::Spring)` : Configures the speed of the solar day and the starting direction of the sun. Used for shadow movements for rooms over ground.
-  - `configure_sun(float minutes_per_day, Latitude latitude = Latitude::High, Season season = Season::Spring)` : Same as above but randomizes the initial direction of the sun.
+  - `configure_sun(float sun_day_t_offs = 0.f, float minutes_per_day = 20.f, Season start_season = Season::Spring, float minutes_per_year = 120.f, Latitude latitude = Latitude::NorthernHemisphere, Longitude longitude = Longitude::F, bool use_per_room_lat_long_for_sun_dir = true)` : Configures the speed of the solar day, speed of the solar year, the starting direction of the sun and the starting season. Used for shadow movements for rooms over ground.
+      When `use_per_room_lat_long_for_sun_dir` is `true` then use `latitude = Latitude::Equator` and `longitude = Longitude::F` to start with. Other values will shift the map over the globe so to speak, but with these starting settings the rooms at the top of the map will be the at the north pole and the rooms at the bottom of the map will be at the south pole. When `use_per_room_lat_long_for_sun_dir` is `false` then the specified latitude and longitude will be used globally across the whole map and the the function default args is a good starting point.
+  - `configure_sun_rand(float minutes_per_day = 20.f, float minutes_per_year = 120.f, Latitude latitude = Latitude::NorthernHemisphere, Longitude longitude = Longitude::F, bool use_per_room_lat_long_for_sun_dir = true)` : Same as above but randomizes the initial direction of the sun.
   - `place_keys()` : Places the keys in rooms, randomly all over the world.
   - `place_lamps(int num_lamps)` : Places `num_lamps` lamps in rooms, randomly all over the world.
   - `set_screen_scrolling_mode(ScreenScrollingMode mode, float t_page = 0.2f)` : Sets the screen scrolling mode to either `AlwaysInCentre`, `PageWise` or `WhenOutsideScreen`. `t_page` is used with `PageWise` mode.
@@ -104,10 +105,10 @@ bsp_tree.create_doors(100, true); // We also create doors here. Arguments: max_n
 
 dungeon_engine = std::make_unique<dung::DungGine>(get_exe_folder(), true); // arguments: exe_folder, use_fow, texture_params.
 dungeon_engine.load_dungeon(&bsp_tree);
+dungeon_engine.configure_sun_rand(20.f, 120.f, dung::Latitude::NorthernHemisphere, dung::Longitude::FW, false); // 20 minutes per day and 120 minutes per year. Global shadow.
 dungeon_engine.style_dungeon();
 if (!dungeon_engine.place_player(sh.size()))
   std::cerr << "ERROR : Unable to place the playable character!" << std::endl;
-dungeon_engine.configure_sun(20.f);
 dungeon_engine->place_keys();
 dungeon_engine->place_lamps(20);
 dungeon_engine.set_screen_scrolling_mode(ScreenScrollingMode::WhenOutsideScreen);
@@ -154,10 +155,10 @@ texture_params.texture_file_names_surface_level_shadow.emplace_back(f_tex_path("
 
 dungeon_engine = std::make_unique<dung::DungGine>(get_exe_folder(), true, texture_params); // arguments: exe_folder, use_fow, texture_params.
 dungeon_engine.load_dungeon(&bsp_tree);
+dungeon_engine.configure_sun_rand(20.f, 120.f, dung::Latitude::Equator, dung::Longitude::F, true); // 20 minutes per day and 120 minutes per year. Localized shadows across the map starting at Equator & Front.
 dungeon_engine.style_dungeon();
 if (!dungeon_engine.place_player(sh.size()))
   std::cerr << "ERROR : Unable to place the playable character!" << std::endl;
-dungeon_engine.configure_sun(20.f);
 dungeon_engine->place_keys();
 dungeon_engine->place_lamps(20);
 dungeon_engine.set_screen_scrolling_mode(ScreenScrollingMode::WhenOutsideScreen);
