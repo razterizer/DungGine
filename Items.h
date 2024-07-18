@@ -58,4 +58,53 @@ namespace dung
     LampType type = LampType::Isotropic;
   };
   
+  struct Weapon : Item
+  {
+    virtual ~Weapon() = default;
+    int damage = 2;
+    bool rusty = false;
+    bool sharpened = false;
+    bool poisonous = false;
+    std::string type;
+  };
+  
+  struct Sword : Weapon
+  {
+    Sword()
+    {
+      character = 'T';
+      style.fg_color = Color::LightGray;
+      style.bg_color = Color::Transparent2;
+      weight = 2.f;
+      price = math::roundI(20*rnd::randn_clamp(4e3f, 500.f, 0.f, 5e6f))/20.f;
+      type = "sword";
+    }
+  };
+  
+  struct Dagger : Weapon
+  {
+    Dagger()
+    {
+      character = 'V';
+      style.fg_color = Color::LightGray;
+      style.bg_color = Color::Transparent2;
+      weight = 2.f;
+      price = math::roundI(20*rnd::randn_clamp(5e2f, 500.f, 0.f, 1e4f))/20.f;
+      type = "dagger";
+    }
+  };
+  
+  struct Flail : Weapon
+  {
+    Flail()
+    {
+      character = '#';
+      style.fg_color = Color::DarkGray;
+      style.bg_color = Color::Transparent2;
+      weight = 2.f;
+      price = math::roundI(20*rnd::randn_clamp(1e3f, 500.f, 0.f, 5e5f))/20.f;
+      type = "flail";
+    }
+  };
+  
 }

@@ -74,6 +74,7 @@ namespace dung
     //   then they will still be visible when the room is not lit.
     // Lamps will not work in surface level rooms.
     std::vector<Lamp> all_lamps;
+    std::vector<std::unique_ptr<Weapon>> all_weapons;
     
     std::unique_ptr<MessageHandler> message_handler;
     bool use_fog_of_war = false;
@@ -151,6 +152,7 @@ namespace dung
       
       auto num_inv_keys = static_cast<int>(m_player.key_idcs.size());
       auto num_inv_lamps = static_cast<int>(m_player.lamp_idcs.size());
+      auto num_inv_wpns = static_cast<int>(m_player.weapon_idcs.size());
       
       auto f_format_item_str = [](std::string& item_str, float weight, float price)
       {
@@ -184,6 +186,26 @@ namespace dung
         const auto& lamp = all_lamps[lamp_idx];
         std::string item_str = "  Lamp:" + std::to_string(lamp_idx);
         f_format_item_str(item_str, lamp.weight, lamp.price);
+        items.emplace_back(std::make_pair(item_str, true));
+      }
+      items.emplace_back(std::make_pair("", false));
+      items.emplace_back(std::make_pair("Weapons:", false));
+      for (int inv_wpn_idx = 0; inv_wpn_idx < num_inv_wpns; ++inv_wpn_idx)
+      {
+        auto wpn_idx = m_player.weapon_idcs[inv_wpn_idx];
+        const auto& weapon = all_weapons[wpn_idx];
+        std::string item_str = "  ";
+        if (dynamic_cast<Sword*>(weapon.get()) != nullptr)
+          item_str += "  Sword:";
+        else if (dynamic_cast<Dagger*>(weapon.get()) != nullptr)
+          item_str += "  Dagger:";
+        else if (dynamic_cast<Flail*>(weapon.get()) != nullptr)
+          item_str += "  Flail:";
+        else
+          item_str += "<Weapon>";
+        item_str += ":";
+        item_str += std::to_string(wpn_idx);
+        f_format_item_str(item_str, weapon->weight, weapon->price);
         items.emplace_back(std::make_pair(item_str, true));
       }
       
@@ -233,6 +255,9 @@ namespace dung
       for (auto& lamp : all_lamps)
         *get_field_ptr(&lamp) = clear_val;
       
+      for (auto& weapon : all_weapons)
+        *get_field_ptr(weapon.get()) = clear_val;
+      
       ttl::Rectangle bb;
       bool_vector* field = nullptr;
       
@@ -272,6 +297,10 @@ namespace dung
       for (auto& lamp : all_lamps)
         if (distance(lamp.pos, curr_pos) <= c_fow_dist)
           *get_field_ptr(&lamp) = set_val;
+          
+      for (auto& weapon : all_weapons)
+        if (distance(weapon->pos, curr_pos) <= c_fow_dist)
+          *get_field_ptr(weapon.get()) = set_val;
       
       ttl::Rectangle bb;
       RC local_pos;
@@ -566,9 +595,52 @@ namespace dung
           return false;
           
         if (leaf != nullptr)
+        {
+          lamp.curr_room = leaf;
           lamp.is_underground = is_underground(leaf);
+        }
         
         all_lamps.emplace_back(lamp);
+      }
+      return true;
+    }
+    
+    bool place_weapons(int num_weapons)
+    {
+      const auto world_size = m_bsp_tree->get_world_size();
+      const int c_max_num_iters = 1e5;
+      int num_iters = 0;
+      for (int wpn_idx = 0; wpn_idx < num_weapons; ++wpn_idx)
+      {
+        std::unique_ptr<Weapon> weapon;
+        switch (rnd::rand_int(0, 2))
+        {
+          case 0: weapon = std::make_unique<Sword>(); break;
+          case 1: weapon = std::make_unique<Dagger>(); break;
+          case 2: weapon = std::make_unique<Flail>(); break;
+          // Error:
+          default: return false;
+        }
+        do
+        {
+          weapon->pos =
+          {
+            rnd::rand_int(0, world_size.r),
+            rnd::rand_int(0, world_size.c)
+          };
+        } while (num_iters++ < c_max_num_iters && !is_inside_any_room(weapon->pos));
+        
+        BSPNode* leaf = nullptr;
+        if (!is_inside_any_room(weapon->pos, &leaf))
+          return false;
+          
+        if (leaf != nullptr)
+        {
+          weapon->curr_room = leaf;
+          weapon->is_underground = is_underground(leaf);
+        }
+        
+        all_weapons.emplace_back(weapon.release());
       }
       return true;
     }
@@ -608,48 +680,46 @@ namespace dung
         {
           if (m_player.inv_select_idx >= 0)
           {
+            auto f_drop_item = [&](auto& obj, int obj_idx, auto& player_obj_idcs)
+            {
+              obj.picked_up = false;
+              obj.pos = curr_pos;
+              if (m_player.is_inside_curr_room())
+              {
+                obj.is_underground = is_underground(m_player.curr_room);
+                obj.curr_room = m_player.curr_room;
+                obj.curr_corridor = nullptr;
+              }
+              else if (m_player.is_inside_curr_corridor())
+              {
+                obj.is_underground = is_underground(m_player.curr_corridor);
+                obj.curr_room = nullptr;
+                obj.curr_corridor = m_player.curr_corridor;
+              }
+              stlutils::erase(player_obj_idcs, obj_idx);
+            };
+          
             std::string msg = "You dropped an item: ";
             if (m_player.inv_select_idx < m_player.key_idcs.size())
             {
               auto key_idx = m_player.key_idcs[m_player.inv_select_idx];
               auto& key = all_keys[key_idx];
-              key.picked_up = false;
-              key.pos = curr_pos;
-              if (m_player.is_inside_curr_room())
-              {
-                key.is_underground = is_underground(m_player.curr_room);
-                key.curr_room = m_player.curr_room;
-                key.curr_corridor = nullptr;
-              }
-              else if (m_player.is_inside_curr_corridor())
-              {
-                key.is_underground = is_underground(m_player.curr_corridor);
-                key.curr_room = nullptr;
-                key.curr_corridor = m_player.curr_corridor;
-              }
-              stlutils::erase(m_player.key_idcs, key_idx);
+              f_drop_item(key, key_idx, m_player.key_idcs);
               msg += "key:" + std::to_string(key.key_id) + "!";
             }
             else if (m_player.inv_select_idx < m_player.key_idcs.size() + m_player.lamp_idcs.size())
             {
               auto lamp_idx = m_player.lamp_idcs[m_player.inv_select_idx - m_player.key_idcs.size()];
               auto& lamp = all_lamps[lamp_idx];
-              lamp.picked_up = false;
-              lamp.pos = curr_pos;
-              if (m_player.is_inside_curr_room())
-              {
-                lamp.is_underground = is_underground(m_player.curr_room);
-                lamp.curr_room = m_player.curr_room;
-                lamp.curr_corridor = nullptr;
-              }
-              else if (m_player.is_inside_curr_corridor())
-              {
-                lamp.is_underground = is_underground(m_player.curr_corridor);
-                lamp.curr_room = nullptr;
-                lamp.curr_corridor = m_player.curr_corridor;
-              }
-              stlutils::erase(m_player.lamp_idcs, lamp_idx);
+              f_drop_item(lamp, lamp_idx, m_player.lamp_idcs);
               msg += "lamp:" + std::to_string(lamp_idx) + "!";
+            }
+            else if (m_player.inv_select_idx < m_player.key_idcs.size() + m_player.lamp_idcs.size() + m_player.weapon_idcs.size())
+            {
+              auto wpn_idx = m_player.weapon_idcs[m_player.inv_select_idx - (m_player.key_idcs.size() + m_player.lamp_idcs.size())];
+              auto& weapon = *all_weapons[wpn_idx];
+              f_drop_item(weapon, wpn_idx, m_player.weapon_idcs);
+              msg += weapon.type +":" + std::to_string(wpn_idx) + "!";
             }
             else
             {
@@ -772,6 +842,17 @@ namespace dung
                                            "You picked up a lamp!", MessageHandler::Level::Guide);
             }
           }
+          for (size_t wpn_idx = 0; wpn_idx < all_weapons.size(); ++wpn_idx)
+          {
+            auto& weapon = all_weapons[wpn_idx];
+            if (weapon->pos == curr_pos && !weapon->picked_up)
+            {
+              m_player.weapon_idcs.emplace_back(wpn_idx);
+              weapon->picked_up = true;
+              message_handler->add_message(static_cast<float>(real_time_s),
+                                           "You picked up a " + weapon->type + "!", MessageHandler::Level::Guide);
+            }
+          }
         }
       }
       else if (str::to_lower(kpd.curr_key) == 'i')
@@ -882,9 +963,9 @@ namespace dung
         sh.write_buffer(door_ch, door_scr_pos.r, door_scr_pos.c, Color::Black, (use_fog_of_war && door->fog_of_war) ? Color::Black : (door->light ? Color::Yellow : Color::DarkYellow));
       }
       
-      for (const auto& key : all_keys)
+      auto f_render_item = [&](const auto& obj)
       {
-        bool is_night = m_sun_dir == SolarDirection::Nadir;
+        bool is_night = false;
         if (m_use_per_room_lat_long_for_sun_dir)
         {
           auto f_set_night = [&](const RoomStyle& rs)
@@ -893,22 +974,27 @@ namespace dung
               is_night = true;
           };
           
-          auto itr = m_room_styles.find(key.curr_room);
+          auto itr = m_room_styles.find(obj.curr_room);
           if (itr != m_room_styles.end())
             f_set_night(itr->second);
           else
           {
-            auto itc = m_corridor_styles.find(key.curr_corridor);
+            auto itc = m_corridor_styles.find(obj.curr_corridor);
             if (itc != m_corridor_styles.end())
               f_set_night(itc->second);
           }
         }
+        else
+          is_night = m_sun_dir == SolarDirection::Nadir;
         
-        if (key.picked_up || (use_fog_of_war && key.fog_of_war) || ((key.is_underground || is_night) && !key.light))
-          continue;
-        auto key_scr_pos = get_screen_pos(key.pos);
-        sh.write_buffer(std::string(1, key.character), key_scr_pos.r, key_scr_pos.c, key.style);
-      }
+        if (obj.picked_up || (use_fog_of_war && obj.fog_of_war) || ((obj.is_underground || is_night) && !obj.light))
+          return;
+        auto scr_pos = get_screen_pos(obj.pos);
+        sh.write_buffer(std::string(1, obj.character), scr_pos.r, scr_pos.c, obj.style);
+      };
+      
+      for (const auto& key : all_keys)
+        f_render_item(key);
       
       for (const auto& lamp : all_lamps)
       {
@@ -917,6 +1003,9 @@ namespace dung
         auto lamp_scr_pos = get_screen_pos(lamp.pos);
         sh.write_buffer(std::string(1, lamp.character), lamp_scr_pos.r, lamp_scr_pos.c, lamp.style);
       }
+      
+      for (const auto& weapon : all_weapons)
+        f_render_item(*weapon);
       
       auto shadow_type = m_sun_dir;
       for (const auto& room_pair : m_room_styles)

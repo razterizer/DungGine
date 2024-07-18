@@ -23,6 +23,7 @@ namespace dung
     
     std::vector<int> key_idcs;
     std::vector<int> lamp_idcs;
+    std::vector<int> weapon_idcs;
     int inv_hilite_idx = 0;
     int inv_select_idx = -1;
     bool show_inventory = false;
