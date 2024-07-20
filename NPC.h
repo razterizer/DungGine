@@ -23,6 +23,12 @@ namespace dung
     float vel_c = 0.f;
     float acc_r = 0.f;
     float acc_c = 0.f;
+    const float px_aspect = 1.5f;
+    float acc_sigma = 10.f;
+    float acc_step = 1.5f;
+    float acc_lim = 25.f;
+    float vel_lim = 12.f;
+    int prob_change_acc = 10;
     bool wall_coll_resolve = false;
     int wall_coll_resolve_ctr = 0;
     
@@ -74,15 +80,15 @@ namespace dung
       }
       else
       {
-        acc_r += rnd::randn_clamp(0.f, 5.f, -1.f, +1.f);
-        acc_c += rnd::randn_clamp(0.f, 10.f, -2.f, +2.f);
-        acc_r = math::clamp<float>(acc_r, -25.f, +25.f);
-        acc_c = math::clamp<float>(acc_c, -50.f, +50.f);
+        acc_r += rnd::randn_clamp(0.f, acc_sigma, -acc_step, +acc_step);
+        acc_c += rnd::randn_clamp(0.f, acc_sigma*px_aspect, -acc_step*px_aspect, +acc_step*px_aspect);
+        acc_r = math::clamp<float>(acc_r, -acc_lim, +acc_lim);
+        acc_c = math::clamp<float>(acc_c, -acc_lim*px_aspect, +acc_lim*px_aspect);
       }
       vel_r += acc_r*dt;
       vel_c += acc_c*dt;
-      vel_r = math::clamp<float>(vel_r, -12.f, +12.f);
-      vel_c = math::clamp<float>(vel_c, -24.f, +24.f);
+      vel_r = math::clamp<float>(vel_r, -vel_lim, +vel_lim);
+      vel_c = math::clamp<float>(vel_c, -vel_lim*px_aspect, +vel_lim*px_aspect);
       pos_r += vel_r*dt;
       pos_c += vel_c*dt;
       auto r = std::round(pos_r);
