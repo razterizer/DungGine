@@ -23,8 +23,8 @@ namespace dung
     float vel_c = 0.f;
     float acc_r = 0.f;
     float acc_c = 0.f;
-    bool hit_wall = false;
-    int hit_wall_ctr = 0;
+    bool wall_coll_resolve = false;
+    int wall_coll_resolve_ctr = 0;
     
     Style style { Color::Green, Color::DarkYellow };
     char character = 'O';
@@ -64,12 +64,12 @@ namespace dung
         return false;
       };
     
-      if (hit_wall)
+      if (wall_coll_resolve)
       {
-        if (hit_wall_ctr++ < 20)
+        if (wall_coll_resolve_ctr++ < 20)
         {
-          hit_wall_ctr = 0;
-          hit_wall = false;
+          wall_coll_resolve_ctr = 0;
+          wall_coll_resolve = false;
         }
       }
       else
@@ -91,7 +91,7 @@ namespace dung
       {
         pos.r = r;
         pos.c = c;
-        hit_wall = false;
+        wall_coll_resolve = false;
       }
       else
       {
@@ -99,13 +99,13 @@ namespace dung
         {
           acc_r = 0.f;
           vel_r = -4.f*math::sgn(vel_r);
-          hit_wall = true;
+          wall_coll_resolve = true;
         }
         else if (rnd::rand_int(0, 10) == 0)
         {
           acc_c = 0.f;
           vel_c = -4.f*math::sgn(vel_c);
-          hit_wall = true;
+          wall_coll_resolve = true;
         }
         //else
         //{
