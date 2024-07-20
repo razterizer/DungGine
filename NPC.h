@@ -78,7 +78,7 @@ namespace dung
           wall_coll_resolve = false;
         }
       }
-      else if (rnd::rand_int(0, prob_change_acc) == 1)
+      else if (rnd::rand_int(0, prob_change_acc) == 0)
       {
         acc_r += rnd::randn_clamp(0.f, acc_sigma, -acc_step, +acc_step);
         acc_c += rnd::randn_clamp(0.f, acc_sigma*px_aspect, -acc_step*px_aspect, +acc_step*px_aspect);
