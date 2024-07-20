@@ -24,8 +24,8 @@ namespace dung
     float acc_r = 0.f;
     float acc_c = 0.f;
     const float px_aspect = 1.5f;
-    float acc_sigma = 10.f;
-    float acc_step = 1.5f;
+    float acc_sigma = 200.f;
+    float acc_step = 3.f;
     float acc_lim = 25.f;
     float vel_lim = 12.f;
     int prob_change_acc = 10;
