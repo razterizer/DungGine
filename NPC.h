@@ -69,7 +69,7 @@ namespace dung
         if (hit_wall_ctr++ < 20)
         {
           hit_wall_ctr = 0;
-          hit_wall = false
+          hit_wall = false;
         }
       }
       else
