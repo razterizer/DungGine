@@ -11,6 +11,7 @@
 #include "RoomStyle.h"
 #include "Items.h"
 #include "Player.h"
+#include "NPC.h"
 #include "SolarMotionPatterns.h"
 #include <Termin8or/Keyboard.h>
 #include <Termin8or/MessageHandler.h>
@@ -51,6 +52,8 @@ namespace dung
     float m_t_solar_period = 0.f;
     
     Player m_player;
+    std::vector<NPC> all_npcs;
+    
     ttl::Rectangle m_screen_in_world;
     // Value between 0 and 1 where 1 means a full screen vertically or horizontally.
     // Fraction of screen that will be scrolled (when in PageWise scroll mode).
@@ -196,11 +199,11 @@ namespace dung
         const auto& weapon = all_weapons[wpn_idx];
         std::string item_str = "  ";
         if (dynamic_cast<Sword*>(weapon.get()) != nullptr)
-          item_str += "  Sword:";
+          item_str += "Sword:";
         else if (dynamic_cast<Dagger*>(weapon.get()) != nullptr)
-          item_str += "  Dagger:";
+          item_str += "Dagger:";
         else if (dynamic_cast<Flail*>(weapon.get()) != nullptr)
-          item_str += "  Flail:";
+          item_str += "Flail:";
         else
           item_str += "<Weapon>";
         item_str += ":";
@@ -257,6 +260,9 @@ namespace dung
       
       for (auto& weapon : all_weapons)
         *get_field_ptr(weapon.get()) = clear_val;
+        
+      for (auto& npc : all_npcs)
+        *get_field_ptr(&npc) = clear_val;
       
       ttl::Rectangle bb;
       bool_vector* field = nullptr;
@@ -301,6 +307,10 @@ namespace dung
       for (auto& weapon : all_weapons)
         if (distance(weapon->pos, curr_pos) <= c_fow_dist)
           *get_field_ptr(weapon.get()) = set_val;
+      
+      for (auto& npc : all_npcs)
+        if (distance(npc.pos, curr_pos) <= c_fow_dist)
+          *get_field_ptr(&npc) = set_val;
       
       ttl::Rectangle bb;
       RC local_pos;
@@ -645,6 +655,41 @@ namespace dung
       return true;
     }
     
+    bool place_npcs(int num_npcs)
+    {
+      const auto world_size = m_bsp_tree->get_world_size();
+      const int c_max_num_iters = 1e5;
+      int num_iters = 0;
+      for (int npc_idx = 0; npc_idx < num_npcs; ++npc_idx)
+      {
+        NPC npc;
+        npc.npc_class = rnd::rand_enum<Class>();
+        npc.npc_race = rnd::rand_enum<Race>();
+        do
+        {
+          npc.pos =
+          {
+            rnd::rand_int(0, world_size.r),
+            rnd::rand_int(0, world_size.c)
+          };
+        } while (num_iters++ < c_max_num_iters && !is_inside_any_room(npc.pos));
+        
+        BSPNode* leaf = nullptr;
+        if (!is_inside_any_room(npc.pos, &leaf))
+          return false;
+          
+        if (leaf != nullptr)
+        {
+          npc.curr_room = leaf;
+          npc.is_underground = is_underground(leaf);
+          npc.init();
+        }
+        
+        all_npcs.emplace_back(npc);
+      }
+      return true;
+    }
+    
     void set_screen_scrolling_mode(ScreenScrollingMode mode, float t_page = 0.2f)
     {
       scr_scrolling_mode = mode;
@@ -652,7 +697,7 @@ namespace dung
         t_scroll_amount = t_page;
     }
     
-    void update(double real_time_s, const keyboard::KeyPressData& kpd)
+    void update(double real_time_s, float sim_dt_s, const keyboard::KeyPressData& kpd)
     {
       update_sun(static_cast<float>(real_time_s));
       
@@ -896,6 +941,10 @@ namespace dung
                      true);
       }
       
+      // NPCs
+      for (auto& npc : all_npcs)
+        npc.update(sim_dt_s);
+      
       // Scrolling mode.
       switch (scr_scrolling_mode)
       {
@@ -963,7 +1012,7 @@ namespace dung
         sh.write_buffer(door_ch, door_scr_pos.r, door_scr_pos.c, Color::Black, (use_fog_of_war && door->fog_of_war) ? Color::Black : (door->light ? Color::Yellow : Color::DarkYellow));
       }
       
-      auto f_render_item = [&](const auto& obj)
+      auto f_calc_night = [&](const auto& obj) -> bool
       {
         bool is_night = false;
         if (m_use_per_room_lat_long_for_sun_dir)
@@ -986,6 +1035,13 @@ namespace dung
         }
         else
           is_night = m_sun_dir == SolarDirection::Nadir;
+          
+        return is_night;
+      };
+      
+      auto f_render_item = [&](const auto& obj)
+      {
+        bool is_night = f_calc_night(obj);
         
         if (obj.picked_up || (use_fog_of_war && obj.fog_of_war) || ((obj.is_underground || is_night) && !obj.light))
           return;
@@ -1006,6 +1062,16 @@ namespace dung
       
       for (const auto& weapon : all_weapons)
         f_render_item(*weapon);
+        
+      for (const auto& npc : all_npcs)
+      {
+        bool is_night = f_calc_night(npc);
+        
+        if ((use_fog_of_war && npc.fog_of_war) || ((npc.is_underground || is_night) && !npc.light))
+          continue;
+        auto scr_pos = get_screen_pos(npc.pos);
+        sh.write_buffer(std::string(1, npc.character), scr_pos.r, scr_pos.c, npc.style);
+      }
       
       auto shadow_type = m_sun_dir;
       for (const auto& room_pair : m_room_styles)
