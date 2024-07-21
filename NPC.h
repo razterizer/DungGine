@@ -67,81 +67,107 @@ namespace dung
       {
         case Race::Human:
           character = '@';
+          style = { Color::Magenta, Color::LightGray };
           break;
         case Race::Elf:
           character = '@';
+          style = { Color::Magenta, Color::DarkGreen };
           break;
         case Race::Half_Elf:
           character = '@';
+          style = { Color::Magenta, Color::DarkYellow };
           break;
         case Race::Gnome:
           character = 'b';
+          style = { Color::Magenta, Color::LightGray };
           break;
         case Race::Halfling:
           character = 'b';
+          style = { Color::Magenta, Color::LightGray };
           break;
         case Race::Dwarf:
           character = '0';
+          style = { Color::White, Color::DarkGray };
           break;
         case Race::Half_Orc:
           character = '3';
+          style = { Color::Yellow, Color::Green };
           break;
         case Race::Ogre:
           character = 'O';
+          style = { Color::Green, Color::DarkYellow };
           break;
         case Race::Hobgoblin:
           character = 'a';
+          style = { Color::Yellow, Color::Cyan };
           break;
         case Race::Goblin:
           character = 'G';
+          style = { Color::Green, Color::DarkCyan };
           break;
         case Race::Orc:
           character = '2';
+          style = { Color::DarkYellow, Color::Cyan };
           break;
         case Race::Troll:
           character = 'R';
+          style = { Color::LightGray, Color::DarkRed };
           break;
         case Race::Monster:
           character = 'M';
+          style = { Color::Cyan, Color::DarkGreen };
           break;
         case Race::Lich:
           character = 'z';
+          style = { Color::DarkYellow, Color::DarkBlue };
           break;
         case Race::Lich_King:
           character = 'Z';
+          style = { Color::Yellow, Color::DarkBlue };
           break;
         case Race::Basilisk:
           character = 'S';
+          style = { Color::Green, Color::DarkGray };
           break;
         case Race::Bear:
           character = 'B';
+          style = { Color::Red, Color::DarkRed };
           break;
         case Race::Kobold:
           character = 'x';
+          style = { Color::Blue, Color::LightGray };
           break;
         case Race::Skeleton:
           character = '%';
+          style = { Color::White, Color::DarkGray };
           break;
         case Race::Giant:
           character = 'O';
+          style = { Color::DarkMagenta, Color::LightGray };
           break;
         case Race::Huge_Spider:
           character = 'W';
+          style = { Color::DarkGray, Color::White };
           break;
         case Race::Wolf:
           character = 'm';
+          style = { Color::LightGray, Color::DarkGray };
           break;
         case Race::Wyvern:
           character = 'w';
+          style = { Color::DarkMagenta, Color::Blue };
           break;
         case Race::Griffin:
           character = 'g';
+          style = { Color::DarkRed, Color::Blue };
           break;
         case Race::Ghoul:
           character = 'h';
+          style = { Color::LightGray, Color::Yellow };
           break;
         case Race::Dragon:
           character = 'R';
+          style = { Color::Red, Color::DarkMagenta };
           break;
         case Race::NUM_ITEMS:
           break;
@@ -153,6 +179,7 @@ namespace dung
       if (health == 0)
       {
         character = '&';
+        style = { Color::Red, Color::DarkGray };
         return;
       }
     
