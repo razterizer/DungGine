@@ -995,23 +995,6 @@ namespace dung
         sh.write_buffer(std::string(1, m_player.character), player_scr_pos.r, player_scr_pos.c, m_player.style);
       }
       
-      for (auto* door : door_vec)
-      {
-        auto door_pos = door->pos;
-        auto door_scr_pos = get_screen_pos(door_pos);
-        std::string door_ch = "^";
-        if (door->is_door)
-        {
-          if (door->is_open)
-            door_ch = "L";
-          else if (door->is_locked)
-            door_ch = "G";
-          else
-            door_ch = "D";
-        }
-        sh.write_buffer(door_ch, door_scr_pos.r, door_scr_pos.c, Color::Black, (use_fog_of_war && door->fog_of_war) ? Color::Black : (door->light ? Color::Yellow : Color::DarkYellow));
-      }
-      
       auto f_calc_night = [&](const auto& obj) -> bool
       {
         bool is_night = false;
@@ -1039,6 +1022,33 @@ namespace dung
         return is_night;
       };
       
+      for (const auto& npc : all_npcs)
+      {
+        bool is_night = f_calc_night(npc);
+        
+        if ((use_fog_of_war && npc.fog_of_war) || ((npc.is_underground || is_night) && !npc.light))
+          continue;
+        auto scr_pos = get_screen_pos(npc.pos);
+        sh.write_buffer(std::string(1, npc.character), scr_pos.r, scr_pos.c, npc.style);
+      }
+      
+      for (auto* door : door_vec)
+      {
+        auto door_pos = door->pos;
+        auto door_scr_pos = get_screen_pos(door_pos);
+        std::string door_ch = "^";
+        if (door->is_door)
+        {
+          if (door->is_open)
+            door_ch = "L";
+          else if (door->is_locked)
+            door_ch = "G";
+          else
+            door_ch = "D";
+        }
+        sh.write_buffer(door_ch, door_scr_pos.r, door_scr_pos.c, Color::Black, (use_fog_of_war && door->fog_of_war) ? Color::Black : (door->light ? Color::Yellow : Color::DarkYellow));
+      }
+      
       auto f_render_item = [&](const auto& obj)
       {
         bool is_night = f_calc_night(obj);
@@ -1062,16 +1072,6 @@ namespace dung
       
       for (const auto& weapon : all_weapons)
         f_render_item(*weapon);
-        
-      for (const auto& npc : all_npcs)
-      {
-        bool is_night = f_calc_night(npc);
-        
-        if ((use_fog_of_war && npc.fog_of_war) || ((npc.is_underground || is_night) && !npc.light))
-          continue;
-        auto scr_pos = get_screen_pos(npc.pos);
-        sh.write_buffer(std::string(1, npc.character), scr_pos.r, scr_pos.c, npc.style);
-      }
       
       auto shadow_type = m_sun_dir;
       for (const auto& room_pair : m_room_styles)
