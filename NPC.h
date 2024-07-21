@@ -59,10 +59,103 @@ namespace dung
     {
       pos_r = pos.r;
       pos_c = pos.c;
+      
+      npc_race = rnd::rand_enum<Race>();
+      npc_class = rnd::rand_enum<Class>();
+      
+      switch (npc_race)
+      {
+        case Race::Human:
+          character = '@';
+          break;
+        case Race::Elf:
+          character = '@';
+          break;
+        case Race::Half_Elf:
+          character = '@';
+          break;
+        case Race::Gnome:
+          character = 'b';
+          break;
+        case Race::Halfling:
+          character = 'b';
+          break;
+        case Race::Dwarf:
+          character = '0';
+          break;
+        case Race::Half_Orc:
+          character = '3';
+          break;
+        case Race::Ogre:
+          character = 'O';
+          break;
+        case Race::Hobgoblin:
+          character = 'a';
+          break;
+        case Race::Goblin:
+          character = 'G';
+          break;
+        case Race::Orc:
+          character = '2';
+          break;
+        case Race::Troll:
+          character = 'R';
+          break;
+        case Race::Monster:
+          character = 'M';
+          break;
+        case Race::Lich:
+          character = 'z';
+          break;
+        case Race::Lich_King:
+          character = 'Z';
+          break;
+        case Race::Basilisk:
+          character = 'S';
+          break;
+        case Race::Bear:
+          character = 'B';
+          break;
+        case Race::Kobold:
+          character = 'x';
+          break;
+        case Race::Skeleton:
+          character = '%';
+          break;
+        case Race::Giant:
+          character = 'O';
+          break;
+        case Race::Huge_Spider:
+          character = 'W';
+          break;
+        case Race::Wolf:
+          character = 'm';
+          break;
+        case Race::Wyvern:
+          character = 'w';
+          break;
+        case Race::Griffin:
+          character = 'g';
+          break;
+        case Race::Ghoul:
+          character = 'h';
+          break;
+        case Race::Dragon:
+          character = 'R';
+          break;
+        case Race::NUM_ITEMS:
+          break;
+      }
     }
     
     void update(float dt)
     {
+      if (health == 0)
+      {
+        character = '&';
+        return;
+      }
+    
       if (wall_coll_resolve)
       {
         if (wall_coll_resolve_ctr++ < 2)
