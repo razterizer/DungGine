@@ -21,7 +21,7 @@ namespace dung
     bool_vector fog_of_war;
     bool_vector light;
     
-    bool is_inside_corridor(const RC& pos) const
+    bool is_inside_corridor(const RC& pos, ttl::BBLocation* location = nullptr) const
     {
       switch (orientation)
       {
@@ -34,7 +34,13 @@ namespace dung
           int top_offs = top_door_open ? 0 : -1;
           int bottom_offs = bottom_door_open ? 0 : -1;
           if (bb.c_len < 2)
+          {
+            if (location != nullptr)
+              *location = ttl::BBLocation::Inside;
             return bb.is_inside_offs(pos, top_offs, bottom_offs, 0, 0);
+          }
+          if (location != nullptr)
+            *location = ttl::BBLocation::Inside; //bb.find_location_offs(pos, 1, 1, -1, -1);
           return bb.is_inside_offs(pos, top_offs, bottom_offs, -1, -1);
         }
         case Orientation::Horizontal:
@@ -46,7 +52,13 @@ namespace dung
           int left_offs = left_door_open ? 0 : -1;
           int right_offs = right_door_open ? 0 : -1;
           if (bb.r_len < 2)
+          {
+            if (location != nullptr)
+              *location = ttl::BBLocation::Inside;
             return bb.is_inside_offs(pos, 0, 0, left_offs, right_offs);
+          }
+          if (location != nullptr)
+            *location = ttl::BBLocation::Inside; //bb.find_location_offs(pos, -1, -1, 1, 1);
           return bb.is_inside_offs(pos, -1, -1, left_offs, right_offs);
         }
         default: // Impossible to reach, but alas necessary with some compilers.

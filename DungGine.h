@@ -681,6 +681,7 @@ namespace dung
         if (leaf != nullptr)
         {
           npc.curr_room = leaf;
+          npc.last_in_room = true;
           npc.is_underground = is_underground(leaf);
           npc.init();
         }
