@@ -68,182 +68,182 @@ namespace dung
           character = '@';
           style = { Color::Magenta, Color::LightGray };
           //acc_sigma = rnd::randn_range(30.f, 200.f);
-          //acc_step = rnd::randn_range(2.f, 20.f);
+          acc_step = rnd::randn_range(2.f, 20.f)/10.f;
           acc_lim = rnd::randn_range(20.f, 50.f);
           break;
         case Race::Elf:
           character = '@';
           style = { Color::Magenta, Color::DarkGreen };
           //acc_sigma = rnd::randn_range(50.f, 300.f);
-          //acc_step = rnd::randn_range(4.f, 40.f);
+          acc_step = rnd::randn_range(4.f, 40.f)/10.f;
           acc_lim = rnd::randn_range(25.f, 70.f);
           break;
         case Race::Half_Elf:
           character = '@';
           style = { Color::Magenta, Color::DarkYellow };
           //acc_sigma = rnd::randn_range(40.f, 250.f);
-          //acc_step = rnd::randn_range(3.f, 30.f);
+          acc_step = rnd::randn_range(3.f, 30.f)/10.f;
           acc_lim = rnd::randn_range(25.f, 60.f);
           break;
         case Race::Gnome:
           character = 'b';
           style = { Color::Magenta, Color::LightGray };
           //acc_sigma = rnd::randn_range(5.f, 60.f);
-          //acc_step = rnd::randn_range(1.f, 10.f);
+          acc_step = rnd::randn_range(1.f, 10.f)/10.f;
           acc_lim = rnd::randn_range(10.f, 20.f);
           break;
         case Race::Halfling:
           character = 'b';
           style = { Color::Magenta, Color::LightGray };
           //acc_sigma = rnd::randn_range(3.f, 80.f);
-          //acc_step = rnd::randn_range(1.f, 15.f);
+          acc_step = rnd::randn_range(1.f, 15.f)/10.f;
           acc_lim = rnd::randn_range(11.f, 25.f);
           break;
         case Race::Dwarf:
           character = '0';
           style = { Color::White, Color::DarkGray };
           //acc_sigma = rnd::randn_range(15.f, 150.f);
-          //acc_step = rnd::randn_range(1.5f, 18.f);
+          acc_step = rnd::randn_range(1.5f, 18.f)/10.f;
           acc_lim = rnd::randn_range(12.f, 30.f);
           break;
         case Race::Half_Orc:
           character = '3';
           style = { Color::Yellow, Color::Green };
           //acc_sigma = rnd::randn_range(20.f, 180.f);
-          //acc_step = rnd::randn_range(1.5f, 20.f);
+          acc_step = rnd::randn_range(1.5f, 20.f)/10.f;
           acc_lim = rnd::randn_range(30.f, 80.f);
           break;
         case Race::Ogre:
           character = 'O';
           style = { Color::Green, Color::DarkYellow };
           //acc_sigma = rnd::randn_range(20.f, 180.f);
-          //acc_step = rnd::randn_range(4.f, 10.f);
+          acc_step = rnd::randn_range(4.f, 10.f)/10.f;
           acc_lim = rnd::randn_range(2.f, 8.f);
           break;
         case Race::Hobgoblin:
           character = 'a';
           style = { Color::Yellow, Color::Cyan };
           //acc_sigma = rnd::randn_range(20.f, 180.f);
-          //acc_step = rnd::randn_range(5.f, 15.f);
+          acc_step = rnd::randn_range(5.f, 15.f)/10.f;
           acc_lim = rnd::randn_range(10.f, 50.f);
           break;
         case Race::Goblin:
           character = 'G';
           style = { Color::Green, Color::DarkCyan };
           //acc_sigma = rnd::randn_range(20.f, 180.f);
-          //acc_step = rnd::randn_range(5.f, 15.f);
+          acc_step = rnd::randn_range(5.f, 15.f)/10.f;
           acc_lim = rnd::randn_range(8.f, 45.f);
           break;
         case Race::Orc:
           character = '2';
           style = { Color::DarkYellow, Color::Cyan };
           //acc_sigma = rnd::randn_range(60.f, 250.f);
-          //acc_step = rnd::randn_range(5.f, 25.f);
+          acc_step = rnd::randn_range(5.f, 25.f)/10.f;
           acc_lim = rnd::randn_range(50.f, 80.f);
           break;
         case Race::Troll:
           character = 'R';
           style = { Color::LightGray, Color::DarkRed };
           //acc_sigma = rnd::randn_range(1.f, 60.f);
-          //acc_step = rnd::randn_range(1.f, 14.f);
+          acc_step = rnd::randn_range(1.f, 14.f)/10.f;
           acc_lim = rnd::randn_range(5.f, 15.f);
           break;
         case Race::Monster:
           character = 'M';
           style = { Color::Cyan, Color::DarkGreen };
           //acc_sigma = rnd::randn_range(20.f, 180.f);
-          //acc_step = rnd::randn_range(0.5f, 25.f);
+          acc_step = rnd::randn_range(0.5f, 25.f)/10.f;
           acc_lim = rnd::randn_range(2.f, 25.f);
           break;
         case Race::Lich:
           character = 'z';
           style = { Color::DarkYellow, Color::DarkBlue };
           //acc_sigma = rnd::randn_range(20.f, 180.f);
-          //acc_step = rnd::randn_range(4.f, 30.f);
+          acc_step = rnd::randn_range(4.f, 30.f)/10.f;
           acc_lim = rnd::randn_range(25.f, 55.f);
           break;
         case Race::Lich_King:
           character = 'Z';
           style = { Color::Yellow, Color::DarkBlue };
           //acc_sigma = rnd::randn_range(30.f, 200.f);
-          //acc_step = rnd::randn_range(5.f, 35.f);
+          acc_step = rnd::randn_range(5.f, 35.f)/10.f;
           acc_lim = rnd::randn_range(25.f, 60.f);
           break;
         case Race::Basilisk:
           character = 'S';
           style = { Color::Green, Color::DarkGray };
           //acc_sigma = rnd::randn_range(20.f, 220.f);
-          //acc_step = rnd::randn_range(5.f, 18.f);
+          acc_step = rnd::randn_range(5.f, 18.f)/10.f;
           acc_lim = rnd::randn_range(2.f, 25.f);
           break;
         case Race::Bear:
           character = 'B';
           style = { Color::Red, Color::DarkRed };
           //acc_sigma = rnd::randn_range(10.f, 250.f);
-          //acc_step = rnd::randn_range(10.f, 25.f);
+          acc_step = rnd::randn_range(10.f, 25.f)/10.f;
           acc_lim = rnd::randn_range(3.f, 10.f);
           break;
         case Race::Kobold:
           character = 'x';
           style = { Color::Blue, Color::LightGray };
           //acc_sigma = rnd::randn_range(20.f, 110.f);
-          //acc_step = rnd::randn_range(5.f, 15.f);
+          acc_step = rnd::randn_range(5.f, 15.f)/10.f;
           acc_lim = rnd::randn_range(25.f, 40.f);
           break;
         case Race::Skeleton:
           character = '%';
           style = { Color::White, Color::DarkGray };
           //acc_sigma = rnd::randn_range(2.f, 25.f);
-          //acc_step = rnd::randn_range(5.f, 15.f);
+          acc_step = rnd::randn_range(5.f, 15.f)/10.f;
           acc_lim = rnd::randn_range(10.f, 60.f);
           break;
         case Race::Giant:
           character = 'O';
           style = { Color::DarkMagenta, Color::LightGray };
           //acc_sigma = rnd::randn_range(15.f, 60.f);
-          //acc_step = rnd::randn_range(5.f, 15.f);
+          acc_step = rnd::randn_range(5.f, 15.f)/10.f;
           acc_lim = rnd::randn_range(1.f, 5.f);
           break;
         case Race::Huge_Spider:
           character = 'W';
           style = { Color::DarkGray, Color::White };
           //acc_sigma = rnd::randn_range(20.f, 260.f);
-          //acc_step = rnd::randn_range(5.f, 15.f);
+          acc_step = rnd::randn_range(5.f, 15.f)/10.f;
           acc_lim = rnd::randn_range(10.f, 70.f);
           break;
         case Race::Wolf:
           character = 'm';
           style = { Color::LightGray, Color::DarkGray };
           //acc_sigma = rnd::randn_range(110.f, 330.f);
-          //acc_step = rnd::randn_range(15.f, 35.f);
+          acc_step = rnd::randn_range(15.f, 35.f)/10.f;
           acc_lim = rnd::randn_range(15.f, 60.f);
           break;
         case Race::Wyvern:
           character = 'w';
           style = { Color::DarkMagenta, Color::Blue };
           //acc_sigma = rnd::randn_range(90.f, 220.f);
-          //acc_step = rnd::randn_range(5.f, 15.f);
+          acc_step = rnd::randn_range(5.f, 15.f)/10.f;
           acc_lim = rnd::randn_range(2.f, 15.f);
           break;
         case Race::Griffin:
           character = 'g';
           style = { Color::DarkRed, Color::Blue };
           //acc_sigma = rnd::randn_range(100.f, 250.f);
-          //acc_step = rnd::randn_range(5.f, 15.f);
+          acc_step = rnd::randn_range(5.f, 15.f)/10.f;
           acc_lim = rnd::randn_range(10.f, 25.f);
           break;
         case Race::Ghoul:
           character = 'h';
           style = { Color::LightGray, Color::Yellow };
           //acc_sigma = rnd::randn_range(35.f, 115.f);
-          //acc_step = rnd::randn_range(5.f, 15.f);
+          acc_step = rnd::randn_range(5.f, 15.f)/10.f;
           acc_lim = rnd::randn_range(30.f, 60.f);
           break;
         case Race::Dragon:
           character = 'R';
           style = { Color::Red, Color::DarkMagenta };
           //acc_sigma = rnd::randn_range(70.f, 350.f);
-          //acc_step = rnd::randn_range(5.f, 45.f);
+          acc_step = rnd::randn_range(5.f, 45.f)/10.f;
           acc_lim = rnd::randn_range(7.f, 30.f);
           break;
         case Race::NUM_ITEMS:
