@@ -901,7 +901,7 @@ namespace dung
           }
         }
       }
-      else if (str::to_lower(kpd.curr_key) == 'i')
+      else if (kpd.curr_key == '-')
       {
         math::toggle(m_player.show_inventory);
       }
