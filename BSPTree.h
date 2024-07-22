@@ -14,6 +14,7 @@
 #include <Core/Rand.h>
 #include <Core/Math.h>
 #include <Core/bool_vector.h>
+#include <Core/Utils.h>
 #include <array>
 #include <memory>
 
@@ -271,13 +272,11 @@ namespace dung
       {
         if (d->open_or_no_door() && pos == d->pos)
         {
-          if (location != nullptr)
-            *location = ttl::BBLocation::Inside;
+          utils::try_set(location, ttl::BBLocation::Inside);
           return true;
         }
       }
-      if (location != nullptr)
-        *location = bb_leaf_room.find_location_offs(pos, -1, -1, -1, -1);
+      utils::try_set(location, bb_leaf_room.find_location_offs(pos, -1, -1, -1, -1));
       return bb_leaf_room.is_inside_offs(pos, -1);
     }
   };

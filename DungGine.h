@@ -113,8 +113,7 @@ namespace dung
       for (auto* leaf : m_leaves)
         if (leaf->bb_leaf_room.is_inside_offs(pos, -1))
         {
-          if (room_node != nullptr)
-            *room_node = leaf;
+          utils::try_set(room_node, leaf);
           return true;
         }
       return false;

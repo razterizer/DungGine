@@ -7,6 +7,7 @@
 
 #pragma once
 #include "Orientation.h"
+#include <Core/Utils.h>
 
 
 namespace dung
@@ -35,12 +36,10 @@ namespace dung
           int bottom_offs = bottom_door_open ? 0 : -1;
           if (bb.c_len < 2)
           {
-            if (location != nullptr)
-              *location = ttl::BBLocation::Inside;
+            utils::try_set(location, ttl::BBLocation::Inside);
             return bb.is_inside_offs(pos, top_offs, bottom_offs, 0, 0);
           }
-          if (location != nullptr)
-            *location = ttl::BBLocation::Inside; //bb.find_location_offs(pos, 1, 1, -1, -1);
+          utils::try_set(location, ttl::BBLocation::Inside); //bb.find_location_offs(pos, 1, 1, -1, -1);
           return bb.is_inside_offs(pos, top_offs, bottom_offs, -1, -1);
         }
         case Orientation::Horizontal:
@@ -53,12 +52,10 @@ namespace dung
           int right_offs = right_door_open ? 0 : -1;
           if (bb.r_len < 2)
           {
-            if (location != nullptr)
-              *location = ttl::BBLocation::Inside;
+            utils::try_set(location, ttl::BBLocation::Inside);
             return bb.is_inside_offs(pos, 0, 0, left_offs, right_offs);
           }
-          if (location != nullptr)
-            *location = ttl::BBLocation::Inside; //bb.find_location_offs(pos, -1, -1, 1, 1);
+          utils::try_set(location, ttl::BBLocation::Inside); //bb.find_location_offs(pos, -1, -1, 1, 1);
           return bb.is_inside_offs(pos, -1, -1, left_offs, right_offs);
         }
         default: // Impossible to reach, but alas necessary with some compilers.
