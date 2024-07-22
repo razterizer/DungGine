@@ -28,6 +28,10 @@ namespace dung
     float acc_lim = 25.f;
     float vel_lim = 12.f;
     int prob_change_acc = 7;
+    int prob_slow_fast = 20;
+    const float acc_slowness_factor = 0.6f;
+    const float vel_slowness_factor = 0.2f;
+    
     bool wall_coll_resolve = false;
     int wall_coll_resolve_ctr = 0;
     
@@ -71,6 +75,7 @@ namespace dung
           acc_step = rnd::randn_range(2.f, 20.f)/10.f;
           acc_lim = rnd::randn_range(20.f, 50.f);
           vel_lim = rnd::randn_range(4.f, 15.f);
+          prob_change_acc = rnd::randn_range_int(4, 10);
           break;
         case Race::Elf:
           character = '@';
@@ -79,6 +84,7 @@ namespace dung
           acc_step = rnd::randn_range(4.f, 40.f)/10.f;
           acc_lim = rnd::randn_range(25.f, 70.f);
           vel_lim = rnd::randn_range(6.f, 20.f);
+          prob_change_acc = rnd::randn_range_int(4, 10);
           break;
         case Race::Half_Elf:
           character = '@';
@@ -87,6 +93,7 @@ namespace dung
           acc_step = rnd::randn_range(3.f, 30.f)/10.f;
           acc_lim = rnd::randn_range(25.f, 60.f);
           vel_lim = rnd::randn_range(5.f, 17.f);
+          prob_change_acc = rnd::randn_range_int(4, 10);
           break;
         case Race::Gnome:
           character = 'b';
@@ -95,6 +102,7 @@ namespace dung
           acc_step = rnd::randn_range(1.f, 10.f)/10.f;
           acc_lim = rnd::randn_range(10.f, 20.f);
           vel_lim = rnd::randn_range(0.5f, 2.5f);
+          prob_change_acc = rnd::randn_range_int(1, 4);
           break;
         case Race::Halfling:
           character = 'b';
@@ -103,6 +111,7 @@ namespace dung
           acc_step = rnd::randn_range(1.f, 15.f)/10.f;
           acc_lim = rnd::randn_range(11.f, 25.f);
           vel_lim = rnd::randn_range(0.7f, 3.f);
+          prob_change_acc = rnd::randn_range_int(1, 5);
           break;
         case Race::Dwarf:
           character = '0';
@@ -111,6 +120,7 @@ namespace dung
           acc_step = rnd::randn_range(1.5f, 18.f)/10.f;
           acc_lim = rnd::randn_range(12.f, 30.f);
           vel_lim = rnd::randn_range(0.4f, 4.f);
+          prob_change_acc = rnd::randn_range_int(5, 20);
           break;
         case Race::Half_Orc:
           character = '3';
@@ -119,6 +129,7 @@ namespace dung
           acc_step = rnd::randn_range(1.5f, 20.f)/10.f;
           acc_lim = rnd::randn_range(30.f, 80.f);
           vel_lim = rnd::randn_range(1.5f, 5.f);
+          prob_change_acc = rnd::randn_range_int(2, 18);
           break;
         case Race::Ogre:
           character = 'O';
@@ -127,6 +138,7 @@ namespace dung
           acc_step = rnd::randn_range(4.f, 10.f)/10.f;
           acc_lim = rnd::randn_range(2.f, 8.f);
           vel_lim = rnd::randn_range(1.f, 6.f);
+          prob_change_acc = rnd::randn_range_int(4, 10);
           break;
         case Race::Hobgoblin:
           character = 'a';
@@ -135,6 +147,7 @@ namespace dung
           acc_step = rnd::randn_range(5.f, 15.f)/10.f;
           acc_lim = rnd::randn_range(10.f, 50.f);
           vel_lim = rnd::randn_range(4.f, 9.f);
+          prob_change_acc = rnd::randn_range_int(4, 14);
           break;
         case Race::Goblin:
           character = 'G';
@@ -143,6 +156,7 @@ namespace dung
           acc_step = rnd::randn_range(5.f, 15.f)/10.f;
           acc_lim = rnd::randn_range(8.f, 45.f);
           vel_lim = rnd::randn_range(4.5f, 10.f);
+          prob_change_acc = rnd::randn_range_int(3, 12);
           break;
         case Race::Orc:
           character = '2';
@@ -151,6 +165,7 @@ namespace dung
           acc_step = rnd::randn_range(5.f, 25.f)/10.f;
           acc_lim = rnd::randn_range(50.f, 80.f);
           vel_lim = rnd::randn_range(6.f, 18.f);
+          prob_change_acc = rnd::randn_range_int(4, 8);
           break;
         case Race::Troll:
           character = 'R';
@@ -159,6 +174,7 @@ namespace dung
           acc_step = rnd::randn_range(1.f, 14.f)/10.f;
           acc_lim = rnd::randn_range(5.f, 15.f);
           vel_lim = rnd::randn_range(2.f, 12.f);
+          prob_change_acc = rnd::randn_range_int(10, 40);
           break;
         case Race::Monster:
           character = 'M';
@@ -167,6 +183,7 @@ namespace dung
           acc_step = rnd::randn_range(0.5f, 25.f)/10.f;
           acc_lim = rnd::randn_range(2.f, 25.f);
           vel_lim = rnd::randn_range(1.f, 8.f);
+          prob_change_acc = rnd::randn_range_int(8, 25);
           break;
         case Race::Lich:
           character = 'z';
@@ -175,6 +192,7 @@ namespace dung
           acc_step = rnd::randn_range(4.f, 30.f)/10.f;
           acc_lim = rnd::randn_range(25.f, 55.f);
           vel_lim = rnd::randn_range(2.f, 9.f);
+          prob_change_acc = rnd::randn_range_int(5, 8);
           break;
         case Race::Lich_King:
           character = 'Z';
@@ -183,6 +201,7 @@ namespace dung
           acc_step = rnd::randn_range(5.f, 35.f)/10.f;
           acc_lim = rnd::randn_range(25.f, 60.f);
           vel_lim = rnd::randn_range(2.5f, 10.f);
+          prob_change_acc = rnd::randn_range_int(4, 6);
           break;
         case Race::Basilisk:
           character = 'S';
@@ -191,6 +210,7 @@ namespace dung
           acc_step = rnd::randn_range(5.f, 18.f)/10.f;
           acc_lim = rnd::randn_range(2.f, 25.f);
           vel_lim = rnd::randn_range(4.f, 8.f);
+          prob_change_acc = rnd::randn_range_int(16, 28);
           break;
         case Race::Bear:
           character = 'B';
@@ -199,6 +219,7 @@ namespace dung
           acc_step = rnd::randn_range(10.f, 25.f)/10.f;
           acc_lim = rnd::randn_range(3.f, 10.f);
           vel_lim = rnd::randn_range(3.f, 18.f);
+          prob_change_acc = rnd::randn_range_int(5, 8);
           break;
         case Race::Kobold:
           character = 'x';
@@ -207,6 +228,7 @@ namespace dung
           acc_step = rnd::randn_range(5.f, 15.f)/10.f;
           acc_lim = rnd::randn_range(25.f, 40.f);
           vel_lim = rnd::randn_range(2.f, 10.f);
+          prob_change_acc = rnd::randn_range_int(3, 9);
           break;
         case Race::Skeleton:
           character = '%';
@@ -215,6 +237,7 @@ namespace dung
           acc_step = rnd::randn_range(5.f, 15.f)/10.f;
           acc_lim = rnd::randn_range(10.f, 60.f);
           vel_lim = rnd::randn_range(1.f, 4.f);
+          prob_change_acc = rnd::randn_range_int(11, 19);
           break;
         case Race::Giant:
           character = 'O';
@@ -223,6 +246,7 @@ namespace dung
           acc_step = rnd::randn_range(5.f, 15.f)/10.f;
           acc_lim = rnd::randn_range(1.f, 5.f);
           vel_lim = rnd::randn_range(0.5f, 4.5f);
+          prob_change_acc = rnd::randn_range_int(20, 40);
           break;
         case Race::Huge_Spider:
           character = 'W';
@@ -231,6 +255,7 @@ namespace dung
           acc_step = rnd::randn_range(5.f, 15.f)/10.f;
           acc_lim = rnd::randn_range(10.f, 70.f);
           vel_lim = rnd::randn_range(3.f, 20.f);
+          prob_change_acc = rnd::randn_range_int(3, 17);
           break;
         case Race::Wolf:
           character = 'm';
@@ -239,6 +264,7 @@ namespace dung
           acc_step = rnd::randn_range(15.f, 35.f)/10.f;
           acc_lim = rnd::randn_range(15.f, 60.f);
           vel_lim = rnd::randn_range(10.f, 24.f);
+          prob_change_acc = rnd::randn_range_int(2, 9);
           break;
         case Race::Wyvern:
           character = 'w';
@@ -247,6 +273,7 @@ namespace dung
           acc_step = rnd::randn_range(5.f, 15.f)/10.f;
           acc_lim = rnd::randn_range(2.f, 15.f);
           vel_lim = rnd::randn_range(8.f, 20.f);
+          prob_change_acc = rnd::randn_range_int(7, 15);
           break;
         case Race::Griffin:
           character = 'g';
@@ -255,6 +282,7 @@ namespace dung
           acc_step = rnd::randn_range(5.f, 15.f)/10.f;
           acc_lim = rnd::randn_range(10.f, 25.f);
           vel_lim = rnd::randn_range(9.f, 21.f);
+          prob_change_acc = rnd::randn_range_int(10, 20);
           break;
         case Race::Ghoul:
           character = 'h';
@@ -263,6 +291,7 @@ namespace dung
           acc_step = rnd::randn_range(5.f, 15.f)/10.f;
           acc_lim = rnd::randn_range(30.f, 60.f);
           vel_lim = rnd::randn_range(10.f, 20.f);
+          prob_change_acc = rnd::randn_range_int(1, 5);
           break;
         case Race::Dragon:
           character = 'R';
@@ -271,6 +300,7 @@ namespace dung
           acc_step = rnd::randn_range(5.f, 45.f)/10.f;
           acc_lim = rnd::randn_range(7.f, 30.f);
           vel_lim = rnd::randn_range(11.f, 29.f);
+          prob_change_acc = rnd::randn_range_int(14, 30);
           break;
         case Race::NUM_ITEMS:
           break;
