@@ -943,7 +943,7 @@ namespace dung
       
       // NPCs
       for (auto& npc : all_npcs)
-        npc.update(sim_dt_s);
+        npc.update(curr_pos, sim_dt_s);
       
       // Scrolling mode.
       switch (scr_scrolling_mode)

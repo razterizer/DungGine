@@ -14,6 +14,8 @@ namespace dung
   enum class Race { Human, Elf, Half_Elf, Gnome, Halfling, Dwarf, Half_Orc, Ogre, Hobgoblin, Goblin, Orc, Troll, Monster, Lich, Lich_King, Basilisk, Bear, Kobold, Skeleton, Giant, Huge_Spider, Wolf, Wyvern, Griffin, Ghoul, Dragon, NUM_ITEMS };
   enum class Class { Warrior_Fighter, Warrior_Ranger, Warrior_Paladin, Warrior_Barbarian, Priest_Cleric, Priest_Druid, Priest_Monk, Priest_Shaman, Wizard_Mage, Wizard_Sorcerer, Rogue_Thief, Rogue_Bard, NUM_ITEMS };
   
+  enum class State { Patroll, Pursue, NUM_ITEMS };
+  
   struct NPC final
   {
     RC pos;
@@ -34,6 +36,7 @@ namespace dung
     float acc_factor = 1.f;
     float vel_factor = 1.f;
     bool slow = false;
+    State state = State::Patroll;
     
     bool wall_coll_resolve = false;
     int wall_coll_resolve_ctr = 0;
@@ -336,7 +339,7 @@ namespace dung
       }
     }
     
-    void update(float dt)
+    void update(const RC& pc_pos, float dt)
     {
       if (health == 0)
       {
@@ -359,6 +362,12 @@ namespace dung
           vel_factor = 1.f;
         }
       }
+      
+      auto dist_to_pc = distance(pos, pc_pos);
+      if (dist_to_pc < 7.f)
+        state = State::Pursue;
+      else if (dist_to_pc > 15.f)
+        state = State::Patroll;
     
       if (wall_coll_resolve)
       {
@@ -375,8 +384,19 @@ namespace dung
         acc_r = math::clamp<float>(acc_r, -acc_lim*acc_factor, +acc_lim*acc_factor);
         acc_c = math::clamp<float>(acc_c, -acc_lim*acc_factor*px_aspect, +acc_lim*acc_factor*px_aspect);
       }
-      vel_r += acc_r*dt;
-      vel_c += acc_c*dt;
+      switch (state)
+      {
+        case State::Patroll:
+          vel_r += acc_r*dt;
+          vel_c += acc_c*dt;
+          break;
+        case State::Pursue:
+          vel_r = 0.5f * (pc_pos.r - pos.r);
+          vel_c = 0.5f * (pc_pos.c - pos.c);
+          break;
+        case State::NUM_ITEMS:
+          break;
+      }
       vel_r = math::clamp<float>(vel_r, -vel_lim, +vel_lim);
       vel_c = math::clamp<float>(vel_c, -vel_lim*vel_factor*px_aspect, +vel_lim*vel_factor*px_aspect);
       pos_r += vel_r*dt;
