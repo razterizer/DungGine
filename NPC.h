@@ -8,6 +8,8 @@
 #pragma once
 #include "Items.h"
 
+#define DBG_NPC
+
 namespace dung
 {
   
@@ -48,8 +50,8 @@ namespace dung
     bool is_underground = false;
     BSPNode* curr_room = nullptr;
     Corridor* curr_corridor = nullptr;
-    bool last_in_room = false;
-    bool last_in_corridor = false;
+    bool inside_room = false;
+    bool inside_corr = false;
     
     bool enemy = true;
     
@@ -405,11 +407,14 @@ namespace dung
       auto c = math::roundI(pos_c);
       auto location_corr = ttl::BBLocation::None;
       auto location_room = ttl::BBLocation::None;
+      inside_room = false;
+      inside_corr = false;
       if (curr_corridor != nullptr)
-        curr_corridor->is_inside_corridor({r, c}, &location_corr);//check_bb_location(r, c);
+        inside_room = curr_corridor->is_inside_corridor({r, c}, &location_corr);//check_bb_location(r, c);
       if (curr_room != nullptr)
-        curr_room->is_inside_room({r, c}, &location_corr);
-      if (location_corr == ttl::BBLocation::Inside || location_room == ttl::BBLocation::Inside)
+        inside_corr = curr_room->is_inside_room({r, c}, &location_corr);
+      //if (location_corr == ttl::BBLocation::Inside || location_room == ttl::BBLocation::Inside)
+      if (inside_room || inside_corr)
       {
         pos.r = r;
         pos.c = c;
@@ -429,9 +434,9 @@ namespace dung
           acc_r = 0.f;
           vel_r = 5.f;
         }
-        else if (location_room != ttl::BBLocation::None)
+        else if (inside_room && location_room != ttl::BBLocation::None)
           location = location_room;
-        else if (location_corr != ttl::BBLocation::None)
+        else if (inside_corr && location_corr != ttl::BBLocation::None)
           location = location_corr;
         pos_r = pos.r;
         pos_c = pos.c;
@@ -490,10 +495,12 @@ namespace dung
         wall_coll_resolve = true;
       }
       
+#ifdef DBG_NPC
       if (wall_coll_resolve)
-        style.bg_color = Color::DarkBlue;
+        style.fg_color = Color::Black;
       else
-        style.bg_color = Color::DarkYellow;
+        style.fg_color = Color::White;
+#endif
       
       // Update current room and current corridor.
       if (curr_corridor != nullptr)
@@ -510,28 +517,16 @@ namespace dung
           curr_room = door_1->room;
           //curr_corridor = nullptr;
         }
-        else
-        {
-          last_in_corridor = true;
-          last_in_room = false;
-        }
       }
       if (curr_room != nullptr)
       {
-        bool found_door = false;
         for (auto* door : curr_room->doors)
           if (pos == door->pos)
           {
             curr_corridor = door->corridor;
             //curr_room = nullptr;
-            found_door = true;
             break;
           }
-        if (!found_door)
-        {
-          last_in_corridor = false;
-          last_in_room = true;
-        }
       }
     }
   };

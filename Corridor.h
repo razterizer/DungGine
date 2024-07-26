@@ -39,7 +39,7 @@ namespace dung
             utils::try_set(location, ttl::BBLocation::Inside);
             return bb.is_inside_offs(pos, top_offs, bottom_offs, 0, 0);
           }
-          utils::try_set(location, ttl::BBLocation::Inside); //bb.find_location_offs(pos, 1, 1, -1, -1);
+          utils::try_set(location, bb.find_location_offs(pos, top_offs, bottom_offs, -1, -1));
           return bb.is_inside_offs(pos, top_offs, bottom_offs, -1, -1);
         }
         case Orientation::Horizontal:
@@ -55,7 +55,7 @@ namespace dung
             utils::try_set(location, ttl::BBLocation::Inside);
             return bb.is_inside_offs(pos, 0, 0, left_offs, right_offs);
           }
-          utils::try_set(location, ttl::BBLocation::Inside); //bb.find_location_offs(pos, -1, -1, 1, 1);
+          utils::try_set(location, bb.find_location_offs(pos, -1, -1, left_offs, right_offs));
           return bb.is_inside_offs(pos, -1, -1, left_offs, right_offs);
         }
         default: // Impossible to reach, but alas necessary with some compilers.
