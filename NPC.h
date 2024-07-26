@@ -8,7 +8,7 @@
 #pragma once
 #include "Items.h"
 
-#define DBG_NPC
+//#define DBG_NPC
 
 namespace dung
 {
