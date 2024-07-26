@@ -21,6 +21,8 @@ namespace dung
     BSPNode* curr_room = nullptr;
     Corridor* curr_corridor = nullptr;
     
+    int health = 100;
+    
     std::vector<int> key_idcs;
     std::vector<int> lamp_idcs;
     std::vector<int> weapon_idcs;
