@@ -909,6 +909,22 @@ namespace dung
           math::toggle(npc.debug);
       }
       
+      // Fog of war
+      if (use_fog_of_war)
+        update_field(curr_pos,
+                     [](auto obj) { return &obj->fog_of_war; },
+                     false);
+                  
+      // Light
+      auto* lamp = m_player.get_selected_lamp(all_lamps);
+      clear_field([](auto obj) { return &obj->light; }, false);
+      if (lamp != nullptr)
+      {
+        update_field(curr_pos,
+                     [](auto obj) { return &obj->light; },
+                     true);
+      }
+      
       // Update current room and current corridor.
       if (m_player.curr_corridor != nullptr)
       {
@@ -927,22 +943,6 @@ namespace dung
             m_player.curr_corridor = door->corridor;
             break;
           }
-      }
-      
-      // Fog of war
-      if (use_fog_of_war)
-        update_field(curr_pos,
-                     [](auto obj) { return &obj->fog_of_war; },
-                     false);
-                  
-      // Light
-      auto* lamp = m_player.get_selected_lamp(all_lamps);
-      clear_field([](auto obj) { return &obj->light; }, false);
-      if (lamp != nullptr)
-      {
-        update_field(curr_pos,
-                     [](auto obj) { return &obj->light; },
-                     true);
       }
       
       // NPCs
