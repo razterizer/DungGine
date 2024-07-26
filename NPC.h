@@ -87,6 +87,8 @@ namespace dung
         } while (ctr++ > 10 || weapon_idx == -1);
       }
       
+      enemy = rnd::rand_bool();
+      
       switch (npc_race)
       {
         case Race::Human:
