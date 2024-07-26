@@ -15,7 +15,7 @@ namespace dung
   enum class Race { Human, Elf, Half_Elf, Gnome, Halfling, Dwarf, Half_Orc, Ogre, Hobgoblin, Goblin, Orc, Troll, Monster, Lich, Lich_King, Basilisk, Bear, Kobold, Skeleton, Giant, Huge_Spider, Wolf, Wyvern, Griffin, Ghoul, Dragon, NUM_ITEMS };
   enum class Class { Warrior_Fighter, Warrior_Ranger, Warrior_Paladin, Warrior_Barbarian, Priest_Cleric, Priest_Druid, Priest_Monk, Priest_Shaman, Wizard_Mage, Wizard_Sorcerer, Rogue_Thief, Rogue_Bard, NUM_ITEMS };
   
-  enum class State { Patroll, Pursue, NUM_ITEMS };
+  enum class State { Patroll, Pursue, Fight, NUM_ITEMS };
   
   struct NPC final
   {
@@ -379,7 +379,10 @@ namespace dung
       }
       
       auto dist_to_pc = distance(pos, pc_pos);
-      if (dist_to_pc < 7.f)
+      const int c_fight_min_dist = 2;
+      if (enemy && dist_to_pc <= 2.f)
+        state = State::Fight;
+      else if (enemy && dist_to_pc < 7.f)
         state = State::Pursue;
       else if (dist_to_pc > 15.f)
         state = State::Patroll;
@@ -406,8 +409,18 @@ namespace dung
           vel_c += acc_c*dt;
           break;
         case State::Pursue:
-          vel_r = 0.5f * (pc_pos.r - pos.r);
-          vel_c = 0.5f * (pc_pos.c - pos.c);
+        case State::Fight:
+          //vel_r = 0.5f * (pc_pos.r - pos.r);
+          //vel_c = 0.5f * (pc_pos.c - pos.c);
+          if (pc_pos.r + c_fight_min_dist < pos.r)
+            vel_r = 0.5f * ((pc_pos.r + c_fight_min_dist) - pos.r);
+          else if (pc_pos.r - c_fight_min_dist > pos.r)
+            vel_r = 0.5f * ((pc_pos.r - c_fight_min_dist) - pos.r);
+            
+          if (pc_pos.c + c_fight_min_dist < pos.c)
+            vel_c = 0.5f * ((pc_pos.c + c_fight_min_dist) - pos.r);
+          else if (pc_pos.c - c_fight_min_dist > pos.c)
+            vel_c = 0.5f * ((pc_pos.c - c_fight_min_dist) - pos.r);
           break;
         case State::NUM_ITEMS:
           break;
