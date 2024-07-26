@@ -62,6 +62,15 @@ namespace dung
           return false;
       }
     }
+    
+    bool is_in_fog_of_war(const RC& world_pos)
+    {
+      auto local_pos = world_pos - bb.pos();
+      auto idx = local_pos.r * (bb.c_len + 1) + local_pos.c;
+      if (math::in_range<int>(idx, 0, fog_of_war.size(), Range::ClosedOpen))
+        return fog_of_war[idx];
+      return true;
+    }
   };
 
 }
