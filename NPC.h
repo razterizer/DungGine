@@ -495,6 +495,11 @@ namespace dung
         
         wall_coll_resolve = true;
       }
+      
+      if (inside_room && curr_room != nullptr)
+        fog_of_war = curr_room->is_in_fog_of_war(pos);
+      else if (inside_corr && curr_corridor != nullptr)
+        fog_of_war = curr_corridor->is_in_fog_of_war(pos);
 
       if (debug)
       {
