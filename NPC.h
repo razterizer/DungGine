@@ -534,6 +534,21 @@ namespace dung
           style.fg_color = Color::Black;
         else
           style.fg_color = Color::White;
+          
+        switch (state)
+        {
+          case State::Patroll:
+            style.bg_color = Color::DarkGreen;
+            break;
+          case State::Pursue:
+            style.bg_color = Color::DarkYellow;
+            break;
+          case State::Fight:
+            style.bg_color = Color::DarkRed;
+            break;
+          case State::NUM_ITEMS:
+            break;
+        }
       }
       
       // Update current room and current corridor.

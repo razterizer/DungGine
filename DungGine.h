@@ -1032,14 +1032,12 @@ namespace dung
         
         if ((use_fog_of_war && npc.fog_of_war) || ((npc.is_underground || is_night) && !npc.light))
           continue;
+          
         auto scr_pos = get_screen_pos(npc.pos);
+        sh.write_buffer(std::string(1, npc.character), scr_pos.r, scr_pos.c, npc.style);
         
-        if (!npc.debug)
-          sh.write_buffer(std::string(1, npc.character), scr_pos.r, scr_pos.c, npc.style);
-        else
+        if (npc.debug)
         {
-          sh.write_buffer(std::string(1, npc.character), scr_pos.r, scr_pos.c, npc.style.fg_color, npc.state == State::Pursue ? Color::Red : Color::DarkGreen);
-        
           if (npc.vel_r < 0.f)
             sh.write_buffer("^", scr_pos.r - 1, scr_pos.c, Color::Black, Color::White);
           else if (npc.vel_r > 0.f)
