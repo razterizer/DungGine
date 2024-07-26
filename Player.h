@@ -63,6 +63,16 @@ namespace dung
       return nullptr;
     }
     
+    const Weapon* get_selected_weapon(const std::vector<std::unique_ptr<Weapon>>& all_weapons)
+    {
+      auto Nk = static_cast<int>(key_idcs.size());
+      auto Nl = static_cast<int>(lamp_idcs.size());
+      auto Nw = static_cast<int>(weapon_idcs.size());
+      if (math::in_range<int>(inv_select_idx, Nk + Nl, Nk + Nl + Nw, Range::ClosedOpen))
+        return all_weapons[weapon_idcs[inv_select_idx - (Nk + Nl)]].get();
+      return nullptr;
+    }
+    
     int num_items() const
     {
       return static_cast<int>(key_idcs.size() + lamp_idcs.size());
