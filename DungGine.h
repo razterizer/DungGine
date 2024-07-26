@@ -681,7 +681,7 @@ namespace dung
         {
           npc.curr_room = leaf;
           npc.is_underground = is_underground(leaf);
-          npc.init();
+          npc.init(all_weapons);
         }
         
         all_npcs.emplace_back(npc);

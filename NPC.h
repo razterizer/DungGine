@@ -67,13 +67,25 @@ namespace dung
     Class npc_class = Class::Warrior_Barbarian;
     int weapon_idx = -1;
     
-    void init()
+    void init(const std::vector<std::unique_ptr<Weapon>>& all_weapons)
     {
       pos_r = pos.r;
       pos_c = pos.c;
       
       npc_race = rnd::rand_enum<Race>();
       npc_class = rnd::rand_enum<Class>();
+      
+      int ctr = 0;
+      const int num_weapons = static_cast<int>(all_weapons.size());
+      if (!all_weapons.empty())
+      {
+        do
+        {
+          int idx = rnd::rand_int(0, num_weapons - 1);
+          if (!all_weapons[idx]->picked_up)
+            weapon_idx = idx;
+        } while (ctr++ > 10 || weapon_idx == -1);
+      }
       
       switch (npc_race)
       {
