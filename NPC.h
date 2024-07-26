@@ -8,7 +8,6 @@
 #pragma once
 #include "Items.h"
 
-//#define DBG_NPC
 
 namespace dung
 {
@@ -39,6 +38,8 @@ namespace dung
     float vel_factor = 1.f;
     bool slow = false;
     State state = State::Patroll;
+    
+    bool debug = false;
     
     bool wall_coll_resolve = false;
     int wall_coll_resolve_ctr = 0;
@@ -494,13 +495,14 @@ namespace dung
         
         wall_coll_resolve = true;
       }
-      
-#ifdef DBG_NPC
-      if (wall_coll_resolve)
-        style.fg_color = Color::Black;
-      else
-        style.fg_color = Color::White;
-#endif
+
+      if (debug)
+      {
+        if (wall_coll_resolve)
+          style.fg_color = Color::Black;
+        else
+          style.fg_color = Color::White;
+      }
       
       // Update current room and current corridor.
       if (curr_corridor != nullptr)

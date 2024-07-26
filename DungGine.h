@@ -903,6 +903,11 @@ namespace dung
       {
         math::toggle(m_player.show_inventory);
       }
+      else if (kpd.curr_key == '+')
+      {
+        for (auto& npc : all_npcs)
+          math::toggle(npc.debug);
+      }
       
       // Update current room and current corridor.
       if (m_player.curr_corridor != nullptr)
@@ -1025,39 +1030,39 @@ namespace dung
       {
         bool is_night = f_calc_night(npc);
         
-#ifndef DBG_NPC
         if ((use_fog_of_war && npc.fog_of_war) || ((npc.is_underground || is_night) && !npc.light))
           continue;
-#endif
         auto scr_pos = get_screen_pos(npc.pos);
-#ifndef DBG_NPC
-        sh.write_buffer(std::string(1, npc.character), scr_pos.r, scr_pos.c, npc.style);
-#else
-        sh.write_buffer(std::string(1, npc.character), scr_pos.r, scr_pos.c, npc.style.fg_color, npc.state == State::Pursue ? Color::Red : Color::DarkGreen);
         
-        if (npc.vel_r < 0.f)
-          sh.write_buffer("^", scr_pos.r - 1, scr_pos.c, Color::Black, Color::White);
-        else if (npc.vel_r > 0.f)
-          sh.write_buffer("v", scr_pos.r + 1, scr_pos.c, Color::Black, Color::White);
-        
-        if (npc.vel_c < 0.f)
-          sh.write_buffer("<", scr_pos.r, scr_pos.c - 1, Color::Black, Color::White);
-        else if (npc.vel_c > 0.f)
-          sh.write_buffer(">", scr_pos.r, scr_pos.c + 1, Color::Black, Color::White);
-        
-        if (npc.curr_room != nullptr)
+        if (!npc.debug)
+          sh.write_buffer(std::string(1, npc.character), scr_pos.r, scr_pos.c, npc.style);
+        else
         {
-          auto scr_pos_room = get_screen_pos(npc.curr_room->bb_leaf_room.center());
-          bresenham::plot_line(sh, scr_pos.c, scr_pos.r, scr_pos_room.c, scr_pos_room.r,
-                 ".", Color::White, Color::Transparent2);
+          sh.write_buffer(std::string(1, npc.character), scr_pos.r, scr_pos.c, npc.style.fg_color, npc.state == State::Pursue ? Color::Red : Color::DarkGreen);
+        
+          if (npc.vel_r < 0.f)
+            sh.write_buffer("^", scr_pos.r - 1, scr_pos.c, Color::Black, Color::White);
+          else if (npc.vel_r > 0.f)
+            sh.write_buffer("v", scr_pos.r + 1, scr_pos.c, Color::Black, Color::White);
+          
+          if (npc.vel_c < 0.f)
+            sh.write_buffer("<", scr_pos.r, scr_pos.c - 1, Color::Black, Color::White);
+          else if (npc.vel_c > 0.f)
+            sh.write_buffer(">", scr_pos.r, scr_pos.c + 1, Color::Black, Color::White);
+          
+          if (npc.curr_room != nullptr)
+          {
+            auto scr_pos_room = get_screen_pos(npc.curr_room->bb_leaf_room.center());
+            bresenham::plot_line(sh, scr_pos.c, scr_pos.r, scr_pos_room.c, scr_pos_room.r,
+                    ".", Color::White, Color::Transparent2);
+          }
+          if (npc.curr_corridor != nullptr)
+          {
+            auto scr_pos_corr = get_screen_pos(npc.curr_corridor->bb.center());
+            bresenham::plot_line(sh, scr_pos.c, scr_pos.r, scr_pos_corr.c, scr_pos_corr.r,
+                    ".", Color::White, Color::Transparent2);
+          }
         }
-        if (npc.curr_corridor != nullptr)
-        {
-          auto scr_pos_corr = get_screen_pos(npc.curr_corridor->bb.center());
-          bresenham::plot_line(sh, scr_pos.c, scr_pos.r, scr_pos_corr.c, scr_pos_corr.r,
-                 ".", Color::White, Color::Transparent2);
-        }
-#endif
       }
       
       for (auto* door : door_vec)
