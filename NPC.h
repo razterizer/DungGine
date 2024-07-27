@@ -89,265 +89,258 @@ namespace dung
       
       enemy = rnd::rand_bool();
       
+      const float c_min_acc_step = 0.3f;
+      const float c_min_acc_lim = 0.6f;
+      const float c_min_vel_lim = 0.2f;
+      
+      auto rand_acc_step = [c_min_acc_step](float lo, float hi)
+      {
+        return std::max(c_min_acc_step, rnd::randn_range(lo, hi))/10.f;
+      };
+      
+      auto rand_acc_lim = [c_min_acc_lim](float lo, float hi)
+      {
+        return std::max(c_min_acc_lim, rnd::randn_range(lo, hi));
+      };
+      
+      auto rand_vel_lim = [c_min_vel_lim](float lo, float hi)
+      {
+        return std::max(c_min_vel_lim, rnd::randn_range(lo, hi));
+      };
+      
       switch (npc_race)
       {
         case Race::Human:
           character = '@';
           style = { Color::Magenta, Color::LightGray };
-          //acc_sigma = rnd::randn_range(30.f, 200.f);
-          acc_step = rnd::randn_range(2.f, 20.f)/10.f;
-          acc_lim = rnd::randn_range(20.f, 50.f);
-          vel_lim = rnd::randn_range(4.f, 15.f);
+          acc_step = rand_acc_step(2.f, 20.f);
+          acc_lim = rand_acc_lim(20.f, 50.f);
+          vel_lim = rand_vel_lim(4.f, 15.f);
           prob_change_acc = rnd::randn_range_int(4, 10);
           prob_slow_fast = rnd::randn_range_int(10, 30);
           break;
         case Race::Elf:
           character = '@';
           style = { Color::Magenta, Color::DarkGreen };
-          //acc_sigma = rnd::randn_range(50.f, 300.f);
-          acc_step = rnd::randn_range(4.f, 40.f)/10.f;
-          acc_lim = rnd::randn_range(25.f, 70.f);
-          vel_lim = rnd::randn_range(6.f, 20.f);
+          acc_step = rand_acc_step(4.f, 40.f);
+          acc_lim = rand_acc_lim(25.f, 70.f);
+          vel_lim = rand_vel_lim(6.f, 20.f);
           prob_change_acc = rnd::randn_range_int(4, 10);
           prob_slow_fast = rnd::randn_range_int(10, 30);
           break;
         case Race::Half_Elf:
           character = '@';
           style = { Color::Magenta, Color::DarkYellow };
-          //acc_sigma = rnd::randn_range(40.f, 250.f);
-          acc_step = rnd::randn_range(3.f, 30.f)/10.f;
-          acc_lim = rnd::randn_range(25.f, 60.f);
-          vel_lim = rnd::randn_range(5.f, 17.f);
+          acc_step = rand_acc_step(3.f, 30.f);
+          acc_lim = rand_acc_lim(25.f, 60.f);
+          vel_lim = rand_vel_lim(5.f, 17.f);
           prob_change_acc = rnd::randn_range_int(4, 10);
           prob_slow_fast = rnd::randn_range_int(10, 30);
           break;
         case Race::Gnome:
           character = 'b';
           style = { Color::Magenta, Color::LightGray };
-          //acc_sigma = rnd::randn_range(5.f, 60.f);
-          acc_step = rnd::randn_range(1.f, 10.f)/10.f;
-          acc_lim = rnd::randn_range(10.f, 20.f);
-          vel_lim = rnd::randn_range(0.5f, 2.5f);
+          acc_step = rand_acc_step(1.f, 10.f);
+          acc_lim = rand_acc_lim(10.f, 20.f);
+          vel_lim = rand_vel_lim(0.5f, 2.5f);
           prob_change_acc = rnd::randn_range_int(1, 4);
           prob_slow_fast = rnd::randn_range_int(10, 30);
           break;
         case Race::Halfling:
           character = 'b';
           style = { Color::Magenta, Color::LightGray };
-          //acc_sigma = rnd::randn_range(3.f, 80.f);
-          acc_step = rnd::randn_range(1.f, 15.f)/10.f;
-          acc_lim = rnd::randn_range(11.f, 25.f);
-          vel_lim = rnd::randn_range(0.7f, 3.f);
+          acc_step = rand_acc_step(1.f, 15.f);
+          acc_lim = rand_acc_lim(11.f, 25.f);
+          vel_lim = rand_vel_lim(0.7f, 3.f);
           prob_change_acc = rnd::randn_range_int(1, 5);
           prob_slow_fast = rnd::randn_range_int(10, 30);
           break;
         case Race::Dwarf:
           character = '0';
           style = { Color::White, Color::DarkGray };
-          //acc_sigma = rnd::randn_range(15.f, 150.f);
-          acc_step = rnd::randn_range(1.5f, 18.f)/10.f;
-          acc_lim = rnd::randn_range(12.f, 30.f);
-          vel_lim = rnd::randn_range(0.4f, 4.f);
+          acc_step = rand_acc_step(1.5f, 18.f);
+          acc_lim = rand_acc_lim(12.f, 30.f);
+          vel_lim = rand_vel_lim(0.4f, 4.f);
           prob_change_acc = rnd::randn_range_int(5, 20);
           prob_slow_fast = rnd::randn_range_int(10, 30);
           break;
         case Race::Half_Orc:
           character = '3';
           style = { Color::Yellow, Color::Green };
-          //acc_sigma = rnd::randn_range(20.f, 180.f);
-          acc_step = rnd::randn_range(1.5f, 20.f)/10.f;
-          acc_lim = rnd::randn_range(30.f, 80.f);
-          vel_lim = rnd::randn_range(1.5f, 5.f);
+          acc_step = rand_acc_step(1.5f, 20.f);
+          acc_lim = rand_acc_lim(30.f, 80.f);
+          vel_lim = rand_vel_lim(1.5f, 5.f);
           prob_change_acc = rnd::randn_range_int(2, 18);
           prob_slow_fast = rnd::randn_range_int(10, 30);
           break;
         case Race::Ogre:
           character = 'O';
           style = { Color::Green, Color::DarkYellow };
-          //acc_sigma = rnd::randn_range(20.f, 180.f);
-          acc_step = rnd::randn_range(4.f, 10.f)/10.f;
-          acc_lim = rnd::randn_range(2.f, 8.f);
-          vel_lim = rnd::randn_range(1.f, 6.f);
+          acc_step = rand_acc_step(4.f, 10.f);
+          acc_lim = rand_acc_lim(2.f, 8.f);
+          vel_lim = rand_vel_lim(1.f, 6.f);
           prob_change_acc = rnd::randn_range_int(4, 10);
           prob_slow_fast = rnd::randn_range_int(10, 30);
           break;
         case Race::Hobgoblin:
           character = 'a';
           style = { Color::Yellow, Color::Cyan };
-          //acc_sigma = rnd::randn_range(20.f, 180.f);
-          acc_step = rnd::randn_range(5.f, 15.f)/10.f;
-          acc_lim = rnd::randn_range(10.f, 50.f);
-          vel_lim = rnd::randn_range(4.f, 9.f);
+          acc_step = rand_acc_step(5.f, 15.f);
+          acc_lim = rand_acc_lim(10.f, 50.f);
+          vel_lim = rand_vel_lim(4.f, 9.f);
           prob_change_acc = rnd::randn_range_int(4, 14);
           prob_slow_fast = rnd::randn_range_int(10, 30);
           break;
         case Race::Goblin:
           character = 'G';
           style = { Color::Green, Color::DarkCyan };
-          //acc_sigma = rnd::randn_range(20.f, 180.f);
-          acc_step = rnd::randn_range(5.f, 15.f)/10.f;
-          acc_lim = rnd::randn_range(8.f, 45.f);
-          vel_lim = rnd::randn_range(4.5f, 10.f);
+          acc_step = rand_acc_step(5.f, 15.f);
+          acc_lim = rand_acc_lim(8.f, 45.f);
+          vel_lim = rand_vel_lim(4.5f, 10.f);
           prob_change_acc = rnd::randn_range_int(3, 12);
           prob_slow_fast = rnd::randn_range_int(10, 30);
           break;
         case Race::Orc:
           character = '2';
           style = { Color::DarkYellow, Color::Cyan };
-          //acc_sigma = rnd::randn_range(60.f, 250.f);
-          acc_step = rnd::randn_range(5.f, 25.f)/10.f;
-          acc_lim = rnd::randn_range(50.f, 80.f);
-          vel_lim = rnd::randn_range(6.f, 18.f);
+          acc_step = rand_acc_step(5.f, 25.f);
+          acc_lim = rand_acc_lim(50.f, 80.f);
+          vel_lim = rand_vel_lim(6.f, 18.f);
           prob_change_acc = rnd::randn_range_int(4, 8);
           prob_slow_fast = rnd::randn_range_int(10, 30);
           break;
         case Race::Troll:
           character = 'R';
           style = { Color::LightGray, Color::DarkRed };
-          //acc_sigma = rnd::randn_range(1.f, 60.f);
-          acc_step = rnd::randn_range(1.f, 14.f)/10.f;
-          acc_lim = rnd::randn_range(5.f, 15.f);
-          vel_lim = rnd::randn_range(2.f, 12.f);
+          acc_step = rand_acc_step(1.f, 14.f);
+          acc_lim = rand_acc_lim(5.f, 15.f);
+          vel_lim = rand_vel_lim(2.f, 12.f);
           prob_change_acc = rnd::randn_range_int(10, 40);
           prob_slow_fast = rnd::randn_range_int(10, 30);
           break;
         case Race::Monster:
           character = 'M';
           style = { Color::Cyan, Color::DarkGreen };
-          //acc_sigma = rnd::randn_range(20.f, 180.f);
-          acc_step = rnd::randn_range(0.5f, 25.f)/10.f;
-          acc_lim = rnd::randn_range(2.f, 25.f);
-          vel_lim = rnd::randn_range(1.f, 8.f);
+          acc_step = rand_acc_step(0.5f, 25.f);
+          acc_lim = rand_acc_lim(2.f, 25.f);
+          vel_lim = rand_vel_lim(1.f, 8.f);
           prob_change_acc = rnd::randn_range_int(8, 25);
           prob_slow_fast = rnd::randn_range_int(10, 30);
           break;
         case Race::Lich:
           character = 'z';
           style = { Color::DarkYellow, Color::DarkBlue };
-          //acc_sigma = rnd::randn_range(20.f, 180.f);
-          acc_step = rnd::randn_range(4.f, 30.f)/10.f;
-          acc_lim = rnd::randn_range(25.f, 55.f);
-          vel_lim = rnd::randn_range(2.f, 9.f);
+          acc_step = rand_acc_step(4.f, 30.f);
+          acc_lim = rand_acc_lim(25.f, 55.f);
+          vel_lim = rand_vel_lim(2.f, 9.f);
           prob_change_acc = rnd::randn_range_int(5, 8);
           prob_slow_fast = rnd::randn_range_int(10, 30);
           break;
         case Race::Lich_King:
           character = 'Z';
           style = { Color::Yellow, Color::DarkBlue };
-          //acc_sigma = rnd::randn_range(30.f, 200.f);
-          acc_step = rnd::randn_range(5.f, 35.f)/10.f;
-          acc_lim = rnd::randn_range(25.f, 60.f);
-          vel_lim = rnd::randn_range(2.5f, 10.f);
+          acc_step = rand_acc_step(5.f, 35.f);
+          acc_lim = rand_acc_lim(25.f, 60.f);
+          vel_lim = rand_vel_lim(2.5f, 10.f);
           prob_change_acc = rnd::randn_range_int(4, 6);
           prob_slow_fast = rnd::randn_range_int(10, 30);
           break;
         case Race::Basilisk:
           character = 'S';
           style = { Color::Green, Color::DarkGray };
-          //acc_sigma = rnd::randn_range(20.f, 220.f);
-          acc_step = rnd::randn_range(5.f, 18.f)/10.f;
-          acc_lim = rnd::randn_range(2.f, 25.f);
-          vel_lim = rnd::randn_range(4.f, 8.f);
+          acc_step = rand_acc_step(5.f, 18.f);
+          acc_lim = rand_acc_lim(2.f, 25.f);
+          vel_lim = rand_vel_lim(4.f, 8.f);
           prob_change_acc = rnd::randn_range_int(16, 28);
           prob_slow_fast = rnd::randn_range_int(10, 30);
           break;
         case Race::Bear:
           character = 'B';
           style = { Color::Red, Color::DarkRed };
-          //acc_sigma = rnd::randn_range(10.f, 250.f);
-          acc_step = rnd::randn_range(10.f, 25.f)/10.f;
-          acc_lim = rnd::randn_range(3.f, 10.f);
-          vel_lim = rnd::randn_range(3.f, 18.f);
+          acc_step = rand_acc_step(10.f, 25.f);
+          acc_lim = rand_acc_lim(3.f, 10.f);
+          vel_lim = rand_vel_lim(3.f, 18.f);
           prob_change_acc = rnd::randn_range_int(5, 8);
           prob_slow_fast = rnd::randn_range_int(10, 30);
           break;
         case Race::Kobold:
           character = 'x';
           style = { Color::Blue, Color::LightGray };
-          //acc_sigma = rnd::randn_range(20.f, 110.f);
-          acc_step = rnd::randn_range(5.f, 15.f)/10.f;
-          acc_lim = rnd::randn_range(25.f, 40.f);
-          vel_lim = rnd::randn_range(2.f, 10.f);
+          acc_step = rand_acc_step(5.f, 15.f);
+          acc_lim = rand_acc_lim(25.f, 40.f);
+          vel_lim = rand_vel_lim(2.f, 10.f);
           prob_change_acc = rnd::randn_range_int(3, 9);
           prob_slow_fast = rnd::randn_range_int(10, 30);
           break;
         case Race::Skeleton:
           character = '%';
           style = { Color::White, Color::DarkGray };
-          //acc_sigma = rnd::randn_range(2.f, 25.f);
-          acc_step = rnd::randn_range(5.f, 15.f)/10.f;
-          acc_lim = rnd::randn_range(10.f, 60.f);
-          vel_lim = rnd::randn_range(1.f, 4.f);
+          acc_step = rand_acc_step(5.f, 15.f);
+          acc_lim = rand_acc_lim(10.f, 60.f);
+          vel_lim = rand_vel_lim(1.f, 4.f);
           prob_change_acc = rnd::randn_range_int(11, 19);
           prob_slow_fast = rnd::randn_range_int(10, 30);
           break;
         case Race::Giant:
           character = 'O';
           style = { Color::DarkMagenta, Color::LightGray };
-          //acc_sigma = rnd::randn_range(15.f, 60.f);
-          acc_step = rnd::randn_range(5.f, 15.f)/10.f;
-          acc_lim = rnd::randn_range(1.f, 5.f);
-          vel_lim = rnd::randn_range(0.5f, 4.5f);
+          acc_step = rand_acc_step(5.f, 15.f);
+          acc_lim = rand_acc_lim(1.f, 5.f);
+          vel_lim = rand_vel_lim(0.5f, 4.5f);
           prob_change_acc = rnd::randn_range_int(20, 40);
           prob_slow_fast = rnd::randn_range_int(10, 30);
           break;
         case Race::Huge_Spider:
           character = 'W';
           style = { Color::DarkGray, Color::White };
-          //acc_sigma = rnd::randn_range(20.f, 260.f);
-          acc_step = rnd::randn_range(5.f, 15.f)/10.f;
-          acc_lim = rnd::randn_range(10.f, 70.f);
-          vel_lim = rnd::randn_range(3.f, 20.f);
+          acc_step = rand_acc_step(5.f, 15.f);
+          acc_lim = rand_acc_lim(10.f, 70.f);
+          vel_lim = rand_vel_lim(3.f, 20.f);
           prob_change_acc = rnd::randn_range_int(3, 17);
           prob_slow_fast = rnd::randn_range_int(10, 30);
           break;
         case Race::Wolf:
           character = 'm';
           style = { Color::LightGray, Color::DarkGray };
-          //acc_sigma = rnd::randn_range(110.f, 330.f);
-          acc_step = rnd::randn_range(15.f, 35.f)/10.f;
-          acc_lim = rnd::randn_range(15.f, 60.f);
-          vel_lim = rnd::randn_range(10.f, 24.f);
+          acc_step = rand_acc_step(15.f, 35.f);
+          acc_lim = rand_acc_lim(15.f, 60.f);
+          vel_lim = rand_vel_lim(10.f, 24.f);
           prob_change_acc = rnd::randn_range_int(2, 9);
           prob_slow_fast = rnd::randn_range_int(10, 30);
           break;
         case Race::Wyvern:
           character = 'w';
           style = { Color::DarkMagenta, Color::Blue };
-          //acc_sigma = rnd::randn_range(90.f, 220.f);
-          acc_step = rnd::randn_range(5.f, 15.f)/10.f;
-          acc_lim = rnd::randn_range(2.f, 15.f);
-          vel_lim = rnd::randn_range(8.f, 20.f);
+          acc_step = rand_acc_step(5.f, 15.f);
+          acc_lim = rand_acc_lim(2.f, 15.f);
+          vel_lim = rand_vel_lim(8.f, 20.f);
           prob_change_acc = rnd::randn_range_int(7, 15);
           prob_slow_fast = rnd::randn_range_int(10, 30);
           break;
         case Race::Griffin:
           character = 'g';
           style = { Color::DarkRed, Color::Blue };
-          //acc_sigma = rnd::randn_range(100.f, 250.f);
-          acc_step = rnd::randn_range(5.f, 15.f)/10.f;
-          acc_lim = rnd::randn_range(10.f, 25.f);
-          vel_lim = rnd::randn_range(9.f, 21.f);
+          acc_step = rand_acc_step(5.f, 15.f);
+          acc_lim = rand_acc_lim(10.f, 25.f);
+          vel_lim = rand_vel_lim(9.f, 21.f);
           prob_change_acc = rnd::randn_range_int(10, 20);
           prob_slow_fast = rnd::randn_range_int(10, 30);
           break;
         case Race::Ghoul:
           character = 'h';
           style = { Color::LightGray, Color::Yellow };
-          //acc_sigma = rnd::randn_range(35.f, 115.f);
-          acc_step = rnd::randn_range(5.f, 15.f)/10.f;
-          acc_lim = rnd::randn_range(30.f, 60.f);
-          vel_lim = rnd::randn_range(10.f, 20.f);
+          acc_step = rand_acc_step(5.f, 15.f);
+          acc_lim = rand_acc_lim(30.f, 60.f);
+          vel_lim = rand_vel_lim(10.f, 20.f);
           prob_change_acc = rnd::randn_range_int(1, 5);
           prob_slow_fast = rnd::randn_range_int(10, 30);
           break;
         case Race::Dragon:
           character = 'R';
           style = { Color::Red, Color::DarkMagenta };
-          //acc_sigma = rnd::randn_range(70.f, 350.f);
-          acc_step = rnd::randn_range(5.f, 45.f)/10.f;
-          acc_lim = rnd::randn_range(7.f, 30.f);
-          vel_lim = rnd::randn_range(11.f, 29.f);
+          acc_step = rand_acc_step(5.f, 45.f);
+          acc_lim = rand_acc_lim(7.f, 30.f);
+          vel_lim = rand_vel_lim(11.f, 29.f);
           prob_change_acc = rnd::randn_range_int(14, 30);
           prob_slow_fast = rnd::randn_range_int(10, 30);
           break;
