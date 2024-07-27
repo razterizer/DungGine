@@ -407,15 +407,16 @@ namespace dung
         case State::Fight:
           //vel_r = 0.5f * (pc_pos.r - pos.r);
           //vel_c = 0.5f * (pc_pos.c - pos.c);
+          
           if (pc_pos.r + c_fight_min_dist < pos.r)
             vel_r = 0.5f * ((pc_pos.r + c_fight_min_dist) - pos.r);
           else if (pc_pos.r - c_fight_min_dist > pos.r)
             vel_r = 0.5f * ((pc_pos.r - c_fight_min_dist) - pos.r);
-            
+          
           if (pc_pos.c + c_fight_min_dist < pos.c)
-            vel_c = 0.5f * ((pc_pos.c + c_fight_min_dist) - pos.r);
+            vel_c = 0.5f * ((pc_pos.c + c_fight_min_dist) - pos.c);
           else if (pc_pos.c - c_fight_min_dist > pos.c)
-            vel_c = 0.5f * ((pc_pos.c - c_fight_min_dist) - pos.r);
+            vel_c = 0.5f * ((pc_pos.c - c_fight_min_dist) - pos.c);
           break;
         case State::NUM_ITEMS:
           break;
