@@ -71,6 +71,15 @@ namespace dung
         return fog_of_war[idx];
       return true;
     }
+    
+    bool is_in_light(const RC& world_pos)
+    {
+      auto local_pos = world_pos - bb.pos();
+      auto idx = local_pos.r * (bb.c_len + 1) + local_pos.c;
+      if (math::in_range<int>(idx, 0, light.size(), Range::ClosedOpen))
+        return light[idx];
+      return false;
+    }
   };
 
 }
