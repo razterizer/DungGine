@@ -393,6 +393,241 @@ namespace dung
       }
     }
     
+    void handle_keys(const keyboard::KeyPressData& kpd, double real_time_s)
+    {
+      auto& curr_pos = m_player.pos;
+      
+      auto is_inside_curr_bb = [&](int r, int c) -> bool
+      {
+        if (m_player.curr_corridor != nullptr && m_player.curr_corridor->is_inside_corridor({r, c}))
+          return true;
+        if (m_player.curr_room != nullptr && m_player.curr_room->is_inside_room({r, c}))
+          return true;
+        return false;
+      };
+      
+      if (str::to_lower(kpd.curr_key) == 'a' || kpd.curr_special_key == keyboard::SpecialKey::Left)
+      {
+        if (m_player.show_inventory)
+        {
+        }
+        else if (is_inside_curr_bb(curr_pos.r, curr_pos.c - 1))
+          curr_pos.c--;
+      }
+      else if (str::to_lower(kpd.curr_key) == 'd' || kpd.curr_special_key == keyboard::SpecialKey::Right)
+      {
+        if (m_player.show_inventory)
+        {
+          if (m_player.inv_select_idx >= 0)
+          {
+            auto f_drop_item = [&](auto& obj, int obj_idx, auto& player_obj_idcs)
+            {
+              obj.picked_up = false;
+              obj.pos = curr_pos;
+              if (m_player.is_inside_curr_room())
+              {
+                obj.is_underground = is_underground(m_player.curr_room);
+                obj.curr_room = m_player.curr_room;
+                obj.curr_corridor = nullptr;
+              }
+              else if (m_player.is_inside_curr_corridor())
+              {
+                obj.is_underground = is_underground(m_player.curr_corridor);
+                obj.curr_room = nullptr;
+                obj.curr_corridor = m_player.curr_corridor;
+              }
+              stlutils::erase(player_obj_idcs, obj_idx);
+            };
+            
+            std::string msg = "You dropped an item: ";
+            if (m_player.inv_select_idx < m_player.key_idcs.size())
+            {
+              auto key_idx = m_player.key_idcs[m_player.inv_select_idx];
+              auto& key = all_keys[key_idx];
+              f_drop_item(key, key_idx, m_player.key_idcs);
+              msg += "key:" + std::to_string(key.key_id) + "!";
+            }
+            else if (m_player.inv_select_idx < m_player.key_idcs.size() + m_player.lamp_idcs.size())
+            {
+              auto lamp_idx = m_player.lamp_idcs[m_player.inv_select_idx - m_player.key_idcs.size()];
+              auto& lamp = all_lamps[lamp_idx];
+              f_drop_item(lamp, lamp_idx, m_player.lamp_idcs);
+              msg += "lamp:" + std::to_string(lamp_idx) + "!";
+            }
+            else if (m_player.inv_select_idx < m_player.key_idcs.size() + m_player.lamp_idcs.size() + m_player.weapon_idcs.size())
+            {
+              auto wpn_idx = m_player.weapon_idcs[m_player.inv_select_idx - (m_player.key_idcs.size() + m_player.lamp_idcs.size())];
+              auto& weapon = *all_weapons[wpn_idx];
+              f_drop_item(weapon, wpn_idx, m_player.weapon_idcs);
+              msg += weapon.type +":" + std::to_string(wpn_idx) + "!";
+            }
+            else
+            {
+              msg += "Invalid Item!";
+              std::cerr << "ERROR: Attempted to drop invalid item!" << std::endl;
+            }
+            m_player.inv_select_idx = -1;
+            message_handler->add_message(static_cast<float>(real_time_s),
+                                         msg,
+                                         MessageHandler::Level::Guide);
+          }
+        }
+        else if (is_inside_curr_bb(curr_pos.r, curr_pos.c + 1))
+          curr_pos.c++;
+      }
+      else if (str::to_lower(kpd.curr_key) == 's' || kpd.curr_special_key == keyboard::SpecialKey::Down)
+      {
+        if (m_player.show_inventory)
+        {
+          m_player.inv_hilite_idx++;
+          m_player.inv_hilite_idx = m_player.inv_hilite_idx % (m_player.key_idcs.size() + m_player.lamp_idcs.size());
+        }
+        else if (is_inside_curr_bb(curr_pos.r + 1, curr_pos.c))
+          curr_pos.r++;
+      }
+      else if (str::to_lower(kpd.curr_key) == 'w' || kpd.curr_special_key == keyboard::SpecialKey::Up)
+      {
+        if (m_player.show_inventory)
+        {
+          m_player.inv_hilite_idx--;
+          if (m_player.inv_hilite_idx < 0)
+            m_player.inv_hilite_idx = static_cast<int>(m_player.key_idcs.size() + m_player.lamp_idcs.size()) - 1;
+        }
+        else if (is_inside_curr_bb(curr_pos.r - 1, curr_pos.c))
+          curr_pos.r--;
+      }
+      else if (kpd.curr_key == ' ')
+      {
+        if (m_player.show_inventory)
+        {
+          int& select_idx = m_player.inv_select_idx;
+          const int hilite_idx = m_player.inv_hilite_idx;
+          select_idx = (select_idx == -1) ? hilite_idx : -1;
+        }
+        else
+        {
+          auto f_alter_door_states = [&](Door* door)
+          {
+            if (door != nullptr && door->is_door && distance(curr_pos, door->pos) == 1.f)
+            {
+              if (door->is_locked)
+              {
+                if (m_player.using_key_id(all_keys, door->key_id))
+                {
+                  // Currently doesn't support locking the door again.
+                  // Not sure if we need that. Maybe do it in the far future...
+                  door->is_locked = false;
+                  
+                  m_player.remove_key_by_key_id(all_keys, door->key_id);
+                  message_handler->add_message(static_cast<float>(real_time_s),
+                                               "You cast a vanishing spell on the key!",
+                                               MessageHandler::Level::Guide);
+                  
+                  message_handler->add_message(static_cast<float>(real_time_s),
+                                               "The door is unlocked!",
+                                               MessageHandler::Level::Guide);
+                }
+                else
+                {
+                  message_handler->add_message(static_cast<float>(real_time_s),
+                                               "The door is locked. You need key:" + std::to_string(door->key_id) + "!",
+                                               MessageHandler::Level::Guide);
+                }
+              }
+              else
+                math::toggle(door->is_open);
+              return true;
+            }
+            return false;
+          };
+          
+          if (m_player.curr_corridor != nullptr && m_player.curr_corridor->is_inside_corridor(curr_pos))
+          {
+            auto* door_0 = m_player.curr_corridor->doors[0];
+            auto* door_1 = m_player.curr_corridor->doors[1];
+            
+            f_alter_door_states(door_0);
+            f_alter_door_states(door_1);
+          }
+          else if (m_player.curr_room != nullptr && m_player.curr_room->is_inside_room(curr_pos))
+          {
+            for (auto* door : m_player.curr_room->doors)
+              if (f_alter_door_states(door))
+                break;
+          }
+          
+          for (size_t key_idx = 0; key_idx < all_keys.size(); ++key_idx)
+          {
+            auto& key = all_keys[key_idx];
+            if (key.pos == curr_pos && !key.picked_up)
+            {
+              if (m_player.key_idcs.size() <= m_player.inv_select_idx)
+                m_player.inv_select_idx++;
+              if (m_player.key_idcs.size() <= m_player.inv_hilite_idx)
+                m_player.inv_hilite_idx++;
+              m_player.key_idcs.emplace_back(key_idx);
+              key.picked_up = true;
+              message_handler->add_message(static_cast<float>(real_time_s),
+                                           "You picked up a key!", MessageHandler::Level::Guide);
+            }
+          }
+          for (size_t lamp_idx = 0; lamp_idx < all_lamps.size(); ++lamp_idx)
+          {
+            auto& lamp = all_lamps[lamp_idx];
+            if (lamp.pos == curr_pos && !lamp.picked_up)
+            {
+              m_player.lamp_idcs.emplace_back(lamp_idx);
+              lamp.picked_up = true;
+              message_handler->add_message(static_cast<float>(real_time_s),
+                                           "You picked up a lamp!", MessageHandler::Level::Guide);
+            }
+          }
+          for (size_t wpn_idx = 0; wpn_idx < all_weapons.size(); ++wpn_idx)
+          {
+            auto& weapon = all_weapons[wpn_idx];
+            if (weapon->pos == curr_pos && !weapon->picked_up)
+            {
+              m_player.weapon_idcs.emplace_back(wpn_idx);
+              weapon->picked_up = true;
+              message_handler->add_message(static_cast<float>(real_time_s),
+                                           "You picked up a " + weapon->type + "!", MessageHandler::Level::Guide);
+            }
+          }
+        }
+      }
+      else if (kpd.curr_key == '-')
+      {
+        math::toggle(m_player.show_inventory);
+      }
+      else if (kpd.curr_key == '+')
+      {
+        for (auto& npc : all_npcs)
+          math::toggle(npc.debug);
+      }
+      else if (str::to_lower(kpd.curr_key) == 'i')
+      {
+        static const float c_search_radius = 2.83;
+        for (const auto& key : all_keys)
+        {
+          if (distance(key.pos, curr_pos) <= c_search_radius)
+            message_handler->add_message(static_cast<float>(real_time_s),
+                                         "You see a key nearby!", MessageHandler::Level::Guide);
+        }
+        for (const auto& lamp : all_lamps)
+        {
+          if (distance(lamp.pos, curr_pos) <= c_search_radius)
+            message_handler->add_message(static_cast<float>(real_time_s),
+                                         "You see a lamp nearby!", MessageHandler::Level::Guide);
+        }
+        for (const auto& weapon : all_weapons)
+        {
+          if (distance(weapon->pos, curr_pos) <= c_search_radius)
+            message_handler->add_message(static_cast<float>(real_time_s),
+                                         "You can see a " + weapon->type + " nearby!", MessageHandler::Level::Guide);
+        }
+      }
+    }
+    
   public:
     DungGine(const std::string& exe_folder, bool use_fow, DungGineTextureParams texture_params = {})
       : message_handler(std::make_unique<MessageHandler>())
@@ -700,236 +935,8 @@ namespace dung
     {
       update_sun(static_cast<float>(real_time_s));
       
-      auto is_inside_curr_bb = [&](int r, int c) -> bool
-      {
-        if (m_player.curr_corridor != nullptr && m_player.curr_corridor->is_inside_corridor({r, c}))
-          return true;
-        if (m_player.curr_room != nullptr && m_player.curr_room->is_inside_room({r, c}))
-          return true;
-        return false;
-      };
-      
       auto& curr_pos = m_player.pos;
-      if (str::to_lower(kpd.curr_key) == 'a' || kpd.curr_special_key == keyboard::SpecialKey::Left)
-      {
-        if (m_player.show_inventory)
-        {
-        }
-        else if (is_inside_curr_bb(curr_pos.r, curr_pos.c - 1))
-          curr_pos.c--;
-      }
-      else if (str::to_lower(kpd.curr_key) == 'd' || kpd.curr_special_key == keyboard::SpecialKey::Right)
-      {
-        if (m_player.show_inventory)
-        {
-          if (m_player.inv_select_idx >= 0)
-          {
-            auto f_drop_item = [&](auto& obj, int obj_idx, auto& player_obj_idcs)
-            {
-              obj.picked_up = false;
-              obj.pos = curr_pos;
-              if (m_player.is_inside_curr_room())
-              {
-                obj.is_underground = is_underground(m_player.curr_room);
-                obj.curr_room = m_player.curr_room;
-                obj.curr_corridor = nullptr;
-              }
-              else if (m_player.is_inside_curr_corridor())
-              {
-                obj.is_underground = is_underground(m_player.curr_corridor);
-                obj.curr_room = nullptr;
-                obj.curr_corridor = m_player.curr_corridor;
-              }
-              stlutils::erase(player_obj_idcs, obj_idx);
-            };
-          
-            std::string msg = "You dropped an item: ";
-            if (m_player.inv_select_idx < m_player.key_idcs.size())
-            {
-              auto key_idx = m_player.key_idcs[m_player.inv_select_idx];
-              auto& key = all_keys[key_idx];
-              f_drop_item(key, key_idx, m_player.key_idcs);
-              msg += "key:" + std::to_string(key.key_id) + "!";
-            }
-            else if (m_player.inv_select_idx < m_player.key_idcs.size() + m_player.lamp_idcs.size())
-            {
-              auto lamp_idx = m_player.lamp_idcs[m_player.inv_select_idx - m_player.key_idcs.size()];
-              auto& lamp = all_lamps[lamp_idx];
-              f_drop_item(lamp, lamp_idx, m_player.lamp_idcs);
-              msg += "lamp:" + std::to_string(lamp_idx) + "!";
-            }
-            else if (m_player.inv_select_idx < m_player.key_idcs.size() + m_player.lamp_idcs.size() + m_player.weapon_idcs.size())
-            {
-              auto wpn_idx = m_player.weapon_idcs[m_player.inv_select_idx - (m_player.key_idcs.size() + m_player.lamp_idcs.size())];
-              auto& weapon = *all_weapons[wpn_idx];
-              f_drop_item(weapon, wpn_idx, m_player.weapon_idcs);
-              msg += weapon.type +":" + std::to_string(wpn_idx) + "!";
-            }
-            else
-            {
-              msg += "Invalid Item!";
-              std::cerr << "ERROR: Attempted to drop invalid item!" << std::endl;
-            }
-            m_player.inv_select_idx = -1;
-            message_handler->add_message(static_cast<float>(real_time_s),
-                                         msg,
-                                         MessageHandler::Level::Guide);
-          }
-        }
-        else if (is_inside_curr_bb(curr_pos.r, curr_pos.c + 1))
-          curr_pos.c++;
-      }
-      else if (str::to_lower(kpd.curr_key) == 's' || kpd.curr_special_key == keyboard::SpecialKey::Down)
-      {
-        if (m_player.show_inventory)
-        {
-          m_player.inv_hilite_idx++;
-          m_player.inv_hilite_idx = m_player.inv_hilite_idx % (m_player.key_idcs.size() + m_player.lamp_idcs.size());
-        }
-        else if (is_inside_curr_bb(curr_pos.r + 1, curr_pos.c))
-          curr_pos.r++;
-      }
-      else if (str::to_lower(kpd.curr_key) == 'w' || kpd.curr_special_key == keyboard::SpecialKey::Up)
-      {
-        if (m_player.show_inventory)
-        {
-          m_player.inv_hilite_idx--;
-          if (m_player.inv_hilite_idx < 0)
-            m_player.inv_hilite_idx = static_cast<int>(m_player.key_idcs.size() + m_player.lamp_idcs.size()) - 1;
-        }
-        else if (is_inside_curr_bb(curr_pos.r - 1, curr_pos.c))
-          curr_pos.r--;
-      }
-      else if (kpd.curr_key == ' ')
-      {
-        if (m_player.show_inventory)
-        {
-          int& select_idx = m_player.inv_select_idx;
-          const int hilite_idx = m_player.inv_hilite_idx;
-          select_idx = (select_idx == -1) ? hilite_idx : -1;
-        }
-        else
-        {
-          auto f_alter_door_states = [&](Door* door)
-          {
-            if (door != nullptr && door->is_door && distance(curr_pos, door->pos) == 1.f)
-            {
-              if (door->is_locked)
-              {
-                if (m_player.using_key_id(all_keys, door->key_id))
-                {
-                  // Currently doesn't support locking the door again.
-                  // Not sure if we need that. Maybe do it in the far future...
-                  door->is_locked = false;
-                  
-                  m_player.remove_key_by_key_id(all_keys, door->key_id);
-                  message_handler->add_message(static_cast<float>(real_time_s),
-                                               "You cast a vanishing spell on the key!",
-                                               MessageHandler::Level::Guide);
-                  
-                  message_handler->add_message(static_cast<float>(real_time_s),
-                                               "The door is unlocked!",
-                                               MessageHandler::Level::Guide);
-                }
-                else
-                {
-                  message_handler->add_message(static_cast<float>(real_time_s),
-                                               "The door is locked. You need key:" + std::to_string(door->key_id) + "!",
-                                               MessageHandler::Level::Guide);
-                }
-              }
-              else
-                math::toggle(door->is_open);
-              return true;
-            }
-            return false;
-          };
-          
-          if (m_player.curr_corridor != nullptr && m_player.curr_corridor->is_inside_corridor(curr_pos))
-          {
-            auto* door_0 = m_player.curr_corridor->doors[0];
-            auto* door_1 = m_player.curr_corridor->doors[1];
-            
-            f_alter_door_states(door_0);
-            f_alter_door_states(door_1);
-          }
-          else if (m_player.curr_room != nullptr && m_player.curr_room->is_inside_room(curr_pos))
-          {
-            for (auto* door : m_player.curr_room->doors)
-              if (f_alter_door_states(door))
-                break;
-          }
-          
-          for (size_t key_idx = 0; key_idx < all_keys.size(); ++key_idx)
-          {
-            auto& key = all_keys[key_idx];
-            if (key.pos == curr_pos && !key.picked_up)
-            {
-              if (m_player.key_idcs.size() <= m_player.inv_select_idx)
-                m_player.inv_select_idx++;
-              if (m_player.key_idcs.size() <= m_player.inv_hilite_idx)
-                m_player.inv_hilite_idx++;
-              m_player.key_idcs.emplace_back(key_idx);
-              key.picked_up = true;
-              message_handler->add_message(static_cast<float>(real_time_s),
-                                           "You picked up a key!", MessageHandler::Level::Guide);
-            }
-          }
-          for (size_t lamp_idx = 0; lamp_idx < all_lamps.size(); ++lamp_idx)
-          {
-            auto& lamp = all_lamps[lamp_idx];
-            if (lamp.pos == curr_pos && !lamp.picked_up)
-            {
-              m_player.lamp_idcs.emplace_back(lamp_idx);
-              lamp.picked_up = true;
-              message_handler->add_message(static_cast<float>(real_time_s),
-                                           "You picked up a lamp!", MessageHandler::Level::Guide);
-            }
-          }
-          for (size_t wpn_idx = 0; wpn_idx < all_weapons.size(); ++wpn_idx)
-          {
-            auto& weapon = all_weapons[wpn_idx];
-            if (weapon->pos == curr_pos && !weapon->picked_up)
-            {
-              m_player.weapon_idcs.emplace_back(wpn_idx);
-              weapon->picked_up = true;
-              message_handler->add_message(static_cast<float>(real_time_s),
-                                           "You picked up a " + weapon->type + "!", MessageHandler::Level::Guide);
-            }
-          }
-        }
-      }
-      else if (kpd.curr_key == '-')
-      {
-        math::toggle(m_player.show_inventory);
-      }
-      else if (kpd.curr_key == '+')
-      {
-        for (auto& npc : all_npcs)
-          math::toggle(npc.debug);
-      }
-      else if (str::to_lower(kpd.curr_key) == 'i')
-      {
-        static const float c_search_radius = 2.83;
-        for (const auto& key : all_keys)
-        {
-          if (distance(key.pos, curr_pos) <= c_search_radius)
-            message_handler->add_message(static_cast<float>(real_time_s),
-                                           "You see a key nearby!", MessageHandler::Level::Guide);
-        }
-        for (const auto& lamp : all_lamps)
-        {
-          if (distance(lamp.pos, curr_pos) <= c_search_radius)
-            message_handler->add_message(static_cast<float>(real_time_s),
-                                           "You see a lamp nearby!", MessageHandler::Level::Guide);
-        }
-        for (const auto& weapon : all_weapons)
-        {
-          if (distance(weapon->pos, curr_pos) <= c_search_radius)
-            message_handler->add_message(static_cast<float>(real_time_s),
-                                           "You can see a " + weapon->type + " nearby!", MessageHandler::Level::Guide);
-        }
-      }
+      handle_keys(kpd, real_time_s);
       
       // Fog of war
       if (use_fog_of_war)
