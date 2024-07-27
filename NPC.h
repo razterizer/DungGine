@@ -15,6 +15,40 @@ namespace dung
   enum class Race { Human, Elf, Half_Elf, Gnome, Halfling, Dwarf, Half_Orc, Ogre, Hobgoblin, Goblin, Orc, Troll, Monster, Lich, Lich_King, Basilisk, Bear, Kobold, Skeleton, Giant, Huge_Spider, Wolf, Wyvern, Griffin, Ghoul, Dragon, NUM_ITEMS };
   enum class Class { Warrior_Fighter, Warrior_Ranger, Warrior_Paladin, Warrior_Barbarian, Priest_Cleric, Priest_Druid, Priest_Monk, Priest_Shaman, Wizard_Mage, Wizard_Sorcerer, Rogue_Thief, Rogue_Bard, NUM_ITEMS };
   
+  std::string race2str(Race race)
+  {
+    switch (race)
+    {
+      case Race::Human: return "human";
+      case Race::Elf: return "elf";
+      case Race::Half_Elf: return "half elf";
+      case Race::Gnome: return "gnome";
+      case Race::Halfling: return "halfling";
+      case Race::Dwarf: return "dwarf";
+      case Race::Half_Orc: return "half orc";
+      case Race::Ogre: return "ogre";
+      case Race::Hobgoblin: return "hobgoblin";
+      case Race::Goblin: return "goblin";
+      case Race::Orc: return "orc";
+      case Race::Troll: return "troll";
+      case Race::Monster: return "monster";
+      case Race::Lich: return "lich";
+      case Race::Lich_King: return "lich king";
+      case Race::Basilisk: return "basilisk";
+      case Race::Bear: return "bear";
+      case Race::Kobold: return "kobold";
+      case Race::Skeleton: return "skeleton";
+      case Race::Giant: return "giant";
+      case Race::Huge_Spider: return "huge spider";
+      case Race::Wolf: return "wolf";
+      case Race::Wyvern: return "wyvern";
+      case Race::Griffin: return "griffin";
+      case Race::Ghoul: return "ghoul";
+      case Race::Dragon: return "dragon";
+      case Race::NUM_ITEMS: return "n/a";
+    }
+  }
+  
   enum class State { Patroll, Pursue, Fight, NUM_ITEMS };
   
   struct NPC final
