@@ -81,7 +81,7 @@ namespace dung
       {
         do
         {
-          int idx = rnd::rand_int(0, num_weapons - 1);
+          int idx = rnd::rand_idx(num_weapons);
           if (!all_weapons[idx]->picked_up)
             weapon_idx = idx;
         } while (ctr++ > 10 || weapon_idx == -1);
@@ -358,7 +358,7 @@ namespace dung
         return;
       }
       
-      if (rnd::rand_int(0, prob_slow_fast) == 0)
+      if (rnd::one_in(prob_slow_fast))
       {
         math::toggle(slow);
         if (slow)
@@ -390,7 +390,7 @@ namespace dung
           wall_coll_resolve = false;
         }
       }
-      else if (rnd::rand_int(0, prob_change_acc) == 0)
+      else if (rnd::one_in(prob_change_acc))
       {
         acc_r += rnd::randn_range(-acc_step, +acc_step);
         acc_c += rnd::randn_range(-acc_step*px_aspect, +acc_step*px_aspect);
@@ -443,12 +443,12 @@ namespace dung
         wall_coll_resolve_ctr = 0;
         wall_coll_resolve = false;
       }
-      else if (!wall_coll_resolve && rnd::rand_int(0, 5) == 0)
+      else if (!wall_coll_resolve && rnd::one_in(6))
       {
         auto location = ttl::BBLocation::None;
         if (location_room != ttl::BBLocation::None && location_corr != ttl::BBLocation::None)
         {
-          //if (rnd::rand_int(0, 1) == 0)
+          //if (rnd::one_in(2))
           //  location = location_room;
           //else
           //  location = location_corr;
