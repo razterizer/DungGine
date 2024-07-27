@@ -374,7 +374,7 @@ namespace dung
       }
       
       auto dist_to_pc = distance(pos, pc_pos);
-      const int c_fight_min_dist = 2;
+      const int c_fight_min_dist = 1;
       if (enemy && dist_to_pc <= 2.83f)
         state = State::Fight;
       else if (enemy && dist_to_pc < 7.f)
