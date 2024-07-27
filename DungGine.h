@@ -609,19 +609,19 @@ namespace dung
         static const float c_search_radius = 2.83;
         for (const auto& key : all_keys)
         {
-          if (distance(key.pos, curr_pos) <= c_search_radius)
+          if (key.visible && distance(key.pos, curr_pos) <= c_search_radius)
             message_handler->add_message(static_cast<float>(real_time_s),
                                          "You see a key nearby!", MessageHandler::Level::Guide);
         }
         for (const auto& lamp : all_lamps)
         {
-          if (distance(lamp.pos, curr_pos) <= c_search_radius)
+          if (lamp.visible && distance(lamp.pos, curr_pos) <= c_search_radius)
             message_handler->add_message(static_cast<float>(real_time_s),
                                          "You see a lamp nearby!", MessageHandler::Level::Guide);
         }
         for (const auto& weapon : all_weapons)
         {
-          if (distance(weapon->pos, curr_pos) <= c_search_radius)
+          if (weapon->visible && distance(weapon->pos, curr_pos) <= c_search_radius)
             message_handler->add_message(static_cast<float>(real_time_s),
                                          "You can see a " + weapon->type + " nearby!", MessageHandler::Level::Guide);
         }
