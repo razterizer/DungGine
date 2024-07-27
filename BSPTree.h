@@ -290,6 +290,17 @@ namespace dung
         return fog_of_war[idx];
       return true;
     }
+    
+    bool is_in_light(const RC& world_pos)
+    {
+      if (!is_leaf())
+        return false;
+      auto local_pos = world_pos - bb_leaf_room.pos();
+      auto idx = local_pos.r * (bb_leaf_room.c_len + 1) + local_pos.c;
+      if (math::in_range<int>(idx, 0, light.size(), Range::ClosedOpen))
+        return light[idx];
+      return false;
+    }
   };
       
   // //////////////////////////////////////////////////////////////
