@@ -432,10 +432,9 @@ namespace dung
       inside_room = false;
       inside_corr = false;
       if (curr_corridor != nullptr)
-        inside_room = curr_corridor->is_inside_corridor({r, c}, &location_corr);//check_bb_location(r, c);
+        inside_corr = curr_corridor->is_inside_corridor({r, c}, &location_corr);//check_bb_location(r, c);
       if (curr_room != nullptr)
-        inside_corr = curr_room->is_inside_room({r, c}, &location_corr);
-      //if (location_corr == ttl::BBLocation::Inside || location_room == ttl::BBLocation::Inside)
+        inside_room = curr_room->is_inside_room({r, c}, &location_corr);
       if (inside_room || inside_corr)
       {
         pos.r = r;
