@@ -447,11 +447,6 @@ namespace dung
         auto location = ttl::BBLocation::None;
         if (location_room != ttl::BBLocation::None && location_corr != ttl::BBLocation::None)
         {
-          //if (rnd::one_in(2))
-          //  location = location_room;
-          //else
-          //  location = location_corr;
-          location = ttl::BBLocation::None;
           acc_r = 0.f;
           vel_r = 5.f;
         }
