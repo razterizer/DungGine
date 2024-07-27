@@ -448,7 +448,9 @@ namespace dung
         if (location_room != ttl::BBLocation::None && location_corr != ttl::BBLocation::None)
         {
           acc_r = 0.f;
-          vel_r = 5.f;
+          acc_c = 0.f;
+          vel_r = 0.f;
+          vel_c = 0.f;
         }
         else if (inside_room && location_room != ttl::BBLocation::None)
           location = location_room;
