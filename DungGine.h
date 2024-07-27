@@ -260,8 +260,8 @@ namespace dung
       for (auto& weapon : all_weapons)
         *get_field_ptr(weapon.get()) = clear_val;
         
-      for (auto& npc : all_npcs)
-        *get_field_ptr(&npc) = clear_val;
+      //for (auto& npc : all_npcs)
+      //  *get_field_ptr(&npc) = clear_val;
       
       ttl::Rectangle bb;
       bool_vector* field = nullptr;
@@ -307,9 +307,9 @@ namespace dung
         if (distance(weapon->pos, curr_pos) <= c_fow_dist)
           *get_field_ptr(weapon.get()) = set_val;
       
-      for (auto& npc : all_npcs)
-        if (distance(npc.pos, curr_pos) <= c_fow_dist)
-          *get_field_ptr(&npc) = set_val;
+      //for (auto& npc : all_npcs)
+      //  if (distance(npc.pos, curr_pos) <= c_fow_dist)
+      //    *get_field_ptr(&npc) = set_val;
       
       ttl::Rectangle bb;
       RC local_pos;
