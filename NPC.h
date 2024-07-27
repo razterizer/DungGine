@@ -48,6 +48,7 @@ namespace dung
     char character = 'O';
     bool fog_of_war = true;
     bool light = false;
+    bool visible = false;
     bool is_underground = false;
     BSPNode* curr_room = nullptr;
     Corridor* curr_corridor = nullptr;
@@ -347,6 +348,12 @@ namespace dung
         case Race::NUM_ITEMS:
           break;
       }
+    }
+    
+    void set_visibility(bool use_fog_of_war, bool is_night)
+    {
+      visible = !((use_fog_of_war && this->fog_of_war) ||
+                  ((this->is_underground || is_night) && !this->light));
     }
     
     void update(const RC& pc_pos, float dt)

@@ -12,17 +12,27 @@ namespace dung
   
   struct Item
   {
+    virtual ~Item() = default;
+  
     RC pos; // world pos
     bool picked_up = false;
     Style style;
     char character = '?';
     bool fog_of_war = true;
     bool light = false;
+    bool visible = false;
     float weight = 0.f; // kg-ish.
     float price = 0.f;  // SEK-ish.
     bool is_underground = false;
     BSPNode* curr_room = nullptr;
     Corridor* curr_corridor = nullptr;
+    
+    virtual void set_visibility(bool use_fog_of_war, bool is_night)
+    {
+      visible = !(picked_up ||
+                  (use_fog_of_war && this->fog_of_war) ||
+                  ((this->is_underground || is_night) && !this->light));
+    }
   };
   
   struct Key : Item
@@ -56,6 +66,12 @@ namespace dung
     }
     enum class LampType { Isotropic, Directional, NUM_ITEMS };
     LampType type = LampType::Isotropic;
+    
+    virtual void set_visibility(bool use_fog_of_war, bool is_night) override
+    {
+      visible = !(picked_up ||
+                  (use_fog_of_war && this->fog_of_war));
+    }
   };
   
   struct Weapon : Item

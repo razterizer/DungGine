@@ -628,6 +628,48 @@ namespace dung
       }
     }
     
+    void set_visibilities()
+    {
+      auto f_calc_night = [&](const auto& obj) -> bool
+      {
+        bool is_night = false;
+        if (m_use_per_room_lat_long_for_sun_dir)
+        {
+          auto f_set_night = [&](const RoomStyle& rs)
+          {
+            if (m_solar_motion.get_solar_direction(rs.latitude, rs.longitude, m_season, m_t_solar_period) == SolarDirection::Nadir)
+              is_night = true;
+          };
+          
+          auto itr = m_room_styles.find(obj.curr_room);
+          if (itr != m_room_styles.end())
+            f_set_night(itr->second);
+          else
+          {
+            auto itc = m_corridor_styles.find(obj.curr_corridor);
+            if (itc != m_corridor_styles.end())
+              f_set_night(itc->second);
+          }
+        }
+        else
+          is_night = m_sun_dir == SolarDirection::Nadir;
+        
+        return is_night;
+      };
+            
+      for (auto& key : all_keys)
+        key.set_visibility(use_fog_of_war, f_calc_night(key));
+      
+      for (auto& lamp : all_lamps)
+        lamp.set_visibility(use_fog_of_war, f_calc_night(lamp));
+      
+      for (auto& weapon : all_weapons)
+        weapon->set_visibility(use_fog_of_war, f_calc_night(*weapon));
+        
+      for (auto& npc : all_npcs)
+        npc.set_visibility(use_fog_of_war, f_calc_night(npc));
+    }
+    
   public:
     DungGine(const std::string& exe_folder, bool use_fow, DungGineTextureParams texture_params = {})
       : message_handler(std::make_unique<MessageHandler>())
@@ -935,6 +977,8 @@ namespace dung
     {
       update_sun(static_cast<float>(real_time_s));
       
+      set_visibilities();
+      
       auto& curr_pos = m_player.pos;
       handle_keys(kpd, real_time_s);
       
@@ -1028,45 +1072,22 @@ namespace dung
         sh.write_buffer(std::string(1, m_player.character), player_scr_pos.r, player_scr_pos.c, m_player.style);
       }
       
-      auto f_calc_night = [&](const auto& obj) -> bool
+      auto f_render_item = [&](const auto& obj)
       {
-        bool is_night = false;
-        if (m_use_per_room_lat_long_for_sun_dir)
-        {
-          auto f_set_night = [&](const RoomStyle& rs)
-          {
-            if (m_solar_motion.get_solar_direction(rs.latitude, rs.longitude, m_season, m_t_solar_period) == SolarDirection::Nadir)
-              is_night = true;
-          };
-          
-          auto itr = m_room_styles.find(obj.curr_room);
-          if (itr != m_room_styles.end())
-            f_set_night(itr->second);
-          else
-          {
-            auto itc = m_corridor_styles.find(obj.curr_corridor);
-            if (itc != m_corridor_styles.end())
-              f_set_night(itc->second);
-          }
-        }
-        else
-          is_night = m_sun_dir == SolarDirection::Nadir;
-          
-        return is_night;
+        if (!obj.visible)
+          return;
+        auto scr_pos = get_screen_pos(obj.pos);
+        sh.write_buffer(std::string(1, obj.character), scr_pos.r, scr_pos.c, obj.style);
       };
       
       for (const auto& npc : all_npcs)
       {
-        bool is_night = f_calc_night(npc);
-        
-        if ((use_fog_of_war && npc.fog_of_war) || ((npc.is_underground || is_night) && !npc.light))
-          continue;
-          
-        auto scr_pos = get_screen_pos(npc.pos);
-        sh.write_buffer(std::string(1, npc.character), scr_pos.r, scr_pos.c, npc.style);
+        f_render_item(npc);
         
         if (npc.debug)
         {
+          auto scr_pos = get_screen_pos(npc.pos);
+          
           if (npc.vel_r < 0.f)
             sh.write_buffer("^", scr_pos.r - 1, scr_pos.c, Color::Black, Color::White);
           else if (npc.vel_r > 0.f)
@@ -1109,26 +1130,11 @@ namespace dung
         sh.write_buffer(door_ch, door_scr_pos.r, door_scr_pos.c, Color::Black, (use_fog_of_war && door->fog_of_war) ? Color::Black : (door->light ? Color::Yellow : Color::DarkYellow));
       }
       
-      auto f_render_item = [&](const auto& obj)
-      {
-        bool is_night = f_calc_night(obj);
-        
-        if (obj.picked_up || (use_fog_of_war && obj.fog_of_war) || ((obj.is_underground || is_night) && !obj.light))
-          return;
-        auto scr_pos = get_screen_pos(obj.pos);
-        sh.write_buffer(std::string(1, obj.character), scr_pos.r, scr_pos.c, obj.style);
-      };
-      
       for (const auto& key : all_keys)
         f_render_item(key);
       
       for (const auto& lamp : all_lamps)
-      {
-        if (lamp.picked_up || (use_fog_of_war && lamp.fog_of_war))
-          continue;
-        auto lamp_scr_pos = get_screen_pos(lamp.pos);
-        sh.write_buffer(std::string(1, lamp.character), lamp_scr_pos.r, lamp_scr_pos.c, lamp.style);
-      }
+        f_render_item(lamp);
       
       for (const auto& weapon : all_weapons)
         f_render_item(*weapon);
