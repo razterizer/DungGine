@@ -625,6 +625,12 @@ namespace dung
             message_handler->add_message(static_cast<float>(real_time_s),
                                          "You can see a " + weapon->type + " nearby!", MessageHandler::Level::Guide);
         }
+        for (const auto& npc : all_npcs)
+        {
+          if (npc.visible && distance(npc.pos, curr_pos) <= c_search_radius)
+            message_handler->add_message(static_cast<float>(real_time_s),
+                                         "You can see a " + race2str(npc.npc_race) + " nearby!", MessageHandler::Level::Guide);
+        }
       }
     }
     
