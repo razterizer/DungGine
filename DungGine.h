@@ -20,6 +20,8 @@
 namespace dung
 {
 
+  using namespace std::string_literals;
+
   enum class ScreenScrollingMode { AlwaysInCentre, PageWise, WhenOutsideScreen };
   
   struct DungGineTextureParams
@@ -1078,9 +1080,28 @@ namespace dung
         draw_inventory(sh);
         
       // Fighting
-      for (const auto& npc : all_npcs)
+      for (auto& npc : all_npcs)
       {
-        if (npc.health > 0 && npc.state == State::Fight)
+        if (npc.health == 0)
+          continue;
+          
+        if (npc.is_hostile)
+        {
+          if (npc.trg_info_hostile_npc.once())
+          {
+            std::string message = "You are being attacked";
+            std::string race = race2str(npc.npc_race);
+            if (npc.visible && !race.empty())
+              message += " by a"s + (str::is_wovel(race[0]) ? "n " : " ") + race;
+            message += "!";
+            message_handler->add_message(static_cast<float>(real_time_s),
+                                         message, MessageHandler::Level::Warning);
+          }
+        }
+        else
+          npc.trg_info_hostile_npc.reset();
+        
+        if (npc.state == State::Fight)
         {
           auto scr_pos = get_screen_pos(npc.pos);
           
