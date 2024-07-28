@@ -91,6 +91,11 @@ namespace dung
     std::vector<drawing::Texture> texture_ug_shadow;
     drawing::Texture texture_empty;
     
+    enum class FightDir { NW, W, SW, S, SE, E, NE, N, NUM_ITEMS };
+    
+    std::vector<int> fight_r_offs = { 1, 0, -1, -1, -1, 0, 1, 1 };
+    std::vector<int> fight_c_offs = { 1, 1, 1, 0, -1, -1, -1, 0 };
+    
     // /////////////////////
     
     RC get_screen_pos(const RC& world_pos) const
@@ -1071,13 +1076,132 @@ namespace dung
       
       if (m_player.show_inventory)
         draw_inventory(sh);
+        
+      // Fighting
+      for (const auto& npc : all_npcs)
+      {
+        if (npc.health > 0 && npc.state == State::Fight)
+        {
+          auto scr_pos = get_screen_pos(npc.pos);
+          
+          // [side_case, base_case, side_case]
+          // Case NW (dp = [1, 1]):
+          //O#
+          //#*
+          // r + [1, 1, 0]
+          // c + [0, 1, 1]
+          //
+          // Case W (dp = [0, 1]):
+          // #
+          //O*
+          // #
+          // r + [1, 0, -1]
+          // c + [1, 1,  1]
+          //
+          // Case SW (dp = [-1, 1]):
+          //#*
+          //O#
+          // r + [0, -1, -1]
+          // c + [1,  1,  0]
+          //
+          // Case S (dp = [-1, 0]):
+          //#*#
+          // O
+          // r + [-1, -1, -1]
+          // c + [ 1,  0, -1]
+          //
+          // Case SE (dp = [-1, -1]):
+          //*#
+          //#O
+          // r + [-1, -1,  0]
+          // c + [ 0, -1, -1]
+          //
+          // Case E (dp = [0, -1]):
+          //#
+          //*O
+          //#
+          // r + [-1,  0,  1]
+          // c + [-1, -1, -1]
+          //
+          // Case NE (dp = [1, -1]):
+          //#O
+          //*#
+          // r + [ 0,  1, 1]
+          // c + [-1, -1, 0]
+          //
+          // Case N (dp = [1, 0]):
+          // O
+          //#*#
+          // r + [ 1, 1, 1]
+          // c + [-1, 0, 1]
+          
+          auto dp = m_player.pos - npc.pos;
+          dp.r = math::sgn(dp.r);
+          dp.c = math::sgn(dp.c);
+          styles::Style fight_style
+          {
+            color::get_random_color({ Color::Red, Color::Yellow, Color::Blue, Color::Magenta, Color::White, Color::Black, Color::LightGray, Color::DarkGray }),
+            Color::Transparent2
+          };
+          std::string fight_str;
+          switch (rnd::dice(6))
+          {
+            case 1:
+              break;
+            case 2:
+              fight_str = "(";
+              break;
+            case 3:
+              fight_str = "#";
+              break;
+            case 4:
+              fight_str = ")";
+              break;
+            case 5:
+              fight_str = "%";
+              break;
+            case 6:
+              fight_str = "*";
+              break;
+          }
+          auto f_dp_to_dir = [](const RC& dp)
+          {
+            if (dp == RC { 1, 1 }) return FightDir::NW;
+            if (dp == RC { 0, 1 }) return FightDir::W;
+            if (dp == RC { -1, 1 }) return FightDir::SW;
+            if (dp == RC { -1, 0 }) return FightDir::S;
+            if (dp == RC { -1, -1 }) return FightDir::SE;
+            if (dp == RC { 0, -1 }) return FightDir::E;
+            if (dp == RC { 1, -1 }) return FightDir::NE;
+            if (dp == RC { 1, 0 }) return FightDir::N;
+            return FightDir::NUM_ITEMS;
+          };
+          const auto num_dir = static_cast<int>(FightDir::NUM_ITEMS);
+          auto dir = static_cast<int>(f_dp_to_dir(dp));
+          
+          auto r_offs = rnd::randn_select(0.f, 1.f, std::vector {
+                                          fight_r_offs[(dir - 1)%num_dir],
+                                          fight_r_offs[dir],
+                                          fight_r_offs[(dir + 1)%num_dir] });
+          auto c_offs = rnd::randn_select(0.f, 1.f, std::vector {
+                                          fight_c_offs[(dir - 1)%num_dir],
+                                          fight_c_offs[dir],
+                                          fight_c_offs[(dir + 1)%num_dir] });
+          sh.write_buffer(fight_str,
+                          scr_pos.r + r_offs,
+                          scr_pos.c + c_offs,
+                          fight_style);
+        }
+      }
       
+      // PC
       if (m_player.is_spawned)
       {
         auto player_scr_pos = get_screen_pos(m_player.pos);
         sh.write_buffer(std::string(1, m_player.character), player_scr_pos.r, player_scr_pos.c, m_player.style);
       }
       
+      // Items and NPCs
       auto f_render_item = [&](const auto& obj)
       {
         if (!obj.visible)
