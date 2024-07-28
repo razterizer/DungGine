@@ -384,6 +384,10 @@ namespace dung
           prob_slow_fast = rnd::randn_range_int(10, 30);
           break;
         case Race::NUM_ITEMS:
+          std::cerr << "Illegal race: NUM_ITEMS!" << std::endl;
+          break;
+        default:
+          std::cerr << "Unknown race (" + std::to_string(static_cast<int>(npc_race)) + ")!";
           break;
       }
     }
