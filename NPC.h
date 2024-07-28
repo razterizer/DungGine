@@ -410,7 +410,7 @@ namespace dung
     
     void update(const RC& pc_pos, float dt)
     {
-      if (health == 0)
+      if (health <= 0)
       {
         character = '&';
         style = { Color::Red, Color::DarkGray };
