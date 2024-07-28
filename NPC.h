@@ -112,7 +112,7 @@ namespace dung
       
       int ctr = 0;
       const int num_weapons = static_cast<int>(all_weapons.size());
-      if (!all_weapons.empty())
+      if (!all_weapons.empty() && !rnd::one_in(4))
       {
         do
         {
