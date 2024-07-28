@@ -98,6 +98,8 @@ namespace dung
     std::vector<int> fight_r_offs = { 1, 0, -1, -1, -1, 0, 1, 1 };
     std::vector<int> fight_c_offs = { 1, 1, 1, 0, -1, -1, -1, 0 };
     
+    ui::TextBox tb_health;
+    
     // /////////////////////
     
     RC get_screen_pos(const RC& world_pos) const
@@ -418,7 +420,7 @@ namespace dung
         if (m_player.show_inventory)
         {
         }
-        else if (is_inside_curr_bb(curr_pos.r, curr_pos.c - 1))
+        else if (m_player.health > 0 && is_inside_curr_bb(curr_pos.r, curr_pos.c - 1))
           curr_pos.c--;
       }
       else if (str::to_lower(kpd.curr_key) == 'd' || kpd.curr_special_key == keyboard::SpecialKey::Right)
@@ -479,7 +481,7 @@ namespace dung
                                          MessageHandler::Level::Guide);
           }
         }
-        else if (is_inside_curr_bb(curr_pos.r, curr_pos.c + 1))
+        else if (m_player.health > 0 && is_inside_curr_bb(curr_pos.r, curr_pos.c + 1))
           curr_pos.c++;
       }
       else if (str::to_lower(kpd.curr_key) == 's' || kpd.curr_special_key == keyboard::SpecialKey::Down)
@@ -489,7 +491,7 @@ namespace dung
           m_player.inv_hilite_idx++;
           m_player.inv_hilite_idx = m_player.inv_hilite_idx % (m_player.key_idcs.size() + m_player.lamp_idcs.size());
         }
-        else if (is_inside_curr_bb(curr_pos.r + 1, curr_pos.c))
+        else if (m_player.health > 0 && is_inside_curr_bb(curr_pos.r + 1, curr_pos.c))
           curr_pos.r++;
       }
       else if (str::to_lower(kpd.curr_key) == 'w' || kpd.curr_special_key == keyboard::SpecialKey::Up)
@@ -500,7 +502,7 @@ namespace dung
           if (m_player.inv_hilite_idx < 0)
             m_player.inv_hilite_idx = static_cast<int>(m_player.key_idcs.size() + m_player.lamp_idcs.size()) - 1;
         }
-        else if (is_inside_curr_bb(curr_pos.r - 1, curr_pos.c))
+        else if (m_player.health > 0 && is_inside_curr_bb(curr_pos.r - 1, curr_pos.c))
           curr_pos.r--;
       }
       else if (kpd.curr_key == ' ')
@@ -681,6 +683,17 @@ namespace dung
         
       for (auto& npc : all_npcs)
         npc.set_visibility(use_fog_of_war, f_calc_night(npc));
+    }
+    
+    template<int NR, int NC>
+    void draw_health_bar(SpriteHandler<NR, NC>& sh)
+    {
+      std::string pc_hb = str::rep_char(' ', 10);
+      for (int i = 0; i < 10; ++i)
+        pc_hb[i] = m_player.health > i*10 ? '#' : ' ';
+      tb_health.set_text(pc_hb);
+      tb_health.calc_pre_draw(str::Adjustment::Left);
+      tb_health.draw(sh, ui::VerticalAlignment::TOP, ui::HorizontalAlignment::LEFT, styles::Style { Color::White, Color::DarkBlue }, true, true, 0, 0, std::nullopt, drawing::OutlineType::Line, false);
     }
     
   public:
@@ -986,8 +999,10 @@ namespace dung
         t_scroll_amount = t_page;
     }
     
-    void update(double real_time_s, float sim_dt_s, const keyboard::KeyPressData& kpd)
+    void update(double real_time_s, float sim_dt_s, const keyboard::KeyPressData& kpd, bool* game_over)
     {
+      utils::try_set(game_over, m_player.health <= 0);
+    
       update_sun(static_cast<float>(real_time_s));
       
       set_visibilities();
@@ -1034,6 +1049,40 @@ namespace dung
       // NPCs
       for (auto& npc : all_npcs)
         npc.update(curr_pos, sim_dt_s);
+        
+      // Fighting
+      for (auto& npc : all_npcs)
+      {
+        if (npc.health > 0 && npc.state == State::Fight)
+        {
+          auto f_calc_damage = [](const Weapon* weapon)
+          {
+            if (weapon == nullptr)
+              return 1; // Fists.
+            if (weapon->type == "dagger")
+              return 3;
+            if (weapon->type == "flail")
+              return 5;
+            if (weapon->type == "sword")
+              return 7;
+            return 1; // Fists. (Error state).
+          };
+          int rolled_dice_20 = rnd::dice(20);
+          if (rolled_dice_20 == 1)
+          {
+            int damage = 1; // Fists.
+            if (npc.weapon_idx != -1)
+              damage = f_calc_damage(all_weapons[npc.weapon_idx].get());
+            m_player.health -= damage;
+          }
+          else if (rolled_dice_20 == 5 && npc.visible)
+          {
+            const auto* weapon = m_player.get_selected_weapon(all_weapons);
+            int damage = f_calc_damage(weapon);
+            npc.health -= damage;
+          }
+        }
+      }
       
       // Scrolling mode.
       switch (scr_scrolling_mode)
@@ -1079,10 +1128,12 @@ namespace dung
       if (m_player.show_inventory)
         draw_inventory(sh);
         
+      draw_health_bar(sh);
+        
       // Fighting
       for (auto& npc : all_npcs)
       {
-        if (npc.health == 0)
+        if (npc.health <= 0)
           continue;
           
         if (npc.is_hostile)
