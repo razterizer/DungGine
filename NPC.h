@@ -118,8 +118,12 @@ namespace dung
         {
           int idx = rnd::rand_idx(num_weapons);
           if (!all_weapons[idx]->picked_up)
+          {
             weapon_idx = idx;
-        } while (ctr++ > 10 || weapon_idx == -1);
+            all_weapons[idx]->picked_up = true;
+            break;
+          }
+        } while (ctr++ < 10);
       }
       
       enemy = rnd::rand_bool();
