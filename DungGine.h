@@ -688,10 +688,27 @@ namespace dung
     template<int NR, int NC>
     void draw_health_bar(SpriteHandler<NR, NC>& sh)
     {
+      std::vector<std::string> health_bars;
+      std::vector<Style> styles;
       std::string pc_hb = str::rep_char(' ', 10);
       for (int i = 0; i < 10; ++i)
         pc_hb[i] = m_player.health > i*10 ? '#' : ' ';
-      tb_health.set_text(pc_hb);
+      health_bars.emplace_back(pc_hb);
+      styles.emplace_back(Style { Color::Cyan, Color::Transparent2 });
+      
+      for (const auto& npc : all_npcs)
+      {
+        if (npc.state == State::Fight)
+        {
+          std::string npc_hb = str::rep_char(' ', 10);
+          for (int i = 0; i < 10; ++i)
+            npc_hb[i] = npc.health > i*10 ? 'O' : ' ';
+          health_bars.emplace_back(npc_hb);
+          styles.emplace_back(Style { Color::Red, Color::Transparent2 });
+        }
+      }
+      
+      tb_health.set_text(health_bars, styles);
       tb_health.calc_pre_draw(str::Adjustment::Left);
       tb_health.draw(sh, ui::VerticalAlignment::TOP, ui::HorizontalAlignment::LEFT, styles::Style { Color::White, Color::DarkBlue }, true, true, 0, 0, std::nullopt, drawing::OutlineType::Line, false);
     }
