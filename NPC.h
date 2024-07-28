@@ -7,6 +7,7 @@
 
 #pragma once
 #include "Items.h"
+#include <Core/OneShot.h>
 
 
 namespace dung
@@ -101,6 +102,15 @@ namespace dung
     Race npc_race = Race::Ogre;
     Class npc_class = Class::Warrior_Barbarian;
     int weapon_idx = -1;
+    
+    const float c_dist_fight = 2.f + 1e-2f;
+    const float c_dist_pursue = 7.f + 1e-2;
+    const float c_dist_patroll = 12.f + 1e-2;
+    const float c_dist_hostile_hyst_on = 2.f + 1e-2f;
+    const float c_dist_hostile_hyst_off = 3.f + 1e-2f;
+    const int c_fight_min_dist = 1;
+    bool is_hostile = false;
+    OneShot trg_info_hostile_npc;
     
     void init(const std::vector<std::unique_ptr<Weapon>>& all_weapons)
     {
@@ -423,12 +433,20 @@ namespace dung
       }
       
       auto dist_to_pc = distance(pos, pc_pos);
-      const int c_fight_min_dist = 1;
-      if (enemy && dist_to_pc <= 2.83f)
+      
+      if (enemy)
+      {
+        if (dist_to_pc < c_dist_hostile_hyst_on)
+          is_hostile = true;
+        else if (dist_to_pc > c_dist_hostile_hyst_off)
+          is_hostile = false;
+      }
+      
+      if (enemy && dist_to_pc < c_dist_fight)
         state = State::Fight;
-      else if (enemy && dist_to_pc < 7.f)
+      else if (enemy && dist_to_pc < c_dist_pursue)
         state = State::Pursue;
-      else if (dist_to_pc > 15.f)
+      else if (dist_to_pc > c_dist_patroll)
         state = State::Patroll;
     
       if (wall_coll_resolve)
