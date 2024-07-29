@@ -1102,13 +1102,7 @@ namespace dung
           {
             if (weapon == nullptr)
               return 1; // Fists.
-            if (weapon->type == "dagger")
-              return 3;
-            if (weapon->type == "flail")
-              return 5;
-            if (weapon->type == "sword")
-              return 7;
-            return 1; // Fists. (Error state).
+            return weapon->damage;
           };
           int rolled_dice_20 = rnd::dice(20);
           if (rolled_dice_20 == 1)

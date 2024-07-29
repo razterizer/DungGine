@@ -77,7 +77,7 @@ namespace dung
   struct Weapon : Item
   {
     virtual ~Weapon() = default;
-    int damage = 2;
+    int damage = 1;
     bool rusty = false;
     bool sharpened = false;
     bool poisonous = false;
@@ -94,6 +94,7 @@ namespace dung
       weight = 2.f;
       price = math::roundI(20*rnd::randn_clamp(4e3f, 500.f, 0.f, 5e6f))/20.f;
       type = "sword";
+      damage = rnd::randn_clamp_int(7.f, 10.f, 4, 50);
     }
   };
   
@@ -107,6 +108,7 @@ namespace dung
       weight = 2.f;
       price = math::roundI(20*rnd::randn_clamp(5e2f, 500.f, 0.f, 1e4f))/20.f;
       type = "dagger";
+      damage = rnd::randn_clamp_int(3.f, 3.f, 1, 7);
     }
   };
   
@@ -120,6 +122,7 @@ namespace dung
       weight = 2.f;
       price = math::roundI(20*rnd::randn_clamp(1e3f, 500.f, 0.f, 5e5f))/20.f;
       type = "flail";
+      damage = rnd::randn_clamp_int(5.f, 10.f, 3, 30);
     }
   };
   
