@@ -593,6 +593,8 @@ namespace dung
               for (int& sel_idx : m_player.inv_select_idcs)
                 if (m_player.start_inv_idx_lamps() <= sel_idx)
                   sel_idx++;
+              m_player.inv_select_idx_lamp++;
+              m_player.inv_select_idx_weapon++;
               if (m_player.start_inv_idx_lamps() <= m_player.inv_hilite_idx)
                 m_player.inv_hilite_idx++;
               m_player.key_idcs.emplace_back(key_idx);
@@ -609,6 +611,7 @@ namespace dung
               for (int& sel_idx : m_player.inv_select_idcs)
                 if (m_player.start_inv_idx_weapons() <= sel_idx)
                   sel_idx++;
+              m_player.inv_select_idx_weapon++;
               if (m_player.start_inv_idx_weapons() <= m_player.inv_hilite_idx)
                 m_player.inv_hilite_idx++;
               m_player.lamp_idcs.emplace_back(lamp_idx);
