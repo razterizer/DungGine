@@ -176,12 +176,12 @@ namespace dung
         oss.clear();
         oss << std::setprecision(2) << std::fixed << price;
         std::string price_str = oss.str() + " FK"; // Fantasy-Kronor.
-        item_str += str::rep_char(' ', 40 - static_cast<int>(item_str.size()) - static_cast<int>(price_str.size())) + price_str;
+        item_str += str::rep_char(' ', 42 - static_cast<int>(item_str.size()) - static_cast<int>(price_str.size())) + price_str;
         
         if (hp > 0)
         {
           std::string hp_str = std::to_string(hp) + " hp";
-          item_str += str::rep_char(' ', 55 - static_cast<int>(item_str.size()) - static_cast<int>(hp_str.size())) + hp_str;
+          item_str += str::rep_char(' ', 52 - static_cast<int>(item_str.size()) - static_cast<int>(hp_str.size())) + hp_str;
         }
       };
       
