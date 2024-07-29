@@ -724,7 +724,7 @@ namespace dung
       
       for (const auto& npc : all_npcs)
       {
-        if (npc.state > 0 && npc.state == State::Fight)
+        if (npc.health > 0 && npc.state == State::Fight)
         {
           std::string npc_hb = str::rep_char(' ', 10);
           for (int i = 0; i < 10; ++i)
