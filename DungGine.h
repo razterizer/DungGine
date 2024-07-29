@@ -712,7 +712,7 @@ namespace dung
     }
     
     template<int NR, int NC>
-    void draw_health_bar(SpriteHandler<NR, NC>& sh)
+    void draw_health_bars(SpriteHandler<NR, NC>& sh)
     {
       std::vector<std::string> health_bars;
       std::vector<Style> styles;
@@ -1171,7 +1171,7 @@ namespace dung
       if (m_player.show_inventory)
         draw_inventory(sh);
         
-      draw_health_bar(sh);
+      draw_health_bars(sh);
         
       // Fighting
       for (auto& npc : all_npcs)
