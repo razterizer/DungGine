@@ -233,7 +233,7 @@ namespace dung
             Style style = style_category;
             if (i.second)
               style = style_item.get_style(m_player.inv_hilite_idx == adj_item_idx,
-                                           m_player.inv_select_idx == adj_item_idx);
+                                           stlutils::contains(m_player.inv_select_idcs, adj_item_idx));
             sh.write_buffer(i.first, r, c_item, style);
             if (m_player.inv_hilite_idx == adj_item_idx && m_player.inv_hilite_idx < m_player.last_item_idx())
             {
@@ -427,59 +427,67 @@ namespace dung
       {
         if (m_player.show_inventory)
         {
-          if (m_player.inv_select_idx >= 0)
+          auto f_drop_item = [&](auto& obj, int obj_idx, auto& player_obj_idcs)
           {
-            auto f_drop_item = [&](auto& obj, int obj_idx, auto& player_obj_idcs)
+            obj.picked_up = false;
+            obj.pos = curr_pos;
+            if (m_player.is_inside_curr_room())
             {
-              obj.picked_up = false;
-              obj.pos = curr_pos;
-              if (m_player.is_inside_curr_room())
-              {
-                obj.is_underground = is_underground(m_player.curr_room);
-                obj.curr_room = m_player.curr_room;
-                obj.curr_corridor = nullptr;
-              }
-              else if (m_player.is_inside_curr_corridor())
-              {
-                obj.is_underground = is_underground(m_player.curr_corridor);
-                obj.curr_room = nullptr;
-                obj.curr_corridor = m_player.curr_corridor;
-              }
-              stlutils::erase(player_obj_idcs, obj_idx);
-            };
-            
-            std::string msg = "You dropped an item: ";
-            if (m_player.inv_select_idx < m_player.key_idcs.size())
-            {
-              auto key_idx = m_player.key_idcs[m_player.inv_select_idx];
-              auto& key = all_keys[key_idx];
-              f_drop_item(key, key_idx, m_player.key_idcs);
-              msg += "key:" + std::to_string(key.key_id) + "!";
+              obj.is_underground = is_underground(m_player.curr_room);
+              obj.curr_room = m_player.curr_room;
+              obj.curr_corridor = nullptr;
             }
-            else if (m_player.inv_select_idx < m_player.key_idcs.size() + m_player.lamp_idcs.size())
+            else if (m_player.is_inside_curr_corridor())
             {
-              auto lamp_idx = m_player.lamp_idcs[m_player.inv_select_idx - m_player.key_idcs.size()];
-              auto& lamp = all_lamps[lamp_idx];
-              f_drop_item(lamp, lamp_idx, m_player.lamp_idcs);
-              msg += "lamp:" + std::to_string(lamp_idx) + "!";
+              obj.is_underground = is_underground(m_player.curr_corridor);
+              obj.curr_room = nullptr;
+              obj.curr_corridor = m_player.curr_corridor;
             }
-            else if (m_player.inv_select_idx < m_player.key_idcs.size() + m_player.lamp_idcs.size() + m_player.weapon_idcs.size())
-            {
-              auto wpn_idx = m_player.weapon_idcs[m_player.inv_select_idx - (m_player.key_idcs.size() + m_player.lamp_idcs.size())];
-              auto& weapon = *all_weapons[wpn_idx];
-              f_drop_item(weapon, wpn_idx, m_player.weapon_idcs);
-              msg += weapon.type +":" + std::to_string(wpn_idx) + "!";
-            }
-            else
-            {
-              msg += "Invalid Item!";
-              std::cerr << "ERROR: Attempted to drop invalid item!" << std::endl;
-            }
-            m_player.inv_select_idx = -1;
-            message_handler->add_message(static_cast<float>(real_time_s),
-                                         msg,
-                                         MessageHandler::Level::Guide);
+            stlutils::erase(player_obj_idcs, obj_idx);
+          };
+          
+          std::string msg = "You dropped an item: ";
+          if (math::in_range<int>(m_player.inv_select_idx_key,
+                                  m_player.start_inv_idx_keys(), m_player.end_inv_idx_keys(),
+                                  Range::Closed))
+          {
+            auto key_idx = m_player.key_idcs[m_player.inv_select_idx_key - m_player.start_inv_idx_keys()];
+            auto& key = all_keys[key_idx];
+            f_drop_item(key, key_idx, m_player.key_idcs);
+            msg += "key:" + std::to_string(key.key_id) + "!";
+            stlutils::erase(m_player.inv_select_idcs, m_player.inv_select_idx_key);
+            m_player.inv_select_idx_key = -1;
           }
+          else if (math::in_range<int>(m_player.inv_select_idx_lamp,
+                                       m_player.start_inv_idx_lamps(), m_player.end_inv_idx_lamps(),
+                                       Range::Closed))
+          {
+            auto lamp_idx = m_player.lamp_idcs[m_player.inv_select_idx_lamp - m_player.start_inv_idx_lamps()];
+            auto& lamp = all_lamps[lamp_idx];
+            f_drop_item(lamp, lamp_idx, m_player.lamp_idcs);
+            msg += "lamp:" + std::to_string(lamp_idx) + "!";
+            stlutils::erase(m_player.inv_select_idcs, m_player.inv_select_idx_lamp);
+            m_player.inv_select_idx_lamp = -1;
+          }
+          else if (math::in_range<int>(m_player.inv_select_idx_weapon,
+                                       m_player.start_inv_idx_weapons(), m_player.end_inv_idx_weapons(),
+                                       Range::Closed))
+          {
+            auto wpn_idx = m_player.weapon_idcs[m_player.inv_select_idx_weapon - m_player.start_inv_idx_weapons()];
+            auto& weapon = *all_weapons[wpn_idx];
+            f_drop_item(weapon, wpn_idx, m_player.weapon_idcs);
+            msg += weapon.type +":" + std::to_string(wpn_idx) + "!";
+            stlutils::erase(m_player.inv_select_idcs, m_player.inv_select_idx_weapon);
+            m_player.inv_select_idx_weapon = -1;
+          }
+          else
+          {
+            msg += "Invalid Item!";
+            std::cerr << "ERROR: Attempted to drop invalid item!" << std::endl;
+          }
+          message_handler->add_message(static_cast<float>(real_time_s),
+                                       msg,
+                                       MessageHandler::Level::Guide);
         }
         else if (m_player.health > 0 && is_inside_curr_bb(curr_pos.r, curr_pos.c + 1))
           curr_pos.c++;
@@ -489,7 +497,7 @@ namespace dung
         if (m_player.show_inventory)
         {
           m_player.inv_hilite_idx++;
-          m_player.inv_hilite_idx = m_player.inv_hilite_idx % (m_player.key_idcs.size() + m_player.lamp_idcs.size() + m_player.weapon_idcs.size());
+          m_player.inv_hilite_idx = m_player.inv_hilite_idx % m_player.num_items();
         }
         else if (m_player.health > 0 && is_inside_curr_bb(curr_pos.r + 1, curr_pos.c))
           curr_pos.r++;
@@ -500,7 +508,7 @@ namespace dung
         {
           m_player.inv_hilite_idx--;
           if (m_player.inv_hilite_idx < 0)
-            m_player.inv_hilite_idx = static_cast<int>(m_player.key_idcs.size() + m_player.lamp_idcs.size() + m_player.weapon_idcs.size()) - 1;
+            m_player.inv_hilite_idx = m_player.num_items() - 1;
         }
         else if (m_player.health > 0 && is_inside_curr_bb(curr_pos.r - 1, curr_pos.c))
           curr_pos.r--;
@@ -509,9 +517,57 @@ namespace dung
       {
         if (m_player.show_inventory)
         {
-          int& select_idx = m_player.inv_select_idx;
           const int hilite_idx = m_player.inv_hilite_idx;
-          select_idx = (select_idx == -1) ? hilite_idx : -1;
+          if (stlutils::contains(m_player.inv_select_idcs, hilite_idx))
+          {
+            stlutils::erase(m_player.inv_select_idcs, hilite_idx);
+            if (math::in_range<int>(hilite_idx,
+                                    m_player.start_inv_idx_keys(),
+                                    m_player.end_inv_idx_keys(),
+                                    Range::Closed))
+            {
+              m_player.inv_select_idx_key = -1;
+            }
+            else if (math::in_range<int>(hilite_idx,
+                                         m_player.start_inv_idx_lamps(),
+                                         m_player.end_inv_idx_lamps(),
+                                         Range::Closed))
+            {
+              m_player.inv_select_idx_lamp = -1;
+            }
+            else if (math::in_range<int>(hilite_idx,
+                                         m_player.start_inv_idx_weapons(),
+                                         m_player.end_inv_idx_weapons(),
+                                         Range::Closed))
+            {
+              m_player.inv_select_idx_weapon = -1;
+            }
+          }
+          else
+          {
+            m_player.inv_select_idcs.emplace_back(hilite_idx);
+            if (math::in_range<int>(hilite_idx,
+                                    m_player.start_inv_idx_keys(),
+                                    m_player.end_inv_idx_keys(),
+                                    Range::Closed))
+            {
+              m_player.inv_select_idx_key = hilite_idx;
+            }
+            else if (math::in_range<int>(hilite_idx,
+                                         m_player.start_inv_idx_lamps(),
+                                         m_player.end_inv_idx_lamps(),
+                                         Range::Closed))
+            {
+              m_player.inv_select_idx_lamp = hilite_idx;
+            }
+            else if (math::in_range<int>(hilite_idx,
+                                         m_player.start_inv_idx_weapons(),
+                                         m_player.end_inv_idx_weapons(),
+                                         Range::Closed))
+            {
+              m_player.inv_select_idx_weapon = hilite_idx;
+            }
+          }
         }
         else
         {
@@ -570,9 +626,10 @@ namespace dung
             auto& key = all_keys[key_idx];
             if (key.pos == curr_pos && !key.picked_up)
             {
-              if (m_player.key_idcs.size() <= m_player.inv_select_idx)
-                m_player.inv_select_idx++;
-              if (m_player.key_idcs.size() <= m_player.inv_hilite_idx)
+              for (int& sel_idx : m_player.inv_select_idcs)
+                if (m_player.start_inv_idx_lamps() <= sel_idx)
+                  sel_idx++;
+              if (m_player.start_inv_idx_lamps() <= m_player.inv_hilite_idx)
                 m_player.inv_hilite_idx++;
               m_player.key_idcs.emplace_back(key_idx);
               key.picked_up = true;
@@ -585,6 +642,11 @@ namespace dung
             auto& lamp = all_lamps[lamp_idx];
             if (lamp.pos == curr_pos && !lamp.picked_up)
             {
+              for (int& sel_idx : m_player.inv_select_idcs)
+                if (m_player.start_inv_idx_weapons() <= sel_idx)
+                  sel_idx++;
+              if (m_player.start_inv_idx_weapons() <= m_player.inv_hilite_idx)
+                m_player.inv_hilite_idx++;
               m_player.lamp_idcs.emplace_back(lamp_idx);
               lamp.picked_up = true;
               message_handler->add_message(static_cast<float>(real_time_s),

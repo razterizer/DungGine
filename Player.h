@@ -27,16 +27,20 @@ namespace dung
     std::vector<int> lamp_idcs;
     std::vector<int> weapon_idcs;
     int inv_hilite_idx = 0;
-    int inv_select_idx = -1;
+    std::vector<int> inv_select_idcs;
+    int inv_select_idx_key = -1;
+    int inv_select_idx_lamp = -1;
+    int inv_select_idx_weapon = -1;
     bool show_inventory = false;
     RC line_of_sight;
     float weight_capacity = 50.f;
     
     bool using_key_id(const std::vector<Key>& all_keys, int key_id) const
     {
-      auto N = static_cast<int>(key_idcs.size());
-      if (math::in_range<int>(inv_select_idx, 0, N, Range::ClosedOpen))
-        if (all_keys[key_idcs[inv_select_idx]].key_id == key_id)
+      if (math::in_range<int>(inv_select_idx_key,
+                              start_inv_idx_keys(), end_inv_idx_keys(),
+                              Range::Closed))
+        if (all_keys[key_idcs[inv_select_idx_key]].key_id == key_id)
           return true;
       return false;
     }
@@ -45,44 +49,74 @@ namespace dung
     {
       stlutils::erase_if(key_idcs, [&](int key_idx) { return all_keys[key_idx].key_id == key_id; });
       stlutils::erase_if(all_keys, [&](const auto& key) { return key.key_id == key_id; });
-      inv_select_idx = -1;
+      inv_select_idx_key = -1;
     }
     
     const Key* get_selected_key(const std::vector<Key>& all_keys) const
     {
-      auto N = static_cast<int>(key_idcs.size());
-      if (math::in_range<int>(inv_select_idx, 0, N, Range::ClosedOpen))
-        return &all_keys[key_idcs[inv_select_idx]];
+      if (math::in_range<int>(inv_select_idx_key,
+                              start_inv_idx_keys(), end_inv_idx_keys(),
+                              Range::Closed))
+        return &all_keys[key_idcs[inv_select_idx_key - start_inv_idx_keys()]];
       return nullptr;
     }
     
     const Lamp* get_selected_lamp(const std::vector<Lamp>& all_lamps) const
     {
-      auto Nk = static_cast<int>(key_idcs.size());
-      auto Nl = static_cast<int>(lamp_idcs.size());
-      if (math::in_range<int>(inv_select_idx, Nk, Nk + Nl, Range::ClosedOpen))
-        return &all_lamps[lamp_idcs[inv_select_idx - Nk]];
+      if (math::in_range<int>(inv_select_idx_lamp,
+                              start_inv_idx_lamps(), end_inv_idx_lamps(),
+                              Range::Closed))
+        return &all_lamps[lamp_idcs[inv_select_idx_lamp - start_inv_idx_lamps()]];
       return nullptr;
     }
     
     const Weapon* get_selected_weapon(const std::vector<std::unique_ptr<Weapon>>& all_weapons)
     {
-      auto Nk = static_cast<int>(key_idcs.size());
-      auto Nl = static_cast<int>(lamp_idcs.size());
-      auto Nw = static_cast<int>(weapon_idcs.size());
-      if (math::in_range<int>(inv_select_idx, Nk + Nl, Nk + Nl + Nw, Range::ClosedOpen))
-        return all_weapons[weapon_idcs[inv_select_idx - (Nk + Nl)]].get();
+     if (math::in_range<int>(inv_select_idx_weapon,
+                              start_inv_idx_weapons(), end_inv_idx_weapons(),
+                              Range::Closed))
+        return all_weapons[weapon_idcs[inv_select_idx_weapon - start_inv_idx_weapons()]].get();
       return nullptr;
     }
     
     int num_items() const
     {
-      return static_cast<int>(key_idcs.size() + lamp_idcs.size());
+      return static_cast<int>(key_idcs.size() + lamp_idcs.size() + weapon_idcs.size());
     }
     
     int last_item_idx() const
     {
       return num_items() - 1;
+    }
+    
+    int start_inv_idx_keys() const
+    {
+      return 0;
+    }
+    
+    int end_inv_idx_keys() const
+    {
+      return static_cast<int>(key_idcs.size()) - 1;
+    }
+    
+    int start_inv_idx_lamps() const
+    {
+      return static_cast<int>(key_idcs.size());
+    }
+    
+    int end_inv_idx_lamps() const
+    {
+      return static_cast<int>(key_idcs.size() + lamp_idcs.size()) - 1;
+    }
+    
+    int start_inv_idx_weapons() const
+    {
+      return static_cast<int>(key_idcs.size() + lamp_idcs.size());
+    }
+    
+    int end_inv_idx_weapons() const
+    {
+      return static_cast<int>(key_idcs.size() + lamp_idcs.size() + weapon_idcs.size()) - 1;
     }
     
     bool is_inside_curr_room() const
