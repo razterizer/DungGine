@@ -447,9 +447,7 @@ namespace dung
           };
           
           std::string msg = "You dropped an item: ";
-          if (math::in_range<int>(m_player.inv_select_idx_key,
-                                  m_player.start_inv_idx_keys(), m_player.end_inv_idx_keys(),
-                                  Range::Closed))
+          if (m_player.in_keys_range(m_player.inv_select_idx_key))
           {
             auto key_idx = m_player.key_idcs[m_player.inv_select_idx_key - m_player.start_inv_idx_keys()];
             auto& key = all_keys[key_idx];
@@ -458,9 +456,7 @@ namespace dung
             stlutils::erase(m_player.inv_select_idcs, m_player.inv_select_idx_key);
             m_player.inv_select_idx_key = -1;
           }
-          else if (math::in_range<int>(m_player.inv_select_idx_lamp,
-                                       m_player.start_inv_idx_lamps(), m_player.end_inv_idx_lamps(),
-                                       Range::Closed))
+          else if (m_player.in_lamps_range(m_player.inv_select_idx_lamp))
           {
             auto lamp_idx = m_player.lamp_idcs[m_player.inv_select_idx_lamp - m_player.start_inv_idx_lamps()];
             auto& lamp = all_lamps[lamp_idx];
@@ -469,9 +465,7 @@ namespace dung
             stlutils::erase(m_player.inv_select_idcs, m_player.inv_select_idx_lamp);
             m_player.inv_select_idx_lamp = -1;
           }
-          else if (math::in_range<int>(m_player.inv_select_idx_weapon,
-                                       m_player.start_inv_idx_weapons(), m_player.end_inv_idx_weapons(),
-                                       Range::Closed))
+          else if (m_player.in_weapons_range(m_player.inv_select_idx_weapon))
           {
             auto wpn_idx = m_player.weapon_idcs[m_player.inv_select_idx_weapon - m_player.start_inv_idx_weapons()];
             auto& weapon = *all_weapons[wpn_idx];
@@ -521,52 +515,22 @@ namespace dung
           if (stlutils::contains(m_player.inv_select_idcs, hilite_idx))
           {
             stlutils::erase(m_player.inv_select_idcs, hilite_idx);
-            if (math::in_range<int>(hilite_idx,
-                                    m_player.start_inv_idx_keys(),
-                                    m_player.end_inv_idx_keys(),
-                                    Range::Closed))
-            {
+            if (m_player.in_keys_range(hilite_idx))
               m_player.inv_select_idx_key = -1;
-            }
-            else if (math::in_range<int>(hilite_idx,
-                                         m_player.start_inv_idx_lamps(),
-                                         m_player.end_inv_idx_lamps(),
-                                         Range::Closed))
-            {
+            else if (m_player.in_lamps_range(hilite_idx))
               m_player.inv_select_idx_lamp = -1;
-            }
-            else if (math::in_range<int>(hilite_idx,
-                                         m_player.start_inv_idx_weapons(),
-                                         m_player.end_inv_idx_weapons(),
-                                         Range::Closed))
-            {
+            else if (m_player.in_weapons_range(hilite_idx))
               m_player.inv_select_idx_weapon = -1;
-            }
           }
           else
           {
             m_player.inv_select_idcs.emplace_back(hilite_idx);
-            if (math::in_range<int>(hilite_idx,
-                                    m_player.start_inv_idx_keys(),
-                                    m_player.end_inv_idx_keys(),
-                                    Range::Closed))
-            {
+            if (m_player.in_keys_range(hilite_idx))
               m_player.inv_select_idx_key = hilite_idx;
-            }
-            else if (math::in_range<int>(hilite_idx,
-                                         m_player.start_inv_idx_lamps(),
-                                         m_player.end_inv_idx_lamps(),
-                                         Range::Closed))
-            {
+            else if (m_player.in_lamps_range(hilite_idx))
               m_player.inv_select_idx_lamp = hilite_idx;
-            }
-            else if (math::in_range<int>(hilite_idx,
-                                         m_player.start_inv_idx_weapons(),
-                                         m_player.end_inv_idx_weapons(),
-                                         Range::Closed))
-            {
+            else if (m_player.in_weapons_range(hilite_idx))
               m_player.inv_select_idx_weapon = hilite_idx;
-            }
           }
         }
         else

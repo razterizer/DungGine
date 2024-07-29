@@ -119,6 +119,21 @@ namespace dung
       return static_cast<int>(key_idcs.size() + lamp_idcs.size() + weapon_idcs.size()) - 1;
     }
     
+    bool in_keys_range(int idx) const
+    {
+      return math::in_range<int>(idx, start_inv_idx_keys(), end_inv_idx_keys(), Range::Closed);
+    }
+    
+    bool in_lamps_range(int idx) const
+    {
+      return math::in_range<int>(idx, start_inv_idx_lamps(), end_inv_idx_lamps(), Range::Closed);
+    }
+    
+    bool in_weapons_range(int idx) const
+    {
+      return math::in_range<int>(idx, start_inv_idx_weapons(), end_inv_idx_weapons(), Range::Closed);
+    }
+    
     bool is_inside_curr_room() const
     {
       if (curr_room != nullptr)
