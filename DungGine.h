@@ -489,7 +489,7 @@ namespace dung
         if (m_player.show_inventory)
         {
           m_player.inv_hilite_idx++;
-          m_player.inv_hilite_idx = m_player.inv_hilite_idx % (m_player.key_idcs.size() + m_player.lamp_idcs.size());
+          m_player.inv_hilite_idx = m_player.inv_hilite_idx % (m_player.key_idcs.size() + m_player.lamp_idcs.size() + m_player.weapon_idcs.size());
         }
         else if (m_player.health > 0 && is_inside_curr_bb(curr_pos.r + 1, curr_pos.c))
           curr_pos.r++;
@@ -500,7 +500,7 @@ namespace dung
         {
           m_player.inv_hilite_idx--;
           if (m_player.inv_hilite_idx < 0)
-            m_player.inv_hilite_idx = static_cast<int>(m_player.key_idcs.size() + m_player.lamp_idcs.size()) - 1;
+            m_player.inv_hilite_idx = static_cast<int>(m_player.key_idcs.size() + m_player.lamp_idcs.size() + m_player.weapon_idcs.size()) - 1;
         }
         else if (m_player.health > 0 && is_inside_curr_bb(curr_pos.r - 1, curr_pos.c))
           curr_pos.r--;
