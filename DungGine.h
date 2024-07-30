@@ -751,7 +751,11 @@ namespace dung
           if (m_player.health + hp > 100)
             hp = 100 - m_player.health;
           m_player.health += hp;
-          math::minimize(m_player.health, 100);
+          
+          m_player.remove_selected_potion(all_potions);
+          message_handler->add_message(static_cast<float>(real_time_s),
+                                       "You throw away the empty vial.",
+                                       MessageHandler::Level::Guide);
           switch (math::sgn(hp))
           {
             case -1:
@@ -764,19 +768,15 @@ namespace dung
                                            "You drank a potion, but nothing appeared to happen.",
                                            MessageHandler::Level::Guide);
             case +1:
-              message_handler->add_message(static_cast<float>(real_time_s),
-                                           "You drank a health potion. Your health increased by " + std::to_string(hp) + " hp.",
-                                           MessageHandler::Level::Guide);
               if (m_player.health == 100)
                 message_handler->add_message(static_cast<float>(real_time_s),
                                              "Your health is now fully restored.",
                                              MessageHandler::Level::Guide);
+              message_handler->add_message(static_cast<float>(real_time_s),
+                                           "You drank a health potion. Your health increased by " + std::to_string(hp) + " hp.",
+                                           MessageHandler::Level::Guide);
               break;
           }
-          m_player.remove_selected_potion(all_potions);
-          message_handler->add_message(static_cast<float>(real_time_s),
-                                       "You throw away the empty vial.",
-                                       MessageHandler::Level::Guide);
         }
       }
     }
