@@ -445,7 +445,7 @@ namespace dung
         if (m_player.show_inventory)
         {
         }
-        else if (m_player.health > 0 && is_inside_curr_bb(curr_pos.r, curr_pos.c - 1))
+        else if (is_inside_curr_bb(curr_pos.r, curr_pos.c - 1))
           curr_pos.c--;
       }
       else if (str::to_lower(kpd.curr_key) == 'd' || kpd.curr_special_key == keyboard::SpecialKey::Right)
@@ -517,7 +517,7 @@ namespace dung
                                        msg,
                                        MessageHandler::Level::Guide);
         }
-        else if (m_player.health > 0 && is_inside_curr_bb(curr_pos.r, curr_pos.c + 1))
+        else if (is_inside_curr_bb(curr_pos.r, curr_pos.c + 1))
           curr_pos.c++;
       }
       else if (str::to_lower(kpd.curr_key) == 's' || kpd.curr_special_key == keyboard::SpecialKey::Down)
@@ -527,7 +527,7 @@ namespace dung
           m_player.inv_hilite_idx++;
           m_player.inv_hilite_idx = m_player.inv_hilite_idx % m_player.num_items();
         }
-        else if (m_player.health > 0 && is_inside_curr_bb(curr_pos.r + 1, curr_pos.c))
+        else if (is_inside_curr_bb(curr_pos.r + 1, curr_pos.c))
           curr_pos.r++;
       }
       else if (str::to_lower(kpd.curr_key) == 'w' || kpd.curr_special_key == keyboard::SpecialKey::Up)
@@ -538,7 +538,7 @@ namespace dung
           if (m_player.inv_hilite_idx < 0)
             m_player.inv_hilite_idx = m_player.num_items() - 1;
         }
-        else if (m_player.health > 0 && is_inside_curr_bb(curr_pos.r - 1, curr_pos.c))
+        else if (is_inside_curr_bb(curr_pos.r - 1, curr_pos.c))
           curr_pos.r--;
       }
       else if (kpd.curr_key == ' ')
@@ -1194,6 +1194,8 @@ namespace dung
     void update(double real_time_s, float sim_dt_s, const keyboard::KeyPressData& kpd, bool* game_over)
     {
       utils::try_set(game_over, m_player.health <= 0);
+      if (utils::try_get(game_over))
+        return;
     
       update_sun(static_cast<float>(real_time_s));
       
