@@ -39,9 +39,10 @@ See the next section for a summary over these two classes.
   - `place_keys()` : Places the keys in rooms, randomly all over the world.
   - `place_lamps(int num_lamps)` : Places `num_lamps` lamps in rooms, randomly all over the world.
   - `place_weapons(int num_weapons)` : Places `num_weapons` weapons in rooms, randomly all over the world.
+  - `place_potions(int num_potions)` : Places `num_potions` potions in rooms, randomly all over the world.
   - `place_npcs(int num_npcs)` : Places `num_npcs` NPCs in rooms, randomly all over the world.
   - `set_screen_scrolling_mode(ScreenScrollingMode mode, float t_page = 0.2f)` : Sets the screen scrolling mode to either `AlwaysInCentre`, `PageWise` or `WhenOutsideScreen`. `t_page` is used with `PageWise` mode.
-  - `update(double real_time_s, const keyboard::KeyPressData& kpd)` : Updating the state of the dungeon engine. Manages things such as the change of direction of the sun for the shadows of rooms that are not under the ground and key-presses for control of the playable character.
+  - `update(double real_time_s, const keyboard::KeyPressData& kpd, bool* game_over)` : Updating the state of the dungeon engine. Manages things such as the change of direction of the sun for the shadows of rooms that are not under the ground and key-presses for control of the playable character.
   - `draw(SpriteHandler<NR, NC>& sh, double real_time_s)` : Draws the rooms of the dungeon / realm (will include drawing of corridors in the near(?) future).
 
 ## Texturing
@@ -123,11 +124,15 @@ if (!dungeon_engine.place_player(sh.size()))
 dungeon_engine->place_keys();
 dungeon_engine->place_lamps(20);
 dungeon_engine->place_weapons(100);
+dungeon_engine->place_potions(100);
 dungeon_engine.set_screen_scrolling_mode(ScreenScrollingMode::WhenOutsideScreen);
 
 // In game loop:
 sh.clear();
-dungeon_engine->update(get_real_time_s(), kpd); // arg0 : time from game start, arg1 : keyboard::KeyPressData object.
+bool game_over = false;
+dungeon_engine->update(get_real_time_s(), kpd, &game_over); // arg0 : time from game start, arg1 : keyboard::KeyPressData object, arg2 : retrieves game over state.
+if (game_over)
+  set_state_game_over();
 dungeon_engine->draw(sh, get_real_time_s());
 sh.print_screen_buffer(t, bg_color);
 ```
@@ -173,13 +178,17 @@ if (!dungeon_engine.place_player(sh.size()))
   std::cerr << "ERROR : Unable to place the playable character!" << std::endl;
 dungeon_engine->place_keys();
 dungeon_engine->place_lamps(20);
-dungeon_engine->place_weapons(100);
+dungeon_engine->place_weapons(150);
+dungeon_engine->place_potions(150);
 dungeon_engine->place_npcs(100);
 dungeon_engine.set_screen_scrolling_mode(ScreenScrollingMode::WhenOutsideScreen);
 
 // In game loop:
 sh.clear();
-dungeon_engine->update(get_real_time_s(), kpd); // arg0 : time from game start, arg1 : keyboard::KeyPressData object.
+bool game_over = false;
+dungeon_engine->update(get_real_time_s(), kpd, &game_over); // arg0 : time from game start, arg1 : keyboard::KeyPressData object, arg2 : retrieves game over state.
+if (game_over)
+  set_state_game_over();
 dungeon_engine->draw(sh, get_real_time_s());
 sh.print_screen_buffer(t, bg_color);
 ```
