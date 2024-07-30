@@ -26,11 +26,13 @@ namespace dung
     std::vector<int> key_idcs;
     std::vector<int> lamp_idcs;
     std::vector<int> weapon_idcs;
+    std::vector<int> potion_idcs;
     int inv_hilite_idx = 0;
     std::vector<int> inv_select_idcs;
     int inv_select_idx_key = -1;
     int inv_select_idx_lamp = -1;
     int inv_select_idx_weapon = -1;
+    int inv_select_idx_potion = -1;
     bool show_inventory = false;
     RC line_of_sight;
     float weight_capacity = 50.f;
@@ -49,39 +51,57 @@ namespace dung
     {
       stlutils::erase_if(key_idcs, [&](int key_idx) { return all_keys[key_idx].key_id == key_id; });
       stlutils::erase_if(all_keys, [&](const auto& key) { return key.key_id == key_id; });
-      inv_select_idx_key = -1;
+      if (inv_select_idx_key != -1)
+      {
+        stlutils::erase(inv_select_idcs, inv_select_idx_key);
+        inv_select_idx_key = -1;
+      }
+    }
+    
+    void remove_selected_potion(std::vector<Potion>& all_potions)
+    {
+      if (inv_select_idx_potion == -1)
+        return;
+      stlutils::erase_at(all_potions, potion_idcs[inv_select_idx_potion - start_inv_idx_potions()]);
+      stlutils::erase_at(potion_idcs, inv_select_idx_potion - start_inv_idx_potions());
+      if (inv_select_idx_potion != -1)
+      {
+        stlutils::erase(inv_select_idcs, inv_select_idx_potion);
+        inv_select_idx_potion = -1;
+      }
     }
     
     const Key* get_selected_key(const std::vector<Key>& all_keys) const
     {
-      if (math::in_range<int>(inv_select_idx_key,
-                              start_inv_idx_keys(), end_inv_idx_keys(),
-                              Range::Closed))
+      if (in_keys_range(inv_select_idx_key))
         return &all_keys[key_idcs[inv_select_idx_key - start_inv_idx_keys()]];
       return nullptr;
     }
     
     const Lamp* get_selected_lamp(const std::vector<Lamp>& all_lamps) const
     {
-      if (math::in_range<int>(inv_select_idx_lamp,
-                              start_inv_idx_lamps(), end_inv_idx_lamps(),
-                              Range::Closed))
+      if (in_lamps_range(inv_select_idx_lamp))
         return &all_lamps[lamp_idcs[inv_select_idx_lamp - start_inv_idx_lamps()]];
       return nullptr;
     }
     
     const Weapon* get_selected_weapon(const std::vector<std::unique_ptr<Weapon>>& all_weapons)
     {
-     if (math::in_range<int>(inv_select_idx_weapon,
-                              start_inv_idx_weapons(), end_inv_idx_weapons(),
-                              Range::Closed))
+     if (in_weapons_range(inv_select_idx_weapon))
         return all_weapons[weapon_idcs[inv_select_idx_weapon - start_inv_idx_weapons()]].get();
+      return nullptr;
+    }
+    
+    const Potion* get_selected_potion(const std::vector<Potion>& all_potions)
+    {
+     if (in_potions_range(inv_select_idx_potion))
+        return &all_potions[potion_idcs[inv_select_idx_potion - start_inv_idx_potions()]];
       return nullptr;
     }
     
     int num_items() const
     {
-      return static_cast<int>(key_idcs.size() + lamp_idcs.size() + weapon_idcs.size());
+      return static_cast<int>(key_idcs.size() + lamp_idcs.size() + weapon_idcs.size() + potion_idcs.size());
     }
     
     int last_item_idx() const
@@ -96,7 +116,7 @@ namespace dung
     
     int end_inv_idx_keys() const
     {
-      return static_cast<int>(key_idcs.size()) - 1;
+      return start_inv_idx_lamps() - 1;
     }
     
     int start_inv_idx_lamps() const
@@ -106,7 +126,7 @@ namespace dung
     
     int end_inv_idx_lamps() const
     {
-      return static_cast<int>(key_idcs.size() + lamp_idcs.size()) - 1;
+      return start_inv_idx_weapons() - 1;
     }
     
     int start_inv_idx_weapons() const
@@ -116,7 +136,17 @@ namespace dung
     
     int end_inv_idx_weapons() const
     {
-      return static_cast<int>(key_idcs.size() + lamp_idcs.size() + weapon_idcs.size()) - 1;
+      return start_inv_idx_potions() - 1;
+    }
+    
+    int start_inv_idx_potions() const
+    {
+      return static_cast<int>(key_idcs.size() + lamp_idcs.size() + weapon_idcs.size());
+    }
+    
+    int end_inv_idx_potions() const
+    {
+      return num_items() - 1;
     }
     
     bool in_keys_range(int idx) const
@@ -132,6 +162,11 @@ namespace dung
     bool in_weapons_range(int idx) const
     {
       return math::in_range<int>(idx, start_inv_idx_weapons(), end_inv_idx_weapons(), Range::Closed);
+    }
+    
+    bool in_potions_range(int idx) const
+    {
+      return math::in_range<int>(idx, start_inv_idx_potions(), end_inv_idx_potions(), Range::Closed);
     }
     
     bool is_inside_curr_room() const

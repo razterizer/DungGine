@@ -818,4 +818,24 @@ namespace dung
     Color::Cyan,
     Color::White,
   };
+  
+  inline std::vector<Color> potion_fg_palette
+  {
+    Color::Black,
+    Color::DarkRed,
+    Color::DarkGreen,
+    Color::DarkYellow,
+    Color::DarkBlue,
+    Color::DarkMagenta,
+    Color::DarkCyan,
+    Color::LightGray,
+    Color::DarkGray,
+    Color::Red,
+    Color::Green,
+    Color::Yellow,
+    Color::Blue,
+    Color::Magenta,
+    Color::Cyan,
+    Color::White,
+  };
 }

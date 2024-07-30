@@ -16,7 +16,7 @@ namespace dung
   
     RC pos; // world pos
     bool picked_up = false;
-    Style style;
+    Style style = { Color::White, Color::Transparent2 };
     char character = '?';
     bool fog_of_war = true;
     bool light = false;
@@ -40,18 +40,12 @@ namespace dung
     Key()
     {
       character = 'F';
-      style.fg_color = Color::Green;
-      style.bg_color = Color::Transparent2;
+      style.fg_color = color::get_random_color(key_fg_palette);
       weight = 0.1f;
       price = math::roundI(20*rnd::randn_clamp(20.f, 30.f, 0.f, 1e4f))/20.f;
     }
     
     int key_id = 0;
-    
-    void randomize_fg_color()
-    {
-      style.fg_color = color::get_random_color(key_fg_palette);
-    }
   };
   
   struct Lamp : Item
@@ -60,7 +54,6 @@ namespace dung
     {
       character = 'Y';
       style.fg_color = Color::Yellow;
-      style.bg_color = Color::Transparent2;
       weight = 0.4f;
       price = math::roundI(20*rnd::randn_clamp(200.f, 100.f, 0.f, 1e4f))/20.f;
     }
@@ -76,7 +69,6 @@ namespace dung
   
   struct Weapon : Item
   {
-    virtual ~Weapon() = default;
     int damage = 1;
     bool rusty = false;
     bool sharpened = false;
@@ -90,7 +82,6 @@ namespace dung
     {
       character = 'T';
       style.fg_color = Color::LightGray;
-      style.bg_color = Color::Transparent2;
       weight = 2.f;
       price = math::roundI(20*rnd::randn_clamp(4e3f, 500.f, 0.f, 5e6f))/20.f;
       type = "sword";
@@ -104,7 +95,6 @@ namespace dung
     {
       character = 'V';
       style.fg_color = Color::LightGray;
-      style.bg_color = Color::Transparent2;
       weight = 2.f;
       price = math::roundI(20*rnd::randn_clamp(5e2f, 500.f, 0.f, 1e4f))/20.f;
       type = "dagger";
@@ -118,11 +108,29 @@ namespace dung
     {
       character = '#';
       style.fg_color = Color::DarkGray;
-      style.bg_color = Color::Transparent2;
       weight = 2.f;
       price = math::roundI(20*rnd::randn_clamp(1e3f, 500.f, 0.f, 5e5f))/20.f;
       type = "flail";
       damage = rnd::randn_clamp_int(5.f, 10.f, 3, 30);
+    }
+  };
+  
+  struct Potion : Item
+  {
+    int health = 1;
+    bool poison = false;
+    
+    Potion()
+    {
+      character = rnd::rand_select<char>({ 'u', 'U', 'b' });
+      style.fg_color = color::get_random_color(potion_fg_palette);
+      health = rnd::randn_clamp_int(5.f, 10.f, 0, 100);
+      poison = rnd::one_in(50);
+    }
+    
+    int get_hp() const
+    {
+      return poison ? -health : health;
     }
   };
   
