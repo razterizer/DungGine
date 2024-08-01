@@ -429,6 +429,9 @@ namespace dung
     
     void handle_keys(const keyboard::KeyPressData& kpd, double real_time_s)
     {
+      auto curr_key = keyboard::get_char_key(kpd);
+      auto curr_special_key = keyboard::get_special_key(kpd);
+    
       auto& curr_pos = m_player.pos;
       
       auto is_inside_curr_bb = [&](int r, int c) -> bool
@@ -440,7 +443,7 @@ namespace dung
         return false;
       };
       
-      if (str::to_lower(kpd.curr_key) == 'a' || kpd.curr_special_key == keyboard::SpecialKey::Left)
+      if (str::to_lower(curr_key) == 'a' || curr_special_key == keyboard::SpecialKey::Left)
       {
         if (m_player.show_inventory)
         {
@@ -448,7 +451,7 @@ namespace dung
         else if (is_inside_curr_bb(curr_pos.r, curr_pos.c - 1))
           curr_pos.c--;
       }
-      else if (str::to_lower(kpd.curr_key) == 'd' || kpd.curr_special_key == keyboard::SpecialKey::Right)
+      else if (str::to_lower(curr_key) == 'd' || curr_special_key == keyboard::SpecialKey::Right)
       {
         if (m_player.show_inventory)
         {
@@ -520,7 +523,7 @@ namespace dung
         else if (is_inside_curr_bb(curr_pos.r, curr_pos.c + 1))
           curr_pos.c++;
       }
-      else if (str::to_lower(kpd.curr_key) == 's' || kpd.curr_special_key == keyboard::SpecialKey::Down)
+      else if (str::to_lower(curr_key) == 's' || curr_special_key == keyboard::SpecialKey::Down)
       {
         if (m_player.show_inventory)
         {
@@ -530,7 +533,7 @@ namespace dung
         else if (is_inside_curr_bb(curr_pos.r + 1, curr_pos.c))
           curr_pos.r++;
       }
-      else if (str::to_lower(kpd.curr_key) == 'w' || kpd.curr_special_key == keyboard::SpecialKey::Up)
+      else if (str::to_lower(curr_key) == 'w' || curr_special_key == keyboard::SpecialKey::Up)
       {
         if (m_player.show_inventory)
         {
@@ -541,7 +544,7 @@ namespace dung
         else if (is_inside_curr_bb(curr_pos.r - 1, curr_pos.c))
           curr_pos.r--;
       }
-      else if (kpd.curr_key == ' ')
+      else if (curr_key == ' ')
       {
         if (m_player.show_inventory)
         {
@@ -699,16 +702,16 @@ namespace dung
           }
         }
       }
-      else if (kpd.curr_key == '-')
+      else if (curr_key == '-')
       {
         math::toggle(m_player.show_inventory);
       }
-      else if (kpd.curr_key == '+')
+      else if (curr_key == '+')
       {
         for (auto& npc : all_npcs)
           math::toggle(npc.debug);
       }
-      else if (str::to_lower(kpd.curr_key) == 'i')
+      else if (str::to_lower(curr_key) == 'i')
       {
         static const float c_search_radius = 2.83;
         for (const auto& key : all_keys)
@@ -742,7 +745,7 @@ namespace dung
                                          "You can see a " + race2str(npc.npc_race) + " nearby!", MessageHandler::Level::Guide);
         }
       }
-      else if (str::to_lower(kpd.curr_key) == 'c')
+      else if (str::to_lower(curr_key) == 'c')
       {
         auto* potion = m_player.get_selected_potion(all_potions);
         if (potion != nullptr)
@@ -1243,7 +1246,7 @@ namespace dung
       // NPCs
       for (auto& npc : all_npcs)
         npc.update(curr_pos, sim_dt_s);
-        
+      
       // Fighting
       for (auto& npc : all_npcs)
       {
