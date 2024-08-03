@@ -92,7 +92,8 @@ namespace dung
     
     bool enemy = true;
     
-    int health = 100;
+    const int max_health = 1000;
+    int health = max_health;
     int strength = 10;
     int dexterity = 10;
     int constitution = 10;
@@ -643,6 +644,24 @@ namespace dung
           }
       }
     }
+    
+    int calc_armour_class() const
+    {
+        return armor_class + (dexterity / 2);
+    }
+    
+    // Function to calculate melee attack bonus
+    int get_melee_attack_bonus() const
+    {
+        return strength / 2; // Example: Strength bonus to attack rolls
+    }
+
+    // Function to calculate melee damage bonus
+    int get_melee_damage_bonus() const
+    {
+        return strength / 2; // Example: Strength bonus to damage
+    }
+
   };
   
 }

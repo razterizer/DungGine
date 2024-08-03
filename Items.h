@@ -106,7 +106,7 @@ namespace dung
   {
     Flail()
     {
-      character = '#';
+      character = 'J';
       style.fg_color = Color::DarkGray;
       weight = 2.f;
       price = math::roundI(20*rnd::randn_clamp(1e3f, 500.f, 0.f, 5e5f))/20.f;
@@ -114,6 +114,8 @@ namespace dung
       damage = rnd::randn_clamp_int(5.f, 10.f, 3, 30);
     }
   };
+  
+  // MorningStar
   
   struct Potion : Item
   {
@@ -124,7 +126,9 @@ namespace dung
     {
       character = rnd::rand_select<char>({ 'u', 'U', 'b' });
       style.fg_color = color::get_random_color(potion_fg_palette);
-      health = rnd::randn_clamp_int(5.f, 10.f, 0, 100);
+      weight = 0.08f;
+      price = math::roundI(20*rnd::randn_clamp(1e3f, 500.f, 0.f, 5e5f))/20.f;
+      health = rnd::randn_clamp_int(5.f, 10.f, 0, 300); // #FIXME: Use global value for max_health = 300.
       poison = rnd::one_in(50);
     }
     
@@ -134,4 +138,96 @@ namespace dung
     }
   };
   
+  struct Armour : Item
+  {
+    int protection = 1;
+    std::string type;
+  };
+  
+  struct Shield : Armour
+  {
+    Shield()
+    {
+      character = 'D';
+      style.fg_color = Color::LightGray;
+      type = "shield";
+      weight = 5.f;
+      price = math::roundI(20*rnd::randn_clamp(1e3f, 500.f, 0.f, 5e4f))/20.f;
+      protection = rnd::randn_clamp_int(2.f, 15.f, 0, 50);
+    }
+  };
+  
+  struct Gambeson : Armour
+  {
+    Gambeson()
+    {
+      character = 'H';
+      style.fg_color = Color::White;
+      type = "gambeson";
+      weight = 1.5f;
+      price = math::roundI(20*rnd::randn_clamp(5e2f, 200.f, 0.f, 5e3f))/20.f;
+      protection = rnd::randn_clamp_int(0.5f, 12.f, 0, 10);
+    }
+  };
+  
+  struct ChainMailleHauberk : Armour
+  {
+    ChainMailleHauberk()
+    {
+      character = '#';
+      style.fg_color = Color::LightGray;
+      type = "chain maille hauberk";
+      weight = 4.f;
+      protection = rnd::randn_clamp_int(5.f, 18.f, 0, 40);
+    }
+  };
+  
+  struct PlatedBodyArmour : Armour
+  {
+    PlatedBodyArmour()
+    {
+      character = 'M';
+      style.fg_color = Color::LightGray;
+      type = "plated body armour";
+      weight = 10.f;
+      price = math::roundI(20*rnd::randn_clamp(2e4f, 5000.f, 0.f, 1e6f))/20.f;
+      protection = rnd::randn_clamp_int(10.f, 20.f, 0, 100);
+    }
+  };
+  
+  struct PaddedCoif : Armour
+  {
+    PaddedCoif()
+    {
+      character = 'C';
+      style.fg_color = Color::White;
+      type = "padded coif";
+      weight = 0.1f;
+      protection = rnd::randn_clamp_int(0.5f, 12.f, 0, 10);
+    }
+  };
+  
+  struct ChainMailleCoif : Armour
+  {
+    ChainMailleCoif()
+    {
+      character = '2';
+      style.fg_color = Color::LightGray;
+      type = "chain maille coif";
+      weight = 0.7f;
+      protection = rnd::randn_clamp_int(5.f, 18.f, 0, 40);
+    }
+  };
+  
+  struct Helmet : Armour
+  {
+    Helmet()
+    {
+      character = 'Q';
+      style.fg_color = Color::LightGray;
+      type = "helmet";
+      weight = 1.3f;
+      protection = rnd::randn_clamp_int(10.f, 20.f, 0, 100);
+    }
+  };
 }

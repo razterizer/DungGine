@@ -21,21 +21,49 @@ namespace dung
     BSPNode* curr_room = nullptr;
     Corridor* curr_corridor = nullptr;
     
-    int health = 100;
+    const int max_health = 1000;
+    int health = max_health;
+    int base_ac = 10;
+    int thac0 = 1;
+    int strength = 10;
+    int dexterity = 10;
+    int constitution = 10;
     
     std::vector<int> key_idcs;
     std::vector<int> lamp_idcs;
     std::vector<int> weapon_idcs;
     std::vector<int> potion_idcs;
+    std::vector<int> armour_idcs;
     int inv_hilite_idx = 0;
     std::vector<int> inv_select_idcs;
     int inv_select_idx_key = -1;
     int inv_select_idx_lamp = -1;
     int inv_select_idx_weapon = -1;
     int inv_select_idx_potion = -1;
+    int inv_select_idx_armour = -1;
     bool show_inventory = false;
     RC line_of_sight;
     float weight_capacity = 50.f;
+    
+    int calc_armour_class(const std::vector<std::unique_ptr<Armour>>& all_armour) const
+    {
+      int tot_protection = 0;
+      for (const auto& a_idx : armour_idcs)
+        tot_protection += all_armour[a_idx]->protection;
+      return base_ac + tot_protection + (dexterity / 2); // Example: Include dexterity bonus
+    }
+    
+    // Function to calculate melee attack bonus
+    int get_melee_attack_bonus() const
+    {
+        return strength / 2; // Example: Strength bonus to attack rolls
+    }
+
+    // Function to calculate melee damage bonus
+    int get_melee_damage_bonus() const
+    {
+        return strength / 2; // Example: Strength bonus to damage
+    }
     
     bool using_key_id(const std::vector<Key>& all_keys, int key_id) const
     {
@@ -99,9 +127,16 @@ namespace dung
       return nullptr;
     }
     
+    const Armour* get_selected_armour(const std::vector<std::unique_ptr<Armour>>& all_armour)
+    {
+     if (in_armour_range(inv_select_idx_armour))
+        return all_armour[armour_idcs[inv_select_idx_armour - start_inv_idx_armour()]].get();
+      return nullptr;
+    }
+    
     int num_items() const
     {
-      return static_cast<int>(key_idcs.size() + lamp_idcs.size() + weapon_idcs.size() + potion_idcs.size());
+      return static_cast<int>(key_idcs.size() + lamp_idcs.size() + weapon_idcs.size() + potion_idcs.size() + armour_idcs.size());
     }
     
     int last_item_idx() const
@@ -121,7 +156,7 @@ namespace dung
     
     int start_inv_idx_lamps() const
     {
-      return static_cast<int>(key_idcs.size());
+      return start_inv_idx_keys() + static_cast<int>(key_idcs.size());
     }
     
     int end_inv_idx_lamps() const
@@ -131,7 +166,7 @@ namespace dung
     
     int start_inv_idx_weapons() const
     {
-      return static_cast<int>(key_idcs.size() + lamp_idcs.size());
+      return start_inv_idx_lamps() + static_cast<int>(lamp_idcs.size());
     }
     
     int end_inv_idx_weapons() const
@@ -141,10 +176,20 @@ namespace dung
     
     int start_inv_idx_potions() const
     {
-      return static_cast<int>(key_idcs.size() + lamp_idcs.size() + weapon_idcs.size());
+      return start_inv_idx_weapons() + static_cast<int>(weapon_idcs.size());
     }
     
     int end_inv_idx_potions() const
+    {
+      return start_inv_idx_armour() - 1;
+    }
+    
+    int start_inv_idx_armour() const
+    {
+      return start_inv_idx_potions() + static_cast<int>(potion_idcs.size());
+    }
+    
+    int end_inv_idx_armour() const
     {
       return num_items() - 1;
     }
@@ -167,6 +212,11 @@ namespace dung
     bool in_potions_range(int idx) const
     {
       return math::in_range<int>(idx, start_inv_idx_potions(), end_inv_idx_potions(), Range::Closed);
+    }
+    
+    bool in_armour_range(int idx) const
+    {
+      return math::in_range<int>(idx, start_inv_idx_armour(), end_inv_idx_armour(), Range::Closed);
     }
     
     bool is_inside_curr_room() const

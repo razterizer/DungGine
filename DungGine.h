@@ -81,6 +81,7 @@ namespace dung
     std::vector<Lamp> all_lamps;
     std::vector<std::unique_ptr<Weapon>> all_weapons;
     std::vector<Potion> all_potions;
+    std::vector<std::unique_ptr<Armour>> all_armour;
     
     std::unique_ptr<MessageHandler> message_handler;
     bool use_fog_of_war = false;
@@ -166,6 +167,7 @@ namespace dung
       auto num_inv_lamps = static_cast<int>(m_player.lamp_idcs.size());
       auto num_inv_wpns = static_cast<int>(m_player.weapon_idcs.size());
       auto num_inv_potions = static_cast<int>(m_player.potion_idcs.size());
+      auto num_inv_armour = static_cast<int>(m_player.armour_idcs.size());
       
       auto f_format_item_str = [](std::string& item_str, float weight, float price, int hp)
       {
@@ -237,6 +239,34 @@ namespace dung
         f_format_item_str(item_str, potion.weight, potion.price, 0);
         items.emplace_back(std::make_pair(item_str, true));
       }
+      items.emplace_back(std::make_pair("", false));
+      items.emplace_back(std::make_pair("Armour:", false));
+      for (int inv_a_idx = 0; inv_a_idx < num_inv_armour; ++inv_a_idx)
+      {
+        auto a_idx = m_player.armour_idcs[inv_a_idx];
+        const auto& armour = all_armour[a_idx];
+        std::string item_str = "  ";
+        if (dynamic_cast<Shield*>(armour.get()) != nullptr)
+          item_str += "Shield:";
+        else if (dynamic_cast<Gambeson*>(armour.get()) != nullptr)
+          item_str += "Gambeson:";
+        else if (dynamic_cast<ChainMailleHauberk*>(armour.get()) != nullptr)
+          item_str += "C.M. Hauberk:";
+        else if (dynamic_cast<PlatedBodyArmour*>(armour.get()) != nullptr)
+          item_str += "P. Body Armour:";
+        else if (dynamic_cast<PaddedCoif*>(armour.get()) != nullptr)
+          item_str += "Padded Coif:";
+        else if (dynamic_cast<ChainMailleCoif*>(armour.get()) != nullptr)
+          item_str += "C.M. Coif:";
+        else if (dynamic_cast<Helmet*>(armour.get()) != nullptr)
+          item_str += "Helmet:";
+        else
+          item_str += "<Armour>";
+        item_str += ":";
+        item_str += std::to_string(a_idx);
+        f_format_item_str(item_str, armour->weight, armour->price, armour->protection);
+        items.emplace_back(std::make_pair(item_str, true));
+      }
       
       auto num_items = static_cast<int>(items.size());
       int num_non_items = 0;
@@ -289,6 +319,9 @@ namespace dung
         
       for (auto& potion : all_potions)
         *get_field_ptr(&potion) = clear_val;
+      
+      for (auto& armour : all_armour)
+        *get_field_ptr(armour.get()) = clear_val;
         
       //for (auto& npc : all_npcs)
       //  *get_field_ptr(&npc) = clear_val;
@@ -340,6 +373,10 @@ namespace dung
       for (auto& potion : all_potions)
         if (distance(potion.pos, curr_pos) <= c_fow_dist)
           *get_field_ptr(&potion) = set_val;
+          
+      for (auto& armour : all_armour)
+        if (distance(armour->pos, curr_pos) <= c_fow_dist)
+          *get_field_ptr(armour.get()) = set_val;
       
       //for (auto& npc : all_npcs)
       //  if (distance(npc.pos, curr_pos) <= c_fow_dist)
@@ -511,6 +548,15 @@ namespace dung
             stlutils::erase(m_player.inv_select_idcs, m_player.inv_select_idx_potion);
             m_player.inv_select_idx_potion = -1;
           }
+          else if (m_player.in_armour_range(m_player.inv_select_idx_armour))
+          {
+            auto a_idx = m_player.armour_idcs[m_player.inv_select_idx_armour - m_player.start_inv_idx_armour()];
+            auto& armour = *all_armour[a_idx];
+            f_drop_item(armour, a_idx, m_player.armour_idcs);
+            msg += armour.type +":" + std::to_string(a_idx) + "!";
+            stlutils::erase(m_player.inv_select_idcs, m_player.inv_select_idx_armour);
+            m_player.inv_select_idx_armour = -1;
+          }
           else
           {
             msg += "Invalid Item!";
@@ -640,6 +686,8 @@ namespace dung
                 m_player.inv_select_idx_weapon++;
               if (m_player.inv_select_idx_potion != -1)
                 m_player.inv_select_idx_potion++;
+              if (m_player.inv_select_idx_armour != -1)
+                m_player.inv_select_idx_armour++;
               if (m_player.start_inv_idx_lamps() <= m_player.inv_hilite_idx)
                 m_player.inv_hilite_idx++;
                 
@@ -661,6 +709,8 @@ namespace dung
                 m_player.inv_select_idx_weapon++;
               if (m_player.inv_select_idx_potion != -1)
                 m_player.inv_select_idx_potion++;
+              if (m_player.inv_select_idx_armour != -1)
+                m_player.inv_select_idx_armour++;
               if (m_player.start_inv_idx_weapons() <= m_player.inv_hilite_idx)
                 m_player.inv_hilite_idx++;
                 
@@ -680,6 +730,8 @@ namespace dung
                   sel_idx++;
               if (m_player.inv_select_idx_potion != -1)
                 m_player.inv_select_idx_potion++;
+              if (m_player.inv_select_idx_armour != -1)
+                m_player.inv_select_idx_armour++;
               if (m_player.start_inv_idx_potions() <= m_player.inv_hilite_idx)
                 m_player.inv_hilite_idx++;
                 
@@ -694,10 +746,28 @@ namespace dung
             auto& potion = all_potions[pot_idx];
             if (potion.pos == curr_pos && !potion.picked_up)
             {
+              for (int& sel_idx : m_player.inv_select_idcs)
+                if (m_player.start_inv_idx_armour() <= sel_idx)
+                  sel_idx++;
+              if (m_player.inv_select_idx_armour != -1)
+                m_player.inv_select_idx_armour++;
+              if (m_player.start_inv_idx_armour() <= m_player.inv_hilite_idx)
+                m_player.inv_hilite_idx++;
               m_player.potion_idcs.emplace_back(pot_idx);
               potion.picked_up = true;
               message_handler->add_message(static_cast<float>(real_time_s),
                                            "You picked up a potion!", MessageHandler::Level::Guide);
+            }
+          }
+          for (size_t a_idx = 0; a_idx < all_armour.size(); ++a_idx)
+          {
+            auto& armour = all_armour[a_idx];
+            if (armour->pos == curr_pos && !armour->picked_up)
+            {
+              m_player.armour_idcs.emplace_back(a_idx);
+              armour->picked_up = true;
+              message_handler->add_message(static_cast<float>(real_time_s),
+                                           "You picked up a " + armour->type + "!", MessageHandler::Level::Guide);
             }
           }
         }
@@ -738,6 +808,12 @@ namespace dung
             message_handler->add_message(static_cast<float>(real_time_s),
                                          "You can see a potion nearby!", MessageHandler::Level::Guide);
         }
+        for (const auto& armour : all_armour)
+        {
+          if (armour->visible && distance(armour->pos, curr_pos) <= c_search_radius)
+            message_handler->add_message(static_cast<float>(real_time_s),
+                                         "You can see a " + armour->type + " nearby!", MessageHandler::Level::Guide);
+        }
         for (const auto& npc : all_npcs)
         {
           if (npc.visible && distance(npc.pos, curr_pos) <= c_search_radius)
@@ -751,8 +827,8 @@ namespace dung
         if (potion != nullptr)
         {
           auto hp = potion->get_hp();
-          if (m_player.health + hp > 100)
-            hp = 100 - m_player.health;
+          if (m_player.health + hp > m_player.max_health)
+            hp = m_player.max_health - m_player.health;
           m_player.health += hp;
           
           m_player.remove_selected_potion(all_potions);
@@ -771,7 +847,7 @@ namespace dung
                                            "You drank a potion, but nothing appeared to happen.",
                                            MessageHandler::Level::Guide);
             case +1:
-              if (m_player.health == 100)
+              if (m_player.health == m_player.max_health)
                 message_handler->add_message(static_cast<float>(real_time_s),
                                              "Your health is now fully restored.",
                                              MessageHandler::Level::Guide);
@@ -825,6 +901,9 @@ namespace dung
       for (auto& potion : all_potions)
         potion.set_visibility(use_fog_of_war, f_calc_night(potion));
         
+      for (auto& armour : all_armour)
+        armour->set_visibility(use_fog_of_war, f_calc_night(*armour));
+        
       for (auto& npc : all_npcs)
         npc.set_visibility(use_fog_of_war, f_calc_night(npc));
     }
@@ -835,8 +914,9 @@ namespace dung
       std::vector<std::string> health_bars;
       std::vector<Style> styles;
       std::string pc_hb = str::rep_char(' ', 10);
+      float pc_ratio = m_player.max_health / 10;
       for (int i = 0; i < 10; ++i)
-        pc_hb[i] = m_player.health > i*10 ? '#' : ' ';
+        pc_hb[i] = m_player.health > static_cast<int>(i*pc_ratio) ? '#' : ' ';
       health_bars.emplace_back(pc_hb);
       styles.emplace_back(Style { Color::Cyan, Color::Transparent2 });
       
@@ -845,8 +925,9 @@ namespace dung
         if (npc.health > 0 && npc.state == State::Fight)
         {
           std::string npc_hb = str::rep_char(' ', 10);
+          float npc_ratio = npc.max_health / 10;
           for (int i = 0; i < 10; ++i)
-            npc_hb[i] = npc.health > i*10 ? 'O' : ' ';
+            npc_hb[i] = npc.health > static_cast<int>(i*npc_ratio) ? 'O' : ' ';
           health_bars.emplace_back(npc_hb);
           styles.emplace_back(Style { Color::Red, Color::Transparent2 });
         }
@@ -1152,6 +1233,50 @@ namespace dung
       return true;
     }
     
+    bool place_armour(int num_armour)
+    {
+      const auto world_size = m_bsp_tree->get_world_size();
+      const int c_max_num_iters = 1e5;
+      int num_iters = 0;
+      for (int a_idx = 0; a_idx < num_armour; ++a_idx)
+      {
+        std::unique_ptr<Armour> armour;
+        switch (rnd::rand_int(0, 6))
+        {
+          case 0: armour = std::make_unique<Shield>(); break;
+          case 1: armour = std::make_unique<Gambeson>(); break;
+          case 2: armour = std::make_unique<ChainMailleHauberk>(); break;
+          case 3: armour = std::make_unique<PlatedBodyArmour>(); break;
+          case 4: armour = std::make_unique<PaddedCoif>(); break;
+          case 5: armour = std::make_unique<ChainMailleCoif>(); break;
+          case 6: armour = std::make_unique<Helmet>(); break;
+          // Error:
+          default: return false;
+        }
+        do
+        {
+          armour->pos =
+          {
+            rnd::rand_int(0, world_size.r),
+            rnd::rand_int(0, world_size.c)
+          };
+        } while (num_iters++ < c_max_num_iters && !is_inside_any_room(armour->pos));
+        
+        BSPNode* leaf = nullptr;
+        if (!is_inside_any_room(armour->pos, &leaf))
+          return false;
+          
+        if (leaf != nullptr)
+        {
+          armour->curr_room = leaf;
+          armour->is_underground = is_underground(leaf);
+        }
+        
+        all_armour.emplace_back(armour.release());
+      }
+      return true;
+    }
+    
     bool place_npcs(int num_npcs)
     {
       const auto world_size = m_bsp_tree->get_world_size();
@@ -1252,30 +1377,54 @@ namespace dung
       {
         if (npc.health > 0 && npc.state == State::Fight)
         {
-          auto f_calc_damage = [](const Weapon* weapon)
+          auto f_calc_damage = [](const Weapon* weapon, int bonus)
           {
             if (weapon == nullptr)
-              return 1; // Fists.
-            return weapon->damage;
+              return 1 + bonus; // Fists with strength bonus
+            return weapon->damage + bonus;
           };
-          int rolled_dice_20 = rnd::dice(20);
-          if (rolled_dice_20 == 1)
+          
+          // NPC attack roll
+          int npc_attack_roll = rnd::dice(20) + npc.thac0 + npc.get_melee_attack_bonus();
+          
+          // Calculate the player's total armor class
+          int player_ac = m_player.calc_armour_class(all_armour);
+          
+          // Determine if NPC hits the player
+          // e.g. d12 + 1 + (2 + 10/2) >= (10 + 10/2)
+          // d12 + 8 >= 15
+          if (npc_attack_roll >= player_ac)
           {
-            int damage = 1; // Fists.
+            // NPC hits the player
+            int damage = 1; // Default damage for fists
             if (npc.weapon_idx != -1)
-              damage = f_calc_damage(all_weapons[npc.weapon_idx].get());
+              damage = f_calc_damage(all_weapons[npc.weapon_idx].get(), npc.get_melee_damage_bonus());
+            
+            // Apply damage to the player
             m_player.health -= damage;
           }
-          else if (rolled_dice_20 == 5 && npc.visible)
+          
+          // Roll a d20 for the player's attack roll (if the NPC is visible)
+          if (npc.visible)
           {
             const auto* weapon = m_player.get_selected_weapon(all_weapons);
-            int damage = f_calc_damage(weapon);
-            npc.health -= damage;
+            int player_attack_roll = rnd::dice(20) + m_player.thac0 + m_player.get_melee_attack_bonus();
+            int npc_ac = npc.calc_armour_class();
+            
+            // Determine if player hits the NPC
+            if (player_attack_roll >= npc_ac)
+            {
+              // Player hits the NPC
+              int damage = f_calc_damage(weapon, m_player.get_melee_damage_bonus());
+              
+              // Apply damage to the NPC
+              npc.health -= damage;
+            }
           }
         }
       }
-      
-      // Scrolling mode.
+        
+        // Scrolling mode.
       switch (scr_scrolling_mode)
       {
         case ScreenScrollingMode::AlwaysInCentre:
@@ -1534,6 +1683,9 @@ namespace dung
         
       for (const auto& potion : all_potions)
         f_render_item(potion);
+        
+      for (const auto& armour : all_armour)
+        f_render_item(*armour);
       
       auto shadow_type = m_sun_dir;
       for (const auto& room_pair : m_room_styles)
