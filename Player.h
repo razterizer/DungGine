@@ -34,8 +34,8 @@ namespace dung
     std::vector<int> weapon_idcs;
     std::vector<int> potion_idcs;
     std::vector<int> armour_idcs;
-    int inv_hilite_idx = 0;
-    std::vector<int> inv_select_idcs;
+    int inv_hilite_idx = 0; // index over over key_idcs through armour_idcs.
+    std::vector<int> inv_select_idcs; // indices over key_idcs through armour_idcs.
     int inv_select_idx_key = -1;
     int inv_select_idx_lamp = -1;
     int inv_select_idx_weapon = -1;
