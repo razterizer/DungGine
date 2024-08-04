@@ -6,12 +6,6 @@
 //
 
 #include <Termin8or/GameEngine.h>
-#include <Termin8or/Screen.h>
-#include <Termin8or/Drawing.h>
-#include <Core/Rand.h>
-#include <Termin8or/RC.h>
-#include <Termin8or/ASCII_Fonts.h>
-#include <Core/Delay.h>
 #include <DungGine/BSPTree.h>
 #include <DungGine/DungGine.h>
 
@@ -26,23 +20,10 @@ class Game : public GameEngine<>
 public:
   Game(int argc, char** argv, const GameEngineParams& params)
     : GameEngine(argv[0], params)
-  {
-    if (argc >= 2)
-      text = argv[1];
-  }
+  {}
   
   virtual void generate_data() override
   {
-    font_data_path = ASCII_Fonts::get_path_to_font_data(get_exe_folder());
-    std::cout << font_data_path << std::endl;
-    
-    color_schemes.emplace_back();
-    auto& cs = color_schemes.emplace_back();
-    cs.internal.bg_color = Color::DarkCyan;
-    cs.side_h.bg_color = Color::DarkBlue;
-    
-    font_data = ASCII_Fonts::load_font_data(font_data_path);
-    
     // /////////
     if (test_type == TestType::DungeonSimple)
     {
@@ -150,14 +131,6 @@ private:
   virtual void draw_instructions() override
   {
   }
-  
-  std::string text;
-  
-  std::vector<ASCII_Fonts::ColorScheme> color_schemes;
-  
-  std::string font_data_path;
-  
-  ASCII_Fonts::FontDataColl font_data;
   
   dung::BSPTree bsp_tree { 4 };
   
