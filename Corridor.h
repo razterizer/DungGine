@@ -8,6 +8,8 @@
 #pragma once
 #include "Orientation.h"
 #include <Core/Utils.h>
+#include <Termin8or/Rectangle.h>
+#include <Core/bool_vector.h>
 
 
 namespace dung
