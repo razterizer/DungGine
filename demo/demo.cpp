@@ -81,7 +81,7 @@ public:
       //sh.print_screen_buffer(t, bg_color);
 
 #if 1
-      dungeon_engine = std::make_unique<dung::DungGine>(get_exe_folder(), true);
+      dungeon_engine = std::make_unique<dung::DungGine>(get_exe_folder(), false);
       dungeon_engine->load_dungeon(&bsp_tree);
       dungeon_engine->style_dungeon();
       if (!dungeon_engine->place_player(sh.size()))
