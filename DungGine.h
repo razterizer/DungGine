@@ -1355,7 +1355,7 @@ namespace dung
       {
         update_field(curr_pos,
                      [](auto obj) { return &obj->light; },
-                     true, 3.f);
+                     true, 2.5f);
       }
       
       // Update current room and current corridor.
