@@ -15,6 +15,8 @@
 namespace dung
 {
 
+  struct Door;
+
   struct Corridor
   {
     ttl::Rectangle bb;
