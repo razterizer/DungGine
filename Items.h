@@ -6,6 +6,7 @@
 //
 
 #pragma once
+#include "Globals.h"
 
 namespace dung
 {
@@ -128,7 +129,7 @@ namespace dung
       style.fg_color = color::get_random_color(potion_fg_palette);
       weight = 0.08f;
       price = math::roundI(20*rnd::randn_clamp(1e3f, 500.f, 0.f, 5e5f))/20.f;
-      health = rnd::randn_clamp_int(5.f, 10.f, 0, 300); // #FIXME: Use global value for max_health = 300.
+      health = math::roundI(rnd::randn_clamp(.05f, 0.1f, 0, 1.f)*globals::max_health);
       poison = rnd::one_in(50);
     }
     

@@ -7,6 +7,7 @@
 
 #pragma once
 #include <Core/StlUtils.h>
+#include "Globals.h"
 
 
 namespace dung
@@ -21,8 +22,7 @@ namespace dung
     BSPNode* curr_room = nullptr;
     Corridor* curr_corridor = nullptr;
     
-    const int max_health = 1000;
-    int health = max_health;
+    int health = globals::max_health;
     int base_ac = 10;
     int thac0 = 1;
     int strength = 10;

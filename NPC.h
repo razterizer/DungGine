@@ -7,6 +7,7 @@
 
 #pragma once
 #include "Items.h"
+#include "Globals.h"
 #include <Core/OneShot.h>
 
 
@@ -92,8 +93,7 @@ namespace dung
     
     bool enemy = true;
     
-    const int max_health = 1000;
-    int health = max_health;
+    int health = globals::max_health;
     int strength = 10;
     int dexterity = 10;
     int constitution = 10;

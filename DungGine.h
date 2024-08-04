@@ -13,6 +13,7 @@
 #include "Player.h"
 #include "NPC.h"
 #include "SolarMotionPatterns.h"
+#include "Globals.h"
 #include <Termin8or/Keyboard.h>
 #include <Termin8or/MessageHandler.h>
 
@@ -831,8 +832,8 @@ namespace dung
         if (potion != nullptr)
         {
           auto hp = potion->get_hp();
-          if (m_player.health + hp > m_player.max_health)
-            hp = m_player.max_health - m_player.health;
+          if (m_player.health + hp > globals::max_health)
+            hp = globals::max_health - m_player.health;
           m_player.health += hp;
           
           m_player.remove_selected_potion(all_potions);
@@ -851,7 +852,7 @@ namespace dung
                                            "You drank a potion, but nothing appeared to happen.",
                                            MessageHandler::Level::Guide);
             case +1:
-              if (m_player.health == m_player.max_health)
+              if (m_player.health == globals::max_health)
                 message_handler->add_message(static_cast<float>(real_time_s),
                                              "Your health is now fully restored.",
                                              MessageHandler::Level::Guide);
@@ -918,7 +919,7 @@ namespace dung
       std::vector<std::string> health_bars;
       std::vector<Style> styles;
       std::string pc_hb = str::rep_char(' ', 10);
-      float pc_ratio = m_player.max_health / 10;
+      float pc_ratio = globals::max_health / 10;
       for (int i = 0; i < 10; ++i)
         pc_hb[i] = m_player.health > static_cast<int>(i*pc_ratio) ? '#' : ' ';
       health_bars.emplace_back(pc_hb);
@@ -929,7 +930,7 @@ namespace dung
         if (npc.health > 0 && npc.state == State::Fight)
         {
           std::string npc_hb = str::rep_char(' ', 10);
-          float npc_ratio = npc.max_health / 10;
+          float npc_ratio = globals::max_health / 10;
           for (int i = 0; i < 10; ++i)
             npc_hb[i] = npc.health > static_cast<int>(i*npc_ratio) ? 'O' : ' ';
           health_bars.emplace_back(npc_hb);

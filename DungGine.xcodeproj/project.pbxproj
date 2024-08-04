@@ -15,6 +15,7 @@
 		07C2A7872C2A28C400869A56 /* Door.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Door.h; sourceTree = "<group>"; };
 		07C2A7882C2A297800869A56 /* Corridor.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Corridor.h; sourceTree = "<group>"; };
 		07C2A7892C2A29CF00869A56 /* Orientation.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Orientation.h; sourceTree = "<group>"; };
+		07D769A62C5FFF3B00BCA669 /* Globals.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Globals.h; sourceTree = "<group>"; };
 		07E6EAC32C14CEA8007BBC6B /* libDungGine.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libDungGine.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		07E6EACA2C14CFD3007BBC6B /* BSPTree.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BSPTree.h; sourceTree = "<group>"; };
 		07E6EACC2C150C23007BBC6B /* LICENSE */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
@@ -50,6 +51,7 @@
 				07C2A7872C2A28C400869A56 /* Door.h */,
 				07C2A7882C2A297800869A56 /* Corridor.h */,
 				071942492C458746008BD519 /* SolarMotionPatterns.h */,
+				07D769A62C5FFF3B00BCA669 /* Globals.h */,
 				07E6EAC42C14CEA8007BBC6B /* Products */,
 			);
 			sourceTree = "<group>";
