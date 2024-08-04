@@ -16,6 +16,7 @@
 #include "Globals.h"
 #include <Termin8or/Keyboard.h>
 #include <Termin8or/MessageHandler.h>
+#include <Core/FolderHelper.h>
 
 
 namespace dung
