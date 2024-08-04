@@ -1351,7 +1351,7 @@ namespace dung
       // Light
       auto* lamp = m_player.get_selected_lamp(all_lamps);
       clear_field([](auto obj) { return &obj->light; }, false);
-      if (lamp != nullptr && lamp->type == LampType::Isotropic)
+      if (lamp != nullptr && lamp->type == Lamp::LampType::Isotropic)
       {
         update_field(curr_pos,
                      [](auto obj) { return &obj->light; },
