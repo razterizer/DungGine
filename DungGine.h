@@ -359,25 +359,27 @@ namespace dung
     {
       const auto c_fow_dist = radius; //2.3f;
       
+      auto f_set_item_field = [&](auto& obj)
+      {
+        if (m_player.curr_room == obj.curr_room || m_player.curr_corridor == obj.curr_corridor)
+          if (distance(obj.pos, curr_pos) <= c_fow_dist)
+            *get_field_ptr(&obj) = set_val;
+      };
+      
       for (auto& key : all_keys)
-        if (distance(key.pos, curr_pos) <= c_fow_dist)
-          *get_field_ptr(&key) = set_val;
+        f_set_item_field(key);
           
       for (auto& lamp : all_lamps)
-        if (distance(lamp.pos, curr_pos) <= c_fow_dist)
-          *get_field_ptr(&lamp) = set_val;
+        f_set_item_field(lamp);
           
       for (auto& weapon : all_weapons)
-        if (distance(weapon->pos, curr_pos) <= c_fow_dist)
-          *get_field_ptr(weapon.get()) = set_val;
+        f_set_item_field(*weapon);
           
       for (auto& potion : all_potions)
-        if (distance(potion.pos, curr_pos) <= c_fow_dist)
-          *get_field_ptr(&potion) = set_val;
+        f_set_item_field(potion);
           
       for (auto& armour : all_armour)
-        if (distance(armour->pos, curr_pos) <= c_fow_dist)
-          *get_field_ptr(armour.get()) = set_val;
+        f_set_item_field(*armour);
       
       //for (auto& npc : all_npcs)
       //  if (distance(npc.pos, curr_pos) <= c_fow_dist)
