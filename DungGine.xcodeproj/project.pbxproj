@@ -6,6 +6,10 @@
 	objectVersion = 56;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		07D769AA2C603CC300BCA669 /* demo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07D769A82C603CC300BCA669 /* demo.cpp */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		071942492C458746008BD519 /* SolarMotionPatterns.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SolarMotionPatterns.h; sourceTree = "<group>"; };
 		0719424A2C49D65F008BD519 /* NPC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NPC.h; sourceTree = "<group>"; };
@@ -16,6 +20,12 @@
 		07C2A7882C2A297800869A56 /* Corridor.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Corridor.h; sourceTree = "<group>"; };
 		07C2A7892C2A29CF00869A56 /* Orientation.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Orientation.h; sourceTree = "<group>"; };
 		07D769A62C5FFF3B00BCA669 /* Globals.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Globals.h; sourceTree = "<group>"; };
+		07D769A82C603CC300BCA669 /* demo.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = demo.cpp; sourceTree = "<group>"; };
+		07D769AC2C6044E000BCA669 /* build_demo.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = build_demo.sh; sourceTree = "<group>"; };
+		07D769AE2C6044FC00BCA669 /* texture_sl_shadow_0.tex */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = texture_sl_shadow_0.tex; path = textures/texture_sl_shadow_0.tex; sourceTree = "<group>"; };
+		07D769AF2C6044FC00BCA669 /* texture_sl_shadow_1.tex */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = texture_sl_shadow_1.tex; path = textures/texture_sl_shadow_1.tex; sourceTree = "<group>"; };
+		07D769B02C6044FC00BCA669 /* texture_sl_fill_0.tex */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = texture_sl_fill_0.tex; path = textures/texture_sl_fill_0.tex; sourceTree = "<group>"; };
+		07D769B12C6044FC00BCA669 /* texture_sl_fill_1.tex */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = texture_sl_fill_1.tex; path = textures/texture_sl_fill_1.tex; sourceTree = "<group>"; };
 		07E6EAC32C14CEA8007BBC6B /* libDungGine.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libDungGine.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		07E6EACA2C14CFD3007BBC6B /* BSPTree.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BSPTree.h; sourceTree = "<group>"; };
 		07E6EACC2C150C23007BBC6B /* LICENSE */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
@@ -35,9 +45,31 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		07D769A72C603C9800BCA669 /* demo */ = {
+			isa = PBXGroup;
+			children = (
+				07D769AD2C6044E800BCA669 /* textures */,
+				07D769AC2C6044E000BCA669 /* build_demo.sh */,
+				07D769A82C603CC300BCA669 /* demo.cpp */,
+			);
+			path = demo;
+			sourceTree = "<group>";
+		};
+		07D769AD2C6044E800BCA669 /* textures */ = {
+			isa = PBXGroup;
+			children = (
+				07D769B02C6044FC00BCA669 /* texture_sl_fill_0.tex */,
+				07D769B12C6044FC00BCA669 /* texture_sl_fill_1.tex */,
+				07D769AE2C6044FC00BCA669 /* texture_sl_shadow_0.tex */,
+				07D769AF2C6044FC00BCA669 /* texture_sl_shadow_1.tex */,
+			);
+			name = textures;
+			sourceTree = "<group>";
+		};
 		07E6EABA2C14CEA8007BBC6B = {
 			isa = PBXGroup;
 			children = (
+				07D769A72C603C9800BCA669 /* demo */,
 				07E6EACC2C150C23007BBC6B /* LICENSE */,
 				07E6EACD2C150C23007BBC6B /* README.md */,
 				07C2A7892C2A29CF00869A56 /* Orientation.h */,
@@ -131,6 +163,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				07D769AA2C603CC300BCA669 /* demo.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -258,6 +291,10 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = HFL2Q84SZB;
 				EXECUTABLE_PREFIX = lib;
+				HEADER_SEARCH_PATHS = (
+					../../../lib,
+					../../lib,
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 			};
@@ -269,6 +306,10 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = HFL2Q84SZB;
 				EXECUTABLE_PREFIX = lib;
+				HEADER_SEARCH_PATHS = (
+					../../../lib,
+					../../lib,
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 			};
