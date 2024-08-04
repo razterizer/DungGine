@@ -137,8 +137,6 @@ namespace dung
         } while (ctr++ < 10);
       }
       
-      enemy = rnd::rand_bool();
-      
       const float c_min_acc_step = 0.3f;
       const float c_min_acc_lim = 0.6f;
       const float c_min_vel_lim = 0.2f;
@@ -168,6 +166,7 @@ namespace dung
           vel_lim = rand_vel_lim(4.f, 15.f);
           prob_change_acc = rnd::randn_range_int(4, 10);
           prob_slow_fast = rnd::randn_range_int(10, 30);
+          enemy = rnd::one_in(5);
           break;
         case Race::Elf:
           character = '@';
@@ -177,6 +176,7 @@ namespace dung
           vel_lim = rand_vel_lim(6.f, 20.f);
           prob_change_acc = rnd::randn_range_int(4, 10);
           prob_slow_fast = rnd::randn_range_int(10, 30);
+          enemy = rnd::one_in(20);
           break;
         case Race::Half_Elf:
           character = '@';
@@ -186,6 +186,7 @@ namespace dung
           vel_lim = rand_vel_lim(5.f, 17.f);
           prob_change_acc = rnd::randn_range_int(4, 10);
           prob_slow_fast = rnd::randn_range_int(10, 30);
+          enemy = rnd::one_in(15);
           break;
         case Race::Gnome:
           character = 'b';
@@ -195,6 +196,7 @@ namespace dung
           vel_lim = rand_vel_lim(0.5f, 2.5f);
           prob_change_acc = rnd::randn_range_int(1, 4);
           prob_slow_fast = rnd::randn_range_int(10, 30);
+          enemy = rnd::one_in(20);
           break;
         case Race::Halfling:
           character = 'b';
@@ -204,6 +206,7 @@ namespace dung
           vel_lim = rand_vel_lim(0.7f, 3.f);
           prob_change_acc = rnd::randn_range_int(1, 5);
           prob_slow_fast = rnd::randn_range_int(10, 30);
+          enemy = rnd::one_in(20);
           break;
         case Race::Dwarf:
           character = '0';
@@ -213,6 +216,7 @@ namespace dung
           vel_lim = rand_vel_lim(0.4f, 4.f);
           prob_change_acc = rnd::randn_range_int(5, 20);
           prob_slow_fast = rnd::randn_range_int(10, 30);
+          enemy = rnd::one_in(18);
           break;
         case Race::Half_Orc:
           character = '3';
@@ -222,6 +226,7 @@ namespace dung
           vel_lim = rand_vel_lim(1.5f, 5.f);
           prob_change_acc = rnd::randn_range_int(2, 18);
           prob_slow_fast = rnd::randn_range_int(10, 30);
+          enemy = !rnd::one_in(10);
           break;
         case Race::Ogre:
           character = 'O';
@@ -231,6 +236,7 @@ namespace dung
           vel_lim = rand_vel_lim(1.f, 6.f);
           prob_change_acc = rnd::randn_range_int(4, 10);
           prob_slow_fast = rnd::randn_range_int(10, 30);
+          enemy = !rnd::one_in(5);
           break;
         case Race::Hobgoblin:
           character = 'a';
@@ -240,6 +246,7 @@ namespace dung
           vel_lim = rand_vel_lim(4.f, 9.f);
           prob_change_acc = rnd::randn_range_int(4, 14);
           prob_slow_fast = rnd::randn_range_int(10, 30);
+          enemy = !rnd::one_in(15);
           break;
         case Race::Goblin:
           character = 'G';
@@ -249,6 +256,7 @@ namespace dung
           vel_lim = rand_vel_lim(4.5f, 10.f);
           prob_change_acc = rnd::randn_range_int(3, 12);
           prob_slow_fast = rnd::randn_range_int(10, 30);
+          enemy = !rnd::one_in(15);
           break;
         case Race::Orc:
           character = '2';
@@ -258,6 +266,7 @@ namespace dung
           vel_lim = rand_vel_lim(6.f, 18.f);
           prob_change_acc = rnd::randn_range_int(4, 8);
           prob_slow_fast = rnd::randn_range_int(10, 30);
+          enemy = !rnd::one_in(15);
           break;
         case Race::Troll:
           character = 'R';
@@ -267,6 +276,7 @@ namespace dung
           vel_lim = rand_vel_lim(2.f, 12.f);
           prob_change_acc = rnd::randn_range_int(10, 40);
           prob_slow_fast = rnd::randn_range_int(10, 30);
+          enemy = !rnd::one_in(14);
           break;
         case Race::Monster:
           character = 'M';
@@ -276,6 +286,7 @@ namespace dung
           vel_lim = rand_vel_lim(1.f, 8.f);
           prob_change_acc = rnd::randn_range_int(8, 25);
           prob_slow_fast = rnd::randn_range_int(10, 30);
+          enemy = !rnd::one_in(15);
           break;
         case Race::Lich:
           character = 'z';
@@ -285,6 +296,7 @@ namespace dung
           vel_lim = rand_vel_lim(2.f, 9.f);
           prob_change_acc = rnd::randn_range_int(5, 8);
           prob_slow_fast = rnd::randn_range_int(10, 30);
+          enemy = !rnd::one_in(15);
           break;
         case Race::Lich_King:
           character = 'Z';
@@ -294,6 +306,7 @@ namespace dung
           vel_lim = rand_vel_lim(2.5f, 10.f);
           prob_change_acc = rnd::randn_range_int(4, 6);
           prob_slow_fast = rnd::randn_range_int(10, 30);
+          enemy = !rnd::one_in(15);
           break;
         case Race::Basilisk:
           character = 'S';
@@ -303,6 +316,7 @@ namespace dung
           vel_lim = rand_vel_lim(4.f, 8.f);
           prob_change_acc = rnd::randn_range_int(16, 28);
           prob_slow_fast = rnd::randn_range_int(10, 30);
+          enemy = !rnd::one_in(15);
           break;
         case Race::Bear:
           character = 'B';
@@ -312,6 +326,7 @@ namespace dung
           vel_lim = rand_vel_lim(3.f, 18.f);
           prob_change_acc = rnd::randn_range_int(5, 8);
           prob_slow_fast = rnd::randn_range_int(10, 30);
+          enemy = !rnd::one_in(10);
           break;
         case Race::Kobold:
           character = 'x';
@@ -321,6 +336,7 @@ namespace dung
           vel_lim = rand_vel_lim(2.f, 10.f);
           prob_change_acc = rnd::randn_range_int(3, 9);
           prob_slow_fast = rnd::randn_range_int(10, 30);
+          enemy = !rnd::one_in(15);
           break;
         case Race::Skeleton:
           character = '%';
@@ -330,6 +346,7 @@ namespace dung
           vel_lim = rand_vel_lim(1.f, 4.f);
           prob_change_acc = rnd::randn_range_int(11, 19);
           prob_slow_fast = rnd::randn_range_int(10, 30);
+          enemy = !rnd::one_in(10);
           break;
         case Race::Giant:
           character = 'O';
@@ -339,6 +356,7 @@ namespace dung
           vel_lim = rand_vel_lim(0.5f, 4.5f);
           prob_change_acc = rnd::randn_range_int(20, 40);
           prob_slow_fast = rnd::randn_range_int(10, 30);
+          enemy = !rnd::one_in(5);
           break;
         case Race::Huge_Spider:
           character = 'W';
@@ -348,6 +366,7 @@ namespace dung
           vel_lim = rand_vel_lim(3.f, 20.f);
           prob_change_acc = rnd::randn_range_int(3, 17);
           prob_slow_fast = rnd::randn_range_int(10, 30);
+          enemy = !rnd::one_in(13);
           break;
         case Race::Wolf:
           character = 'm';
@@ -357,6 +376,7 @@ namespace dung
           vel_lim = rand_vel_lim(10.f, 24.f);
           prob_change_acc = rnd::randn_range_int(2, 9);
           prob_slow_fast = rnd::randn_range_int(10, 30);
+          enemy = !rnd::one_in(8);
           break;
         case Race::Wyvern:
           character = 'w';
@@ -366,6 +386,7 @@ namespace dung
           vel_lim = rand_vel_lim(8.f, 20.f);
           prob_change_acc = rnd::randn_range_int(7, 15);
           prob_slow_fast = rnd::randn_range_int(10, 30);
+          enemy = !rnd::one_in(12);
           break;
         case Race::Griffin:
           character = 'g';
@@ -375,6 +396,7 @@ namespace dung
           vel_lim = rand_vel_lim(9.f, 21.f);
           prob_change_acc = rnd::randn_range_int(10, 20);
           prob_slow_fast = rnd::randn_range_int(10, 30);
+          enemy = !rnd::one_in(13);
           break;
         case Race::Ghoul:
           character = 'h';
@@ -384,6 +406,7 @@ namespace dung
           vel_lim = rand_vel_lim(10.f, 20.f);
           prob_change_acc = rnd::randn_range_int(1, 5);
           prob_slow_fast = rnd::randn_range_int(10, 30);
+          enemy = !rnd::one_in(20);
           break;
         case Race::Dragon:
           character = 'R';
@@ -393,6 +416,7 @@ namespace dung
           vel_lim = rand_vel_lim(11.f, 29.f);
           prob_change_acc = rnd::randn_range_int(14, 30);
           prob_slow_fast = rnd::randn_range_int(10, 30);
+          enemy = !rnd::one_in(7);
           break;
         case Race::NUM_ITEMS:
           std::cerr << "Illegal race: NUM_ITEMS!" << std::endl;
