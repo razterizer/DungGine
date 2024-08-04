@@ -354,9 +354,9 @@ namespace dung
     }
     
     template<typename Lambda>
-    void update_field(const RC& curr_pos, Lambda get_field_ptr, bool set_val)
+    void update_field(const RC& curr_pos, Lambda get_field_ptr, bool set_val, float radius)
     {
-      const auto c_fow_dist = 2.3f;
+      const auto c_fow_dist = radius; //2.3f;
       
       for (auto& key : all_keys)
         if (distance(key.pos, curr_pos) <= c_fow_dist)
@@ -414,14 +414,18 @@ namespace dung
         //    ###
         //   #####
         //    ###
-        set_field(local_pos);
-        for (int c = -1; c <= +1; ++c)
-        {
-          set_field(local_pos + RC { -1, c });
-          set_field(local_pos + RC { +1, c });
-        }
-        for (int c = -2; c <= +2; ++c)
-          set_field(local_pos + RC { 0, c });
+        //set_field(local_pos);
+        //for (int c = -1; c <= +1; ++c)
+        //{
+        //  set_field(local_pos + RC { -1, c });
+        //  set_field(local_pos + RC { +1, c });
+        //}
+        //for (int c = -2; c <= +2; ++c)
+        //  set_field(local_pos + RC { 0, c });
+        
+        auto circle_positions = drawing::filled_circle_positions(local_pos, radius, 1.8f);
+        for (const auto& pos : circle_positions)
+          set_field(pos);
         
         int r_room = -1;
         int c_room = -1;
@@ -1336,7 +1340,7 @@ namespace dung
       if (use_fog_of_war)
         update_field(curr_pos,
                      [](auto obj) { return &obj->fog_of_war; },
-                     false);
+                     false, 5.5f);
                   
       // Light
       auto* lamp = m_player.get_selected_lamp(all_lamps);
@@ -1345,7 +1349,7 @@ namespace dung
       {
         update_field(curr_pos,
                      [](auto obj) { return &obj->light; },
-                     true);
+                     true, 3.f);
       }
       
       // Update current room and current corridor.
