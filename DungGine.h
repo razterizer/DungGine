@@ -173,7 +173,7 @@ namespace dung
       auto f_format_item_str = [](std::string& item_str, float weight, float price, int hp)
       {
         std::ostringstream oss;
-        oss << std::setprecision(1) << weight;
+        oss << std::setprecision(1) << std::fixed << weight;
         std::string weight_str = oss.str() + " kg";
         item_str += str::rep_char(' ', 25 - static_cast<int>(item_str.size()) - static_cast<int>(weight_str.size())) + weight_str;
         
@@ -185,7 +185,10 @@ namespace dung
         
         if (hp > 0)
         {
-          std::string hp_str = std::to_string(hp) + " hp";
+          oss.str("");
+          oss.clear();
+          oss << std::setprecision(0) << std::fixed << hp;
+          std::string hp_str = oss.str() + " hp";
           item_str += str::rep_char(' ', 52 - static_cast<int>(item_str.size()) - static_cast<int>(hp_str.size())) + hp_str;
         }
       };
