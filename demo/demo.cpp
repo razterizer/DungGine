@@ -19,7 +19,7 @@
 
 #include <iostream>
 
-enum class TestType { FontTest, DungeonSimple, DungeonRuntime };
+enum class TestType { DungeonSimple, DungeonRuntime };
 static TestType test_type = TestType::DungeonRuntime;
 
 
@@ -170,14 +170,11 @@ private:
 int main(int argc, char** argv)
 {
   GameEngineParams params;
-  params.enable_title_screen = test_type == TestType::FontTest;
+  params.enable_title_screen = false;
   params.enable_instructions_screen = false;
   params.enable_quit_confirm_screen = true;
   params.enable_hiscores = false;
-  if (test_type == TestType::FontTest)
-    params.screen_bg_color_default = Color::DarkMagenta;
-  else
-    params.screen_bg_color_default = Color::Black;
+  params.screen_bg_color_default = Color::Black;
   params.screen_bg_color_title = Color::DarkYellow;
   params.screen_bg_color_instructions = Color::Black;
 
