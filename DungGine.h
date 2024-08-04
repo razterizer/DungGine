@@ -1346,16 +1346,16 @@ namespace dung
       if (use_fog_of_war)
         update_field(curr_pos,
                      [](auto obj) { return &obj->fog_of_war; },
-                     false, 5.5f);
+                     false, globals::fow_radius);
                   
       // Light
       auto* lamp = m_player.get_selected_lamp(all_lamps);
       clear_field([](auto obj) { return &obj->light; }, false);
-      if (lamp != nullptr)
+      if (lamp != nullptr && lamp->type == LampType::Isotropic)
       {
         update_field(curr_pos,
                      [](auto obj) { return &obj->light; },
-                     true, 2.5f);
+                     true, lamp->radius);
       }
       
       // Update current room and current corridor.
