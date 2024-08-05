@@ -645,13 +645,13 @@ namespace dung
                   // Not sure if we need that. Maybe do it in the far future...
                   door->is_locked = false;
                   
+                  message_handler->add_message(static_cast<float>(real_time_s),
+                                               "The door is unlocked!",
+                                               MessageHandler::Level::Guide);
+                  
                   m_player.remove_key_by_key_id(all_keys, door->key_id);
                   message_handler->add_message(static_cast<float>(real_time_s),
                                                "You cast a vanishing spell on the key!",
-                                               MessageHandler::Level::Guide);
-                  
-                  message_handler->add_message(static_cast<float>(real_time_s),
-                                               "The door is unlocked!",
                                                MessageHandler::Level::Guide);
                 }
                 else
@@ -778,7 +778,8 @@ namespace dung
               m_player.armour_idcs.emplace_back(a_idx);
               armour->picked_up = true;
               message_handler->add_message(static_cast<float>(real_time_s),
-                                           "You picked up a " + armour->type + "!", MessageHandler::Level::Guide);
+                                           "You picked up a " + armour->type + "!",
+                                           MessageHandler::Level::Guide);
             }
           }
         }
@@ -842,10 +843,6 @@ namespace dung
             hp = globals::max_health - m_player.health;
           m_player.health += hp;
           
-          m_player.remove_selected_potion(all_potions);
-          message_handler->add_message(static_cast<float>(real_time_s),
-                                       "You throw away the empty vial.",
-                                       MessageHandler::Level::Guide);
           switch (math::sgn(hp))
           {
             case -1:
@@ -858,15 +855,19 @@ namespace dung
                                            "You drank a potion, but nothing appeared to happen.",
                                            MessageHandler::Level::Guide);
             case +1:
+              message_handler->add_message(static_cast<float>(real_time_s),
+                                           "You drank a health potion. Your health increased by " + std::to_string(hp) + " hp.",
+                                           MessageHandler::Level::Guide);
               if (m_player.health == globals::max_health)
                 message_handler->add_message(static_cast<float>(real_time_s),
                                              "Your health is now fully restored.",
                                              MessageHandler::Level::Guide);
-              message_handler->add_message(static_cast<float>(real_time_s),
-                                           "You drank a health potion. Your health increased by " + std::to_string(hp) + " hp.",
-                                           MessageHandler::Level::Guide);
               break;
           }
+          m_player.remove_selected_potion(all_potions);
+          message_handler->add_message(static_cast<float>(real_time_s),
+                                       "You throw away the empty vial.",
+                                       MessageHandler::Level::Guide);
         }
       }
     }
