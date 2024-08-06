@@ -1358,14 +1358,21 @@ namespace dung
       auto& curr_pos = m_player.pos;
       handle_keys(kpd, real_time_s);
       
+      auto fow_radius = 5.5f;
+      auto* lamp = m_player.get_selected_lamp(all_lamps);
+      if (lamp != nullptr)
+      {
+        math::maximize(fow_radius, lamp->radius);
+        math::minimize(fow_radius, globals::max_fow_radius);
+      }
+      
       // Fog of war
       if (use_fog_of_war)
         update_field(curr_pos,
                      [](auto obj) { return &obj->fog_of_war; },
-                     false, globals::fow_radius, 0.f, Lamp::LampType::Isotropic);
+                     false, fow_radius, 0.f, Lamp::LampType::Isotropic);
                   
       // Light
-      auto* lamp = m_player.get_selected_lamp(all_lamps);
       clear_field([](auto obj) { return &obj->light; }, false);
       if (lamp != nullptr)
       {

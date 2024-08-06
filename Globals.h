@@ -15,7 +15,7 @@ namespace dung
 
     static const int max_health = 1000;
     
-    static const float fow_radius = 5.5f;
+    static const float max_fow_radius = 10.f; //5.5f;
     
     static const float px_aspect = 1.8f;
   }
