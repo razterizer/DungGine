@@ -17,7 +17,11 @@ namespace dung
   {
     char character = '@';
     Style style = { Color::Magenta, Color::White };
-    RC pos;
+    RC pos, last_pos;
+    float los_r = 0.f;
+    float los_c = 0.f;
+    float last_los_r = 0.f;
+    float last_los_c = 0.f;
     bool is_spawned = false;
     BSPNode* curr_room = nullptr;
     Corridor* curr_corridor = nullptr;
@@ -42,8 +46,22 @@ namespace dung
     int inv_select_idx_potion = -1;
     int inv_select_idx_armour = -1;
     bool show_inventory = false;
-    RC line_of_sight;
     float weight_capacity = 50.f;
+    
+    void update()
+    {
+      if (pos != last_pos)
+      {
+        los_r = pos.r - last_pos.r;
+        los_c = pos.c - last_pos.c;
+        los_r += last_los_r;
+        los_c += last_los_c;
+        math::normalize(los_r, los_c);
+        last_los_r = los_r;
+        last_los_c = los_c;
+      }
+      last_pos = pos;
+    }
     
     int calc_armour_class(const std::vector<std::unique_ptr<Armour>>& all_armour) const
     {
