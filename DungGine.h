@@ -364,11 +364,52 @@ namespace dung
     {
       const auto c_fow_dist = radius; //2.3f;
       
+      auto f_normalize_angle = [](float& ang)
+      {
+        while (ang < 0.f)
+          ang += math::c_2pi;
+        while (ang >= math::c_2pi)
+          ang -= math::c_2pi;
+      };
+      
       auto f_set_item_field = [&](auto& obj)
       {
         if (m_player.curr_room == obj.curr_room || m_player.curr_corridor == obj.curr_corridor)
-          if (distance(obj.pos, curr_pos) <= c_fow_dist)
-            *get_field_ptr(&obj) = set_val;
+          if (distance(obj.pos, curr_pos) <= radius)
+          {
+            if (src_type == Lamp::LampType::Directional)
+            {
+              // Rotating dir vector CW and CCW using a rotation matrix.
+              auto a = math::deg2rad(angle_deg*0.5f);
+              auto dir_r = m_player.los_r;
+              auto dir_c = m_player.los_c;
+              auto Clo = std::cos(-a);
+              auto Slo = std::sin(-a);
+              auto Chi = std::cos(+a);
+              auto Shi = std::sin(+a);
+              math::normalize(dir_r, dir_c);
+              float dir_lo_r = (dir_r*Clo - dir_c*Slo);
+              float dir_lo_c = dir_r*Slo + dir_c*Clo;
+              float dir_hi_r = (dir_r*Chi - dir_c*Shi);
+              float dir_hi_c = dir_r*Shi + dir_c*Chi;
+    
+              auto lo_angle_rad = std::atan2(-dir_lo_r, dir_lo_c);
+              auto hi_angle_rad = std::atan2(-dir_hi_r, dir_hi_c);
+              f_normalize_angle(lo_angle_rad);
+              f_normalize_angle(hi_angle_rad);
+              if (lo_angle_rad > hi_angle_rad)
+                hi_angle_rad += math::c_2pi;
+                
+              float curr_angle_rad = std::atan2(-(obj.pos.r - curr_pos.r), obj.pos.c - curr_pos.c);
+              f_normalize_angle(curr_angle_rad);
+              if (curr_angle_rad < lo_angle_rad)
+                curr_angle_rad += math::c_2pi;
+              if (math::in_range<float>(curr_angle_rad, lo_angle_rad, hi_angle_rad, Range::Closed))
+                *get_field_ptr(&obj) = set_val;
+            }
+            else
+              *get_field_ptr(&obj) = set_val;
+          }
       };
       
       for (auto& key : all_keys)
