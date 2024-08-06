@@ -359,7 +359,8 @@ namespace dung
     }
     
     template<typename Lambda>
-    void update_field(const RC& curr_pos, Lambda get_field_ptr, bool set_val, float radius)
+    void update_field(const RC& curr_pos, Lambda get_field_ptr, bool set_val, float radius, float angle_deg,
+                      Lamp::LampType src_type)
     {
       const auto c_fow_dist = radius; //2.3f;
       
@@ -430,8 +431,19 @@ namespace dung
         //for (int c = -2; c <= +2; ++c)
         //  set_field(local_pos + RC { 0, c });
         
-        auto circle_positions = drawing::filled_circle_positions(local_pos, radius, 1.8f);
-        for (const auto& pos : circle_positions)
+        std::vector<RC> positions;
+        switch (src_type)
+        {
+          case Lamp::LampType::Isotropic:
+            positions = drawing::filled_circle_positions(local_pos, radius, globals::px_aspect);
+            break;
+          case Lamp::LampType::Directional:
+            positions = drawing::filled_arc_positions(local_pos, radius, math::deg2rad(angle_deg), m_player.los_r, m_player.los_c, globals::px_aspect);
+            break;
+          case Lamp::LampType::NUM_ITEMS:
+            break;
+        }
+        for (const auto& pos : positions)
           set_field(pos);
         
         int r_room = -1;
@@ -1039,6 +1051,8 @@ namespace dung
         m_player.pos = world_pos.value();
       else
         m_player.pos = world_size / 2;
+        
+      m_player.last_pos = m_player.pos;
       
       const auto& room_corridor_map = m_bsp_tree->get_room_corridor_map();
       
@@ -1348,16 +1362,17 @@ namespace dung
       if (use_fog_of_war)
         update_field(curr_pos,
                      [](auto obj) { return &obj->fog_of_war; },
-                     false, globals::fow_radius);
+                     false, globals::fow_radius, 0.f, Lamp::LampType::Isotropic);
                   
       // Light
       auto* lamp = m_player.get_selected_lamp(all_lamps);
       clear_field([](auto obj) { return &obj->light; }, false);
-      if (lamp != nullptr && lamp->type == Lamp::LampType::Isotropic)
+      if (lamp != nullptr)
       {
         update_field(curr_pos,
                      [](auto obj) { return &obj->light; },
-                     true, lamp->radius);
+                     true, lamp->radius, lamp->angle_deg,
+                     lamp->type);
       }
       
       // Update current room and current corridor.
@@ -1379,6 +1394,9 @@ namespace dung
             break;
           }
       }
+      
+      // Player LOS etc.
+      m_player.update();
       
       // NPCs
       for (auto& npc : all_npcs)
