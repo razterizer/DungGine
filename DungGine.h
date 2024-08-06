@@ -393,8 +393,8 @@ namespace dung
               float dir_hi_r = (dir_r*Chi - dir_c*Shi);
               float dir_hi_c = dir_r*Shi + dir_c*Chi;
     
-              auto lo_angle_rad = std::atan2(-dir_lo_r, dir_lo_c);
-              auto hi_angle_rad = std::atan2(-dir_hi_r, dir_hi_c);
+              float lo_angle_rad = std::atan2(-dir_lo_r, dir_lo_c);
+              float hi_angle_rad = std::atan2(-dir_hi_r, dir_hi_c);
               f_normalize_angle(lo_angle_rad);
               f_normalize_angle(hi_angle_rad);
               if (lo_angle_rad > hi_angle_rad)
