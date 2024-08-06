@@ -57,11 +57,13 @@ namespace dung
       style.fg_color = Color::Yellow;
       weight = 0.4f;
       price = math::roundI(20*rnd::randn_clamp(200.f, 100.f, 0.f, 1e4f))/20.f;
-      radius = rnd::randn_range_clamp(2.5f, globals::fow_radius);
+      radius = rnd::randn_range_clamp(1.5f, globals::fow_radius);
+      angle_deg = rnd::randn_range_clamp(2.f, 179.f);
     }
     enum class LampType { Isotropic, Directional, NUM_ITEMS };
     LampType type = LampType::Isotropic;
     float radius = 2.5f;
+    float angle_deg = 45.f;
     
     virtual void set_visibility(bool use_fog_of_war, bool is_night) override
     {
