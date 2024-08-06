@@ -99,35 +99,35 @@ namespace dung
       }
     }
     
-    const Key* get_selected_key(const std::vector<Key>& all_keys) const
+    Key* get_selected_key(std::vector<Key>& all_keys) const
     {
       if (in_keys_range(inv_select_idx_key))
         return &all_keys[key_idcs[inv_select_idx_key - start_inv_idx_keys()]];
       return nullptr;
     }
     
-    const Lamp* get_selected_lamp(const std::vector<Lamp>& all_lamps) const
+    Lamp* get_selected_lamp(std::vector<Lamp>& all_lamps) const
     {
       if (in_lamps_range(inv_select_idx_lamp))
         return &all_lamps[lamp_idcs[inv_select_idx_lamp - start_inv_idx_lamps()]];
       return nullptr;
     }
     
-    const Weapon* get_selected_weapon(const std::vector<std::unique_ptr<Weapon>>& all_weapons)
+    Weapon* get_selected_weapon(std::vector<std::unique_ptr<Weapon>>& all_weapons)
     {
      if (in_weapons_range(inv_select_idx_weapon))
         return all_weapons[weapon_idcs[inv_select_idx_weapon - start_inv_idx_weapons()]].get();
       return nullptr;
     }
     
-    const Potion* get_selected_potion(const std::vector<Potion>& all_potions)
+    Potion* get_selected_potion(std::vector<Potion>& all_potions)
     {
      if (in_potions_range(inv_select_idx_potion))
         return &all_potions[potion_idcs[inv_select_idx_potion - start_inv_idx_potions()]];
       return nullptr;
     }
     
-    const Armour* get_selected_armour(const std::vector<std::unique_ptr<Armour>>& all_armour)
+    Armour* get_selected_armour(std::vector<std::unique_ptr<Armour>>& all_armour)
     {
      if (in_armour_range(inv_select_idx_armour))
         return all_armour[armour_idcs[inv_select_idx_armour - start_inv_idx_armour()]].get();
