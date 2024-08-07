@@ -40,6 +40,7 @@ See the next section for a summary over these two classes.
   - `place_lamps(int num_lamps)` : Places `num_lamps` lamps in rooms, randomly all over the world.
   - `place_weapons(int num_weapons)` : Places `num_weapons` weapons in rooms, randomly all over the world.
   - `place_potions(int num_potions)` : Places `num_potions` potions in rooms, randomly all over the world.
+  - `place_armour(int num_armour)` : Places `num_armour` armour parts in rooms, randomly all over the world.
   - `place_npcs(int num_npcs)` : Places `num_npcs` NPCs in rooms, randomly all over the world.
   - `set_screen_scrolling_mode(ScreenScrollingMode mode, float t_page = 0.2f)` : Sets the screen scrolling mode to either `AlwaysInCentre`, `PageWise` or `WhenOutsideScreen`. `t_page` is used with `PageWise` mode.
   - `update(double real_time_s, const keyboard::KeyPressData& kpd, bool* game_over)` : Updating the state of the dungeon engine. Manages things such as the change of direction of the sun for the shadows of rooms that are not under the ground and key-presses for control of the playable character.
