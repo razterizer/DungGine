@@ -31,7 +31,7 @@ namespace dung
     int thac0 = 1;
     int strength = 10;
     int dexterity = 10;
-    int constitution = 10;
+    int endurance = 10;
     
     std::vector<int> key_idcs;
     std::vector<int> lamp_idcs;

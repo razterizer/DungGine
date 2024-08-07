@@ -96,7 +96,7 @@ namespace dung
     int health = globals::max_health;
     int strength = 10;
     int dexterity = 10;
-    int constitution = 10;
+    int endurance = 10;
     int thac0 = 1;
     int armor_class = 2;
     
