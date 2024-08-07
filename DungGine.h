@@ -379,6 +379,7 @@ namespace dung
           {
             if (src_type == Lamp::LampType::Directional)
             {
+              // #FIXME: Move parts into math functions for better reuse.
               // Rotating dir vector CW and CCW using a rotation matrix.
               auto a = math::deg2rad(angle_deg*0.5f);
               auto dir_r = m_player.los_r;
