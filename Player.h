@@ -78,15 +78,11 @@ namespace dung
       
       if (on_terrain == Terrain::Water)
       {
-        if (rnd::one_in(endurance) && weakness < endurance)
+        if (rnd::one_in(endurance) && weakness < strength)
           weakness++;
       
-        if (rnd::one_in(endurance - weakness))
-        {
-          strength--;
-          if (strength <= 0)
-            health -= math::roundI(globals::max_health*0.002f);
-        }
+        if (rnd::one_in(strength - weakness))
+          health -= math::roundI(globals::max_health*0.002f);
       }
       else
       {
