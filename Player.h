@@ -53,6 +53,15 @@ namespace dung
     bool show_inventory = false;
     float weight_capacity = 50.f;
     
+    bool allow_move()
+    {
+      if (on_terrain == Terrain::Water)
+        return !rnd::one_in(strength);
+      else if (on_terrain == Terrain::Sand)
+        return rnd::one_in(3);
+      return true;
+    }
+    
     void update()
     {
       if (pos != last_pos)
