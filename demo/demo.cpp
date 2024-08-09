@@ -71,7 +71,7 @@ public:
       sh.clear();
       bool game_over = false;
       dungeon_engine->update(get_real_time_s(), get_sim_dt_s(), kpd, &game_over);
-      dungeon_engine->draw(sh, get_real_time_s());
+      dungeon_engine->draw(sh, get_real_time_s(), anim_ctr);
       sh.print_screen_buffer(t, Color::Black);
 #endif
     }
@@ -120,7 +120,7 @@ private:
       if (game_over)
         set_state_game_over();
       
-      dungeon_engine->draw(sh, get_real_time_s());
+      dungeon_engine->draw(sh, get_real_time_s(), anim_ctr);
     }
   }
   
