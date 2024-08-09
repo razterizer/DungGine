@@ -13,6 +13,8 @@
 namespace dung
 {
   
+  enum class Terrain { Default, Water, Sand };
+  
   struct Player
   {
     char character = '@';
