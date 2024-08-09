@@ -82,7 +82,7 @@ namespace dung
           weakness++;
       
         if (rnd::one_in(strength - weakness))
-          health -= math::roundI(globals::max_health*0.002f);
+          health -= math::roundI(globals::max_health*0.01f);
       }
       else
       {
