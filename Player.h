@@ -34,6 +34,9 @@ namespace dung
     int strength = 10;
     int dexterity = 10;
     int endurance = 10;
+    int weakness = 0;
+    
+    Terrain on_terrain = Terrain::Default;
     
     std::vector<int> key_idcs;
     std::vector<int> lamp_idcs;
