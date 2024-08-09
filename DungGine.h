@@ -55,6 +55,8 @@ namespace dung
     float m_sun_year_t_offs = 0.f;
     float m_t_solar_period = 0.f;
     
+    bool debug = false;
+    
     Player m_player;
     std::vector<NPC> all_npcs;
     
@@ -847,6 +849,8 @@ namespace dung
         for (auto& npc : all_npcs)
           math::toggle(npc.debug);
       }
+      else if (curr_key == '?')
+        math::toggle(debug);
       else if (str::to_lower(curr_key) == 'i')
       {
         static const float c_search_radius = 2.83;
@@ -1682,6 +1686,22 @@ namespace dung
                           scr_pos.r + r_offs,
                           scr_pos.c + c_offs,
                           fight_style);
+        }
+      }
+
+      if (debug)
+      {
+        switch (m_player.on_terrain)
+        {
+          case Terrain::Default:
+            sh.write_buffer("D", 5, 1, Color::Black, Color::White);
+            break;
+          case Terrain::Water:
+            sh.write_buffer("W", 5, 1, Color::DarkBlue, Color::White);
+            break;
+          case Terrain::Sand:
+            sh.write_buffer("S", 5, 1, Color::DarkYellow, Color::White);
+            break;
         }
       }
       
