@@ -1537,7 +1537,7 @@ namespace dung
     
     
     template<int NR, int NC>
-    void draw(SpriteHandler<NR, NC>& sh, double real_time_s)
+    void draw(SpriteHandler<NR, NC>& sh, double real_time_s, int anim_ctr)
     {
       const auto& room_corridor_map = m_bsp_tree->get_room_corridor_map();
       const auto& door_vec = m_bsp_tree->fetch_doors();
