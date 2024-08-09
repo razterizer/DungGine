@@ -66,6 +66,24 @@ namespace dung
         last_los_c = los_c;
       }
       last_pos = pos;
+      
+      if (on_terrain == Terrain::Water)
+      {
+        if (rnd::one_in(endurance) && weakness < endurance)
+          weakness++;
+      
+        if (rnd::one_in(endurance - weakness))
+        {
+          strength--;
+          if (strength <= 0)
+            health -= math::roundI(globals::max_health*0.002f);
+        }
+      }
+      else
+      {
+        if (rnd::one_in(2) && 0 < weakness)
+          weakness--;
+      }
     }
     
     int calc_armour_class(const std::vector<std::unique_ptr<Armour>>& all_armour) const
