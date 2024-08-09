@@ -1825,6 +1825,24 @@ namespace dung
             f_fetch_texture(texture_ug_fill) : f_fetch_texture(texture_sl_fill);
           const auto& texture_shadow = room_style.is_underground ?
             f_fetch_texture(texture_ug_shadow) : f_fetch_texture(texture_sl_shadow);
+            
+          if (m_player.curr_room == room && m_player.is_inside_curr_room())
+          {
+            auto local_pos = room_style.tex_pos + m_player.pos - bb.pos();
+            auto curr_mat = texture_fill(local_pos).mat;
+            // #FIXME: Canonize material idcs.
+            switch (curr_mat)
+            {
+              case 2:
+                m_player.on_terrain = Terrain::Water;
+                break;
+              case 3:
+                m_player.on_terrain = Terrain::Sand;
+                break;
+              default:
+                m_player.on_terrain = Terrain::Default;
+            }
+          }
         
           drawing::draw_box_textured(sh,
                                      bb_scr_pos.r, bb_scr_pos.c, bb.r_len, bb.c_len,
@@ -1846,6 +1864,9 @@ namespace dung
         auto bb_scr_pos = get_screen_pos(bb.pos());
         if (m_use_per_room_lat_long_for_sun_dir)
           shadow_type = m_solar_motion.get_solar_direction(corr_style.latitude, corr_style.longitude, m_season, m_t_solar_period);
+          
+        if (m_player.curr_corridor == corr && m_player.is_inside_curr_corridor())
+          m_player.on_terrain = Terrain::Default;
         
         // Fog of war
         if (use_fog_of_war)
