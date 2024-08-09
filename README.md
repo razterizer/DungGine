@@ -44,7 +44,7 @@ See the next section for a summary over these two classes.
   - `place_npcs(int num_npcs)` : Places `num_npcs` NPCs in rooms, randomly all over the world.
   - `set_screen_scrolling_mode(ScreenScrollingMode mode, float t_page = 0.2f)` : Sets the screen scrolling mode to either `AlwaysInCentre`, `PageWise` or `WhenOutsideScreen`. `t_page` is used with `PageWise` mode.
   - `update(double real_time_s, const keyboard::KeyPressData& kpd, bool* game_over)` : Updating the state of the dungeon engine. Manages things such as the change of direction of the sun for the shadows of rooms that are not under the ground and key-presses for control of the playable character.
-  - `draw(SpriteHandler<NR, NC>& sh, double real_time_s)` : Draws the rooms of the dungeon / realm (will include drawing of corridors in the near(?) future).
+  - `draw(SpriteHandler<NR, NC>& sh, double real_time_s, int anim_ctr)` : Draws the rooms of the dungeon / realm (will include drawing of corridors in the near(?) future).
 
 ## Texturing
 
@@ -92,7 +92,7 @@ Color bg_color = Color::Default;
 dung::DungGine dungeon_engine;
 dungeon_engine.load_dungeon(&bsp_tree);
 dungeon_engine.style_dungeon();
-dungeon_engine.draw(sh, get_real_time_s());
+dungeon_engine.draw(sh, get_real_time_s(), 0);
 sh.print_screen_buffer(t, bg_color);
 ```
 
@@ -108,6 +108,7 @@ std::unique_ptr<dung::DungGine> dungeon_engine;
 Text t;
 SpriteHandler<NR, NC> sh;
 Color bg_color = Color::Black;
+int anim_ctr = 0;
 
 // Initializations
 bsp_tree.generate(200, 400, dung::Orientation::Vertical); // arguments: world_size_rows, world_size_cols,
@@ -134,8 +135,9 @@ bool game_over = false;
 dungeon_engine->update(get_real_time_s(), kpd, &game_over); // arg0 : time from game start, arg1 : keyboard::KeyPressData object, arg2 : retrieves game over state.
 if (game_over)
   set_state_game_over();
-dungeon_engine->draw(sh, get_real_time_s());
+dungeon_engine->draw(sh, get_real_time_s(), anim_ctr);
 sh.print_screen_buffer(t, bg_color);
+anim_ctr++;
 ```
 
 <img width="566" alt="image" src="https://github.com/razterizer/DungGine/assets/32767250/b24d58d7-6ad5-4063-881d-650dd7bc905a">
@@ -153,6 +155,7 @@ std::unique_ptr<dung::DungGine> dungeon_engine;
 Text t;
 SpriteHandler<NR, NC> sh;
 Color bg_color = Color::Black;
+int anim_ctr = 0;
 
 // Initializations
 bsp_tree.generate(200, 400, dung::Orientation::Vertical); // arguments: world_size_rows, world_size_cols,
@@ -190,6 +193,7 @@ bool game_over = false;
 dungeon_engine->update(get_real_time_s(), kpd, &game_over); // arg0 : time from game start, arg1 : keyboard::KeyPressData object, arg2 : retrieves game over state.
 if (game_over)
   set_state_game_over();
-dungeon_engine->draw(sh, get_real_time_s());
+dungeon_engine->draw(sh, get_real_time_s(), anim_ctr);
 sh.print_screen_buffer(t, bg_color);
+anim_ctr++;
 ```
