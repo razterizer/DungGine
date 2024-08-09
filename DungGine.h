@@ -550,7 +550,7 @@ namespace dung
         if (m_player.show_inventory)
         {
         }
-        else if (is_inside_curr_bb(curr_pos.r, curr_pos.c - 1))
+        else if (is_inside_curr_bb(curr_pos.r, curr_pos.c - 1) && m_player.allow_move())
           curr_pos.c--;
       }
       else if (str::to_lower(curr_key) == 'd' || curr_special_key == keyboard::SpecialKey::Right)
@@ -631,7 +631,7 @@ namespace dung
                                        msg,
                                        MessageHandler::Level::Guide);
         }
-        else if (is_inside_curr_bb(curr_pos.r, curr_pos.c + 1))
+        else if (is_inside_curr_bb(curr_pos.r, curr_pos.c + 1) && m_player.allow_move())
           curr_pos.c++;
       }
       else if (str::to_lower(curr_key) == 's' || curr_special_key == keyboard::SpecialKey::Down)
@@ -641,7 +641,7 @@ namespace dung
           m_player.inv_hilite_idx++;
           m_player.inv_hilite_idx = m_player.inv_hilite_idx % m_player.num_items();
         }
-        else if (is_inside_curr_bb(curr_pos.r + 1, curr_pos.c))
+        else if (is_inside_curr_bb(curr_pos.r + 1, curr_pos.c) && m_player.allow_move())
           curr_pos.r++;
       }
       else if (str::to_lower(curr_key) == 'w' || curr_special_key == keyboard::SpecialKey::Up)
@@ -652,7 +652,7 @@ namespace dung
           if (m_player.inv_hilite_idx < 0)
             m_player.inv_hilite_idx = m_player.num_items() - 1;
         }
-        else if (is_inside_curr_bb(curr_pos.r - 1, curr_pos.c))
+        else if (is_inside_curr_bb(curr_pos.r - 1, curr_pos.c) && m_player.allow_move())
           curr_pos.r--;
       }
       else if (curr_key == ' ')
