@@ -54,11 +54,9 @@ namespace dung
     
     bool allow_move()
     {
-      if (is_wet(on_terrain))
-        return !rnd::one_in(strength);
-      else if (on_terrain == Terrain::Sand)
-        return rnd::one_in(3);
-      return true;
+      if (on_terrain == Terrain::Sand)
+        return rnd::rand() < 0.4f;
+      return !rnd::one_in(2 + strength - weakness);
     }
     
     void update()
@@ -75,13 +73,25 @@ namespace dung
       }
       last_pos = pos;
       
+      float fluid_damage = 0.01f;
+      switch (on_terrain)
+      {
+        case Terrain::Water: fluid_damage = 0.005f; break;
+        case Terrain::Poison: fluid_damage = 0.02f; break;
+        case Terrain::Acid: fluid_damage = 0.04f; break;
+        case Terrain::Tar: fluid_damage = 0.015f; break;
+        case Terrain::Lava: fluid_damage = 0.4f; break;
+        case Terrain::Swamp: fluid_damage = 0.01f; break;
+        default: break;
+      }
+      
       if (is_wet(on_terrain))
       {
         if (rnd::one_in(endurance) && weakness < strength)
           weakness++;
       
-        if (rnd::one_in(strength - weakness))
-          health -= math::roundI(globals::max_health*0.01f);
+        if (rnd::one_in(1 + strength - weakness))
+          health -= math::roundI(globals::max_health*fluid_damage);
       }
       else
       {
