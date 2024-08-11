@@ -102,11 +102,11 @@ public:
       if (!dungeon_engine->place_player(sh.size()))
         std::cerr << "ERROR : Unable to place the playable character!" << std::endl;
       dungeon_engine->place_keys(true);
-      dungeon_engine->place_lamps(20);
-      dungeon_engine->place_weapons(150);
-      dungeon_engine->place_potions(150);
-      dungeon_engine->place_armour(150);
-      dungeon_engine->place_npcs(100);
+      dungeon_engine->place_lamps(20, true);
+      dungeon_engine->place_weapons(150, true);
+      dungeon_engine->place_potions(150, true);
+      dungeon_engine->place_armour(150, true);
+      dungeon_engine->place_npcs(100, true);
     }
   }
   

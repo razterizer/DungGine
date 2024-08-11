@@ -1283,11 +1283,12 @@ namespace dung
       return true;
     }
     
-    bool place_lamps(int num_lamps)
+    bool place_lamps(int num_lamps, bool only_place_on_dry_land)
     {
       const auto world_size = m_bsp_tree->get_world_size();
       const int c_max_num_iters = 1e5;
       int num_iters = 0;
+      bool valid_pos = false;
       for (int lamp_idx = 0; lamp_idx < num_lamps; ++lamp_idx)
       {
         Lamp lamp;
@@ -1310,7 +1311,15 @@ namespace dung
               rnd::rand_int(0, world_size.c)
             };
           }
-        } while (num_iters++ < c_max_num_iters && !is_inside_any_room(lamp.pos));
+          BSPNode* room = nullptr;
+          valid_pos = is_inside_any_room(lamp.pos, &room);
+          if (only_place_on_dry_land &&
+              room != nullptr &&
+              get_curr_terrain(lamp.pos, room) == Terrain::Water)
+          {
+            valid_pos = false;
+          }
+        } while (num_iters++ < c_max_num_iters && !valid_pos);
         
         BSPNode* leaf = nullptr;
         if (!is_inside_any_room(lamp.pos, &leaf))
@@ -1327,11 +1336,12 @@ namespace dung
       return true;
     }
     
-    bool place_weapons(int num_weapons)
+    bool place_weapons(int num_weapons, bool only_place_on_dry_land)
     {
       const auto world_size = m_bsp_tree->get_world_size();
       const int c_max_num_iters = 1e5;
       int num_iters = 0;
+      bool valid_pos = false;
       for (int wpn_idx = 0; wpn_idx < num_weapons; ++wpn_idx)
       {
         std::unique_ptr<Weapon> weapon;
@@ -1350,7 +1360,15 @@ namespace dung
             rnd::rand_int(0, world_size.r),
             rnd::rand_int(0, world_size.c)
           };
-        } while (num_iters++ < c_max_num_iters && !is_inside_any_room(weapon->pos));
+          BSPNode* room = nullptr;
+          valid_pos = is_inside_any_room(weapon->pos, &room);
+          if (only_place_on_dry_land &&
+              room != nullptr &&
+              get_curr_terrain(weapon->pos, room) == Terrain::Water)
+          {
+            valid_pos = false;
+          }
+        } while (num_iters++ < c_max_num_iters && !valid_pos);
         
         BSPNode* leaf = nullptr;
         if (!is_inside_any_room(weapon->pos, &leaf))
@@ -1367,11 +1385,12 @@ namespace dung
       return true;
     }
     
-    bool place_potions(int num_potions)
+    bool place_potions(int num_potions, bool only_place_on_dry_land)
     {
       const auto world_size = m_bsp_tree->get_world_size();
       const int c_max_num_iters = 1e5;
       int num_iters = 0;
+      bool valid_pos = false;
       for (int pot_idx = 0; pot_idx < num_potions; ++pot_idx)
       {
         Potion potion;
@@ -1385,7 +1404,15 @@ namespace dung
               rnd::rand_int(0, world_size.c)
             };
           }
-        } while (num_iters++ < c_max_num_iters && !is_inside_any_room(potion.pos));
+          BSPNode* room = nullptr;
+          valid_pos = is_inside_any_room(potion.pos, &room);
+          if (only_place_on_dry_land &&
+              room != nullptr &&
+              get_curr_terrain(potion.pos, room) == Terrain::Water)
+          {
+            valid_pos = false;
+          }
+        } while (num_iters++ < c_max_num_iters && !valid_pos);
         
         BSPNode* leaf = nullptr;
         if (!is_inside_any_room(potion.pos, &leaf))
@@ -1402,11 +1429,12 @@ namespace dung
       return true;
     }
     
-    bool place_armour(int num_armour)
+    bool place_armour(int num_armour, bool only_place_on_dry_land)
     {
       const auto world_size = m_bsp_tree->get_world_size();
       const int c_max_num_iters = 1e5;
       int num_iters = 0;
+      bool valid_pos = false;
       for (int a_idx = 0; a_idx < num_armour; ++a_idx)
       {
         std::unique_ptr<Armour> armour;
@@ -1429,7 +1457,15 @@ namespace dung
             rnd::rand_int(0, world_size.r),
             rnd::rand_int(0, world_size.c)
           };
-        } while (num_iters++ < c_max_num_iters && !is_inside_any_room(armour->pos));
+          BSPNode* room = nullptr;
+          valid_pos = is_inside_any_room(armour->pos, &room);
+          if (only_place_on_dry_land &&
+              room != nullptr &&
+              get_curr_terrain(armour->pos, room) == Terrain::Water)
+          {
+            valid_pos = false;
+          }
+        } while (num_iters++ < c_max_num_iters && !valid_pos);
         
         BSPNode* leaf = nullptr;
         if (!is_inside_any_room(armour->pos, &leaf))
@@ -1446,11 +1482,12 @@ namespace dung
       return true;
     }
     
-    bool place_npcs(int num_npcs)
+    bool place_npcs(int num_npcs, bool only_place_on_dry_land)
     {
       const auto world_size = m_bsp_tree->get_world_size();
       const int c_max_num_iters = 1e5;
       int num_iters = 0;
+      bool valid_pos = false;
       for (int npc_idx = 0; npc_idx < num_npcs; ++npc_idx)
       {
         NPC npc;
@@ -1463,7 +1500,15 @@ namespace dung
             rnd::rand_int(0, world_size.r),
             rnd::rand_int(0, world_size.c)
           };
-        } while (num_iters++ < c_max_num_iters && !is_inside_any_room(npc.pos));
+          BSPNode* room = nullptr;
+          valid_pos = is_inside_any_room(npc.pos, &room);
+          if (only_place_on_dry_land &&
+              room != nullptr &&
+              get_curr_terrain(npc.pos, room) == Terrain::Water)
+          {
+            valid_pos = false;
+          }
+        } while (num_iters++ < c_max_num_iters && !valid_pos);
         
         BSPNode* leaf = nullptr;
         if (!is_inside_any_room(npc.pos, &leaf))
