@@ -552,7 +552,9 @@ namespace dung
         if (m_player.show_inventory)
         {
         }
-        else if (is_inside_curr_bb(curr_pos.r, curr_pos.c - 1) && m_player.allow_move())
+        else if (is_inside_curr_bb(curr_pos.r, curr_pos.c - 1) &&
+                 m_player.allow_move() &&
+                 allow_move_to(curr_pos.r, curr_pos.c - 1))
           curr_pos.c--;
       }
       else if (str::to_lower(curr_key) == 'd' || curr_special_key == keyboard::SpecialKey::Right)
@@ -633,7 +635,9 @@ namespace dung
                                        msg,
                                        MessageHandler::Level::Guide);
         }
-        else if (is_inside_curr_bb(curr_pos.r, curr_pos.c + 1) && m_player.allow_move())
+        else if (is_inside_curr_bb(curr_pos.r, curr_pos.c + 1) &&
+                 m_player.allow_move() &&
+                 allow_move_to(curr_pos.r, curr_pos.c + 1))
           curr_pos.c++;
       }
       else if (str::to_lower(curr_key) == 's' || curr_special_key == keyboard::SpecialKey::Down)
@@ -643,7 +647,9 @@ namespace dung
           m_player.inv_hilite_idx++;
           m_player.inv_hilite_idx = m_player.inv_hilite_idx % m_player.num_items();
         }
-        else if (is_inside_curr_bb(curr_pos.r + 1, curr_pos.c) && m_player.allow_move())
+        else if (is_inside_curr_bb(curr_pos.r + 1, curr_pos.c) &&
+                 m_player.allow_move() &&
+                 allow_move_to(curr_pos.r + 1, curr_pos.c))
           curr_pos.r++;
       }
       else if (str::to_lower(curr_key) == 'w' || curr_special_key == keyboard::SpecialKey::Up)
@@ -654,7 +660,9 @@ namespace dung
           if (m_player.inv_hilite_idx < 0)
             m_player.inv_hilite_idx = m_player.num_items() - 1;
         }
-        else if (is_inside_curr_bb(curr_pos.r - 1, curr_pos.c) && m_player.allow_move())
+        else if (is_inside_curr_bb(curr_pos.r - 1, curr_pos.c) &&
+                 m_player.allow_move() &&
+                 allow_move_to(curr_pos.r - 1, curr_pos.c))
           curr_pos.r--;
       }
       else if (curr_key == ' ')
@@ -1043,9 +1051,10 @@ namespace dung
       return texture_shadow;
     }
     
-    Terrain get_curr_terrain(const RC& pos, BSPNode* room)
+    Terrain get_terrain(const RC& pos)
     {
-      if (room == nullptr)
+      BSPNode* room = nullptr;
+      if (!is_inside_any_room(pos, &room))
         return Terrain::Default;
       const auto& bb = room->bb_leaf_room;
       if (bb.is_inside_offs(pos, -1))
@@ -1107,6 +1116,20 @@ namespace dung
         }
       }
       return Terrain::Default;
+    }
+    
+    bool allow_move_to(int r, int c)
+    {
+      auto terrain = get_terrain(RC { r, c });
+    
+      switch (terrain)
+      {
+        case Terrain::Mountain: return false;
+        case Terrain::Tree: return false;
+        case Terrain::Column: return false;
+        case Terrain::Masonry: return false;
+        default: return true;
+      }
     }
     
   public:
@@ -1275,7 +1298,7 @@ namespace dung
             valid_pos = is_inside_any_room(key.pos, &room);
             if (only_place_on_dry_land &&
                 room != nullptr &&
-                !is_dry(get_curr_terrain(key.pos, room)))
+                !is_dry(get_terrain(key.pos)))
             {
               valid_pos = false;
             }
@@ -1329,7 +1352,7 @@ namespace dung
           valid_pos = is_inside_any_room(lamp.pos, &room);
           if (only_place_on_dry_land &&
               room != nullptr &&
-              !is_dry(get_curr_terrain(lamp.pos, room)))
+              !is_dry(get_terrain(lamp.pos)))
           {
             valid_pos = false;
           }
@@ -1378,7 +1401,7 @@ namespace dung
           valid_pos = is_inside_any_room(weapon->pos, &room);
           if (only_place_on_dry_land &&
               room != nullptr &&
-              !is_dry(get_curr_terrain(weapon->pos, room)))
+              !is_dry(get_terrain(weapon->pos)))
           {
             valid_pos = false;
           }
@@ -1422,7 +1445,7 @@ namespace dung
           valid_pos = is_inside_any_room(potion.pos, &room);
           if (only_place_on_dry_land &&
               room != nullptr &&
-              !is_dry(get_curr_terrain(potion.pos, room)))
+              !is_dry(get_terrain(potion.pos)))
           {
             valid_pos = false;
           }
@@ -1475,7 +1498,7 @@ namespace dung
           valid_pos = is_inside_any_room(armour->pos, &room);
           if (only_place_on_dry_land &&
               room != nullptr &&
-              !is_dry(get_curr_terrain(armour->pos, room)))
+              !is_dry(get_terrain(armour->pos)))
           {
             valid_pos = false;
           }
@@ -1518,7 +1541,7 @@ namespace dung
           valid_pos = is_inside_any_room(npc.pos, &room);
           if (only_place_on_dry_land &&
               room != nullptr &&
-              !is_dry(get_curr_terrain(npc.pos, room)))
+              !is_dry(get_terrain(npc.pos)))
           {
             valid_pos = false;
           }
@@ -1945,7 +1968,7 @@ namespace dung
           shadow_type = m_solar_motion.get_solar_direction(room_style.latitude, room_style.longitude, m_season, m_t_solar_period);
           
         if (m_player.curr_room == room && m_player.is_inside_curr_room())
-          m_player.on_terrain = get_curr_terrain(m_player.pos, room);
+          m_player.on_terrain = get_terrain(m_player.pos);
         
         // Fog of war
         if (use_fog_of_war)
