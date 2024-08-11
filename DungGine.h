@@ -1205,12 +1205,13 @@ namespace dung
       m_use_per_room_lat_long_for_sun_dir = use_per_room_lat_long_for_sun_dir;
     }
     
-    bool place_keys()
+    bool place_keys(bool only_place_on_dry_land)
     {
       const auto world_size = m_bsp_tree->get_world_size();
       const auto& door_vec = m_bsp_tree->fetch_doors();
       const int c_max_num_iters = 1e5;
       int num_iters = 0;
+      bool valid_pos = false;
       for (auto* d : door_vec)
       {
         if (d->is_locked)
@@ -1224,7 +1225,16 @@ namespace dung
               rnd::rand_int(0, world_size.r),
               rnd::rand_int(0, world_size.c)
             };
-          } while (num_iters++ < c_max_num_iters && !is_inside_any_room(key.pos));
+            
+            BSPNode* room = nullptr;
+            valid_pos = is_inside_any_room(key.pos, &room);
+            if (only_place_on_dry_land &&
+                room != nullptr &&
+                get_curr_terrain(key.pos, room) == Terrain::Water)
+            {
+              valid_pos = false;
+            }
+          } while (num_iters++ < c_max_num_iters && !valid_pos);
           
           BSPNode* leaf = nullptr;
           if (!is_inside_any_room(key.pos, &leaf))
