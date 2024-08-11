@@ -104,7 +104,7 @@ namespace dung
     std::vector<int> fight_r_offs = { 1, 0, -1, -1, -1, 0, 1, 1 };
     std::vector<int> fight_c_offs = { 1, 1, 1, 0, -1, -1, -1, 0 };
     
-    ui::TextBox tb_health;
+    ui::TextBox tb_health, tb_strength;
     
     // /////////////////////
     
@@ -1008,6 +1008,20 @@ namespace dung
       tb_health.draw(sh, ui::VerticalAlignment::TOP, ui::HorizontalAlignment::LEFT, styles::Style { Color::White, Color::DarkBlue }, true, true, 0, 0, std::nullopt, drawing::OutlineType::Line, false);
     }
     
+    template<int NR, int NC>
+    void draw_strength_bar(SpriteHandler<NR, NC>& sh)
+    {
+      std::string strength_bar = str::rep_char(' ', 10);
+      float pc_ratio = m_player.strength / 10;
+      for (int i = 0; i < 10; ++i)
+        strength_bar[i] = (m_player.strength - m_player.weakness) > static_cast<int>(i*pc_ratio)
+        ? '=' : ' ';
+      Style style { Color::Green, Color::Transparent2 };
+      tb_strength.set_text(strength_bar, style);
+      tb_strength.calc_pre_draw(str::Adjustment::Left);
+      tb_strength.draw(sh, { 1, 12 }, { Color::White, Color::DarkBlue }, true, true, 0, 0, std::nullopt, drawing::OutlineType::Line);
+    }
+    
     std::optional<const drawing::Texture*> fetch_texture(const auto& texture_vector)
     {
       if (texture_vector.empty())
@@ -1694,6 +1708,7 @@ namespace dung
         draw_inventory(sh);
         
       draw_health_bars(sh);
+      draw_strength_bar(sh);
         
       // Fighting
       for (auto& npc : all_npcs)
