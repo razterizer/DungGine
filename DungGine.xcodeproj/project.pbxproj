@@ -26,6 +26,7 @@
 		07D769AF2C6044FC00BCA669 /* texture_sl_shadow_1.tex */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = texture_sl_shadow_1.tex; path = textures/texture_sl_shadow_1.tex; sourceTree = "<group>"; };
 		07D769B02C6044FC00BCA669 /* texture_sl_fill_0.tex */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = texture_sl_fill_0.tex; path = textures/texture_sl_fill_0.tex; sourceTree = "<group>"; };
 		07D769B12C6044FC00BCA669 /* texture_sl_fill_1.tex */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = texture_sl_fill_1.tex; path = textures/texture_sl_fill_1.tex; sourceTree = "<group>"; };
+		07D769B22C68D06D00BCA669 /* Terrain.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Terrain.h; sourceTree = "<group>"; };
 		07E6EAC32C14CEA8007BBC6B /* libDungGine.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libDungGine.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		07E6EACA2C14CFD3007BBC6B /* BSPTree.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BSPTree.h; sourceTree = "<group>"; };
 		07E6EACC2C150C23007BBC6B /* LICENSE */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
@@ -84,6 +85,7 @@
 				07C2A7882C2A297800869A56 /* Corridor.h */,
 				071942492C458746008BD519 /* SolarMotionPatterns.h */,
 				07D769A62C5FFF3B00BCA669 /* Globals.h */,
+				07D769B22C68D06D00BCA669 /* Terrain.h */,
 				07E6EAC42C14CEA8007BBC6B /* Products */,
 			);
 			sourceTree = "<group>";
