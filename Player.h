@@ -56,6 +56,8 @@ namespace dung
     {
       if (on_terrain == Terrain::Sand)
         return rnd::rand() < 0.4f;
+      if (on_terrain == Terrain::Grass)
+        return rnd::rand() < 0.8f;
       return !rnd::one_in(2 + strength - weakness);
     }
     
