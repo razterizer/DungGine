@@ -66,7 +66,7 @@ public:
       if (!dungeon_engine->place_player(sh.size()))
         std::cerr << "ERROR : Unable to place the playable character!" << std::endl;
       dungeon_engine->configure_sun(20.f);
-      dungeon_engine->place_keys();
+      dungeon_engine->place_keys(true);
       
       sh.clear();
       bool game_over = false;
@@ -101,7 +101,7 @@ public:
       dungeon_engine->style_dungeon();
       if (!dungeon_engine->place_player(sh.size()))
         std::cerr << "ERROR : Unable to place the playable character!" << std::endl;
-      dungeon_engine->place_keys();
+      dungeon_engine->place_keys(true);
       dungeon_engine->place_lamps(20);
       dungeon_engine->place_weapons(150);
       dungeon_engine->place_potions(150);
