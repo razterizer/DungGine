@@ -123,10 +123,10 @@ dungeon_engine.configure_sun_rand(20.f, 120.f, dung::Latitude::NorthernHemispher
 dungeon_engine.style_dungeon();
 if (!dungeon_engine.place_player(sh.size()))
   std::cerr << "ERROR : Unable to place the playable character!" << std::endl;
-dungeon_engine->place_keys();
-dungeon_engine->place_lamps(20);
-dungeon_engine->place_weapons(100);
-dungeon_engine->place_potions(100);
+dungeon_engine->place_keys(true);
+dungeon_engine->place_lamps(20, true);
+dungeon_engine->place_weapons(100, true);
+dungeon_engine->place_potions(100, true);
 dungeon_engine.set_screen_scrolling_mode(ScreenScrollingMode::WhenOutsideScreen);
 
 // In game loop:
@@ -180,11 +180,11 @@ dungeon_engine.configure_sun_rand(20.f, 120.f, dung::Latitude::Equator, dung::Lo
 dungeon_engine.style_dungeon();
 if (!dungeon_engine.place_player(sh.size()))
   std::cerr << "ERROR : Unable to place the playable character!" << std::endl;
-dungeon_engine->place_keys();
-dungeon_engine->place_lamps(20);
-dungeon_engine->place_weapons(150);
-dungeon_engine->place_potions(150);
-dungeon_engine->place_npcs(100);
+dungeon_engine->place_keys(true);
+dungeon_engine->place_lamps(20, true);
+dungeon_engine->place_weapons(150, true);
+dungeon_engine->place_potions(150, true);
+dungeon_engine->place_npcs(100, false);
 dungeon_engine.set_screen_scrolling_mode(ScreenScrollingMode::WhenOutsideScreen);
 
 // In game loop:
