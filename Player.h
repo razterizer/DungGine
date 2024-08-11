@@ -8,6 +8,7 @@
 #pragma once
 #include <Core/StlUtils.h>
 #include "Globals.h"
+#include "Terrain.h"
 
 
 namespace dung
