@@ -36,12 +36,12 @@ See the next section for a summary over these two classes.
   - `configure_sun(float sun_day_t_offs = 0.f, float minutes_per_day = 20.f, Season start_season = Season::Spring, float minutes_per_year = 120.f, Latitude latitude = Latitude::NorthernHemisphere, Longitude longitude = Longitude::F, bool use_per_room_lat_long_for_sun_dir = true)` : Configures the speed of the solar day, speed of the solar year, the starting direction of the sun and the starting season. Used for shadow movements for rooms over ground.
       When `use_per_room_lat_long_for_sun_dir` is `true` then use `latitude = Latitude::Equator` and `longitude = Longitude::F` to start with. Other values will shift the map over the globe so to speak, but with these starting settings the rooms at the top of the map will be the at the north pole and the rooms at the bottom of the map will be at the south pole. When `use_per_room_lat_long_for_sun_dir` is `false` then the specified latitude and longitude will be used globally across the whole map and the the function default args is a good starting point.
   - `configure_sun_rand(float minutes_per_day = 20.f, float minutes_per_year = 120.f, Latitude latitude = Latitude::NorthernHemisphere, Longitude longitude = Longitude::F, bool use_per_room_lat_long_for_sun_dir = true)` : Same as above but randomizes the initial direction of the sun.
-  - `place_keys()` : Places the keys in rooms, randomly all over the world.
-  - `place_lamps(int num_lamps)` : Places `num_lamps` lamps in rooms, randomly all over the world.
-  - `place_weapons(int num_weapons)` : Places `num_weapons` weapons in rooms, randomly all over the world.
-  - `place_potions(int num_potions)` : Places `num_potions` potions in rooms, randomly all over the world.
-  - `place_armour(int num_armour)` : Places `num_armour` armour parts in rooms, randomly all over the world.
-  - `place_npcs(int num_npcs)` : Places `num_npcs` NPCs in rooms, randomly all over the world.
+  - `place_keys(bool only_place_on_dry_land)` : Places the keys in rooms, randomly all over the world.
+  - `place_lamps(int num_lamps, bool only_place_on_dry_land)` : Places `num_lamps` lamps in rooms, randomly all over the world.
+  - `place_weapons(int num_weapons, bool only_place_on_dry_land)` : Places `num_weapons` weapons in rooms, randomly all over the world.
+  - `place_potions(int num_potions, bool only_place_on_dry_land)` : Places `num_potions` potions in rooms, randomly all over the world.
+  - `place_armour(int num_armour, bool only_place_on_dry_land)` : Places `num_armour` armour parts in rooms, randomly all over the world.
+  - `place_npcs(int num_npcs, bool only_place_on_dry_land)` : Places `num_npcs` NPCs in rooms, randomly all over the world.
   - `set_screen_scrolling_mode(ScreenScrollingMode mode, float t_page = 0.2f)` : Sets the screen scrolling mode to either `AlwaysInCentre`, `PageWise` or `WhenOutsideScreen`. `t_page` is used with `PageWise` mode.
   - `update(double real_time_s, const keyboard::KeyPressData& kpd, bool* game_over)` : Updating the state of the dungeon engine. Manages things such as the change of direction of the sun for the shadows of rooms that are not under the ground and key-presses for control of the playable character.
   - `draw(SpriteHandler<NR, NC>& sh, double real_time_s, int anim_ctr)` : Draws the rooms of the dungeon / realm (will include drawing of corridors in the near(?) future).
