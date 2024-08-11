@@ -43,6 +43,35 @@ namespace dung
     Rope,
   };
   
+  bool is_dry(Terrain terrain)
+  {
+    switch (terrain)
+    {
+      case Terrain::Water:
+      case Terrain::Lava:
+      case Terrain::Swamp:
+      case Terrain::Poison:
+      case Terrain::Acid:
+      case Terrain::Tar:
+        return false;
+      default:
+        return true;
+    }
+  }
+  
+  bool is_wet(Terrain terrain)
+  {
+    switch (terrain)
+    {
+      case Terrain::Water:
+      case Terrain::Poison:
+      case Terrain::Acid:
+        return true;
+      default:
+        return false;
+    }
+  }
+  
   std::string terrain2str(Terrain terrain)
   {
     switch (terrain)
