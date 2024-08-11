@@ -1008,6 +1008,62 @@ namespace dung
       tb_health.draw(sh, ui::VerticalAlignment::TOP, ui::HorizontalAlignment::LEFT, styles::Style { Color::White, Color::DarkBlue }, true, true, 0, 0, std::nullopt, drawing::OutlineType::Line, false);
     }
     
+    std::optional<const drawing::Texture*> fetch_texture(const auto& texture_vector)
+    {
+      if (texture_vector.empty())
+        return std::nullopt; //texture_empty;
+      return &texture_vector[texture_anim_ctr % texture_vector.size()];
+    };
+    
+    std::optional<const drawing::Texture*> fetch_curr_fill_texture(const RoomStyle& room_style)
+    {
+      auto texture_fill = room_style.is_underground ?
+        fetch_texture(texture_ug_fill) : fetch_texture(texture_sl_fill);
+      return texture_fill;
+    }
+    
+    std::optional<const drawing::Texture*> fetch_curr_shadow_texture(const RoomStyle& room_style)
+    {
+      auto texture_shadow = room_style.is_underground ?
+      fetch_texture(texture_ug_shadow) : fetch_texture(texture_sl_shadow);
+      return texture_shadow;
+    }
+    
+    Terrain get_curr_terrain(const RC& pos, BSPNode* room)
+    {
+      if (room == nullptr)
+        return Terrain::Default;
+      const auto& bb = room->bb_leaf_room;
+      if (bb.is_inside_offs(pos, -1))
+      {
+        const auto& room_style = m_room_styles[room];
+        auto local_pos = m_player.pos - bb.pos();
+        auto tex_pos = room_style.tex_pos + local_pos;
+        auto texture = fetch_curr_fill_texture(room_style);
+        if (texture.has_value())
+        {
+          int curr_mat = (*texture.value())(tex_pos).mat;
+          // #FIXME: Canonize material idcs.
+          switch (curr_mat)
+          {
+            case 2: return Terrain::Water;
+            case 3: return Terrain::Sand;
+            default: return Terrain::Default;
+          }
+        }
+        else
+        {
+          switch (room_style.get_fill_char())
+          {
+            case '~': return Terrain::Water;
+            case ':': return Terrain::Sand;
+            default: return Terrain::Default;
+          }
+        }
+      }
+      return Terrain::Default;
+    }
+    
   public:
     DungGine(const std::string& exe_folder, bool use_fow, DungGineTextureParams texture_params = {})
       : message_handler(std::make_unique<MessageHandler>())
@@ -1799,6 +1855,9 @@ namespace dung
         auto bb_scr_pos = get_screen_pos(bb.pos());
         if (m_use_per_room_lat_long_for_sun_dir)
           shadow_type = m_solar_motion.get_solar_direction(room_style.latitude, room_style.longitude, m_season, m_t_solar_period);
+          
+        if (m_player.curr_room == room && m_player.is_inside_curr_room())
+          m_player.on_terrain = get_curr_terrain(m_player.pos, room);
         
         // Fog of war
         if (use_fog_of_war)
@@ -1838,35 +1897,8 @@ namespace dung
             texture_anim_time_stamp = real_time_s;
           }
           
-          auto f_fetch_texture = [&](const auto& texture_vector) -> const drawing::Texture&
-          {
-            if (texture_vector.empty())
-              return texture_empty;
-            return texture_vector[texture_anim_ctr % texture_vector.size()];
-          };
-          
-          const auto& texture_fill = room_style.is_underground ?
-            f_fetch_texture(texture_ug_fill) : f_fetch_texture(texture_sl_fill);
-          const auto& texture_shadow = room_style.is_underground ?
-            f_fetch_texture(texture_ug_shadow) : f_fetch_texture(texture_sl_shadow);
-            
-          if (m_player.curr_room == room && m_player.is_inside_curr_room())
-          {
-            auto local_pos = room_style.tex_pos + m_player.pos - bb.pos();
-            auto curr_mat = texture_fill(local_pos).mat;
-            // #FIXME: Canonize material idcs.
-            switch (curr_mat)
-            {
-              case 2:
-                m_player.on_terrain = Terrain::Water;
-                break;
-              case 3:
-                m_player.on_terrain = Terrain::Sand;
-                break;
-              default:
-                m_player.on_terrain = Terrain::Default;
-            }
-          }
+          const auto& texture_fill = *(fetch_curr_fill_texture(room_style).value_or(&texture_empty));
+          const auto& texture_shadow = *(fetch_curr_shadow_texture(room_style).value_or(&texture_empty));
         
           drawing::draw_box_textured(sh,
                                      bb_scr_pos.r, bb_scr_pos.c, bb.r_len, bb.c_len,
