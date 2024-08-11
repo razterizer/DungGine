@@ -1261,7 +1261,7 @@ namespace dung
             valid_pos = is_inside_any_room(key.pos, &room);
             if (only_place_on_dry_land &&
                 room != nullptr &&
-                get_curr_terrain(key.pos, room) == Terrain::Water)
+                !is_dry(get_curr_terrain(key.pos, room)))
             {
               valid_pos = false;
             }
@@ -1315,7 +1315,7 @@ namespace dung
           valid_pos = is_inside_any_room(lamp.pos, &room);
           if (only_place_on_dry_land &&
               room != nullptr &&
-              get_curr_terrain(lamp.pos, room) == Terrain::Water)
+              !is_dry(get_curr_terrain(lamp.pos, room)))
           {
             valid_pos = false;
           }
@@ -1364,7 +1364,7 @@ namespace dung
           valid_pos = is_inside_any_room(weapon->pos, &room);
           if (only_place_on_dry_land &&
               room != nullptr &&
-              get_curr_terrain(weapon->pos, room) == Terrain::Water)
+              !is_dry(get_curr_terrain(weapon->pos, room)))
           {
             valid_pos = false;
           }
@@ -1408,7 +1408,7 @@ namespace dung
           valid_pos = is_inside_any_room(potion.pos, &room);
           if (only_place_on_dry_land &&
               room != nullptr &&
-              get_curr_terrain(potion.pos, room) == Terrain::Water)
+              !is_dry(get_curr_terrain(potion.pos, room)))
           {
             valid_pos = false;
           }
@@ -1461,7 +1461,7 @@ namespace dung
           valid_pos = is_inside_any_room(armour->pos, &room);
           if (only_place_on_dry_land &&
               room != nullptr &&
-              get_curr_terrain(armour->pos, room) == Terrain::Water)
+              !is_dry(get_curr_terrain(armour->pos, room)))
           {
             valid_pos = false;
           }
@@ -1504,7 +1504,7 @@ namespace dung
           valid_pos = is_inside_any_room(npc.pos, &room);
           if (only_place_on_dry_land &&
               room != nullptr &&
-              get_curr_terrain(npc.pos, room) == Terrain::Water)
+              !is_dry(get_curr_terrain(npc.pos, room)))
           {
             valid_pos = false;
           }
