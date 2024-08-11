@@ -1046,17 +1046,48 @@ namespace dung
           // #FIXME: Canonize material idcs.
           switch (curr_mat)
           {
+            case 0: return Terrain::Void;
+            case 1: return Terrain::Tile;
             case 2: return Terrain::Water;
             case 3: return Terrain::Sand;
+            case 4: return Terrain::Stone;
+            case 5: return Terrain::Masonry;
+            case 6: return Terrain::Brick;
+            case 7: return Terrain::Grass;
+            case 8: return Terrain::Shrub;
+            case 9: return Terrain::Tree;
+            case 10: return Terrain::Metal;
+            case 11: return Terrain::Wood;
+            case 12: return Terrain::Ice;
+            case 13: return Terrain::Mountain;
+            case 14: return Terrain::Lava;
+            case 15: return Terrain::Cave;
+            case 16: return Terrain::Swamp;
+            case 17: return Terrain::Poison;
+            case 18: return Terrain::Path;
+            case 19: return Terrain::Mine;
+            case 20: return Terrain::Gold;
+            case 21: return Terrain::Silver;
+            case 22: return Terrain::Gravel;
+            case 23: return Terrain::Bone;
+            case 24: return Terrain::Acid;
+            case 25: return Terrain::Column;
+            case 26: return Terrain::Tar;
+            case 27: return Terrain::Rope;
             default: return Terrain::Default;
           }
         }
         else
         {
-          switch (room_style.get_fill_char())
+          switch (room_style.floor_type)
           {
-            case '~': return Terrain::Water;
-            case ':': return Terrain::Sand;
+            case FloorType::None: return Terrain::Default;
+            case FloorType::Sand: return Terrain::Sand;
+            case FloorType::Grass: return Terrain::Grass;
+            case FloorType::Stone: return Terrain::Stone;
+            case FloorType::Stone2: return Terrain::Stone;
+            case FloorType::Water: return Terrain::Water;
+            case FloorType::Wood: return Terrain::Wood;
             default: return Terrain::Default;
           }
         }
@@ -1756,20 +1787,7 @@ namespace dung
       }
 
       if (debug)
-      {
-        switch (m_player.on_terrain)
-        {
-          case Terrain::Default:
-            sh.write_buffer("D", 5, 1, Color::Black, Color::White);
-            break;
-          case Terrain::Water:
-            sh.write_buffer("W", 5, 1, Color::DarkBlue, Color::White);
-            break;
-          case Terrain::Sand:
-            sh.write_buffer("S", 5, 1, Color::DarkYellow, Color::White);
-            break;
-        }
-      }
+        sh.write_buffer(terrain2str(m_player.on_terrain), 5, 1, Color::Black, Color::White);
       
       // PC
       if (m_player.is_spawned)
