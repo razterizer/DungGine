@@ -54,7 +54,7 @@ namespace dung
     
     bool allow_move()
     {
-      if (on_terrain == Terrain::Water)
+      if (is_wet(on_terrain))
         return !rnd::one_in(strength);
       else if (on_terrain == Terrain::Sand)
         return rnd::one_in(3);
@@ -75,7 +75,7 @@ namespace dung
       }
       last_pos = pos;
       
-      if (on_terrain == Terrain::Water)
+      if (is_wet(on_terrain))
       {
         if (rnd::one_in(endurance) && weakness < strength)
           weakness++;
