@@ -1840,7 +1840,7 @@ namespace dung
         auto player_scr_pos = get_screen_pos(m_player.pos);
         sh.write_buffer(std::string(1, m_player.character), player_scr_pos.r, player_scr_pos.c, m_player.style);
         
-        if (m_player.on_terrain == Terrain::Water)
+        if (is_wet(m_player.on_terrain))
           if (anim_ctr % 3 == 0)
             sh.write_buffer("*", math::roundI(player_scr_pos.r - m_player.los_r), math::roundI(player_scr_pos.c - m_player.los_c), Color::White, Color::Transparent2);
       }
