@@ -27,6 +27,7 @@ public:
     // /////////
     if (test_type == TestType::DungeonSimple)
     {
+      std::cout << "curr rnd seed = " << curr_rnd_seed << std::endl;
       //rnd::srand(0x1337f00d); // Use srand_time() after map generation.
       
       bsp_tree.generate(29, 79, dung::Orientation::Vertical);
@@ -77,6 +78,7 @@ public:
     }
     else if (test_type == TestType::DungeonRuntime)
     {
+      std::cout << "curr rnd seed = " << curr_rnd_seed << std::endl;
       //rnd::srand(0x1337f00d + 5); // Use srand_time() after map generation.
       
       bsp_tree.generate(200, 400, dung::Orientation::Vertical);
