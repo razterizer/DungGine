@@ -2,7 +2,9 @@
 
 <img width="568" alt="image" src="https://github.com/user-attachments/assets/c3075838-7f15-4679-862e-ce47780c9b39">
 
-![dunggine_demo-comp_360](https://github.com/user-attachments/assets/f825a2df-ff6b-4d0a-b0c9-758dea19bea4)
+![dunggine_demo-comp](https://github.com/user-attachments/assets/b476eeb8-4d47-46f8-a5c1-403906555174)
+
+<!-- ![dunggine_demo-comp_360](https://github.com/user-attachments/assets/f825a2df-ff6b-4d0a-b0c9-758dea19bea4) -->
 
 <!-- <img src="https://github.com/user-attachments/assets/f825a2df-ff6b-4d0a-b0c9-758dea19bea4" alt="dunggine_demo-comp_360" width="500"/> -->
 
