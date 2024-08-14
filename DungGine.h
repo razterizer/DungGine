@@ -7,6 +7,8 @@
 
 #pragma once
 #include "BSPTree.h"
+#include "Environment.h"
+#include "ScreenHelper.h"
 #include "DungGineStyles.h"
 #include "RoomStyle.h"
 #include "Items.h"
@@ -24,24 +26,9 @@ namespace dung
 
   using namespace std::string_literals;
 
-  enum class ScreenScrollingMode { AlwaysInCentre, PageWise, WhenOutsideScreen };
-  
-  struct DungGineTextureParams
+  class DungGine final
   {
-    double dt_anim_s = 0.1;
-    std::vector<std::string> texture_file_names_surface_level_fill;
-    std::vector<std::string> texture_file_names_surface_level_shadow;
-    std::vector<std::string> texture_file_names_underground_fill;
-    std::vector<std::string> texture_file_names_underground_shadow;
-  };
-
-  class DungGine
-  {
-    BSPTree* m_bsp_tree;
-    std::vector<BSPNode*> m_leaves;
-    
-    std::map<BSPNode*, RoomStyle> m_room_styles;
-    std::map<Corridor*, RoomStyle> m_corridor_styles;
+    std::unique_ptr<Environment> m_environment;
     
     bool m_use_per_room_lat_long_for_sun_dir = true;
     SolarDirection m_sun_dir = SolarDirection::E;
@@ -60,22 +47,7 @@ namespace dung
     Player m_player;
     std::vector<NPC> all_npcs;
     
-    ttl::Rectangle m_screen_in_world;
-    // Value between 0 and 1 where 1 means a full screen vertically or horizontally.
-    // Fraction of screen that will be scrolled (when in PageWise scroll mode).
-    float t_scroll_amount = 0.2f;
-    ScreenScrollingMode scr_scrolling_mode = ScreenScrollingMode::AlwaysInCentre;
-    
-    // (0,0) world pos
-    // +--------------------+
-    // | (5,8) scr world pos|
-    // |    +-------+       |
-    // |    |       |       |
-    // |    |    @  |       |  <---- (8, 20) player world pos
-    // |    +-------+       |
-    // |                    |
-    // |                    |
-    // +--------------------+
+    std::unique_ptr<ScreenHelper> m_screen_helper;
     
     std::vector<Key> all_keys;
     // Lamps illuminate items and NPCs. If you've already discovered an item or
@@ -90,15 +62,6 @@ namespace dung
     std::unique_ptr<MessageHandler> message_handler;
     bool use_fog_of_war = false;
     
-    double dt_texture_anim_s = 0.1;
-    double texture_anim_time_stamp = 0.;
-    unsigned short texture_anim_ctr = 0;
-    std::vector<drawing::Texture> texture_sl_fill;
-    std::vector<drawing::Texture> texture_sl_shadow;
-    std::vector<drawing::Texture> texture_ug_fill;
-    std::vector<drawing::Texture> texture_ug_shadow;
-    drawing::Texture texture_empty;
-    
     enum class FightDir { NW, W, SW, S, SE, E, NE, N, NUM_ITEMS };
     
     std::vector<int> fight_r_offs = { 1, 0, -1, -1, -1, 0, 1, 1 };
@@ -108,11 +71,6 @@ namespace dung
     
     // /////////////////////
     
-    RC get_screen_pos(const RC& world_pos) const
-    {
-      return world_pos - m_screen_in_world.pos();
-    }
-    
     void update_sun(float real_time_s)
     {
       m_t_solar_period = std::fmod(m_sun_day_t_offs + (real_time_s / 60.f) / m_sun_minutes_per_day, 1);
@@ -120,34 +78,6 @@ namespace dung
       
       float t_season_period = std::fmod(m_sun_year_t_offs + (real_time_s / 60.f) / m_sun_minutes_per_year, 1);
       m_season = static_cast<Season>(math::roundI(7*t_season_period));
-    }
-    
-    // #NOTE: Only for unwalled area!
-    bool is_inside_any_room(const RC& pos, BSPNode** room_node = nullptr)
-    {
-      for (auto* leaf : m_leaves)
-        if (leaf->bb_leaf_room.is_inside_offs(pos, -1))
-        {
-          utils::try_set(room_node, leaf);
-          return true;
-        }
-      return false;
-    }
-    
-    bool is_underground(BSPNode* leaf)
-    {
-      auto it = m_room_styles.find(leaf);
-      if (it != m_room_styles.end())
-        return it->second.is_underground;
-      return false;
-    }
-    
-    bool is_underground(Corridor* corr)
-    {
-      auto it = m_corridor_styles.find(corr);
-      if (it != m_corridor_styles.end())
-        return it->second.is_underground;
-      return false;
     }
         
     template<int NR, int NC>
@@ -554,7 +484,7 @@ namespace dung
         }
         else if (is_inside_curr_bb(curr_pos.r, curr_pos.c - 1) &&
                  m_player.allow_move() &&
-                 allow_move_to(curr_pos.r, curr_pos.c - 1))
+                 m_environment->allow_move_to(curr_pos.r, curr_pos.c - 1))
           curr_pos.c--;
       }
       else if (str::to_lower(curr_key) == 'd' || curr_special_key == keyboard::SpecialKey::Right)
@@ -567,13 +497,13 @@ namespace dung
             obj.pos = curr_pos;
             if (m_player.is_inside_curr_room())
             {
-              obj.is_underground = is_underground(m_player.curr_room);
+              obj.is_underground = m_environment->is_underground(m_player.curr_room);
               obj.curr_room = m_player.curr_room;
               obj.curr_corridor = nullptr;
             }
             else if (m_player.is_inside_curr_corridor())
             {
-              obj.is_underground = is_underground(m_player.curr_corridor);
+              obj.is_underground = m_environment->is_underground(m_player.curr_corridor);
               obj.curr_room = nullptr;
               obj.curr_corridor = m_player.curr_corridor;
             }
@@ -637,7 +567,7 @@ namespace dung
         }
         else if (is_inside_curr_bb(curr_pos.r, curr_pos.c + 1) &&
                  m_player.allow_move() &&
-                 allow_move_to(curr_pos.r, curr_pos.c + 1))
+                 m_environment->allow_move_to(curr_pos.r, curr_pos.c + 1))
           curr_pos.c++;
       }
       else if (str::to_lower(curr_key) == 's' || curr_special_key == keyboard::SpecialKey::Down)
@@ -649,7 +579,7 @@ namespace dung
         }
         else if (is_inside_curr_bb(curr_pos.r + 1, curr_pos.c) &&
                  m_player.allow_move() &&
-                 allow_move_to(curr_pos.r + 1, curr_pos.c))
+                 m_environment->allow_move_to(curr_pos.r + 1, curr_pos.c))
           curr_pos.r++;
       }
       else if (str::to_lower(curr_key) == 'w' || curr_special_key == keyboard::SpecialKey::Up)
@@ -662,7 +592,7 @@ namespace dung
         }
         else if (is_inside_curr_bb(curr_pos.r - 1, curr_pos.c) &&
                  m_player.allow_move() &&
-                 allow_move_to(curr_pos.r - 1, curr_pos.c))
+                 m_environment->allow_move_to(curr_pos.r - 1, curr_pos.c))
           curr_pos.r--;
       }
       else if (curr_key == ' ')
@@ -951,14 +881,14 @@ namespace dung
               is_night = true;
           };
           
-          auto itr = m_room_styles.find(obj.curr_room);
-          if (itr != m_room_styles.end())
-            f_set_night(itr->second);
+          auto room_style = m_environment->find_room_style(obj.curr_room);
+          if (room_style.has_value())
+            f_set_night(room_style.value());
           else
           {
-            auto itc = m_corridor_styles.find(obj.curr_corridor);
-            if (itc != m_corridor_styles.end())
-              f_set_night(itc->second);
+            auto corr_style = m_environment->find_corridor_style(obj.curr_corridor);
+            if (corr_style.has_value())
+              f_set_night(corr_style.value());
           }
         }
         else
@@ -1030,192 +960,32 @@ namespace dung
       tb_strength.draw(sh, { 1, 12 }, { Color::White, Color::DarkBlue }, true, true, 0, 0, std::nullopt, drawing::OutlineType::Line);
     }
     
-    std::optional<const drawing::Texture*> fetch_texture(const auto& texture_vector)
-    {
-      if (texture_vector.empty())
-        return std::nullopt; //texture_empty;
-      return &texture_vector[texture_anim_ctr % texture_vector.size()];
-    };
-    
-    std::optional<const drawing::Texture*> fetch_curr_fill_texture(const RoomStyle& room_style)
-    {
-      auto texture_fill = room_style.is_underground ?
-        fetch_texture(texture_ug_fill) : fetch_texture(texture_sl_fill);
-      return texture_fill;
-    }
-    
-    std::optional<const drawing::Texture*> fetch_curr_shadow_texture(const RoomStyle& room_style)
-    {
-      auto texture_shadow = room_style.is_underground ?
-      fetch_texture(texture_ug_shadow) : fetch_texture(texture_sl_shadow);
-      return texture_shadow;
-    }
-    
-    Terrain get_terrain(const RC& pos)
-    {
-      BSPNode* room = nullptr;
-      if (!is_inside_any_room(pos, &room))
-        return Terrain::Default;
-      const auto& bb = room->bb_leaf_room;
-      if (bb.is_inside_offs(pos, -1))
-      {
-        const auto& room_style = m_room_styles[room];
-        auto local_pos = m_player.pos - bb.pos();
-        auto tex_pos = room_style.tex_pos + local_pos;
-        auto texture = fetch_curr_fill_texture(room_style);
-        if (texture.has_value())
-        {
-          int curr_mat = (*texture.value())(tex_pos).mat;
-          // #FIXME: Canonize material idcs.
-          switch (curr_mat)
-          {
-            case 0: return Terrain::Void;
-            case 1: return Terrain::Tile;
-            case 2: return Terrain::Water;
-            case 3: return Terrain::Sand;
-            case 4: return Terrain::Stone;
-            case 5: return Terrain::Masonry;
-            case 6: return Terrain::Brick;
-            case 7: return Terrain::Grass;
-            case 8: return Terrain::Shrub;
-            case 9: return Terrain::Tree;
-            case 10: return Terrain::Metal;
-            case 11: return Terrain::Wood;
-            case 12: return Terrain::Ice;
-            case 13: return Terrain::Mountain;
-            case 14: return Terrain::Lava;
-            case 15: return Terrain::Cave;
-            case 16: return Terrain::Swamp;
-            case 17: return Terrain::Poison;
-            case 18: return Terrain::Path;
-            case 19: return Terrain::Mine;
-            case 20: return Terrain::Gold;
-            case 21: return Terrain::Silver;
-            case 22: return Terrain::Gravel;
-            case 23: return Terrain::Bone;
-            case 24: return Terrain::Acid;
-            case 25: return Terrain::Column;
-            case 26: return Terrain::Tar;
-            case 27: return Terrain::Rope;
-            default: return Terrain::Default;
-          }
-        }
-        else
-        {
-          switch (room_style.floor_type)
-          {
-            case FloorType::None: return Terrain::Default;
-            case FloorType::Sand: return Terrain::Sand;
-            case FloorType::Grass: return Terrain::Grass;
-            case FloorType::Stone: return Terrain::Stone;
-            case FloorType::Stone2: return Terrain::Stone;
-            case FloorType::Water: return Terrain::Water;
-            case FloorType::Wood: return Terrain::Wood;
-            default: return Terrain::Default;
-          }
-        }
-      }
-      return Terrain::Default;
-    }
-    
-    bool allow_move_to(int r, int c)
-    {
-      auto terrain = get_terrain(RC { r, c });
-    
-      switch (terrain)
-      {
-        case Terrain::Mountain: return false;
-        case Terrain::Tree: return false;
-        case Terrain::Column: return false;
-        case Terrain::Masonry: return false;
-        default: return true;
-      }
-    }
-    
   public:
     DungGine(const std::string& exe_folder, bool use_fow, DungGineTextureParams texture_params = {})
       : message_handler(std::make_unique<MessageHandler>())
       , use_fog_of_war(use_fow)
-      , dt_texture_anim_s(texture_params.dt_anim_s)
     {
-      for (const auto& fn : texture_params.texture_file_names_surface_level_fill)
-        texture_sl_fill.emplace_back().load(folder::join_path({ exe_folder, fn }));
-      for (const auto& fn : texture_params.texture_file_names_surface_level_shadow)
-        texture_sl_shadow.emplace_back().load(folder::join_path({ exe_folder, fn }));
-      for (const auto& fn : texture_params.texture_file_names_underground_fill)
-        texture_ug_fill.emplace_back().load(folder::join_path({ exe_folder, fn }));
-      for (const auto& fn : texture_params.texture_file_names_underground_shadow)
-        texture_ug_shadow.emplace_back().load(folder::join_path({ exe_folder, fn }));
+      m_screen_helper = std::make_unique<ScreenHelper>();
+      m_environment = std::make_unique<Environment>();
+      m_environment->load_textures(exe_folder, texture_params);
     }
     
     void load_dungeon(BSPTree* bsp_tree)
     {
-      m_bsp_tree = bsp_tree;
-      m_leaves = m_bsp_tree->fetch_leaves();
+      m_environment->load_dungeon(bsp_tree);
     }
     
     void style_dungeon()
     {
-      auto world_size = m_bsp_tree->get_world_size();
-      // Default lat_offs = 0 @ Latitude::Equator.
-      auto lat_offs = static_cast<int>(m_latitude) - static_cast<int>(Latitude::Equator);
-      // Default long_offs = 0 @ Longitude::F.
-      auto long_offs = static_cast<int>(m_longitude);
-      
-      auto f_calc_lat_long = [&world_size, lat_offs, long_offs](auto& room_style, const ttl::Rectangle& bb)
-      {
-        const auto num_lat = static_cast<int>(Latitude::NUM_ITEMS);
-        const auto num_long = static_cast<int>(Longitude::NUM_ITEMS);
-        RC cp { bb.r + bb.r_len/2, bb.c + bb.c_len };
-        auto lat_idx = math::clamp(static_cast<int>(num_lat*cp.r/world_size.r), 0, num_lat - 1);
-        auto long_idx = math::clamp(static_cast<int>(num_long*cp.c/world_size.c), 0, num_long - 1);
-        room_style.latitude = static_cast<Latitude>((lat_offs + lat_idx) % num_lat);
-        room_style.longitude = static_cast<Longitude>((long_offs + long_idx) % num_long);
-      };
-      
-      for (auto* leaf : m_leaves)
-      {
-        RoomStyle room_style;
-        room_style.init_rand();
-        
-        const auto& fill_textures = room_style.is_underground ? texture_ug_fill : texture_sl_fill;
-        if (!fill_textures.empty())
-        {
-          // #NOTE: Here we assume all textures in the animation batch are of the same size.
-          const auto& tex = fill_textures.front();
-          if (tex.size.r >= leaf->bb_leaf_room.r_len && tex.size.c >= leaf->bb_leaf_room.c_len)
-          {
-            room_style.tex_pos.r = rnd::rand_int(0, tex.size.r - leaf->bb_leaf_room.r_len + 1);
-            room_style.tex_pos.c = rnd::rand_int(0, tex.size.c - leaf->bb_leaf_room.c_len + 1);
-          }
-        }
-        
-        f_calc_lat_long(room_style, leaf->bb_leaf_room);
-        
-        m_room_styles[leaf] = room_style;
-      }
-      
-      const auto& room_corridor_map = m_bsp_tree->get_room_corridor_map();
-      for (const auto& cp : room_corridor_map)
-      {
-        RoomStyle room_style;
-        room_style.is_underground = is_underground(cp.first.first) || is_underground(cp.first.second);
-        room_style.wall_type = WallType::Masonry4;
-        room_style.wall_style = { Color::LightGray, Color::Black }; //wall_palette[WallBasicType::Masonry]
-        room_style.floor_type = FloorType::Stone2;
-        
-        f_calc_lat_long(room_style, cp.second->bb);
-        
-        m_corridor_styles[cp.second] = room_style;
-      }
+      m_environment->style_dungeon(m_latitude, m_longitude);
     }
     
     void set_player_character(char ch) { m_player.character = ch; }
     void set_player_style(const Style& style) { m_player.style = style; }
     bool place_player(const RC& screen_size, std::optional<RC> world_pos = std::nullopt)
     {
-      const auto world_size = m_bsp_tree->get_world_size();
-      m_screen_in_world.set_size(screen_size);
+      const auto world_size = m_environment->get_world_size();
+      m_screen_helper->set_screen_size(screen_size);
     
       if (world_pos.has_value())
         m_player.pos = world_pos.value();
@@ -1224,7 +994,7 @@ namespace dung
         
       m_player.last_pos = m_player.pos;
       
-      const auto& room_corridor_map = m_bsp_tree->get_room_corridor_map();
+      const auto& room_corridor_map = m_environment->get_room_corridor_map();
       
       const int c_max_num_iters = 1e5;
       int num_iters = 0;
@@ -1235,7 +1005,7 @@ namespace dung
           {
             m_player.is_spawned = true;
             m_player.curr_corridor = cp.second;
-            m_screen_in_world.set_pos(m_player.pos - m_screen_in_world.size()/2);
+            m_screen_helper->focus_on_world_pos_mid_screen(m_player.pos);
             return true;
           }
         m_player.pos += { rnd::rand_int(-2, +2), rnd::rand_int(-2, +2) };
@@ -1275,8 +1045,8 @@ namespace dung
     
     bool place_keys(bool only_place_on_dry_land)
     {
-      const auto world_size = m_bsp_tree->get_world_size();
-      const auto& door_vec = m_bsp_tree->fetch_doors();
+      const auto world_size = m_environment->get_world_size();
+      const auto& door_vec = m_environment->fetch_doors();
       const int c_max_num_iters = 1e5;
       int num_iters = 0;
       bool valid_pos = false;
@@ -1295,23 +1065,23 @@ namespace dung
             };
             
             BSPNode* room = nullptr;
-            valid_pos = is_inside_any_room(key.pos, &room);
+            valid_pos = m_environment->is_inside_any_room(key.pos, &room);
             if (only_place_on_dry_land &&
                 room != nullptr &&
-                !is_dry(get_terrain(key.pos)))
+                !is_dry(m_environment->get_terrain(key.pos)))
             {
               valid_pos = false;
             }
           } while (num_iters++ < c_max_num_iters && !valid_pos);
           
           BSPNode* leaf = nullptr;
-          if (!is_inside_any_room(key.pos, &leaf))
+          if (!m_environment->is_inside_any_room(key.pos, &leaf))
             return false;
             
           if (leaf != nullptr)
           {
             key.curr_room = leaf;
-            key.is_underground = is_underground(leaf);
+            key.is_underground = m_environment->is_underground(leaf);
           }
             
           all_keys.emplace_back(key);
@@ -1322,7 +1092,7 @@ namespace dung
     
     bool place_lamps(int num_lamps, bool only_place_on_dry_land)
     {
-      const auto world_size = m_bsp_tree->get_world_size();
+      const auto world_size = m_environment->get_world_size();
       const int c_max_num_iters = 1e5;
       int num_iters = 0;
       bool valid_pos = false;
@@ -1349,23 +1119,23 @@ namespace dung
             };
           }
           BSPNode* room = nullptr;
-          valid_pos = is_inside_any_room(lamp.pos, &room);
+          valid_pos = m_environment->is_inside_any_room(lamp.pos, &room);
           if (only_place_on_dry_land &&
               room != nullptr &&
-              !is_dry(get_terrain(lamp.pos)))
+              !is_dry(m_environment->get_terrain(lamp.pos)))
           {
             valid_pos = false;
           }
         } while (num_iters++ < c_max_num_iters && !valid_pos);
         
         BSPNode* leaf = nullptr;
-        if (!is_inside_any_room(lamp.pos, &leaf))
+        if (!m_environment->is_inside_any_room(lamp.pos, &leaf))
           return false;
           
         if (leaf != nullptr)
         {
           lamp.curr_room = leaf;
-          lamp.is_underground = is_underground(leaf);
+          lamp.is_underground = m_environment->is_underground(leaf);
         }
         
         all_lamps.emplace_back(lamp);
@@ -1375,7 +1145,7 @@ namespace dung
     
     bool place_weapons(int num_weapons, bool only_place_on_dry_land)
     {
-      const auto world_size = m_bsp_tree->get_world_size();
+      const auto world_size = m_environment->get_world_size();
       const int c_max_num_iters = 1e5;
       int num_iters = 0;
       bool valid_pos = false;
@@ -1398,23 +1168,23 @@ namespace dung
             rnd::rand_int(0, world_size.c)
           };
           BSPNode* room = nullptr;
-          valid_pos = is_inside_any_room(weapon->pos, &room);
+          valid_pos = m_environment->is_inside_any_room(weapon->pos, &room);
           if (only_place_on_dry_land &&
               room != nullptr &&
-              !is_dry(get_terrain(weapon->pos)))
+              !is_dry(m_environment->get_terrain(weapon->pos)))
           {
             valid_pos = false;
           }
         } while (num_iters++ < c_max_num_iters && !valid_pos);
         
         BSPNode* leaf = nullptr;
-        if (!is_inside_any_room(weapon->pos, &leaf))
+        if (!m_environment->is_inside_any_room(weapon->pos, &leaf))
           return false;
           
         if (leaf != nullptr)
         {
           weapon->curr_room = leaf;
-          weapon->is_underground = is_underground(leaf);
+          weapon->is_underground = m_environment->is_underground(leaf);
         }
         
         all_weapons.emplace_back(weapon.release());
@@ -1424,7 +1194,7 @@ namespace dung
     
     bool place_potions(int num_potions, bool only_place_on_dry_land)
     {
-      const auto world_size = m_bsp_tree->get_world_size();
+      const auto world_size = m_environment->get_world_size();
       const int c_max_num_iters = 1e5;
       int num_iters = 0;
       bool valid_pos = false;
@@ -1442,23 +1212,23 @@ namespace dung
             };
           }
           BSPNode* room = nullptr;
-          valid_pos = is_inside_any_room(potion.pos, &room);
+          valid_pos = m_environment->is_inside_any_room(potion.pos, &room);
           if (only_place_on_dry_land &&
               room != nullptr &&
-              !is_dry(get_terrain(potion.pos)))
+              !is_dry(m_environment->get_terrain(potion.pos)))
           {
             valid_pos = false;
           }
         } while (num_iters++ < c_max_num_iters && !valid_pos);
         
         BSPNode* leaf = nullptr;
-        if (!is_inside_any_room(potion.pos, &leaf))
+        if (!m_environment->is_inside_any_room(potion.pos, &leaf))
           return false;
           
         if (leaf != nullptr)
         {
           potion.curr_room = leaf;
-          potion.is_underground = is_underground(leaf);
+          potion.is_underground = m_environment->is_underground(leaf);
         }
         
         all_potions.emplace_back(potion);
@@ -1468,7 +1238,7 @@ namespace dung
     
     bool place_armour(int num_armour, bool only_place_on_dry_land)
     {
-      const auto world_size = m_bsp_tree->get_world_size();
+      const auto world_size = m_environment->get_world_size();
       const int c_max_num_iters = 1e5;
       int num_iters = 0;
       bool valid_pos = false;
@@ -1495,23 +1265,23 @@ namespace dung
             rnd::rand_int(0, world_size.c)
           };
           BSPNode* room = nullptr;
-          valid_pos = is_inside_any_room(armour->pos, &room);
+          valid_pos = m_environment->is_inside_any_room(armour->pos, &room);
           if (only_place_on_dry_land &&
               room != nullptr &&
-              !is_dry(get_terrain(armour->pos)))
+              !is_dry(m_environment->get_terrain(armour->pos)))
           {
             valid_pos = false;
           }
         } while (num_iters++ < c_max_num_iters && !valid_pos);
         
         BSPNode* leaf = nullptr;
-        if (!is_inside_any_room(armour->pos, &leaf))
+        if (!m_environment->is_inside_any_room(armour->pos, &leaf))
           return false;
           
         if (leaf != nullptr)
         {
           armour->curr_room = leaf;
-          armour->is_underground = is_underground(leaf);
+          armour->is_underground = m_environment->is_underground(leaf);
         }
         
         all_armour.emplace_back(armour.release());
@@ -1521,7 +1291,7 @@ namespace dung
     
     bool place_npcs(int num_npcs, bool only_place_on_dry_land)
     {
-      const auto world_size = m_bsp_tree->get_world_size();
+      const auto world_size = m_environment->get_world_size();
       const int c_max_num_iters = 1e5;
       int num_iters = 0;
       bool valid_pos = false;
@@ -1538,36 +1308,29 @@ namespace dung
             rnd::rand_int(0, world_size.c)
           };
           BSPNode* room = nullptr;
-          valid_pos = is_inside_any_room(npc.pos, &room);
+          valid_pos = m_environment->is_inside_any_room(npc.pos, &room);
           if (only_place_on_dry_land &&
               room != nullptr &&
-              !is_dry(get_terrain(npc.pos)))
+              !is_dry(m_environment->get_terrain(npc.pos)))
           {
             valid_pos = false;
           }
         } while (num_iters++ < c_max_num_iters && !valid_pos);
         
         BSPNode* leaf = nullptr;
-        if (!is_inside_any_room(npc.pos, &leaf))
+        if (!m_environment->is_inside_any_room(npc.pos, &leaf))
           return false;
           
         if (leaf != nullptr)
         {
           npc.curr_room = leaf;
-          npc.is_underground = is_underground(leaf);
+          npc.is_underground = m_environment->is_underground(leaf);
           npc.init(all_weapons);
         }
         
         all_npcs.emplace_back(npc);
       }
       return true;
-    }
-    
-    void set_screen_scrolling_mode(ScreenScrollingMode mode, float t_page = 0.2f)
-    {
-      scr_scrolling_mode = mode;
-      if (mode == ScreenScrollingMode::PageWise)
-        t_scroll_amount = t_page;
     }
     
     void update(double real_time_s, float sim_dt_s, const keyboard::KeyPressData& kpd, bool* game_over)
@@ -1685,45 +1448,16 @@ namespace dung
           }
         }
       }
-        
-        // Scrolling mode.
-      switch (scr_scrolling_mode)
-      {
-        case ScreenScrollingMode::AlwaysInCentre:
-          m_screen_in_world.set_pos(curr_pos - m_screen_in_world.size()/2);
-          break;
-        case ScreenScrollingMode::PageWise:
-        {
-          int offs_v = -static_cast<int>(std::round(m_screen_in_world.r_len*t_scroll_amount));
-          int offs_h = -static_cast<int>(std::round(m_screen_in_world.c_len*t_scroll_amount));
-          if (!m_screen_in_world.is_inside_offs(curr_pos, offs_v, offs_h))
-            m_screen_in_world.set_pos(curr_pos - m_screen_in_world.size()/2);
-          break;
-        }
-        case ScreenScrollingMode::WhenOutsideScreen:
-          if (!m_screen_in_world.is_inside(curr_pos))
-          {
-            if (curr_pos.r < m_screen_in_world.top())
-              m_screen_in_world.r -= m_screen_in_world.r_len;
-            else if (curr_pos.r > m_screen_in_world.bottom())
-              m_screen_in_world.r += m_screen_in_world.r_len;
-            else if (curr_pos.c < m_screen_in_world.left())
-              m_screen_in_world.c -= m_screen_in_world.c_len;
-            else if (curr_pos.c > m_screen_in_world.right())
-              m_screen_in_world.c += m_screen_in_world.c_len;
-          }
-          break;
-        default:
-          break;
-      }
+      
+      m_screen_helper->update_scrolling(curr_pos);
     }
     
     
     template<int NR, int NC>
     void draw(SpriteHandler<NR, NC>& sh, double real_time_s, int anim_ctr)
     {
-      const auto& room_corridor_map = m_bsp_tree->get_room_corridor_map();
-      const auto& door_vec = m_bsp_tree->fetch_doors();
+      const auto& room_corridor_map = m_environment->get_room_corridor_map();
+      const auto& door_vec = m_environment->fetch_doors();
       
       message_handler->update(sh, static_cast<float>(real_time_s));
       
@@ -1757,7 +1491,7 @@ namespace dung
         
         if (npc.state == State::Fight)
         {
-          auto scr_pos = get_screen_pos(npc.pos);
+          auto scr_pos = m_screen_helper->get_screen_pos(npc.pos);
           
           // [side_case, base_case, side_case]
           // Case NW (dp = [1, 1]):
@@ -1875,7 +1609,7 @@ namespace dung
       // PC
       if (m_player.is_spawned)
       {
-        auto player_scr_pos = get_screen_pos(m_player.pos);
+        auto player_scr_pos = m_screen_helper->get_screen_pos(m_player.pos);
         sh.write_buffer(std::string(1, m_player.character), player_scr_pos.r, player_scr_pos.c, m_player.style);
         
         if (is_wet(m_player.on_terrain))
@@ -1888,7 +1622,7 @@ namespace dung
       {
         if (!obj.visible)
           return;
-        auto scr_pos = get_screen_pos(obj.pos);
+        auto scr_pos = m_screen_helper->get_screen_pos(obj.pos);
         sh.write_buffer(std::string(1, obj.character), scr_pos.r, scr_pos.c, obj.style);
       };
       
@@ -1898,7 +1632,7 @@ namespace dung
         
         if (npc.debug)
         {
-          auto scr_pos = get_screen_pos(npc.pos);
+          auto scr_pos = m_screen_helper->get_screen_pos(npc.pos);
           
           if (npc.vel_r < 0.f)
             sh.write_buffer("^", scr_pos.r - 1, scr_pos.c, Color::Black, Color::White);
@@ -1912,13 +1646,13 @@ namespace dung
           
           if (npc.curr_room != nullptr)
           {
-            auto scr_pos_room = get_screen_pos(npc.curr_room->bb_leaf_room.center());
+            auto scr_pos_room = m_screen_helper->get_screen_pos(npc.curr_room->bb_leaf_room.center());
             bresenham::plot_line(sh, scr_pos.c, scr_pos.r, scr_pos_room.c, scr_pos_room.r,
                     ".", Color::White, Color::Transparent2);
           }
           if (npc.curr_corridor != nullptr)
           {
-            auto scr_pos_corr = get_screen_pos(npc.curr_corridor->bb.center());
+            auto scr_pos_corr = m_screen_helper->get_screen_pos(npc.curr_corridor->bb.center());
             bresenham::plot_line(sh, scr_pos.c, scr_pos.r, scr_pos_corr.c, scr_pos_corr.r,
                     ".", Color::White, Color::Transparent2);
           }
@@ -1928,7 +1662,7 @@ namespace dung
       for (auto* door : door_vec)
       {
         auto door_pos = door->pos;
-        auto door_scr_pos = get_screen_pos(door_pos);
+        auto door_scr_pos = m_screen_helper->get_screen_pos(door_pos);
         std::string door_ch = "^";
         if (door->is_door)
         {
@@ -1957,112 +1691,13 @@ namespace dung
       for (const auto& armour : all_armour)
         f_render_item(*armour);
       
-      auto shadow_type = m_sun_dir;
-      for (const auto& room_pair : m_room_styles)
-      {
-        auto* room = room_pair.first;
-        const auto& bb = room->bb_leaf_room;
-        const auto& room_style = room_pair.second;
-        auto bb_scr_pos = get_screen_pos(bb.pos());
-        if (m_use_per_room_lat_long_for_sun_dir)
-          shadow_type = m_solar_motion.get_solar_direction(room_style.latitude, room_style.longitude, m_season, m_t_solar_period);
-          
-        if (m_player.curr_room == room && m_player.is_inside_curr_room())
-          m_player.on_terrain = get_terrain(m_player.pos);
-        
-        // Fog of war
-        if (use_fog_of_war)
-        {
-          for (int r = 0; r <= bb.r_len; ++r)
-          {
-            for (int c = 0; c <= bb.c_len; ++c)
-            {
-              if (room->fog_of_war[r * (bb.c_len + 1) + c])
-                sh.write_buffer(".", bb_scr_pos.r + r, bb_scr_pos.c + c, Color::Black, Color::Black);
-            }
-          }
-        }
-        
-        drawing::draw_box_outline(sh,
-                                  bb_scr_pos.r, bb_scr_pos.c, bb.r_len, bb.c_len,
-                                  room_style.wall_type,
-                                  room_style.wall_style,
-                                  room->light);
-                                  
-        if (room_style.is_underground ? texture_ug_fill.empty() : texture_sl_fill.empty())
-        {
-          drawing::draw_box(sh,
-                            bb_scr_pos.r, bb_scr_pos.c, bb.r_len, bb.c_len,
-                            room_style.get_fill_style(),
-                            room_style.get_fill_char(),
-                            room_style.is_underground ? SolarDirection::Nadir : shadow_type,
-                            styles::shade_style(room_style.get_fill_style(), color::ShadeType::Dark),
-                            room_style.get_fill_char(),
-                            room->light);
-        }
-        else
-        {
-          if (real_time_s - texture_anim_time_stamp > dt_texture_anim_s)
-          {
-            texture_anim_ctr++;
-            texture_anim_time_stamp = real_time_s;
-          }
-          
-          const auto& texture_fill = *(fetch_curr_fill_texture(room_style).value_or(&texture_empty));
-          const auto& texture_shadow = *(fetch_curr_shadow_texture(room_style).value_or(&texture_empty));
-        
-          drawing::draw_box_textured(sh,
-                                     bb_scr_pos.r, bb_scr_pos.c, bb.r_len, bb.c_len,
-                                     room_style.is_underground ? SolarDirection::Nadir : shadow_type,
-                                     texture_fill,
-                                     texture_shadow,
-                                     room->light,
-                                     room_style.is_underground,
-                                     room_style.tex_pos);
-        }
-      }
-      
-      shadow_type = m_sun_dir;
-      for (const auto& corr_pair : m_corridor_styles)
-      {
-        auto* corr = corr_pair.first;
-        const auto& bb = corr->bb;
-        const auto& corr_style = corr_pair.second;
-        auto bb_scr_pos = get_screen_pos(bb.pos());
-        if (m_use_per_room_lat_long_for_sun_dir)
-          shadow_type = m_solar_motion.get_solar_direction(corr_style.latitude, corr_style.longitude, m_season, m_t_solar_period);
-          
-        if (m_player.curr_corridor == corr && m_player.is_inside_curr_corridor())
-          m_player.on_terrain = Terrain::Default;
-        
-        // Fog of war
-        if (use_fog_of_war)
-        {
-          for (int r = 0; r <= bb.r_len; ++r)
-          {
-            for (int c = 0; c <= bb.c_len; ++c)
-            {
-              if (corr->fog_of_war[r * (bb.c_len + 1) + c])
-                sh.write_buffer(".", bb_scr_pos.r + r, bb_scr_pos.c + c, Color::Black, Color::Black);
-            }
-          }
-        }
-        
-        
-        drawing::draw_box_outline(sh,
-                                  bb_scr_pos.r, bb_scr_pos.c, bb.r_len, bb.c_len,
-                                  corr_style.wall_type,
-                                  corr_style.wall_style,
-                                  corr->light);
-        drawing::draw_box(sh,
-                          bb_scr_pos.r, bb_scr_pos.c, bb.r_len, bb.c_len,
-                          corr_style.get_fill_style(),
-                          corr_style.get_fill_char(),
-                          corr_style.is_underground ? SolarDirection::Nadir : shadow_type,
-                          styles::shade_style(corr_style.get_fill_style(), color::ShadeType::Dark, true),
-                          corr_style.get_fill_char(),
-                          corr->light);
-      }
+      m_environment->draw_environment(sh, real_time_s,
+                                      use_fog_of_war,
+                                      m_sun_dir, m_solar_motion,
+                                      m_t_solar_period, m_season,
+                                      m_use_per_room_lat_long_for_sun_dir,
+                                      m_screen_helper.get(),
+                                      m_player);
     }
     
   };

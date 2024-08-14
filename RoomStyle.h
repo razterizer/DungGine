@@ -7,6 +7,7 @@
 
 #pragma once
 #include "SolarMotionPatterns.h"
+#include "DungGineStyles.h"
 
 namespace dung
 {

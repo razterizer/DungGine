@@ -6,9 +6,10 @@
 //
 
 #pragma once
-#include <Core/StlUtils.h>
 #include "Globals.h"
 #include "Terrain.h"
+#include "Items.h"
+#include <Core/StlUtils.h>
 
 
 namespace dung
