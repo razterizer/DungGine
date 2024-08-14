@@ -1310,10 +1310,12 @@ namespace dung
           BSPNode* room = nullptr;
           valid_pos = m_environment->is_inside_any_room(npc.pos, &room);
           if (only_place_on_dry_land &&
-              room != nullptr &&
-              !is_dry(m_environment->get_terrain(npc.pos)))
+              room != nullptr)
           {
-            valid_pos = false;
+            if (!is_dry(m_environment->get_terrain(npc.pos)))
+              valid_pos = false;
+            else if (!m_environment->allow_move_to(npc.pos.r, npc.pos.c))
+              valid_pos = false;
           }
         } while (num_iters++ < c_max_num_iters && !valid_pos);
         
