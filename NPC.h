@@ -115,6 +115,159 @@ namespace dung
     bool is_hostile = false;
     OneShot trg_info_hostile_npc;
     
+  private:
+    bool allow_move()
+    {
+      if (on_terrain == Terrain::Sand)
+        return rnd::rand() < 0.4f;
+      if (on_terrain == Terrain::Grass)
+        return rnd::rand() < 0.8f;
+      return !rnd::one_in(2 + strength /* - weakness*/);
+    }
+    
+    void move(const RC& pc_pos, Environment* environment, float dt)
+    {
+      if (wall_coll_resolve)
+      {
+        if (wall_coll_resolve_ctr++ < 2)
+        {
+          wall_coll_resolve_ctr = 0;
+          wall_coll_resolve = false;
+        }
+      }
+      else if (rnd::one_in(prob_change_acc))
+      {
+        acc_r += rnd::randn_range(-acc_step, +acc_step);
+        acc_c += rnd::randn_range(-acc_step*px_aspect, +acc_step*px_aspect);
+        acc_r = math::clamp<float>(acc_r, -acc_lim*acc_factor, +acc_lim*acc_factor);
+        acc_c = math::clamp<float>(acc_c, -acc_lim*acc_factor*px_aspect, +acc_lim*acc_factor*px_aspect);
+      }
+      switch (state)
+      {
+        case State::Patroll:
+          vel_r += acc_r*dt;
+          vel_c += acc_c*dt;
+          break;
+        case State::Pursue:
+        case State::Fight:
+          //vel_r = 0.5f * (pc_pos.r - pos.r);
+          //vel_c = 0.5f * (pc_pos.c - pos.c);
+          
+          if (pc_pos.r + c_fight_min_dist < pos.r)
+            vel_r = 0.5f * ((pc_pos.r + c_fight_min_dist) - pos.r);
+          else if (pc_pos.r - c_fight_min_dist > pos.r)
+            vel_r = 0.5f * ((pc_pos.r - c_fight_min_dist) - pos.r);
+          
+          if (pc_pos.c + c_fight_min_dist < pos.c)
+            vel_c = 0.5f * ((pc_pos.c + c_fight_min_dist) - pos.c);
+          else if (pc_pos.c - c_fight_min_dist > pos.c)
+            vel_c = 0.5f * ((pc_pos.c - c_fight_min_dist) - pos.c);
+          break;
+        case State::NUM_ITEMS:
+          break;
+      }
+      vel_r = math::clamp<float>(vel_r, -vel_lim, +vel_lim);
+      vel_c = math::clamp<float>(vel_c, -vel_lim*vel_factor*px_aspect, +vel_lim*vel_factor*px_aspect);
+      pos_r += vel_r*dt;
+      pos_c += vel_c*dt;
+      auto r = math::roundI(pos_r);
+      auto c = math::roundI(pos_c);
+      auto location_corr = ttl::BBLocation::None;
+      auto location_room = ttl::BBLocation::None;
+      inside_room = false;
+      inside_corr = false;
+      if (curr_corridor != nullptr)
+        inside_corr = curr_corridor->is_inside_corridor({r, c}, &location_corr);//check_bb_location(r, c);
+      if (curr_room != nullptr)
+        inside_room = curr_room->is_inside_room({r, c}, &location_corr);
+      if (inside_room || inside_corr)
+      {
+        if (environment->allow_move_to(r, c))
+        {
+          pos.r = r;
+          pos.c = c;
+        }
+        else
+        {
+          pos_r = pos.r;
+          pos_c = pos.c;
+        }
+        wall_coll_resolve_ctr = 0;
+        wall_coll_resolve = false;
+      }
+      else if (!wall_coll_resolve && rnd::one_in(6))
+      {
+        auto location = ttl::BBLocation::None;
+        if (location_room != ttl::BBLocation::None && location_corr != ttl::BBLocation::None)
+        {
+          acc_r = 0.f;
+          acc_c = 0.f;
+          vel_r = 0.f;
+          vel_c = 0.f;
+        }
+        else if (inside_room && location_room != ttl::BBLocation::None)
+          location = location_room;
+        else if (inside_corr && location_corr != ttl::BBLocation::None)
+          location = location_corr;
+        pos_r = pos.r;
+        pos_c = pos.c;
+        const float c_res_acc = 0.f;
+        const float c_res_vel = 5.f;
+        switch (location)
+        {
+          case ttl::BBLocation::OutsideTop:
+            acc_r = c_res_acc;
+            vel_r = c_res_vel;
+            break;
+          case ttl::BBLocation::OutsideTopLeft:
+            acc_r = c_res_acc;
+            acc_c = c_res_acc;
+            vel_r = c_res_vel;
+            vel_c = c_res_vel;
+            break;
+          case ttl::BBLocation::OutsideLeft:
+            acc_c = c_res_acc;
+            vel_c = c_res_vel;
+            break;
+          case ttl::BBLocation::OutsideBottomLeft:
+            acc_r = -c_res_acc;
+            acc_c = c_res_acc;
+            vel_r = -c_res_vel;
+            vel_c = c_res_vel;
+            break;
+          case ttl::BBLocation::OutsideBottom:
+            acc_r = -c_res_acc;
+            vel_r = -c_res_vel;
+            break;
+          case ttl::BBLocation::OutsideBottomRight:
+            acc_r = -c_res_acc;
+            acc_c = -c_res_acc;
+            vel_r = -c_res_vel;
+            vel_c = -c_res_vel;
+            break;
+          case ttl::BBLocation::OutsideRight:
+            acc_c = -c_res_acc;
+            vel_c = -c_res_vel;
+            break;
+          case ttl::BBLocation::OutsideTopRight:
+            acc_r = c_res_acc;
+            acc_c = -c_res_acc;
+            vel_r = c_res_vel;
+            vel_c = -c_res_vel;
+            break;
+          default:
+            acc_r = 0.f;
+            acc_c = 0.f;
+            vel_r = 0.f;
+            vel_c = 0.f;
+            break;
+        }
+        
+        wall_coll_resolve = true;
+      }
+    }
+    
+  public:
     void init(const std::vector<std::unique_ptr<Weapon>>& all_weapons)
     {
       pos_r = pos.r;
@@ -435,148 +588,6 @@ namespace dung
                   ((this->is_underground || is_night) && !this->light));
     }
     
-    void move(const RC& pc_pos, Environment* environment, float dt)
-    {
-      if (wall_coll_resolve)
-      {
-        if (wall_coll_resolve_ctr++ < 2)
-        {
-          wall_coll_resolve_ctr = 0;
-          wall_coll_resolve = false;
-        }
-      }
-      else if (rnd::one_in(prob_change_acc))
-      {
-        acc_r += rnd::randn_range(-acc_step, +acc_step);
-        acc_c += rnd::randn_range(-acc_step*px_aspect, +acc_step*px_aspect);
-        acc_r = math::clamp<float>(acc_r, -acc_lim*acc_factor, +acc_lim*acc_factor);
-        acc_c = math::clamp<float>(acc_c, -acc_lim*acc_factor*px_aspect, +acc_lim*acc_factor*px_aspect);
-      }
-      switch (state)
-      {
-        case State::Patroll:
-          vel_r += acc_r*dt;
-          vel_c += acc_c*dt;
-          break;
-        case State::Pursue:
-        case State::Fight:
-          //vel_r = 0.5f * (pc_pos.r - pos.r);
-          //vel_c = 0.5f * (pc_pos.c - pos.c);
-          
-          if (pc_pos.r + c_fight_min_dist < pos.r)
-            vel_r = 0.5f * ((pc_pos.r + c_fight_min_dist) - pos.r);
-          else if (pc_pos.r - c_fight_min_dist > pos.r)
-            vel_r = 0.5f * ((pc_pos.r - c_fight_min_dist) - pos.r);
-          
-          if (pc_pos.c + c_fight_min_dist < pos.c)
-            vel_c = 0.5f * ((pc_pos.c + c_fight_min_dist) - pos.c);
-          else if (pc_pos.c - c_fight_min_dist > pos.c)
-            vel_c = 0.5f * ((pc_pos.c - c_fight_min_dist) - pos.c);
-          break;
-        case State::NUM_ITEMS:
-          break;
-      }
-      vel_r = math::clamp<float>(vel_r, -vel_lim, +vel_lim);
-      vel_c = math::clamp<float>(vel_c, -vel_lim*vel_factor*px_aspect, +vel_lim*vel_factor*px_aspect);
-      pos_r += vel_r*dt;
-      pos_c += vel_c*dt;
-      auto r = math::roundI(pos_r);
-      auto c = math::roundI(pos_c);
-      auto location_corr = ttl::BBLocation::None;
-      auto location_room = ttl::BBLocation::None;
-      inside_room = false;
-      inside_corr = false;
-      if (curr_corridor != nullptr)
-        inside_corr = curr_corridor->is_inside_corridor({r, c}, &location_corr);//check_bb_location(r, c);
-      if (curr_room != nullptr)
-        inside_room = curr_room->is_inside_room({r, c}, &location_corr);
-      if (inside_room || inside_corr)
-      {
-        if (environment->allow_move_to(r, c))
-        {
-          pos.r = r;
-          pos.c = c;
-        }
-        else
-        {
-          pos_r = pos.r;
-          pos_c = pos.c;
-        }
-        wall_coll_resolve_ctr = 0;
-        wall_coll_resolve = false;
-      }
-      else if (!wall_coll_resolve && rnd::one_in(6))
-      {
-        auto location = ttl::BBLocation::None;
-        if (location_room != ttl::BBLocation::None && location_corr != ttl::BBLocation::None)
-        {
-          acc_r = 0.f;
-          acc_c = 0.f;
-          vel_r = 0.f;
-          vel_c = 0.f;
-        }
-        else if (inside_room && location_room != ttl::BBLocation::None)
-          location = location_room;
-        else if (inside_corr && location_corr != ttl::BBLocation::None)
-          location = location_corr;
-        pos_r = pos.r;
-        pos_c = pos.c;
-        const float c_res_acc = 0.f;
-        const float c_res_vel = 5.f;
-        switch (location)
-        {
-          case ttl::BBLocation::OutsideTop:
-            acc_r = c_res_acc;
-            vel_r = c_res_vel;
-            break;
-          case ttl::BBLocation::OutsideTopLeft:
-            acc_r = c_res_acc;
-            acc_c = c_res_acc;
-            vel_r = c_res_vel;
-            vel_c = c_res_vel;
-            break;
-          case ttl::BBLocation::OutsideLeft:
-            acc_c = c_res_acc;
-            vel_c = c_res_vel;
-            break;
-          case ttl::BBLocation::OutsideBottomLeft:
-            acc_r = -c_res_acc;
-            acc_c = c_res_acc;
-            vel_r = -c_res_vel;
-            vel_c = c_res_vel;
-            break;
-          case ttl::BBLocation::OutsideBottom:
-            acc_r = -c_res_acc;
-            vel_r = -c_res_vel;
-            break;
-          case ttl::BBLocation::OutsideBottomRight:
-            acc_r = -c_res_acc;
-            acc_c = -c_res_acc;
-            vel_r = -c_res_vel;
-            vel_c = -c_res_vel;
-            break;
-          case ttl::BBLocation::OutsideRight:
-            acc_c = -c_res_acc;
-            vel_c = -c_res_vel;
-            break;
-          case ttl::BBLocation::OutsideTopRight:
-            acc_r = c_res_acc;
-            acc_c = -c_res_acc;
-            vel_r = c_res_vel;
-            vel_c = -c_res_vel;
-            break;
-          default:
-            acc_r = 0.f;
-            acc_c = 0.f;
-            vel_r = 0.f;
-            vel_c = 0.f;
-            break;
-        }
-        
-        wall_coll_resolve = true;
-      }
-    }
-    
     void update(const RC& pc_pos, Environment* environment, float dt)
     {
       if (health <= 0)
@@ -685,29 +696,19 @@ namespace dung
     
     int calc_armour_class() const
     {
-        return armor_class + (dexterity / 2);
+      return armor_class + (dexterity / 2);
     }
     
     // Function to calculate melee attack bonus
     int get_melee_attack_bonus() const
     {
-        return strength / 2; // Example: Strength bonus to attack rolls
+      return strength / 2; // Example: Strength bonus to attack rolls
     }
 
     // Function to calculate melee damage bonus
     int get_melee_damage_bonus() const
     {
-        return strength / 2; // Example: Strength bonus to damage
-    }
-    
-  private:
-    bool allow_move()
-    {
-      if (on_terrain == Terrain::Sand)
-        return rnd::rand() < 0.4f;
-      if (on_terrain == Terrain::Grass)
-        return rnd::rand() < 0.8f;
-      return !rnd::one_in(2 + strength /* - weakness*/);
+      return strength / 2; // Example: Strength bonus to damage
     }
 
   };
