@@ -1402,7 +1402,11 @@ namespace dung
       
       // NPCs
       for (auto& npc : all_npcs)
+      {
         npc.update(curr_pos, sim_dt_s);
+        
+        npc.on_terrain = m_environment->get_terrain(npc.pos);
+      }
       
       // Fighting
       for (auto& npc : all_npcs)
