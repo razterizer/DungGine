@@ -435,47 +435,8 @@ namespace dung
                   ((this->is_underground || is_night) && !this->light));
     }
     
-    void update(const RC& pc_pos, float dt)
+    void move(const RC& pc_pos, Environment* environment, float dt)
     {
-      if (health <= 0)
-      {
-        character = '&';
-        style = { Color::Red, Color::DarkGray };
-        return;
-      }
-      
-      if (rnd::one_in(prob_slow_fast))
-      {
-        math::toggle(slow);
-        if (slow)
-        {
-          acc_factor = acc_slowness_factor;
-          vel_factor = vel_slowness_factor;
-        }
-        else
-        {
-          acc_factor = 1.f;
-          vel_factor = 1.f;
-        }
-      }
-      
-      auto dist_to_pc = distance(pos, pc_pos);
-      
-      if (enemy)
-      {
-        if (dist_to_pc < c_dist_hostile_hyst_on)
-          is_hostile = true;
-        else if (dist_to_pc > c_dist_hostile_hyst_off)
-          is_hostile = false;
-      }
-      
-      if (enemy && dist_to_pc < c_dist_fight)
-        state = State::Fight;
-      else if (enemy && dist_to_pc < c_dist_pursue)
-        state = State::Pursue;
-      else if (dist_to_pc > c_dist_patroll)
-        state = State::Patroll;
-    
       if (wall_coll_resolve)
       {
         if (wall_coll_resolve_ctr++ < 2)
@@ -531,8 +492,16 @@ namespace dung
         inside_room = curr_room->is_inside_room({r, c}, &location_corr);
       if (inside_room || inside_corr)
       {
-        pos.r = r;
-        pos.c = c;
+        if (environment->allow_move_to(r, c))
+        {
+          pos.r = r;
+          pos.c = c;
+        }
+        else
+        {
+          pos_r = pos.r;
+          pos_c = pos.c;
+        }
         wall_coll_resolve_ctr = 0;
         wall_coll_resolve = false;
       }
@@ -606,8 +575,51 @@ namespace dung
         
         wall_coll_resolve = true;
       }
+    }
+    
+    void update(const RC& pc_pos, Environment* environment, float dt)
+    {
+      if (health <= 0)
+      {
+        character = '&';
+        style = { Color::Red, Color::DarkGray };
+        return;
+      }
       
+      if (rnd::one_in(prob_slow_fast))
+      {
+        math::toggle(slow);
+        if (slow)
+        {
+          acc_factor = acc_slowness_factor;
+          vel_factor = vel_slowness_factor;
+        }
+        else
+        {
+          acc_factor = 1.f;
+          vel_factor = 1.f;
+        }
+      }
       
+      auto dist_to_pc = distance(pos, pc_pos);
+      
+      if (enemy)
+      {
+        if (dist_to_pc < c_dist_hostile_hyst_on)
+          is_hostile = true;
+        else if (dist_to_pc > c_dist_hostile_hyst_off)
+          is_hostile = false;
+      }
+      
+      if (enemy && dist_to_pc < c_dist_fight)
+        state = State::Fight;
+      else if (enemy && dist_to_pc < c_dist_pursue)
+        state = State::Pursue;
+      else if (dist_to_pc > c_dist_patroll)
+        state = State::Patroll;
+      
+      if (allow_move())
+        move(pc_pos, environment, dt);
       
       if (inside_room && curr_room != nullptr)
       {
@@ -686,6 +698,16 @@ namespace dung
     int get_melee_damage_bonus() const
     {
         return strength / 2; // Example: Strength bonus to damage
+    }
+    
+  private:
+    bool allow_move()
+    {
+      if (on_terrain == Terrain::Sand)
+        return rnd::rand() < 0.4f;
+      if (on_terrain == Terrain::Grass)
+        return rnd::rand() < 0.8f;
+      return !rnd::one_in(2 + strength /* - weakness*/);
     }
 
   };
