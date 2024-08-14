@@ -100,6 +100,8 @@ namespace dung
     int thac0 = 1;
     int armor_class = 2;
     
+    Terrain on_terrain = Terrain::Default;
+    
     Race npc_race = Race::Ogre;
     Class npc_class = Class::Warrior_Barbarian;
     int weapon_idx = -1;
