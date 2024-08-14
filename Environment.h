@@ -216,7 +216,7 @@ namespace dung
         if (its == m_room_styles.end())
           return Terrain::Default;
         const auto& room_style = its->second;
-        auto local_pos = pos - bb.pos();
+        auto local_pos = pos - bb.pos() - RC { 1, 1 };
         auto tex_pos = room_style.tex_pos + local_pos;
         auto texture = fetch_curr_fill_texture(room_style);
         if (texture.has_value())
