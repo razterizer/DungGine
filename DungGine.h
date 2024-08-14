@@ -1393,6 +1393,13 @@ namespace dung
       // Player LOS etc.
       m_player.update();
       
+      if (m_player.is_inside_curr_room())
+        m_player.on_terrain = m_environment->get_terrain(m_player.pos);
+      else if (m_player.is_inside_curr_corridor())
+        m_player.on_terrain = Terrain::Default;
+      else
+        std::cerr << "ERROR in DungGine::update() : Invalid PC state." << std::endl;
+      
       // NPCs
       for (auto& npc : all_npcs)
         npc.update(curr_pos, sim_dt_s);
@@ -1696,8 +1703,7 @@ namespace dung
                                       m_sun_dir, m_solar_motion,
                                       m_t_solar_period, m_season,
                                       m_use_per_room_lat_long_for_sun_dir,
-                                      m_screen_helper.get(),
-                                      m_player);
+                                      m_screen_helper.get());
     }
     
   };

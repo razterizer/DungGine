@@ -10,7 +10,6 @@
 #include "RoomStyle.h"
 #include "Terrain.h"
 #include "ScreenHelper.h"
-#include "Player.h"
 #include <Termin8or/SpriteHandler.h>
 #include <optional>
 
@@ -295,8 +294,7 @@ namespace dung
                           SolarDirection sun_dir, SolarMotionPatterns& solar_motion,
                           float t_solar_period, Season season,
                           bool use_per_room_lat_long_for_sun_dir,
-                          ScreenHelper* screen_helper,
-                          Player& player)
+                          ScreenHelper* screen_helper)
     {
       auto shadow_type = sun_dir;
       for (const auto& room_pair : m_room_styles)
@@ -307,9 +305,6 @@ namespace dung
         auto bb_scr_pos = screen_helper->get_screen_pos(bb.pos());
         if (use_per_room_lat_long_for_sun_dir)
           shadow_type = solar_motion.get_solar_direction(room_style.latitude, room_style.longitude, season, t_solar_period);
-          
-        if (player.curr_room == room && player.is_inside_curr_room())
-          player.on_terrain = get_terrain(player.pos);
         
         // Fog of war
         if (use_fog_of_war)
@@ -372,9 +367,6 @@ namespace dung
         auto bb_scr_pos = screen_helper->get_screen_pos(bb.pos());
         if (use_per_room_lat_long_for_sun_dir)
           shadow_type = solar_motion.get_solar_direction(corr_style.latitude, corr_style.longitude, season, t_solar_period);
-          
-        if (player.curr_corridor == corr && player.is_inside_curr_corridor())
-          player.on_terrain = Terrain::Default;
         
         // Fog of war
         if (use_fog_of_war)
