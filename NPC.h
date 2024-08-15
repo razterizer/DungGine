@@ -687,7 +687,7 @@ namespace dung
         default: break;
       }
       
-      if (is_wet(on_terrain))
+      if (is_wet(on_terrain) && can_swim && !can_fly)
       {
         if (rnd::one_in(endurance) && weakness < strength)
           weakness++;
