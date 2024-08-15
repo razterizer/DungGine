@@ -55,7 +55,11 @@ namespace dung
   
   struct NPC final
   {
-    RC pos;
+    RC pos, last_pos;
+    float los_r = 0.f;
+    float los_c = 0.f;
+    float last_los_r = 0.f;
+    float last_los_c = 0.f;
     float pos_r = 0.f;
     float pos_c = 0.f;
     float vel_r = 0.f;
@@ -599,6 +603,18 @@ namespace dung
         style = { Color::Red, Color::DarkGray };
         return;
       }
+      
+      if (pos != last_pos)
+      {
+        los_r = pos.r - last_pos.r;
+        los_c = pos.c - last_pos.c;
+        los_r += last_los_r;
+        los_c += last_los_c;
+        math::normalize(los_r, los_c);
+        last_los_r = los_r;
+        last_los_c = los_c;
+      }
+      last_pos = pos;
       
       if (rnd::one_in(prob_slow_fast))
       {
