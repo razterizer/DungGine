@@ -1644,6 +1644,13 @@ namespace dung
       {
         f_render_item(npc);
         
+        if (npc.visible && is_wet(npc.on_terrain))
+        {
+          auto npc_scr_pos = m_screen_helper->get_screen_pos(npc.pos);
+          if (anim_ctr % 3 == 0)
+            sh.write_buffer("*", math::roundI(npc_scr_pos.r - npc.los_r), math::roundI(npc_scr_pos.c - npc.los_c), Color::White, Color::Transparent2);
+        }
+        
         if (npc.debug)
         {
           auto scr_pos = m_screen_helper->get_screen_pos(npc.pos);
