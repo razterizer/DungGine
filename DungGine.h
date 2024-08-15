@@ -1499,7 +1499,7 @@ namespace dung
             std::string message = "You are being attacked";
             std::string race = race2str(npc.npc_race);
             if (npc.visible && !race.empty())
-              message += " by a"s + (str::is_wovel(race[0]) ? "n " : " ") + race;
+              message += " by a"s + (str::is_an(race) ? "n " : " ") + race;
             message += "!";
             message_handler->add_message(static_cast<float>(real_time_s),
                                          message, MessageHandler::Level::Warning);
