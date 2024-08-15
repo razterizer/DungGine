@@ -104,6 +104,7 @@ namespace dung
     int endurance = 10;
     int thac0 = 1;
     int armor_class = 2;
+    int weakness = 0;
     
     Terrain on_terrain = Terrain::Default;
     
@@ -127,6 +128,8 @@ namespace dung
         return rnd::rand() < 0.4f;
       if (on_terrain == Terrain::Grass)
         return rnd::rand() < 0.8f;
+      if (weakness > 0)
+        return !rnd::one_in(2 + strength - weakness);
       return true;
     }
     
@@ -604,6 +607,8 @@ namespace dung
         return;
       }
       
+      //
+      
       if (pos != last_pos)
       {
         los_r = pos.r - last_pos.r;
@@ -615,6 +620,34 @@ namespace dung
         last_los_c = los_c;
       }
       last_pos = pos;
+      
+      float fluid_damage = 0.01f;
+      switch (on_terrain)
+      {
+        case Terrain::Water: fluid_damage = 0.005f; break;
+        case Terrain::Poison: fluid_damage = 0.02f; break;
+        case Terrain::Acid: fluid_damage = 0.04f; break;
+        case Terrain::Tar: fluid_damage = 0.015f; break;
+        case Terrain::Lava: fluid_damage = 0.4f; break;
+        case Terrain::Swamp: fluid_damage = 0.01f; break;
+        default: break;
+      }
+      
+      if (is_wet(on_terrain))
+      {
+        if (rnd::one_in(endurance) && weakness < strength)
+          weakness++;
+      
+        if (rnd::one_in(1 + strength - weakness))
+          health -= math::roundI(globals::max_health*fluid_damage);
+      }
+      else
+      {
+        if (rnd::one_in(2) && 0 < weakness)
+          weakness--;
+      }
+      
+      //
       
       if (rnd::one_in(prob_slow_fast))
       {
