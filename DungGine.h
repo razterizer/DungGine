@@ -791,40 +791,39 @@ namespace dung
         math::toggle(debug);
       else if (str::to_lower(curr_key) == 'i')
       {
-        static const float c_search_radius = 2.83;
         for (const auto& key : all_keys)
         {
-          if (key.visible && distance(key.pos, curr_pos) <= c_search_radius)
+          if (key.visible_near)
             message_handler->add_message(static_cast<float>(real_time_s),
                                          "You see a key nearby!", MessageHandler::Level::Guide);
         }
         for (const auto& lamp : all_lamps)
         {
-          if (lamp.visible && distance(lamp.pos, curr_pos) <= c_search_radius)
+          if (lamp.visible_near)
             message_handler->add_message(static_cast<float>(real_time_s),
                                          "You see a lamp nearby!", MessageHandler::Level::Guide);
         }
         for (const auto& weapon : all_weapons)
         {
-          if (weapon->visible && distance(weapon->pos, curr_pos) <= c_search_radius)
+          if (weapon->visible_near)
             message_handler->add_message(static_cast<float>(real_time_s),
                                          "You can see a " + weapon->type + " nearby!", MessageHandler::Level::Guide);
         }
         for (const auto& potion : all_potions)
         {
-          if (potion.visible && distance(potion.pos, curr_pos) <= c_search_radius)
+          if (potion.visible_near)
             message_handler->add_message(static_cast<float>(real_time_s),
                                          "You can see a potion nearby!", MessageHandler::Level::Guide);
         }
         for (const auto& armour : all_armour)
         {
-          if (armour->visible && distance(armour->pos, curr_pos) <= c_search_radius)
+          if (armour->visible_near)
             message_handler->add_message(static_cast<float>(real_time_s),
                                          "You can see a " + armour->type + " nearby!", MessageHandler::Level::Guide);
         }
         for (const auto& npc : all_npcs)
         {
-          if (npc.visible && distance(npc.pos, curr_pos) <= c_search_radius)
+          if (npc.light)
             message_handler->add_message(static_cast<float>(real_time_s),
                                          "You can see a " + race2str(npc.npc_race) + " nearby!", MessageHandler::Level::Guide);
         }
@@ -868,8 +867,10 @@ namespace dung
       }
     }
     
-    void set_visibilities()
+    void set_visibilities(float fow_radius, const RC& pc_pos)
     {
+      const auto c_fow_radius_sq = math::sq(fow_radius);
+    
       auto f_calc_night = [&](const auto& obj) -> bool
       {
         bool is_night = false;
@@ -896,24 +897,29 @@ namespace dung
         
         return is_night;
       };
+      
+      auto f_fow_near = [&pc_pos, c_fow_radius_sq](const auto& obj) -> bool
+      {
+        return distance_squared(obj.pos, pc_pos) <= c_fow_radius_sq;
+      };
             
       for (auto& key : all_keys)
-        key.set_visibility(use_fog_of_war, f_calc_night(key));
+        key.set_visibility(use_fog_of_war, f_fow_near(key), f_calc_night(key));
       
       for (auto& lamp : all_lamps)
-        lamp.set_visibility(use_fog_of_war, f_calc_night(lamp));
+        lamp.set_visibility(use_fog_of_war, f_fow_near(lamp), f_calc_night(lamp));
       
       for (auto& weapon : all_weapons)
-        weapon->set_visibility(use_fog_of_war, f_calc_night(*weapon));
+        weapon->set_visibility(use_fog_of_war, f_fow_near(*weapon), f_calc_night(*weapon));
       
       for (auto& potion : all_potions)
-        potion.set_visibility(use_fog_of_war, f_calc_night(potion));
+        potion.set_visibility(use_fog_of_war, f_fow_near(potion), f_calc_night(potion));
         
       for (auto& armour : all_armour)
-        armour->set_visibility(use_fog_of_war, f_calc_night(*armour));
+        armour->set_visibility(use_fog_of_war, f_fow_near(*armour), f_calc_night(*armour));
         
       for (auto& npc : all_npcs)
-        npc.set_visibility(use_fog_of_war, f_calc_night(npc));
+        npc.set_visibility(use_fog_of_war, f_fow_near(npc), f_calc_night(npc));
     }
     
     template<int NR, int NC>
@@ -1343,11 +1349,6 @@ namespace dung
     
       update_sun(static_cast<float>(real_time_s));
       
-      set_visibilities();
-      
-      auto& curr_pos = m_player.pos;
-      handle_keys(kpd, real_time_s);
-      
       auto fow_radius = 5.5f;
       auto* lamp = m_player.get_selected_lamp(all_lamps);
       if (lamp != nullptr)
@@ -1355,6 +1356,11 @@ namespace dung
         math::maximize(fow_radius, lamp->radius);
         math::minimize(fow_radius, globals::max_fow_radius);
       }
+      
+      set_visibilities(fow_radius, m_player.pos);
+      
+      auto& curr_pos = m_player.pos;
+      handle_keys(kpd, real_time_s);
       
       // Fog of war
       if (use_fog_of_war)

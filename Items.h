@@ -22,17 +22,21 @@ namespace dung
     bool fog_of_war = true;
     bool light = false;
     bool visible = false;
+    bool visible_near = false;
     float weight = 0.f; // kg-ish.
     float price = 0.f;  // SEK-ish.
     bool is_underground = false;
     BSPNode* curr_room = nullptr;
     Corridor* curr_corridor = nullptr;
     
-    virtual void set_visibility(bool use_fog_of_war, bool is_night)
+    virtual void set_visibility(bool use_fog_of_war, bool fow_near, bool is_night)
     {
       visible = !(picked_up ||
                   (use_fog_of_war && this->fog_of_war) ||
                   ((this->is_underground || is_night) && !this->light));
+      visible_near = !(picked_up ||
+                       (use_fog_of_war && (this->fog_of_war || !fow_near)) ||
+                       ((this->is_underground || is_night) && !this->light));
     }
   };
   
@@ -65,10 +69,13 @@ namespace dung
     float radius = 2.5f;
     float angle_deg = 45.f;
     
-    virtual void set_visibility(bool use_fog_of_war, bool is_night) override
+    virtual void set_visibility(bool use_fog_of_war, bool fow_near, bool is_night) override
     {
       visible = !(picked_up ||
                   (use_fog_of_war && this->fog_of_war));
+                  
+      visible_near = !(picked_up ||
+                       (use_fog_of_war && (this->fog_of_war || !fow_near)));
     }
   };
   

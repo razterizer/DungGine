@@ -85,6 +85,7 @@ namespace dung
     bool fog_of_war = true;
     bool light = false;
     bool visible = false;
+    bool visible_near = false;
     bool is_underground = false;
     BSPNode* curr_room = nullptr;
     Corridor* curr_corridor = nullptr;
@@ -582,10 +583,12 @@ namespace dung
       }
     }
     
-    void set_visibility(bool use_fog_of_war, bool is_night)
+    void set_visibility(bool use_fog_of_war, bool fow_near, bool is_night)
     {
       visible = !((use_fog_of_war && this->fog_of_war) ||
                   ((this->is_underground || is_night) && !this->light));
+      visible_near = !((use_fog_of_war && (this->fog_of_war || !fow_near)) ||
+                       ((this->is_underground || is_night) && !this->light));
     }
     
     void update(const RC& pc_pos, Environment* environment, float dt)
