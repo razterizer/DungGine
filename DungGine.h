@@ -142,7 +142,9 @@ namespace dung
       {
         auto lamp_idx = m_player.lamp_idcs[inv_lamp_idx];
         const auto& lamp = all_lamps[lamp_idx];
-        std::string item_str = "  Lamp:" + std::to_string(lamp_idx);
+        auto lamp_type = lamp.get_type_str();
+        str::to_upper(lamp_type[0]);
+        std::string item_str = "  "s + lamp_type + ":" + std::to_string(lamp_idx);
         f_format_item_str(item_str, lamp.weight, lamp.price, 0);
         items.emplace_back(std::make_pair(item_str, true));
       }
@@ -392,18 +394,6 @@ namespace dung
       {
         local_pos = curr_pos - bb.pos();
         size = bb.size();
-        
-        //    ###
-        //   #####
-        //    ###
-        //set_field(local_pos);
-        //for (int c = -1; c <= +1; ++c)
-        //{
-        //  set_field(local_pos + RC { -1, c });
-        //  set_field(local_pos + RC { +1, c });
-        //}
-        //for (int c = -2; c <= +2; ++c)
-        //  set_field(local_pos + RC { 0, c });
         
         std::vector<RC> positions;
         switch (src_type)
@@ -721,8 +711,9 @@ namespace dung
                 
               m_player.lamp_idcs.emplace_back(lamp_idx);
               lamp.picked_up = true;
+              auto lamp_type = lamp.get_type_str();
               message_handler->add_message(static_cast<float>(real_time_s),
-                                           "You picked up a lamp!", MessageHandler::Level::Guide);
+                                           "You picked up a"s + (str::is_an(lamp_type) ? "n ":" ") + lamp_type + "!", MessageHandler::Level::Guide);
             }
           }
           for (size_t wpn_idx = 0; wpn_idx < all_weapons.size(); ++wpn_idx)
@@ -800,8 +791,11 @@ namespace dung
         for (const auto& lamp : all_lamps)
         {
           if (lamp.visible_near)
+          {
+            auto lamp_type = lamp.get_type_str();
             message_handler->add_message(static_cast<float>(real_time_s),
-                                         "You see a lamp nearby!", MessageHandler::Level::Guide);
+                                         "You see a"s + (str::is_an(lamp_type) ? "n ":" ") + lamp_type + " nearby!", MessageHandler::Level::Guide);
+          }
         }
         for (const auto& weapon : all_weapons)
         {
