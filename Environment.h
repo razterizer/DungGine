@@ -274,6 +274,11 @@ namespace dung
       return Terrain::Default;
     }
     
+    Terrain get_terrain(int r, int c) const
+    {
+      return get_terrain(RC { r, c });
+    }
+    
     bool allow_move_to(int r, int c) const
     {
       auto terrain = get_terrain(RC { r, c });
