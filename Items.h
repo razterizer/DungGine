@@ -77,6 +77,21 @@ namespace dung
       visible_near = !(picked_up ||
                        (use_fog_of_war && (this->fog_of_war || !fow_near)));
     }
+    
+    std::string get_type_str() const
+    {
+      switch (type)
+      {
+        case LampType::Isotropic:
+          return "magic lamp";
+        case LampType::Directional:
+          if (angle_deg < 90)
+            return "lantern";
+          return "torch";
+        default:
+          return "unknown lamp";
+      }
+    }
   };
   
   struct Weapon : Item
