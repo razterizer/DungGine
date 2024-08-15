@@ -1401,12 +1401,7 @@ namespace dung
       // Player LOS etc.
       m_player.update();
       
-      if (m_player.is_inside_curr_room())
-        m_player.on_terrain = m_environment->get_terrain(m_player.pos);
-      else if (m_player.is_inside_curr_corridor())
-        m_player.on_terrain = Terrain::Default;
-      else
-        std::cerr << "ERROR in DungGine::update() : Invalid PC state." << std::endl;
+      m_player.on_terrain = m_environment->get_terrain(m_player.pos);
       
       // NPCs
       for (auto& npc : all_npcs)
