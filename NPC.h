@@ -107,6 +107,8 @@ namespace dung
     int weakness = 0;
     
     Terrain on_terrain = Terrain::Default;
+    bool can_swim = true;
+    bool can_fly = false;
     
     Race npc_race = Race::Ogre;
     Class npc_class = Class::Warrior_Barbarian;
@@ -190,7 +192,7 @@ namespace dung
         inside_room = curr_room->is_inside_room({r, c}, &location_corr);
       if (inside_room || inside_corr)
       {
-        if (environment->allow_move_to(r, c))
+        if (environment->allow_move_to(r, c) || (can_swim && is_wet(environment->get_terrain(r, c))) || can_fly)
         {
           pos.r = r;
           pos.c = c;
@@ -330,6 +332,8 @@ namespace dung
           prob_change_acc = rnd::randn_range_int(4, 10);
           prob_slow_fast = rnd::randn_range_int(10, 30);
           enemy = rnd::one_in(5);
+          can_swim = true;
+          can_fly = false;
           break;
         case Race::Elf:
           character = '@';
@@ -340,6 +344,8 @@ namespace dung
           prob_change_acc = rnd::randn_range_int(4, 10);
           prob_slow_fast = rnd::randn_range_int(10, 30);
           enemy = rnd::one_in(20);
+          can_swim = true;
+          can_fly = false;
           break;
         case Race::Half_Elf:
           character = '@';
@@ -350,6 +356,8 @@ namespace dung
           prob_change_acc = rnd::randn_range_int(4, 10);
           prob_slow_fast = rnd::randn_range_int(10, 30);
           enemy = rnd::one_in(15);
+          can_swim = true;
+          can_fly = false;
           break;
         case Race::Gnome:
           character = 'b';
@@ -360,6 +368,8 @@ namespace dung
           prob_change_acc = rnd::randn_range_int(1, 4);
           prob_slow_fast = rnd::randn_range_int(10, 30);
           enemy = rnd::one_in(20);
+          can_swim = true;
+          can_fly = false;
           break;
         case Race::Halfling:
           character = 'b';
@@ -370,6 +380,8 @@ namespace dung
           prob_change_acc = rnd::randn_range_int(1, 5);
           prob_slow_fast = rnd::randn_range_int(10, 30);
           enemy = rnd::one_in(20);
+          can_swim = true;
+          can_fly = false;
           break;
         case Race::Dwarf:
           character = '0';
@@ -380,6 +392,8 @@ namespace dung
           prob_change_acc = rnd::randn_range_int(5, 20);
           prob_slow_fast = rnd::randn_range_int(10, 30);
           enemy = rnd::one_in(18);
+          can_swim = rnd::rand_bool();
+          can_fly = false;
           break;
         case Race::Half_Orc:
           character = '3';
@@ -390,6 +404,8 @@ namespace dung
           prob_change_acc = rnd::randn_range_int(2, 18);
           prob_slow_fast = rnd::randn_range_int(10, 30);
           enemy = !rnd::one_in(10);
+          can_swim = rnd::rand_bool();
+          can_fly = false;
           break;
         case Race::Ogre:
           character = 'O';
@@ -400,6 +416,8 @@ namespace dung
           prob_change_acc = rnd::randn_range_int(4, 10);
           prob_slow_fast = rnd::randn_range_int(10, 30);
           enemy = !rnd::one_in(5);
+          can_swim = true;
+          can_fly = false;
           break;
         case Race::Hobgoblin:
           character = 'a';
@@ -410,6 +428,8 @@ namespace dung
           prob_change_acc = rnd::randn_range_int(4, 14);
           prob_slow_fast = rnd::randn_range_int(10, 30);
           enemy = !rnd::one_in(15);
+          can_swim = false;
+          can_fly = false;
           break;
         case Race::Goblin:
           character = 'G';
@@ -420,6 +440,8 @@ namespace dung
           prob_change_acc = rnd::randn_range_int(3, 12);
           prob_slow_fast = rnd::randn_range_int(10, 30);
           enemy = !rnd::one_in(15);
+          can_swim = rnd::rand_bool();
+          can_fly = false;
           break;
         case Race::Orc:
           character = '2';
@@ -430,6 +452,8 @@ namespace dung
           prob_change_acc = rnd::randn_range_int(4, 8);
           prob_slow_fast = rnd::randn_range_int(10, 30);
           enemy = !rnd::one_in(15);
+          can_swim = rnd::rand_bool();
+          can_fly = false;
           break;
         case Race::Troll:
           character = 'R';
@@ -440,6 +464,8 @@ namespace dung
           prob_change_acc = rnd::randn_range_int(10, 40);
           prob_slow_fast = rnd::randn_range_int(10, 30);
           enemy = !rnd::one_in(14);
+          can_swim = false;
+          can_fly = false;
           break;
         case Race::Monster:
           character = 'M';
@@ -450,6 +476,8 @@ namespace dung
           prob_change_acc = rnd::randn_range_int(8, 25);
           prob_slow_fast = rnd::randn_range_int(10, 30);
           enemy = !rnd::one_in(15);
+          can_swim = rnd::rand_bool();
+          can_fly = false;
           break;
         case Race::Lich:
           character = 'z';
@@ -460,6 +488,8 @@ namespace dung
           prob_change_acc = rnd::randn_range_int(5, 8);
           prob_slow_fast = rnd::randn_range_int(10, 30);
           enemy = !rnd::one_in(15);
+          can_swim = false;
+          can_fly = false;
           break;
         case Race::Lich_King:
           character = 'Z';
@@ -470,6 +500,8 @@ namespace dung
           prob_change_acc = rnd::randn_range_int(4, 6);
           prob_slow_fast = rnd::randn_range_int(10, 30);
           enemy = !rnd::one_in(15);
+          can_swim = false;
+          can_fly = false;
           break;
         case Race::Basilisk:
           character = 'S';
@@ -480,6 +512,8 @@ namespace dung
           prob_change_acc = rnd::randn_range_int(16, 28);
           prob_slow_fast = rnd::randn_range_int(10, 30);
           enemy = !rnd::one_in(15);
+          can_swim = true;
+          can_fly = false;
           break;
         case Race::Bear:
           character = 'B';
@@ -490,6 +524,8 @@ namespace dung
           prob_change_acc = rnd::randn_range_int(5, 8);
           prob_slow_fast = rnd::randn_range_int(10, 30);
           enemy = !rnd::one_in(10);
+          can_swim = true;
+          can_fly = false;
           break;
         case Race::Kobold:
           character = 'x';
@@ -500,6 +536,8 @@ namespace dung
           prob_change_acc = rnd::randn_range_int(3, 9);
           prob_slow_fast = rnd::randn_range_int(10, 30);
           enemy = !rnd::one_in(15);
+          can_swim = false;
+          can_fly = false;
           break;
         case Race::Skeleton:
           character = '%';
@@ -510,6 +548,8 @@ namespace dung
           prob_change_acc = rnd::randn_range_int(11, 19);
           prob_slow_fast = rnd::randn_range_int(10, 30);
           enemy = !rnd::one_in(10);
+          can_swim = false;
+          can_fly = false;
           break;
         case Race::Giant:
           character = 'O';
@@ -520,6 +560,8 @@ namespace dung
           prob_change_acc = rnd::randn_range_int(20, 40);
           prob_slow_fast = rnd::randn_range_int(10, 30);
           enemy = !rnd::one_in(5);
+          can_swim = rnd::rand_bool();
+          can_fly = false;
           break;
         case Race::Huge_Spider:
           character = 'W';
@@ -530,6 +572,8 @@ namespace dung
           prob_change_acc = rnd::randn_range_int(3, 17);
           prob_slow_fast = rnd::randn_range_int(10, 30);
           enemy = !rnd::one_in(13);
+          can_swim = false;
+          can_fly = false;
           break;
         case Race::Wolf:
           character = 'm';
@@ -540,6 +584,8 @@ namespace dung
           prob_change_acc = rnd::randn_range_int(2, 9);
           prob_slow_fast = rnd::randn_range_int(10, 30);
           enemy = !rnd::one_in(8);
+          can_swim = rnd::rand_bool();
+          can_fly = false;
           break;
         case Race::Wyvern:
           character = 'w';
@@ -550,6 +596,8 @@ namespace dung
           prob_change_acc = rnd::randn_range_int(7, 15);
           prob_slow_fast = rnd::randn_range_int(10, 30);
           enemy = !rnd::one_in(12);
+          can_swim = false;
+          can_fly = true;
           break;
         case Race::Griffin:
           character = 'g';
@@ -560,6 +608,8 @@ namespace dung
           prob_change_acc = rnd::randn_range_int(10, 20);
           prob_slow_fast = rnd::randn_range_int(10, 30);
           enemy = !rnd::one_in(13);
+          can_swim = false;
+          can_fly = true;
           break;
         case Race::Ghoul:
           character = 'h';
@@ -570,6 +620,8 @@ namespace dung
           prob_change_acc = rnd::randn_range_int(1, 5);
           prob_slow_fast = rnd::randn_range_int(10, 30);
           enemy = !rnd::one_in(20);
+          can_swim = false;
+          can_fly = false;
           break;
         case Race::Dragon:
           character = 'R';
@@ -580,6 +632,8 @@ namespace dung
           prob_change_acc = rnd::randn_range_int(14, 30);
           prob_slow_fast = rnd::randn_range_int(10, 30);
           enemy = !rnd::one_in(7);
+          can_swim = false;
+          can_fly = true;
           break;
         case Race::NUM_ITEMS:
           std::cerr << "Illegal race: NUM_ITEMS!" << std::endl;
