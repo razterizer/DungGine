@@ -823,7 +823,7 @@ namespace dung
         }
         for (const auto& npc : all_npcs)
         {
-          if (npc.light)
+          if (npc.visible_near)
             message_handler->add_message(static_cast<float>(real_time_s),
                                          "You can see a " + race2str(npc.npc_race) + " nearby!", MessageHandler::Level::Guide);
         }
