@@ -1644,7 +1644,7 @@ namespace dung
       {
         f_render_item(npc);
         
-        if (npc.visible && is_wet(npc.on_terrain))
+        if (npc.visible && is_wet(npc.on_terrain) && npc.can_swim && !npc.can_fly)
         {
           auto npc_scr_pos = m_screen_helper->get_screen_pos(npc.pos);
           if (anim_ctr % 3 == 0)
