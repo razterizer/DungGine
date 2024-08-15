@@ -11,6 +11,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		0709B9AB2C6E445100A43834 /* AgentBase.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AgentBase.h; sourceTree = "<group>"; };
 		071942492C458746008BD519 /* SolarMotionPatterns.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SolarMotionPatterns.h; sourceTree = "<group>"; };
 		0719424A2C49D65F008BD519 /* NPC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NPC.h; sourceTree = "<group>"; };
 		07C2A7842C2616FC00869A56 /* RoomStyle.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RoomStyle.h; sourceTree = "<group>"; };
@@ -83,6 +84,7 @@
 				07E6EAD72C1C2657007BBC6B /* DungGineStyles.h */,
 				07C2A7842C2616FC00869A56 /* RoomStyle.h */,
 				07C2A7852C2618A500869A56 /* Items.h */,
+				0709B9AB2C6E445100A43834 /* AgentBase.h */,
 				07C2A7862C261B3C00869A56 /* Player.h */,
 				0719424A2C49D65F008BD519 /* NPC.h */,
 				07C2A7872C2A28C400869A56 /* Door.h */,

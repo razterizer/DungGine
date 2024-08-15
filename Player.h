@@ -9,35 +9,19 @@
 #include "Globals.h"
 #include "Terrain.h"
 #include "Items.h"
+#include "AgentBase.h"
 #include <Core/StlUtils.h>
 
 
 namespace dung
 {
   
-  struct Player
+  struct Player final : AgentBase
   {
-    char character = '@';
-    Style style = { Color::Magenta, Color::White };
-    RC pos, last_pos;
-    float los_r = 0.f;
-    float los_c = 0.f;
-    float last_los_r = 0.f;
-    float last_los_c = 0.f;
     bool is_spawned = false;
-    BSPNode* curr_room = nullptr;
-    Corridor* curr_corridor = nullptr;
     
-    int health = globals::max_health;
     int base_ac = 10;
-    int thac0 = 1;
-    int strength = 10;
-    int dexterity = 10;
-    int endurance = 10;
-    int weakness = 0;
-    
-    Terrain on_terrain = Terrain::Default;
-    
+        
     std::vector<int> key_idcs;
     std::vector<int> lamp_idcs;
     std::vector<int> weapon_idcs;
@@ -52,6 +36,12 @@ namespace dung
     int inv_select_idx_armour = -1;
     bool show_inventory = false;
     float weight_capacity = 50.f;
+    
+    Player()
+    {
+      character = '@';
+      style = { Color::Magenta, Color::White };
+    }
     
     bool allow_move()
     {

@@ -8,6 +8,7 @@
 #pragma once
 #include "Items.h"
 #include "Globals.h"
+#include "AgentBase.h"
 #include <Core/OneShot.h>
 
 
@@ -53,20 +54,15 @@ namespace dung
   
   enum class State { Patroll, Pursue, Fight, NUM_ITEMS };
   
-  struct NPC final
+  struct NPC final : AgentBase
   {
-    RC pos, last_pos;
-    float los_r = 0.f;
-    float los_c = 0.f;
-    float last_los_r = 0.f;
-    float last_los_c = 0.f;
     float pos_r = 0.f;
     float pos_c = 0.f;
     float vel_r = 0.f;
     float vel_c = 0.f;
     float acc_r = 0.f;
     float acc_c = 0.f;
-    const float px_aspect = 1.5f;
+    const float px_aspect = globals::px_aspect;
     float acc_step = 10.f;
     float acc_lim = 25.f;
     float vel_lim = 12.f;
@@ -84,29 +80,18 @@ namespace dung
     bool wall_coll_resolve = false;
     int wall_coll_resolve_ctr = 0;
     
-    Style style { Color::Green, Color::DarkYellow };
-    char character = 'O';
     bool fog_of_war = true;
     bool light = false;
     bool visible = false;
     bool visible_near = false;
     bool is_underground = false;
-    BSPNode* curr_room = nullptr;
-    Corridor* curr_corridor = nullptr;
     bool inside_room = false;
     bool inside_corr = false;
     
     bool enemy = true;
     
-    int health = globals::max_health;
-    int strength = 10;
-    int dexterity = 10;
-    int endurance = 10;
-    int thac0 = 1;
     int armor_class = 2;
-    int weakness = 0;
     
-    Terrain on_terrain = Terrain::Default;
     bool can_swim = true;
     bool can_fly = false;
     
@@ -278,6 +263,12 @@ namespace dung
     }
     
   public:
+    NPC()
+    {
+      character = 'O';
+      style = { Color::Green, Color::DarkYellow };
+    }
+  
     void init(const std::vector<std::unique_ptr<Weapon>>& all_weapons)
     {
       pos_r = pos.r;
