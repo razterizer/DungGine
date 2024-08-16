@@ -92,9 +92,6 @@ namespace dung
     
     int armor_class = 2;
     
-    bool can_swim = true;
-    bool can_fly = false;
-    
     Race npc_race = Race::Ogre;
     Class npc_class = Class::Warrior_Barbarian;
     int weapon_idx = -1;
@@ -642,47 +639,8 @@ namespace dung
         return;
       }
       
-      //
-      
-      if (pos != last_pos)
-      {
-        los_r = pos.r - last_pos.r;
-        los_c = pos.c - last_pos.c;
-        los_r += last_los_r;
-        los_c += last_los_c;
-        math::normalize(los_r, los_c);
-        last_los_r = los_r;
-        last_los_c = los_c;
-      }
-      last_pos = pos;
-      
-      float fluid_damage = 0.01f;
-      switch (on_terrain)
-      {
-        case Terrain::Water: fluid_damage = 0.005f; break;
-        case Terrain::Poison: fluid_damage = 0.02f; break;
-        case Terrain::Acid: fluid_damage = 0.04f; break;
-        case Terrain::Tar: fluid_damage = 0.015f; break;
-        case Terrain::Lava: fluid_damage = 0.4f; break;
-        case Terrain::Swamp: fluid_damage = 0.01f; break;
-        default: break;
-      }
-      
-      if (is_wet(on_terrain) && can_swim && !can_fly)
-      {
-        if (rnd::one_in(endurance) && weakness < strength)
-          weakness++;
-      
-        if (rnd::one_in(1 + strength - weakness))
-          health -= math::roundI(globals::max_health*fluid_damage);
-      }
-      else
-      {
-        if (rnd::one_in(2) && 0 < weakness)
-          weakness--;
-      }
-      
-      //
+      update_los();
+      update_terrain();
       
       if (rnd::one_in(prob_slow_fast))
       {
