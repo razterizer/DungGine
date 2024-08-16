@@ -23,6 +23,11 @@ public:
     : GameEngine(argv[0], params)
   {}
   
+  virtual ~Game() override
+  {
+    dungeon_engine->remove_listener(this);
+  }
+  
   virtual void on_pc_death() override
   {
     // Play sound.
