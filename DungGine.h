@@ -1439,9 +1439,9 @@ namespace dung
                 damage = f_calc_damage(all_weapons[npc.weapon_idx].get(), npc.get_melee_damage_bonus());
         
               // Apply damage to the player
-              bool was_living = m_player.health > 0;
+              bool was_alive = m_player.health > 0;
               m_player.health -= damage;
-              if (was_living && m_player.health <= 0)
+              if (was_alive && m_player.health <= 0)
               {
                   message_handler->add_message(static_cast<float>(real_time_s),
                                                "You were killed!",
@@ -1463,9 +1463,9 @@ namespace dung
                 int damage = f_calc_damage(weapon, m_player.get_melee_damage_bonus());
         
                 // Apply damage to the NPC
-                bool was_living = npc.health > 0;
+                bool was_alive = npc.health > 0;
                 npc.health -= damage;
-                if (was_living && npc.health <= 0)
+                if (was_alive && npc.health <= 0)
                 {
                   message_handler->add_message(static_cast<float>(real_time_s),
                                                "You killed the " + race2str(npc.npc_race) + "!",
