@@ -77,6 +77,21 @@ namespace dung
         default:
           break;
       }
+      switch (lamp_type)
+      {
+        case LampType::MagicLamp:
+          character = '*';
+          style.fg_color = Color::Magenta;
+          break;
+        case LampType::Lantern:
+          character = 'G';
+          style.fg_color = color::get_random_color({ Color::Red, Color::Green });
+          break;
+        case LampType::Torch:
+          character = 'Y';
+          style.fg_color = Color::Yellow;
+          break;
+      }
     }
     enum class LightType { Isotropic, Directional, NUM_ITEMS };
     LightType light_type = LightType::Isotropic;
