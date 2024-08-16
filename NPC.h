@@ -54,7 +54,7 @@ namespace dung
   
   enum class State { Patroll, Pursue, Fight, NUM_ITEMS };
   
-  struct NPC final : AgentBase
+  struct NPC final : PlayerBase
   {
     float pos_r = 0.f;
     float pos_c = 0.f;

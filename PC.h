@@ -16,7 +16,7 @@
 namespace dung
 {
   
-  struct Player final : AgentBase
+  struct Player final : PlayerBase
   {
     bool is_spawned = false;
     
