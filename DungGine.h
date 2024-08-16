@@ -716,7 +716,8 @@ namespace dung
               lamp.picked_up = true;
               auto lamp_type = lamp.get_type_str();
               message_handler->add_message(static_cast<float>(real_time_s),
-                                           "You picked up a"s + (str::is_an(lamp_type) ? "n ":" ") + lamp_type + "!", MessageHandler::Level::Guide);
+                                           "You picked up " + str::indef_art(lamp_type) + "!",
+                                           MessageHandler::Level::Guide);
             }
           }
           for (size_t wpn_idx = 0; wpn_idx < all_weapons.size(); ++wpn_idx)
@@ -737,7 +738,7 @@ namespace dung
               m_player.weapon_idcs.emplace_back(wpn_idx);
               weapon->picked_up = true;
               message_handler->add_message(static_cast<float>(real_time_s),
-                                           "You picked up a " + weapon->type + "!", MessageHandler::Level::Guide);
+                                           "You picked up " + str::indef_art(weapon->type) + "!", MessageHandler::Level::Guide);
             }
           }
           for (size_t pot_idx = 0; pot_idx < all_potions.size(); ++pot_idx)
@@ -766,7 +767,7 @@ namespace dung
               m_player.armour_idcs.emplace_back(a_idx);
               armour->picked_up = true;
               message_handler->add_message(static_cast<float>(real_time_s),
-                                           "You picked up a " + armour->type + "!",
+                                           "You picked up " + str::indef_art(armour->type) + "!",
                                            MessageHandler::Level::Guide);
             }
           }
@@ -797,14 +798,14 @@ namespace dung
           {
             auto lamp_type = lamp.get_type_str();
             message_handler->add_message(static_cast<float>(real_time_s),
-                                         "You see a"s + (str::is_an(lamp_type) ? "n ":" ") + lamp_type + " nearby!", MessageHandler::Level::Guide);
+                                         "You see " + str::indef_art(lamp_type) + " nearby!", MessageHandler::Level::Guide);
           }
         }
         for (const auto& weapon : all_weapons)
         {
           if (weapon->visible_near)
             message_handler->add_message(static_cast<float>(real_time_s),
-                                         "You can see a " + weapon->type + " nearby!", MessageHandler::Level::Guide);
+                                         "You can see " + str::indef_art(weapon->type) + " nearby!", MessageHandler::Level::Guide);
         }
         for (const auto& potion : all_potions)
         {
@@ -816,13 +817,13 @@ namespace dung
         {
           if (armour->visible_near)
             message_handler->add_message(static_cast<float>(real_time_s),
-                                         "You can see a " + armour->type + " nearby!", MessageHandler::Level::Guide);
+                                         "You can see " + str::indef_art(armour->type) + " nearby!", MessageHandler::Level::Guide);
         }
         for (const auto& npc : all_npcs)
         {
           if (npc.visible_near)
             message_handler->add_message(static_cast<float>(real_time_s),
-                                         "You can see a " + race2str(npc.npc_race) + " nearby!", MessageHandler::Level::Guide);
+                                         "You can see " + str::indef_art(race2str(npc.npc_race)) + " nearby!", MessageHandler::Level::Guide);
         }
       }
       else if (str::to_lower(curr_key) == 'c')
@@ -1517,7 +1518,7 @@ namespace dung
               std::string message = "You are being attacked";
               std::string race = race2str(npc.npc_race);
               if (npc.visible && !race.empty())
-                message += " by a"s + (str::is_an(race) ? "n " : " ") + race;
+                message += " by " + str::indef_art(race);
               message += "!";
               message_handler->add_message(static_cast<float>(real_time_s),
                                            message, MessageHandler::Level::Warning);
