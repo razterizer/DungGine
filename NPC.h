@@ -8,7 +8,7 @@
 #pragma once
 #include "Items.h"
 #include "Globals.h"
-#include "AgentBase.h"
+#include "PlayerBase.h"
 #include <Core/OneShot.h>
 
 

@@ -9,7 +9,7 @@
 #include "Globals.h"
 #include "Terrain.h"
 #include "Items.h"
-#include "AgentBase.h"
+#include "PlayerBase.h"
 #include <Core/StlUtils.h>
 
 
