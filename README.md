@@ -3,10 +3,7 @@
 <img width="568" alt="image" src="https://github.com/user-attachments/assets/c3075838-7f15-4679-862e-ce47780c9b39">
 
 ![dunggine_demo-comp](https://github.com/user-attachments/assets/b476eeb8-4d47-46f8-a5c1-403906555174)
-
-<!-- ![dunggine_demo-comp_360](https://github.com/user-attachments/assets/f825a2df-ff6b-4d0a-b0c9-758dea19bea4) -->
-
-<!-- <img src="https://github.com/user-attachments/assets/f825a2df-ff6b-4d0a-b0c9-758dea19bea4" alt="dunggine_demo-comp_360" width="500"/> -->
+(gif animation produced using [`terminalizer`](https://github.com/faressoft/terminalizer) and [`gifsicle`](https://github.com/kohler/gifsicle).)
 
 `DungGine` is a terminal based dungeon engine for RPGs and dungeon-crawlers (e.g. Rogue-likes) and that uses [`Termin8or`](https://github.com/razterizer/Termin8or) for rendering.
 This is a header only library.
