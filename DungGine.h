@@ -295,7 +295,7 @@ namespace dung
     
     template<typename Lambda>
     void update_field(const RC& curr_pos, Lambda get_field_ptr, bool set_val, float radius, float angle_deg,
-                      Lamp::LampType src_type)
+                      Lamp::LightType src_type)
     {
       const auto c_fow_dist = radius; //2.3f;
       
@@ -312,7 +312,7 @@ namespace dung
         if (m_player.curr_room == obj.curr_room || m_player.curr_corridor == obj.curr_corridor)
           if (distance(obj.pos, curr_pos) <= radius)
           {
-            if (src_type == Lamp::LampType::Directional)
+            if (src_type == Lamp::LightType::Directional)
             {
               // #FIXME: Move parts into math functions for better reuse.
               // Rotating dir vector CW and CCW using a rotation matrix.
@@ -399,13 +399,13 @@ namespace dung
         std::vector<RC> positions;
         switch (src_type)
         {
-          case Lamp::LampType::Isotropic:
+          case Lamp::LightType::Isotropic:
             positions = drawing::filled_circle_positions(local_pos, radius, globals::px_aspect);
             break;
-          case Lamp::LampType::Directional:
+          case Lamp::LightType::Directional:
             positions = drawing::filled_arc_positions(local_pos, radius, math::deg2rad(angle_deg), m_player.los_r, m_player.los_c, globals::px_aspect);
             break;
-          case Lamp::LampType::NUM_ITEMS:
+          case Lamp::LightType::NUM_ITEMS:
             break;
         }
         for (const auto& pos : positions)
@@ -1103,7 +1103,6 @@ namespace dung
       for (int lamp_idx = 0; lamp_idx < num_lamps; ++lamp_idx)
       {
         Lamp lamp;
-        lamp.type = rnd::rand_enum<Lamp::LampType>();
         do
         {
           if (lamp_idx == 0 && num_iters < 50)
@@ -1364,7 +1363,7 @@ namespace dung
       if (use_fog_of_war)
         update_field(curr_pos,
                      [](auto obj) { return &obj->fog_of_war; },
-                     false, fow_radius, 0.f, Lamp::LampType::Isotropic);
+                     false, fow_radius, 0.f, Lamp::LightType::Isotropic);
                   
       // Light
       clear_field([](auto obj) { return &obj->light; }, false);
@@ -1373,7 +1372,7 @@ namespace dung
         update_field(curr_pos,
                      [](auto obj) { return &obj->light; },
                      true, lamp->radius, lamp->angle_deg,
-                     lamp->type);
+                     lamp->light_type);
       }
       
       // Update current room and current corridor.
