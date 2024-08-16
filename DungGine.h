@@ -1610,11 +1610,11 @@ namespace dung
               auto dir = static_cast<int>(f_dp_to_dir(dp));
               
               auto r_offs = rnd::randn_select(0.f, 1.f, std::vector {
-                fight_r_offs[(dir - 1)%num_dir],
+                fight_r_offs[(num_dir + dir - 1)%num_dir],
                 fight_r_offs[dir],
                 fight_r_offs[(dir + 1)%num_dir] });
               auto c_offs = rnd::randn_select(0.f, 1.f, std::vector {
-                fight_c_offs[(dir - 1)%num_dir],
+                fight_c_offs[(num_dir + dir - 1)%num_dir],
                 fight_c_offs[dir],
                 fight_c_offs[(dir + 1)%num_dir] });
               sh.write_buffer(fight_str,
