@@ -43,17 +43,6 @@ namespace dung
       style = { Color::Magenta, Color::White };
     }
     
-    bool allow_move()
-    {
-      if (on_terrain == Terrain::Sand)
-        return rnd::rand() < 0.4f;
-      if (on_terrain == Terrain::Grass)
-        return rnd::rand() < 0.8f;
-      if (weakness > 0)
-        return !rnd::one_in(2 + strength - weakness);
-      return true;
-    }
-    
     void update()
     {
       if (pos != last_pos)

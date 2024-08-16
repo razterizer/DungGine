@@ -109,16 +109,6 @@ namespace dung
     OneShot trg_info_hostile_npc;
     
   private:
-    bool allow_move()
-    {
-      if (on_terrain == Terrain::Sand)
-        return rnd::rand() < 0.4f;
-      if (on_terrain == Terrain::Grass)
-        return rnd::rand() < 0.8f;
-      if (weakness > 0)
-        return !rnd::one_in(2 + strength - weakness);
-      return true;
-    }
     
     void move(const RC& pc_pos, Environment* environment, float dt)
     {
