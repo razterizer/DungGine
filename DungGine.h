@@ -822,8 +822,13 @@ namespace dung
         for (const auto& npc : all_npcs)
         {
           if (npc.visible_near)
+          {
+            auto race = race2str(npc.npc_race);
+            if (npc.health <= 0)
+              race = "dead " + race;
             message_handler->add_message(static_cast<float>(real_time_s),
-                                         "You can see " + str::indef_art(race2str(npc.npc_race)) + " nearby!", MessageHandler::Level::Guide);
+                                         "You can see " + str::indef_art(race) + " nearby!", MessageHandler::Level::Guide);
+          }
         }
       }
       else if (str::to_lower(curr_key) == 'c')
