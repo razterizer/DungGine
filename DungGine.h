@@ -1452,7 +1452,14 @@ namespace dung
               int damage = f_calc_damage(weapon, m_player.get_melee_damage_bonus());
               
               // Apply damage to the NPC
+              bool was_living = npc.health > 0;
               npc.health -= damage;
+              if (was_living && npc.health < 0)
+              {
+                message_handler->add_message(static_cast<float>(real_time_s),
+                                             "You killed the " + race2str(npc.npc_race) + "!",
+                                             MessageHandler::Level::Guide);
+              }
             }
           }
         }
