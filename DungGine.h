@@ -1396,8 +1396,15 @@ namespace dung
       }
       
       // PC LOS etc.
+      bool was_alive = m_player.health > 0;
       m_player.on_terrain = m_environment->get_terrain(m_player.pos);
       m_player.update();
+      if (was_alive && m_player.health <= 0)
+      {
+        message_handler->add_message(static_cast<float>(real_time_s),
+                                     "You died!",
+                                     MessageHandler::Level::Fatal);
+      }
       
       // NPCs
       for (auto& npc : all_npcs)
