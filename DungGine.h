@@ -1396,16 +1396,14 @@ namespace dung
       }
       
       // PC LOS etc.
-      m_player.update();
-      
       m_player.on_terrain = m_environment->get_terrain(m_player.pos);
+      m_player.update();
       
       // NPCs
       for (auto& npc : all_npcs)
       {
-        npc.update(curr_pos, m_environment.get(), sim_dt_s);
-        
         npc.on_terrain = m_environment->get_terrain(npc.pos);
+        npc.update(curr_pos, m_environment.get(), sim_dt_s);
       }
       
       // Fighting
