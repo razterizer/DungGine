@@ -1444,7 +1444,7 @@ namespace dung
               if (was_living && m_player.health < 0)
               {
                   message_handler->add_message(static_cast<float>(real_time_s),
-                                               "You died!",
+                                               "You were killed!",
                                                MessageHandler::Level::Fatal);
               }
             }
