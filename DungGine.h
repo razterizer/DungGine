@@ -1441,12 +1441,12 @@ namespace dung
               m_player.health -= damage;
               if (was_alive && m_player.health <= 0)
               {
-                  message_handler->add_message(static_cast<float>(real_time_s),
-                                               "You were killed!",
-                                               MessageHandler::Level::Fatal);
+                message_handler->add_message(static_cast<float>(real_time_s),
+                                             "You were killed!",
+                                             MessageHandler::Level::Fatal);
               }
             }
-        
+            
             // Roll a d20 for the player's attack roll (if the NPC is visible)
             if (npc.visible)
             {
