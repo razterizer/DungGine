@@ -8,6 +8,7 @@
 #include <Termin8or/GameEngine.h>
 #include <DungGine/BSPTree.h>
 #include <DungGine/DungGine.h>
+#include <DungGine/DungGineListener.h>
 
 #include <iostream>
 
@@ -15,12 +16,32 @@ enum class TestType { DungeonSimple, DungeonRuntime };
 static TestType test_type = TestType::DungeonRuntime;
 
 
-class Game : public GameEngine<>
+class Game : public GameEngine<>, public dung::DungGineListener
 {
 public:
   Game(int argc, char** argv, const GameEngineParams& params)
     : GameEngine(argv[0], params)
   {}
+  
+  virtual void on_pc_death() override
+  {
+    // Play sound.
+  }
+  
+  virtual void on_npc_death() override
+  {
+    // Play sound.
+  }
+  
+  virtual void on_fight_begin(dung::NPC* UNUSED(npc)) override
+  {
+    // Play sound.
+  }
+  
+  virtual void on_fight_end(dung::NPC* UNUSED(npc)) override
+  {
+    // Stop sound.
+  }
   
   virtual void generate_data() override
   {
@@ -110,6 +131,8 @@ public:
       dungeon_engine->place_potions(150, true);
       dungeon_engine->place_armour(150, true);
       dungeon_engine->place_npcs(100, true);
+      
+      dungeon_engine->add_listener(this);
     }
   }
   
