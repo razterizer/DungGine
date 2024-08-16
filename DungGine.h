@@ -618,6 +618,8 @@ namespace dung
         }
         else
         {
+          message_handler->clear_curr_message();
+        
           auto f_alter_door_states = [&](Door* door)
           {
             if (door != nullptr && door->is_door && distance(curr_pos, door->pos) == 1.f)
