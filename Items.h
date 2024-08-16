@@ -64,9 +64,24 @@ namespace dung
       radius = rnd::randn_range_clamp(1.5f, globals::max_fow_radius);
       angle_deg = rnd::randn_range_clamp(2.f, 358.f);
       light_type = rnd::rand_enum<Lamp::LightType>();
+      switch (light_type)
+      {
+        case LightType::Isotropic:
+          lamp_type = LampType::MagicLamp;
+          break;
+        case LightType::Directional:
+          if (angle_deg < 90)
+            lamp_type = LampType::Lantern;
+          lamp_type = LampType::Torch;
+          break;
+        default:
+          break;
+      }
     }
     enum class LightType { Isotropic, Directional, NUM_ITEMS };
     LightType light_type = LightType::Isotropic;
+    enum class LampType { MagicLamp, Lantern, Torch };
+    LampType lamp_type = LampType::MagicLamp;
     float radius = 2.5f;
     float angle_deg = 45.f;
     
@@ -81,17 +96,16 @@ namespace dung
     
     std::string get_type_str() const
     {
-      switch (light_type)
+      switch (lamp_type)
       {
-        case LightType::Isotropic:
+        case LampType::MagicLamp:
           return "magic lamp";
-        case LightType::Directional:
-          if (angle_deg < 90)
-            return "lantern";
+        case LampType::Lantern:
+          return "lantern";
+        case LampType::Torch:
           return "torch";
-        default:
-          return "unknown lamp";
       }
+      return "unknown lamp";
     }
   };
   
