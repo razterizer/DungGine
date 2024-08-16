@@ -1409,65 +1409,68 @@ namespace dung
       }
       
       // Fighting
-      for (auto& npc : all_npcs)
+      if (m_player.health > 0)
       {
-        if (npc.health > 0 && npc.state == State::Fight)
+        for (auto& npc : all_npcs)
         {
-          auto f_calc_damage = [](const Weapon* weapon, int bonus)
+          if (npc.health > 0 && npc.state == State::Fight)
           {
-            if (weapon == nullptr)
-              return 1 + bonus; // Fists with strength bonus
-            return weapon->damage + bonus;
-          };
-          
-          // NPC attack roll
-          int npc_attack_roll = rnd::dice(20) + npc.thac0 + npc.get_melee_attack_bonus();
-          
-          // Calculate the player's total armor class
-          int player_ac = m_player.calc_armour_class(all_armour);
-          
-          // Determine if NPC hits the player
-          // e.g. d12 + 1 + (2 + 10/2) >= (10 + 10/2)
-          // d12 + 8 >= 15
-          if (npc_attack_roll >= player_ac)
-          {
-            // NPC hits the player
-            int damage = 1; // Default damage for fists
-            if (npc.weapon_idx != -1)
-              damage = f_calc_damage(all_weapons[npc.weapon_idx].get(), npc.get_melee_damage_bonus());
-            
-            // Apply damage to the player
-            bool was_living = m_player.health > 0;
-            m_player.health -= damage;
-            if (was_living && m_player.health < 0)
+            auto f_calc_damage = [](const Weapon* weapon, int bonus)
             {
-                message_handler->add_message(static_cast<float>(real_time_s),
-                                             "You died!",
-                                             MessageHandler::Level::Fatal);
-            }
-          }
-          
-          // Roll a d20 for the player's attack roll (if the NPC is visible)
-          if (npc.visible)
-          {
-            const auto* weapon = m_player.get_selected_weapon(all_weapons);
-            int player_attack_roll = rnd::dice(20) + m_player.thac0 + m_player.get_melee_attack_bonus();
-            int npc_ac = npc.calc_armour_class();
-            
-            // Determine if player hits the NPC
-            if (player_attack_roll >= npc_ac)
+              if (weapon == nullptr)
+                return 1 + bonus; // Fists with strength bonus
+              return weapon->damage + bonus;
+            };
+        
+            // NPC attack roll
+            int npc_attack_roll = rnd::dice(20) + npc.thac0 + npc.get_melee_attack_bonus();
+        
+            // Calculate the player's total armor class
+            int player_ac = m_player.calc_armour_class(all_armour);
+        
+            // Determine if NPC hits the player
+            // e.g. d12 + 1 + (2 + 10/2) >= (10 + 10/2)
+            // d12 + 8 >= 15
+            if (npc_attack_roll >= player_ac)
             {
-              // PC hits the NPC
-              int damage = f_calc_damage(weapon, m_player.get_melee_damage_bonus());
-              
-              // Apply damage to the NPC
-              bool was_living = npc.health > 0;
-              npc.health -= damage;
-              if (was_living && npc.health < 0)
+              // NPC hits the player
+              int damage = 1; // Default damage for fists
+              if (npc.weapon_idx != -1)
+                damage = f_calc_damage(all_weapons[npc.weapon_idx].get(), npc.get_melee_damage_bonus());
+        
+              // Apply damage to the player
+              bool was_living = m_player.health > 0;
+              m_player.health -= damage;
+              if (was_living && m_player.health < 0)
               {
-                message_handler->add_message(static_cast<float>(real_time_s),
-                                             "You killed the " + race2str(npc.npc_race) + "!",
-                                             MessageHandler::Level::Guide);
+                  message_handler->add_message(static_cast<float>(real_time_s),
+                                               "You died!",
+                                               MessageHandler::Level::Fatal);
+              }
+            }
+        
+            // Roll a d20 for the player's attack roll (if the NPC is visible)
+            if (npc.visible)
+            {
+              const auto* weapon = m_player.get_selected_weapon(all_weapons);
+              int player_attack_roll = rnd::dice(20) + m_player.thac0 + m_player.get_melee_attack_bonus();
+              int npc_ac = npc.calc_armour_class();
+        
+              // Determine if player hits the NPC
+              if (player_attack_roll >= npc_ac)
+              {
+                // PC hits the NPC
+                int damage = f_calc_damage(weapon, m_player.get_melee_damage_bonus());
+        
+                // Apply damage to the NPC
+                bool was_living = npc.health > 0;
+                npc.health -= damage;
+                if (was_living && npc.health < 0)
+                {
+                  message_handler->add_message(static_cast<float>(real_time_s),
+                                               "You killed the " + race2str(npc.npc_race) + "!",
+                                               MessageHandler::Level::Guide);
+                }
               }
             }
           }
@@ -1493,128 +1496,131 @@ namespace dung
       draw_strength_bar(sh);
       
       auto pc_scr_pos = m_screen_helper->get_screen_pos(m_player.pos);
-        
+      
       // Fighting
-      for (auto& npc : all_npcs)
+      if (m_player.health > 0)
       {
-        if (npc.health <= 0)
-          continue;
-          
-        if (npc.is_hostile)
+        for (auto& npc : all_npcs)
         {
-          if (npc.trg_info_hostile_npc.once())
+          if (npc.health <= 0)
+            continue;
+          
+          if (npc.is_hostile)
           {
-            std::string message = "You are being attacked";
-            std::string race = race2str(npc.npc_race);
-            if (npc.visible && !race.empty())
-              message += " by a"s + (str::is_an(race) ? "n " : " ") + race;
-            message += "!";
-            message_handler->add_message(static_cast<float>(real_time_s),
-                                         message, MessageHandler::Level::Warning);
-          }
-        }
-        else
-          npc.trg_info_hostile_npc.reset();
-        
-        if (npc.state == State::Fight)
-        {
-          auto npc_scr_pos = m_screen_helper->get_screen_pos(npc.pos);
-          
-          // [side_case, base_case, side_case]
-          // Case NW (dp = [1, 1]):
-          //O#
-          //#*
-          // r + [1, 1, 0]
-          // c + [0, 1, 1]
-          //
-          // Case W (dp = [0, 1]):
-          // #
-          //O*
-          // #
-          // r + [1, 0, -1]
-          // c + [1, 1,  1]
-          //
-          // Case SW (dp = [-1, 1]):
-          //#*
-          //O#
-          // r + [0, -1, -1]
-          // c + [1,  1,  0]
-          //
-          // Case S (dp = [-1, 0]):
-          //#*#
-          // O
-          // r + [-1, -1, -1]
-          // c + [ 1,  0, -1]
-          //
-          // Case SE (dp = [-1, -1]):
-          //*#
-          //#O
-          // r + [-1, -1,  0]
-          // c + [ 0, -1, -1]
-          //
-          // Case E (dp = [0, -1]):
-          //#
-          //*O
-          //#
-          // r + [-1,  0,  1]
-          // c + [-1, -1, -1]
-          //
-          // Case NE (dp = [1, -1]):
-          //#O
-          //*#
-          // r + [ 0,  1, 1]
-          // c + [-1, -1, 0]
-          //
-          // Case N (dp = [1, 0]):
-          // O
-          //#*#
-          // r + [ 1, 1, 1]
-          // c + [-1, 0, 1]
-          
-          auto dp = m_player.pos - npc.pos;
-          dp.r = math::sgn(dp.r);
-          dp.c = math::sgn(dp.c);
-          
-          auto f_dp_to_dir = [](const RC& dp)
-          {
-            if (dp == RC { 1, 1 }) return FightDir::NW;
-            if (dp == RC { 0, 1 }) return FightDir::W;
-            if (dp == RC { -1, 1 }) return FightDir::SW;
-            if (dp == RC { -1, 0 }) return FightDir::S;
-            if (dp == RC { -1, -1 }) return FightDir::SE;
-            if (dp == RC { 0, -1 }) return FightDir::E;
-            if (dp == RC { 1, -1 }) return FightDir::NE;
-            if (dp == RC { 1, 0 }) return FightDir::N;
-            return FightDir::NUM_ITEMS;
-          };
-          const auto num_dir = static_cast<int>(FightDir::NUM_ITEMS);
-          
-          auto f_render_fight = [&](const RC& scr_pos, const RC& dp)
-          {
-            styles::Style fight_style
+            if (npc.trg_info_hostile_npc.once())
             {
-              color::get_random_color(c_fight_colors),
-              Color::Transparent2
-            };
-            std::string fight_str = rnd::rand_select(c_fight_strings);
-            auto dir = static_cast<int>(f_dp_to_dir(dp));
+              std::string message = "You are being attacked";
+              std::string race = race2str(npc.npc_race);
+              if (npc.visible && !race.empty())
+                message += " by a"s + (str::is_an(race) ? "n " : " ") + race;
+              message += "!";
+              message_handler->add_message(static_cast<float>(real_time_s),
+                                           message, MessageHandler::Level::Warning);
+            }
+          }
+          else
+            npc.trg_info_hostile_npc.reset();
+          
+          if (npc.state == State::Fight)
+          {
+            auto npc_scr_pos = m_screen_helper->get_screen_pos(npc.pos);
             
-            auto r_offs = rnd::randn_select(0.f, 1.f, std::vector {
-              fight_r_offs[(dir - 1)%num_dir],
-              fight_r_offs[dir],
-              fight_r_offs[(dir + 1)%num_dir] });
-            auto c_offs = rnd::randn_select(0.f, 1.f, std::vector {
-              fight_c_offs[(dir - 1)%num_dir],
-              fight_c_offs[dir],
-              fight_c_offs[(dir + 1)%num_dir] });
-            sh.write_buffer(fight_str,
-                            scr_pos.r + r_offs,
-                            scr_pos.c + c_offs,
-                            fight_style);
-          };
-          f_render_fight(npc_scr_pos, dp);
-          if (npc.visible)
-            f_render_fight(pc_scr_pos, -dp);
+            // [side_case, base_case, side_case]
+            // Case NW (dp = [1, 1]):
+            //O#
+            //#*
+            // r + [1, 1, 0]
+            // c + [0, 1, 1]
+            //
+            // Case W (dp = [0, 1]):
+            // #
+            //O*
+            // #
+            // r + [1, 0, -1]
+            // c + [1, 1,  1]
+            //
+            // Case SW (dp = [-1, 1]):
+            //#*
+            //O#
+            // r + [0, -1, -1]
+            // c + [1,  1,  0]
+            //
+            // Case S (dp = [-1, 0]):
+            //#*#
+            // O
+            // r + [-1, -1, -1]
+            // c + [ 1,  0, -1]
+            //
+            // Case SE (dp = [-1, -1]):
+            //*#
+            //#O
+            // r + [-1, -1,  0]
+            // c + [ 0, -1, -1]
+            //
+            // Case E (dp = [0, -1]):
+            //#
+            //*O
+            //#
+            // r + [-1,  0,  1]
+            // c + [-1, -1, -1]
+            //
+            // Case NE (dp = [1, -1]):
+            //#O
+            //*#
+            // r + [ 0,  1, 1]
+            // c + [-1, -1, 0]
+            //
+            // Case N (dp = [1, 0]):
+            // O
+            //#*#
+            // r + [ 1, 1, 1]
+            // c + [-1, 0, 1]
+            
+            auto dp = m_player.pos - npc.pos;
+            dp.r = math::sgn(dp.r);
+            dp.c = math::sgn(dp.c);
+            
+            auto f_dp_to_dir = [](const RC& dp)
+            {
+              if (dp == RC { 1, 1 }) return FightDir::NW;
+              if (dp == RC { 0, 1 }) return FightDir::W;
+              if (dp == RC { -1, 1 }) return FightDir::SW;
+              if (dp == RC { -1, 0 }) return FightDir::S;
+              if (dp == RC { -1, -1 }) return FightDir::SE;
+              if (dp == RC { 0, -1 }) return FightDir::E;
+              if (dp == RC { 1, -1 }) return FightDir::NE;
+              if (dp == RC { 1, 0 }) return FightDir::N;
+              return FightDir::NUM_ITEMS;
+            };
+            const auto num_dir = static_cast<int>(FightDir::NUM_ITEMS);
+            
+            auto f_render_fight = [&](const RC& scr_pos, const RC& dp)
+            {
+              styles::Style fight_style
+              {
+                color::get_random_color(c_fight_colors),
+                Color::Transparent2
+              };
+              std::string fight_str = rnd::rand_select(c_fight_strings);
+              auto dir = static_cast<int>(f_dp_to_dir(dp));
+              
+              auto r_offs = rnd::randn_select(0.f, 1.f, std::vector {
+                fight_r_offs[(dir - 1)%num_dir],
+                fight_r_offs[dir],
+                fight_r_offs[(dir + 1)%num_dir] });
+              auto c_offs = rnd::randn_select(0.f, 1.f, std::vector {
+                fight_c_offs[(dir - 1)%num_dir],
+                fight_c_offs[dir],
+                fight_c_offs[(dir + 1)%num_dir] });
+              sh.write_buffer(fight_str,
+                              scr_pos.r + r_offs,
+                              scr_pos.c + c_offs,
+                              fight_style);
+            };
+            f_render_fight(npc_scr_pos, dp);
+            if (npc.visible)
+              f_render_fight(pc_scr_pos, -dp);
+          }
         }
       }
 
