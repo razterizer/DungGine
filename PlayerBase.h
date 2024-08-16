@@ -10,8 +10,6 @@
 namespace dung
 {
 
-  // We consider the PC (Player) to be an agent as well as the NPCs.
-  // A PC is a controllable agent according to this nomenclature.
   struct PlayerBase
   {
     char character;
