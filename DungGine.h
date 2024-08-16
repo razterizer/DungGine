@@ -44,7 +44,7 @@ namespace dung
     
     bool debug = false;
     
-    Player m_player;
+    PC m_player;
     std::vector<NPC> all_npcs;
     
     std::unique_ptr<ScreenHelper> m_screen_helper;
@@ -1393,7 +1393,7 @@ namespace dung
           }
       }
       
-      // Player LOS etc.
+      // PC LOS etc.
       m_player.update();
       
       m_player.on_terrain = m_environment->get_terrain(m_player.pos);
@@ -1448,7 +1448,7 @@ namespace dung
             // Determine if player hits the NPC
             if (player_attack_roll >= npc_ac)
             {
-              // Player hits the NPC
+              // PC hits the NPC
               int damage = f_calc_damage(weapon, m_player.get_melee_damage_bonus());
               
               // Apply damage to the NPC

@@ -1,5 +1,5 @@
 //
-//  Player.h
+//  PC.h
 //  DungGine
 //
 //  Created by Rasmus Anthin on 2024-06-21.
@@ -16,7 +16,7 @@
 namespace dung
 {
   
-  struct Player final : PlayerBase
+  struct PC final : PlayerBase
   {
     bool is_spawned = false;
     
@@ -37,7 +37,7 @@ namespace dung
     bool show_inventory = false;
     float weight_capacity = 50.f;
     
-    Player()
+    PC()
     {
       character = '@';
       style = { Color::Magenta, Color::White };
