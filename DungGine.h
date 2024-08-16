@@ -12,7 +12,7 @@
 #include "DungGineStyles.h"
 #include "RoomStyle.h"
 #include "Items.h"
-#include "Player.h"
+#include "PC.h"
 #include "NPC.h"
 #include "SolarMotionPatterns.h"
 #include "Globals.h"
