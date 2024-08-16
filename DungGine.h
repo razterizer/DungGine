@@ -1613,7 +1613,8 @@ namespace dung
                             fight_style);
           };
           f_render_fight(npc_scr_pos, dp);
-          f_render_fight(pc_scr_pos, -dp);
+          if (npc.visible)
+            f_render_fight(pc_scr_pos, -dp);
         }
       }
 
