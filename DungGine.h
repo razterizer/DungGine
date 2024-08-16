@@ -1437,7 +1437,14 @@ namespace dung
               damage = f_calc_damage(all_weapons[npc.weapon_idx].get(), npc.get_melee_damage_bonus());
             
             // Apply damage to the player
+            bool was_living = m_player.health > 0;
             m_player.health -= damage;
+            if (was_living && m_player.health < 0)
+            {
+                message_handler->add_message(static_cast<float>(real_time_s),
+                                             "You died!",
+                                             MessageHandler::Level::Fatal);
+            }
           }
           
           // Roll a d20 for the player's attack roll (if the NPC is visible)
