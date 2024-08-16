@@ -62,7 +62,7 @@ namespace dung
     
     void update_scrolling(const RC& world_pos)
     {
-          // Scrolling mode.
+      // Scrolling mode.
       switch (scr_scrolling_mode)
       {
         case ScreenScrollingMode::AlwaysInCentre:
