@@ -103,6 +103,7 @@ namespace dung
     const float c_dist_hostile_hyst_off = 3.f + 1e-2f;
     const int c_fight_min_dist = 1;
     bool is_hostile = false;
+    bool was_hostile = false;
     OneShot trg_info_hostile_npc;
     
   private:
@@ -659,6 +660,7 @@ namespace dung
       
       auto dist_to_pc = distance(pos, pc_pos);
       
+      was_hostile = is_hostile;
       if (enemy)
       {
         if (dist_to_pc < c_dist_hostile_hyst_on)

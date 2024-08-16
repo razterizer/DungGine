@@ -16,9 +16,11 @@
 #include "NPC.h"
 #include "SolarMotionPatterns.h"
 #include "Globals.h"
+#include "DungGineListener.h"
 #include <Termin8or/Keyboard.h>
 #include <Termin8or/MessageHandler.h>
 #include <Core/FolderHelper.h>
+#include <Core/events/EventBroadcaster.h>
 
 
 namespace dung
@@ -26,7 +28,7 @@ namespace dung
 
   using namespace std::string_literals;
 
-  class DungGine final
+  class DungGine final : public EventBroadcaster<DungGineListener>
   {
     std::unique_ptr<Environment> m_environment;
     
@@ -1409,6 +1411,7 @@ namespace dung
         message_handler->add_message(static_cast<float>(real_time_s),
                                      "You died!",
                                      MessageHandler::Level::Fatal);
+        broadcast([](auto* listener) { listener->on_pc_death(); });
       }
       
       // NPCs
@@ -1416,6 +1419,11 @@ namespace dung
       {
         npc.on_terrain = m_environment->get_terrain(npc.pos);
         npc.update(curr_pos, m_environment.get(), sim_dt_s);
+        
+        if (npc.is_hostile && !npc.was_hostile)
+          broadcast([&npc](auto* listener) { listener->on_fight_begin(&npc); });
+        else if (!npc.is_hostile && npc.was_hostile)
+          broadcast([&npc](auto* listener) { listener->on_fight_end(&npc); });
       }
       
       // Fighting
@@ -1456,6 +1464,7 @@ namespace dung
                 message_handler->add_message(static_cast<float>(real_time_s),
                                              "You were killed!",
                                              MessageHandler::Level::Fatal);
+                broadcast([](auto* listener) { listener->on_pc_death(); });
               }
             }
             
@@ -1480,6 +1489,7 @@ namespace dung
                   message_handler->add_message(static_cast<float>(real_time_s),
                                                "You killed the " + race2str(npc.npc_race) + "!",
                                                MessageHandler::Level::Guide);
+                  broadcast([](auto* listener) { listener->on_npc_death(); });
                 }
               }
             }
