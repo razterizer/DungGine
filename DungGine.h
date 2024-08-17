@@ -1504,12 +1504,13 @@ namespace dung
     template<int NR, int NC>
     void draw(SpriteHandler<NR, NC>& sh, double real_time_s, int anim_ctr,
               ui::VerticalAlignment mb_v_align = ui::VerticalAlignment::CENTER,
-              ui::HorizontalAlignment mb_h_align = ui::HorizontalAlignment::CENTER)
+              ui::HorizontalAlignment mb_h_align = ui::HorizontalAlignment::CENTER,
+              bool framed_mode = false)
     {
       const auto& room_corridor_map = m_environment->get_room_corridor_map();
       const auto& door_vec = m_environment->fetch_doors();
       
-      message_handler->update(sh, static_cast<float>(real_time_s), mb_v_align, mb_h_align);
+      message_handler->update(sh, static_cast<float>(real_time_s), mb_v_align, mb_h_align, true, true, 0, 0, drawing::OutlineType::Line, framed_mode);
       
       if (m_player.show_inventory)
         draw_inventory(sh);
