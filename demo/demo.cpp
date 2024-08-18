@@ -151,7 +151,7 @@ private:
       if (game_over)
         set_state_game_over();
       
-      dungeon_engine->draw(sh, get_real_time_s(), anim_ctr, ui::VerticalAlignment::BOTTOM, ui::HorizontalAlignment::CENTER);
+      dungeon_engine->draw(sh, get_real_time_s(), anim_ctr, ui::VerticalAlignment::CENTER, ui::HorizontalAlignment::CENTER, 4, 0);
     }
   }
   
