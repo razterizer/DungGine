@@ -1524,6 +1524,7 @@ namespace dung
     void draw(SpriteHandler<NR, NC>& sh, double real_time_s, int anim_ctr,
               ui::VerticalAlignment mb_v_align = ui::VerticalAlignment::CENTER,
               ui::HorizontalAlignment mb_h_align = ui::HorizontalAlignment::CENTER,
+              int mb_v_align_offs = 0, int mb_h_align_offs = 0,
               bool framed_mode = false)
     {
       const auto& room_corridor_map = m_environment->get_room_corridor_map();
@@ -1532,6 +1533,8 @@ namespace dung
       MessageBoxDrawingArgs mb_args;
       mb_args.v_align = mb_v_align;
       mb_args.h_align = mb_h_align;
+      mb_args.v_align_offs = mb_v_align_offs;
+      mb_args.h_align_offs = mb_h_align_offs;
       mb_args.framed_mode = framed_mode;
       message_handler->update(sh, static_cast<float>(real_time_s), mb_args);
       
