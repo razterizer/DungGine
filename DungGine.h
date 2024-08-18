@@ -624,7 +624,17 @@ namespace dung
         
           auto f_alter_door_states = [&](Door* door)
           {
-            if (door != nullptr && door->is_door && distance(curr_pos, door->pos) == 1.f)
+            if (door == nullptr)
+              return false;
+            auto dr = door->pos.r - curr_pos.r;
+            auto dc = door->pos.c - curr_pos.c;
+            auto adr = std::abs(dr);
+            auto adc = std::abs(dc);
+            auto sdr = math::sgn(dr);
+            auto sdc = math::sgn(dc);
+            auto slos_r = math::sgn(m_player.los_r);
+            auto slos_c = math::sgn(m_player.los_c);
+            if (door->is_door && ((adr == 1 && sdr == slos_r) || (adc == 1 && sdc == slos_c)))
             {
               if (door->is_locked)
               {
