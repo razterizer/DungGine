@@ -962,14 +962,23 @@ namespace dung
         }
       }
       
+      ui::TextBoxDrawingArgsAlign tb_args;
+      tb_args.v_align = ui::VerticalAlignment::TOP;
+      tb_args.h_align = ui::HorizontalAlignment::LEFT;
+      tb_args.base.box_style = { Color::White, Color::DarkBlue };
+      tb_args.framed_mode = false;
       tb_health.set_text(health_bars, styles);
       tb_health.calc_pre_draw(str::Adjustment::Left);
-      tb_health.draw(sh, ui::VerticalAlignment::TOP, ui::HorizontalAlignment::LEFT, styles::Style { Color::White, Color::DarkBlue }, true, true, 0, 0, std::nullopt, drawing::OutlineType::Line, false);
+      tb_health.draw(sh, tb_args);
     }
     
     template<int NR, int NC>
     void draw_strength_bar(SpriteHandler<NR, NC>& sh)
     {
+      ui::TextBoxDrawingArgsPos tb_args;
+      tb_args.pos = { 1, 12 };
+      tb_args.base.box_style = { Color::White, Color::DarkBlue };
+    
       std::string strength_bar = str::rep_char(' ', 10);
       float pc_ratio = m_player.strength / 10;
       for (int i = 0; i < 10; ++i)
@@ -978,7 +987,7 @@ namespace dung
       Style style { Color::Green, Color::Transparent2 };
       tb_strength.set_text(strength_bar, style);
       tb_strength.calc_pre_draw(str::Adjustment::Left);
-      tb_strength.draw(sh, { 1, 12 }, { Color::White, Color::DarkBlue }, true, true, 0, 0, std::nullopt, drawing::OutlineType::Line);
+      tb_strength.draw(sh, tb_args);
     }
     
   public:
@@ -1520,7 +1529,11 @@ namespace dung
       const auto& room_corridor_map = m_environment->get_room_corridor_map();
       const auto& door_vec = m_environment->fetch_doors();
       
-      message_handler->update(sh, static_cast<float>(real_time_s), mb_v_align, mb_h_align, true, true, 0, 0, drawing::OutlineType::Line, framed_mode);
+      MessageBoxDrawingArgs mb_args;
+      mb_args.v_align = mb_v_align;
+      mb_args.h_align = mb_h_align;
+      mb_args.framed_mode = framed_mode;
+      message_handler->update(sh, static_cast<float>(real_time_s), mb_args);
       
       if (m_player.show_inventory)
         draw_inventory(sh);
