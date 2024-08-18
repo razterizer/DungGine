@@ -1689,12 +1689,15 @@ namespace dung
       {
         sh.write_buffer(terrain2str(m_player.on_terrain), 5, 1, Color::Black, Color::White);
         
-        ui::TextBoxDrawingArgsAlign tbd_args;
-        tbd_args.v_align = ui::VerticalAlignment::TOP;
-        tbd_args.base.box_style = { Color::Blue, Color::Yellow };
-        tbd_args.framed_mode = false;
-        tbd.calc_pre_draw(str::Adjustment::Left);
-        tbd.draw(sh, tbd_args);
+        if (!tbd.empty())
+        {
+          ui::TextBoxDrawingArgsAlign tbd_args;
+          tbd_args.v_align = ui::VerticalAlignment::TOP;
+          tbd_args.base.box_style = { Color::Blue, Color::Yellow };
+          tbd_args.framed_mode = false;
+          tbd.calc_pre_draw(str::Adjustment::Left);
+          tbd.draw(sh, tbd_args);
+        }
       }
       
       // PC
