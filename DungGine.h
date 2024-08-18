@@ -622,10 +622,19 @@ namespace dung
         else
         {
           message_handler->clear_curr_message();
+          
+          tbd.clear();
+          
+          auto slos_r = math::sgn(m_player.los_r);
+          auto slos_c = math::sgn(m_player.los_c);
+          //tbd.ref_tmp("slos_r", &slos_r) = slos_r;
+          //tbd.ref_tmp("slos_c", &slos_c) = slos_c;
         
           auto f_alter_door_states = [&](Door* door)
           {
             if (door == nullptr)
+              return false;
+            if (!door->is_door)
               return false;
             auto dr = door->pos.r - curr_pos.r;
             auto dc = door->pos.c - curr_pos.c;
@@ -633,9 +642,11 @@ namespace dung
             auto adc = std::abs(dc);
             auto sdr = math::sgn(dr);
             auto sdc = math::sgn(dc);
-            auto slos_r = math::sgn(m_player.los_r);
-            auto slos_c = math::sgn(m_player.los_c);
-            if (door->is_door && ((adr == 1 && sdr == slos_r) || (adc == 1 && sdc == slos_c)))
+            //tbd.ref_tmp("adr" + std::to_string(door->key_id), &adr) = adr;
+            //tbd.ref_tmp("adc" + std::to_string(door->key_id), &adc) = adc;
+            //tbd.ref_tmp("sdr" + std::to_string(door->key_id), &sdr) = sdr;
+            //tbd.ref_tmp("sdc" + std::to_string(door->key_id), &sdc) = sdc;
+            if (math::length_squared(dr, dc) == 1.f && ((adr == 1 && sdr == slos_r) || (adc == 1 && sdc == slos_c)))
             {
               if (door->is_locked)
               {
