@@ -195,6 +195,17 @@ namespace dung
     }
   };
   
+  enum ArmourType
+  {
+    ARMOUR_Shield = 0,
+    ARMOUR_Gambeson,
+    ARMOUR_ChainMailleHauberk,
+    ARMOUR_PlatedBodyArmour,
+    ARMOUR_PaddedCoif,
+    ARMOUR_ChainMailleCoif,
+    ARMOUR_Helmet
+  };
+  
   struct Armour : Item
   {
     int protection = 1;

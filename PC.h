@@ -10,6 +10,7 @@
 #include "Terrain.h"
 #include "Items.h"
 #include "PlayerBase.h"
+#include "Inventory.h"
 #include <Core/StlUtils.h>
 
 
@@ -27,13 +28,6 @@ namespace dung
     std::vector<int> weapon_idcs;
     std::vector<int> potion_idcs;
     std::vector<int> armour_idcs;
-    int inv_hilite_idx = 0; // index over over key_idcs through armour_idcs.
-    std::vector<int> inv_select_idcs; // indices over key_idcs through armour_idcs.
-    int inv_select_idx_key = -1;
-    int inv_select_idx_lamp = -1;
-    int inv_select_idx_weapon = -1;
-    int inv_select_idx_potion = -1;
-    int inv_select_idx_armour = -1;
     bool show_inventory = false;
     float weight_capacity = 50.f;
     
@@ -49,178 +43,144 @@ namespace dung
       update_terrain();
     }
     
-    int calc_armour_class(const std::vector<std::unique_ptr<Armour>>& all_armour) const
+    int calc_armour_class(Inventory* inventory) const
     {
       int tot_protection = 0;
-      for (const auto& a_idx : armour_idcs)
-        tot_protection += all_armour[a_idx]->protection;
+      auto* armour_group = inventory->fetch_group("Armour:");
+      for (auto& armour_subgroup : *armour_group)
+      {
+        auto* selected_inv_item = armour_subgroup.get_selected_item();
+        if (selected_inv_item != nullptr && selected_inv_item->item != nullptr)
+        {
+          auto* armour = dynamic_cast<Armour*>(selected_inv_item->item);
+          if (armour != nullptr)
+            tot_protection += armour->protection;
+        }
+      }
       return base_ac + tot_protection + (dexterity / 2); // Example: Include dexterity bonus
     }
     
     // Function to calculate melee attack bonus
     int get_melee_attack_bonus() const
     {
-        return strength / 2; // Example: Strength bonus to attack rolls
+      return strength / 2; // Example: Strength bonus to attack rolls
     }
 
     // Function to calculate melee damage bonus
     int get_melee_damage_bonus() const
     {
-        return strength / 2; // Example: Strength bonus to damage
+      return strength / 2; // Example: Strength bonus to damage
     }
     
-    bool using_key_id(const std::vector<Key>& all_keys, int key_id) const
+    bool using_key_id(Inventory* inventory, int key_id) const
     {
-      if (math::in_range<int>(inv_select_idx_key,
-                              start_inv_idx_keys(), end_inv_idx_keys(),
-                              Range::Closed))
-        if (all_keys[key_idcs[inv_select_idx_key]].key_id == key_id)
-          return true;
+      auto* group = inventory->fetch_group("Keys:");
+      auto* subgroup = group->fetch_subgroup(0);
+      auto* selected_inv_item = subgroup->get_selected_item();
+      if (selected_inv_item != nullptr && selected_inv_item->item != nullptr)
+      {
+        auto* key = dynamic_cast<Key*>(selected_inv_item->item);
+        if (key != nullptr)
+          return key->key_id == key_id;
+      }
       return false;
     }
     
-    void remove_key_by_key_id(std::vector<Key>& all_keys, int key_id)
+    void remove_key_by_key_id(Inventory* inventory, std::vector<Key>& all_keys, int key_id)
     {
+      auto it = stlutils::find_if(all_keys, [key_id](const auto& key) { return key.key_id == key_id; });
+      if (it != all_keys.end())
+        inventory->remove_item(&(*it));
       stlutils::erase_if(key_idcs, [&](int key_idx) { return all_keys[key_idx].key_id == key_id; });
       stlutils::erase_if(all_keys, [&](const auto& key) { return key.key_id == key_id; });
-      if (inv_select_idx_key != -1)
+    }
+    
+    void remove_selected_potion(Inventory* inventory, std::vector<Potion>& all_potions)
+    {
+      auto* group = inventory->fetch_group("Potions:");
+      auto* subgroup = group->fetch_subgroup(0);
+      auto* selected_inv_item = subgroup->get_selected_item();
+      if (selected_inv_item != nullptr && selected_inv_item->item != nullptr)
       {
-        stlutils::erase(inv_select_idcs, inv_select_idx_key);
-        inv_select_idx_key = -1;
+        auto* potion = dynamic_cast<Potion*>(selected_inv_item->item);
+        if (potion != nullptr)
+        {
+          subgroup->remove_item(potion);
+          auto idx = stlutils::find_if_idx(all_potions, [potion](const auto& p) { return &p == potion; });
+          stlutils::erase_at(potion_idcs, idx);
+          stlutils::erase_if(all_potions, [potion](const auto& p) { return &p == potion; });
+        }
       }
     }
     
-    void remove_selected_potion(std::vector<Potion>& all_potions)
+    Key* get_selected_key(Inventory* inventory) const
     {
-      if (inv_select_idx_potion == -1)
-        return;
-      stlutils::erase_at(all_potions, potion_idcs[inv_select_idx_potion - start_inv_idx_potions()]);
-      stlutils::erase_at(potion_idcs, inv_select_idx_potion - start_inv_idx_potions());
-      if (inv_select_idx_potion != -1)
+      auto* group = inventory->fetch_group("Keys:");
+      auto* subgroup = group->fetch_subgroup(0);
+      auto* selected_inv_item = subgroup->get_selected_item();
+      if (selected_inv_item != nullptr && selected_inv_item->item != nullptr)
       {
-        stlutils::erase(inv_select_idcs, inv_select_idx_potion);
-        inv_select_idx_potion = -1;
+        auto* key = dynamic_cast<Key*>(selected_inv_item->item);
+        if (key != nullptr)
+          return key;
       }
-    }
-    
-    Key* get_selected_key(std::vector<Key>& all_keys) const
-    {
-      if (in_keys_range(inv_select_idx_key))
-        return &all_keys[key_idcs[inv_select_idx_key - start_inv_idx_keys()]];
       return nullptr;
     }
     
-    Lamp* get_selected_lamp(std::vector<Lamp>& all_lamps) const
+    Lamp* get_selected_lamp(Inventory* inventory) const
     {
-      if (in_lamps_range(inv_select_idx_lamp))
-        return &all_lamps[lamp_idcs[inv_select_idx_lamp - start_inv_idx_lamps()]];
+      auto* group = inventory->fetch_group("Lamps:");
+      auto* subgroup = group->fetch_subgroup(0);
+      auto* selected_inv_item = subgroup->get_selected_item();
+      if (selected_inv_item != nullptr && selected_inv_item->item != nullptr)
+      {
+        auto* lamp = dynamic_cast<Lamp*>(selected_inv_item->item);
+        if (lamp != nullptr)
+          return lamp;
+      }
       return nullptr;
     }
     
-    Weapon* get_selected_weapon(std::vector<std::unique_ptr<Weapon>>& all_weapons)
+    Weapon* get_selected_melee_weapon(Inventory* inventory)
     {
-     if (in_weapons_range(inv_select_idx_weapon))
-        return all_weapons[weapon_idcs[inv_select_idx_weapon - start_inv_idx_weapons()]].get();
+     auto* group = inventory->fetch_group("Weapons:");
+      auto* subgroup = group->fetch_subgroup(0);
+      auto* selected_inv_item = subgroup->get_selected_item();
+      if (selected_inv_item != nullptr && selected_inv_item->item != nullptr)
+      {
+        auto* weapon = dynamic_cast<Weapon*>(selected_inv_item->item);
+        if (weapon != nullptr)
+          return weapon;
+      }
       return nullptr;
     }
     
-    Potion* get_selected_potion(std::vector<Potion>& all_potions)
+    Potion* get_selected_potion(Inventory* inventory)
     {
-     if (in_potions_range(inv_select_idx_potion))
-        return &all_potions[potion_idcs[inv_select_idx_potion - start_inv_idx_potions()]];
+      auto* group = inventory->fetch_group("Potions:");
+      auto* subgroup = group->fetch_subgroup(0);
+      auto* selected_inv_item = subgroup->get_selected_item();
+      if (selected_inv_item != nullptr && selected_inv_item->item != nullptr)
+      {
+        auto* potion = dynamic_cast<Potion*>(selected_inv_item->item);
+        if (potion != nullptr)
+          return potion;
+      }
       return nullptr;
     }
     
-    Armour* get_selected_armour(std::vector<std::unique_ptr<Armour>>& all_armour)
+    Armour* get_selected_armour(Inventory* inventory, ArmourType type)
     {
-     if (in_armour_range(inv_select_idx_armour))
-        return all_armour[armour_idcs[inv_select_idx_armour - start_inv_idx_armour()]].get();
+      auto* group = inventory->fetch_group("Armour:");
+      auto* subgroup = group->fetch_subgroup(type);
+      auto* selected_inv_item = subgroup->get_selected_item();
+      if (selected_inv_item != nullptr && selected_inv_item->item != nullptr)
+      {
+        auto* armour = dynamic_cast<Armour*>(selected_inv_item->item);
+        if (armour != nullptr)
+          return armour;
+      }
       return nullptr;
-    }
-    
-    int num_items() const
-    {
-      return static_cast<int>(key_idcs.size() + lamp_idcs.size() + weapon_idcs.size() + potion_idcs.size() + armour_idcs.size());
-    }
-    
-    int last_item_idx() const
-    {
-      return num_items() - 1;
-    }
-    
-    int start_inv_idx_keys() const
-    {
-      return 0;
-    }
-    
-    int end_inv_idx_keys() const
-    {
-      return start_inv_idx_lamps() - 1;
-    }
-    
-    int start_inv_idx_lamps() const
-    {
-      return start_inv_idx_keys() + static_cast<int>(key_idcs.size());
-    }
-    
-    int end_inv_idx_lamps() const
-    {
-      return start_inv_idx_weapons() - 1;
-    }
-    
-    int start_inv_idx_weapons() const
-    {
-      return start_inv_idx_lamps() + static_cast<int>(lamp_idcs.size());
-    }
-    
-    int end_inv_idx_weapons() const
-    {
-      return start_inv_idx_potions() - 1;
-    }
-    
-    int start_inv_idx_potions() const
-    {
-      return start_inv_idx_weapons() + static_cast<int>(weapon_idcs.size());
-    }
-    
-    int end_inv_idx_potions() const
-    {
-      return start_inv_idx_armour() - 1;
-    }
-    
-    int start_inv_idx_armour() const
-    {
-      return start_inv_idx_potions() + static_cast<int>(potion_idcs.size());
-    }
-    
-    int end_inv_idx_armour() const
-    {
-      return num_items() - 1;
-    }
-    
-    bool in_keys_range(int idx) const
-    {
-      return math::in_range<int>(idx, start_inv_idx_keys(), end_inv_idx_keys(), Range::Closed);
-    }
-    
-    bool in_lamps_range(int idx) const
-    {
-      return math::in_range<int>(idx, start_inv_idx_lamps(), end_inv_idx_lamps(), Range::Closed);
-    }
-    
-    bool in_weapons_range(int idx) const
-    {
-      return math::in_range<int>(idx, start_inv_idx_weapons(), end_inv_idx_weapons(), Range::Closed);
-    }
-    
-    bool in_potions_range(int idx) const
-    {
-      return math::in_range<int>(idx, start_inv_idx_potions(), end_inv_idx_potions(), Range::Closed);
-    }
-    
-    bool in_armour_range(int idx) const
-    {
-      return math::in_range<int>(idx, start_inv_idx_armour(), end_inv_idx_armour(), Range::Closed);
     }
     
     bool is_inside_curr_room() const

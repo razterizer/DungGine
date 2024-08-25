@@ -17,6 +17,7 @@
 #include "SolarMotionPatterns.h"
 #include "Globals.h"
 #include "DungGineListener.h"
+#include "Inventory.h"
 #include <Termin8or/Keyboard.h>
 #include <Termin8or/MessageHandler.h>
 #include <Core/FolderHelper.h>
@@ -51,6 +52,8 @@ namespace dung
     
     std::unique_ptr<ScreenHelper> m_screen_helper;
     
+    std::unique_ptr<Inventory> m_inventory;
+    
     std::vector<Key> all_keys;
     // Lamps illuminate items and NPCs. If you've already discovered an item or
     //   NPC using a lamp (and after FOW been cleared),
@@ -83,24 +86,9 @@ namespace dung
       float t_season_period = std::fmod(m_sun_year_t_offs + (real_time_s / 60.f) / m_sun_minutes_per_year, 1);
       m_season = static_cast<Season>(math::roundI(7*t_season_period));
     }
-        
-    template<int NR, int NC>
-    void draw_inventory(SpriteHandler<NR, NC>& sh) const
-    {
-      sh.write_buffer(str::adjust_str("Inventory", str::Adjustment::Center, NC - 1), 4, 0, Color::White, Color::Transparent2);
     
-      const int x = -5;
-      const int y = -2;
-      const int z = 4;
-      ttl::Rectangle bb_inv { 2, 2, NR + x, NC - 5 };
-      static int r_offs = 0;
-      const int c_item = 6;
-      const int r_min = bb_inv.top() + z;
-      const int r_max = bb_inv.bottom() + y;
-      int r = r_min + r_offs;
-      Style style_category { Color::White, Color::Transparent2 };
-      HiliteSelectFGStyle style_item { Color::DarkGreen, Color::Transparent2, Color::Green, Color::DarkBlue, Color::Blue };
-      
+    void update_inventory()
+    {
       auto num_inv_keys = static_cast<int>(m_player.key_idcs.size());
       auto num_inv_lamps = static_cast<int>(m_player.lamp_idcs.size());
       auto num_inv_wpns = static_cast<int>(m_player.weapon_idcs.size());
@@ -130,34 +118,39 @@ namespace dung
         }
       };
       
-      std::vector<std::pair<std::string, bool>> items;
-      items.emplace_back(std::make_pair("Keys:", false));
+      auto* keys_group = m_inventory->fetch_group("Keys:");
+      auto* keys_subgroup = keys_group->fetch_subgroup(0);
       for (int inv_key_idx = 0; inv_key_idx < num_inv_keys; ++inv_key_idx)
       {
         auto key_idx = m_player.key_idcs[inv_key_idx];
-        const auto& key = all_keys[key_idx];
+        auto& key = all_keys[key_idx];
         std::string item_str = "  Key:" + std::to_string(key.key_id);
         f_format_item_str(item_str, key.weight, key.price, 0);
-        items.emplace_back(make_pair(item_str, true));
+        if (keys_subgroup->find_item(&key) == nullptr)
+          keys_subgroup->add_item(item_str, &key);
       }
-      items.emplace_back(std::make_pair("", false));
-      items.emplace_back(std::make_pair("Lamps:", false));
+      
+      auto* lamps_group = m_inventory->fetch_group("Lamps:");
+      auto* lamps_subgroup = lamps_group->fetch_subgroup(0);
       for (int inv_lamp_idx = 0; inv_lamp_idx < num_inv_lamps; ++inv_lamp_idx)
       {
         auto lamp_idx = m_player.lamp_idcs[inv_lamp_idx];
-        const auto& lamp = all_lamps[lamp_idx];
+        auto& lamp = all_lamps[lamp_idx];
         auto lamp_type = lamp.get_type_str();
         str::to_upper(lamp_type[0]);
         std::string item_str = "  "s + lamp_type + ":" + std::to_string(lamp_idx);
         f_format_item_str(item_str, lamp.weight, lamp.price, 0);
-        items.emplace_back(std::make_pair(item_str, true));
+        if (lamps_subgroup->find_item(&lamp) == nullptr)
+          lamps_subgroup->add_item(item_str, &lamp);
       }
-      items.emplace_back(std::make_pair("", false));
-      items.emplace_back(std::make_pair("Weapons:", false));
+      
+      auto* weapons_group = m_inventory->fetch_group("Weapons:");
+      auto* weapons_subgroup_melee = weapons_group->fetch_subgroup(0);
+      weapons_subgroup_melee->set_title("Melee:");
       for (int inv_wpn_idx = 0; inv_wpn_idx < num_inv_wpns; ++inv_wpn_idx)
       {
         auto wpn_idx = m_player.weapon_idcs[inv_wpn_idx];
-        const auto& weapon = all_weapons[wpn_idx];
+        auto& weapon = all_weapons[wpn_idx];
         std::string item_str = "  ";
         if (dynamic_cast<Sword*>(weapon.get()) != nullptr)
           item_str += "Sword:";
@@ -170,82 +163,87 @@ namespace dung
         item_str += ":";
         item_str += std::to_string(wpn_idx);
         f_format_item_str(item_str, weapon->weight, weapon->price, weapon->damage);
-        items.emplace_back(std::make_pair(item_str, true));
+        if (weapons_subgroup_melee->find_item(weapon.get()) == nullptr)
+          weapons_subgroup_melee->add_item(item_str, weapon.get());
       }
-      items.emplace_back(std::make_pair("", false));
-      items.emplace_back(std::make_pair("Potions:", false));
+      
+      auto* potions_group = m_inventory->fetch_group("Potions:");
+      auto* potions_subgroup = potions_group->fetch_subgroup(0);
       for (int inv_pot_idx = 0; inv_pot_idx < num_inv_potions; ++inv_pot_idx)
       {
         auto pot_idx = m_player.potion_idcs[inv_pot_idx];
-        const auto& potion = all_potions[pot_idx];
+        auto& potion = all_potions[pot_idx];
         std::string item_str = "  Potion:" + std::to_string(pot_idx);
         f_format_item_str(item_str, potion.weight, potion.price, 0);
-        items.emplace_back(std::make_pair(item_str, true));
+        if (potions_subgroup->find_item(&potion) == nullptr)
+          potions_subgroup->add_item(item_str, &potion);
       }
-      items.emplace_back(std::make_pair("", false));
-      items.emplace_back(std::make_pair("Armour:", false));
+      
+      auto* armour_group = m_inventory->fetch_group("Armour:");
+      auto* armour_subgroup_shields = armour_group->fetch_subgroup(ARMOUR_Shield);
+      armour_subgroup_shields->set_title("Shields:");
+      auto* armour_subgroup_gambesons = armour_group->fetch_subgroup(ARMOUR_Gambeson);
+      armour_subgroup_gambesons->set_title("Gambesons:");
+      auto* armour_subgroup_chainmaillehauberks = armour_group->fetch_subgroup(ARMOUR_ChainMailleHauberk);
+      armour_subgroup_chainmaillehauberks->set_title("Chain-Maille Hauberks:");
+      auto* armour_subgroup_platedbodyarmour = armour_group->fetch_subgroup(ARMOUR_PlatedBodyArmour);
+      armour_subgroup_platedbodyarmour->set_title("Plated Body Armour:");
+      auto* armour_subgroup_paddedcoifs = armour_group->fetch_subgroup(ARMOUR_PaddedCoif);
+      armour_subgroup_paddedcoifs->set_title("Padded Coifs:");
+      auto* armour_subgroup_chainmaillecoifs = armour_group->fetch_subgroup(ARMOUR_ChainMailleCoif);
+      armour_subgroup_chainmaillecoifs->set_title("Chain-Maille Coifs:");
+      auto* armour_subgroup_helmets = armour_group->fetch_subgroup(ARMOUR_Helmet);
+      armour_subgroup_helmets->set_title("Helmets:");
       for (int inv_a_idx = 0; inv_a_idx < num_inv_armour; ++inv_a_idx)
       {
         auto a_idx = m_player.armour_idcs[inv_a_idx];
         const auto& armour = all_armour[a_idx];
         std::string item_str = "  ";
+        InvSubGroup* armour_subgroup = nullptr;
         if (dynamic_cast<Shield*>(armour.get()) != nullptr)
+        {
           item_str += "Shield:";
+          armour_subgroup = armour_subgroup_shields;
+        }
         else if (dynamic_cast<Gambeson*>(armour.get()) != nullptr)
+        {
           item_str += "Gambeson:";
+          armour_subgroup = armour_subgroup_gambesons;
+        }
         else if (dynamic_cast<ChainMailleHauberk*>(armour.get()) != nullptr)
+        {
           item_str += "C.M. Hauberk:";
+          armour_subgroup = armour_subgroup_chainmaillehauberks;
+        }
         else if (dynamic_cast<PlatedBodyArmour*>(armour.get()) != nullptr)
+        {
           item_str += "P. Body Armour:";
+          armour_subgroup = armour_subgroup_platedbodyarmour;
+        }
         else if (dynamic_cast<PaddedCoif*>(armour.get()) != nullptr)
+        {
           item_str += "Padded Coif:";
+          armour_subgroup = armour_subgroup_paddedcoifs;
+        }
         else if (dynamic_cast<ChainMailleCoif*>(armour.get()) != nullptr)
+        {
           item_str += "C.M. Coif:";
+          armour_subgroup = armour_subgroup_chainmaillecoifs;
+        }
         else if (dynamic_cast<Helmet*>(armour.get()) != nullptr)
+        {
           item_str += "Helmet:";
+          armour_subgroup = armour_subgroup_helmets;
+        }
         else
           item_str += "<Armour>";
         item_str += ":";
         item_str += std::to_string(a_idx);
         f_format_item_str(item_str, armour->weight, armour->price, armour->protection);
-        items.emplace_back(std::make_pair(item_str, true));
+        if (armour_subgroup != nullptr)
+          if (armour_subgroup->find_item(armour.get()) == nullptr)
+            armour_subgroup->add_item(item_str, armour.get());
       }
-      
-      auto num_items = static_cast<int>(items.size());
-      int num_non_items = 0;
-      for (int item_idx = 0; item_idx < num_items; ++item_idx)
-      {
-        const auto& i = items[item_idx];
-        if (!i.second)
-          num_non_items++;
-        int adj_item_idx = item_idx - num_non_items;
-        if (r_min <= r && r <= r_max)
-        {
-            Style style = style_category;
-            if (i.second)
-              style = style_item.get_style(m_player.inv_hilite_idx == adj_item_idx,
-                                           stlutils::contains(m_player.inv_select_idcs, adj_item_idx));
-            sh.write_buffer(i.first, r, c_item, style);
-            if (m_player.inv_hilite_idx == adj_item_idx && m_player.inv_hilite_idx < m_player.last_item_idx())
-            {
-              if (r == r_min)
-                r_offs++;
-              else if (r == r_max)
-                r_offs--;
-            }
-        }
-        else
-        {
-          if (m_player.inv_hilite_idx == 0)
-            r_offs = 0;
-          else if (m_player.inv_hilite_idx == m_player.last_item_idx())
-            r_offs = x - m_player.num_items() + NR + y - (z - 1) - num_non_items;
-        }
-        r++;
-      }
-      
-      drawing::draw_box_outline(sh, bb_inv, drawing::OutlineType::Line, { Color::White, Color::DarkGray });
-      drawing::draw_box(sh, bb_inv, { Color::White, Color::DarkGray }, ' ');
     }
     
     template<typename Lambda>
@@ -455,7 +453,7 @@ namespace dung
       }
     }
     
-    void handle_keys(const keyboard::KeyPressData& kpd, double real_time_s)
+    void handle_keyboard(const keyboard::KeyPressData& kpd, double real_time_s)
     {
       auto curr_key = keyboard::get_char_key(kpd);
       auto curr_special_key = keyboard::get_special_key(kpd);
@@ -485,72 +483,144 @@ namespace dung
       {
         if (m_player.show_inventory)
         {
-          auto f_drop_item = [&](auto& obj, int obj_idx, auto& player_obj_idcs)
+          auto f_drop_item = [&](auto* obj)
           {
-            obj.picked_up = false;
-            obj.pos = curr_pos;
+            obj->picked_up = false;
+            obj->pos = curr_pos;
             if (m_player.is_inside_curr_room())
             {
-              obj.is_underground = m_environment->is_underground(m_player.curr_room);
-              obj.curr_room = m_player.curr_room;
-              obj.curr_corridor = nullptr;
+              obj->is_underground = m_environment->is_underground(m_player.curr_room);
+              obj->curr_room = m_player.curr_room;
+              obj->curr_corridor = nullptr;
             }
             else if (m_player.is_inside_curr_corridor())
             {
-              obj.is_underground = m_environment->is_underground(m_player.curr_corridor);
-              obj.curr_room = nullptr;
-              obj.curr_corridor = m_player.curr_corridor;
+              obj->is_underground = m_environment->is_underground(m_player.curr_corridor);
+              obj->curr_room = nullptr;
+              obj->curr_corridor = m_player.curr_corridor;
             }
-            stlutils::erase(player_obj_idcs, obj_idx);
           };
           
           std::string msg = "You dropped an item: ";
-          if (m_player.in_keys_range(m_player.inv_select_idx_key))
+          bool to_drop_found = false;
           {
-            auto key_idx = m_player.key_idcs[m_player.inv_select_idx_key - m_player.start_inv_idx_keys()];
-            auto& key = all_keys[key_idx];
-            f_drop_item(key, key_idx, m_player.key_idcs);
-            msg += "key:" + std::to_string(key.key_id) + "!";
-            stlutils::erase(m_player.inv_select_idcs, m_player.inv_select_idx_key);
-            m_player.inv_select_idx_key = -1;
+            auto* keys_group = m_inventory->fetch_group("Keys:");
+            auto* keys_subgroup = keys_group->fetch_subgroup(0);
+            auto* selected_inv_item = keys_subgroup->get_selected_item();
+            if (selected_inv_item != nullptr && selected_inv_item->item != nullptr && selected_inv_item->hilited)
+            {
+              auto* key = dynamic_cast<Key*>(selected_inv_item->item);
+              if (key != nullptr)
+              {
+                auto idx = stlutils::find_if_idx(all_keys, [key](const auto& o) { return &o == key; });
+                msg += "key:" + std::to_string(key->key_id) + "!";
+                f_drop_item(key);
+                stlutils::erase_at(m_player.key_idcs, idx);
+                keys_subgroup->remove_item(key);
+                to_drop_found = true;
+              }
+            }
           }
-          else if (m_player.in_lamps_range(m_player.inv_select_idx_lamp))
+          if (!to_drop_found)
           {
-            auto lamp_idx = m_player.lamp_idcs[m_player.inv_select_idx_lamp - m_player.start_inv_idx_lamps()];
-            auto& lamp = all_lamps[lamp_idx];
-            f_drop_item(lamp, lamp_idx, m_player.lamp_idcs);
-            msg += "lamp:" + std::to_string(lamp_idx) + "!";
-            stlutils::erase(m_player.inv_select_idcs, m_player.inv_select_idx_lamp);
-            m_player.inv_select_idx_lamp = -1;
+            auto* lamps_group = m_inventory->fetch_group("Lamps:");
+            auto* lamps_subgroup = lamps_group->fetch_subgroup(0);
+            auto* selected_inv_item = lamps_subgroup->get_selected_item();
+            if (selected_inv_item != nullptr && selected_inv_item->item != nullptr)
+            {
+              auto* lamp = dynamic_cast<Lamp*>(selected_inv_item->item);
+              if (lamp != nullptr)
+              {
+                auto idx = stlutils::find_if_idx(all_lamps, [lamp](const auto& o) { return &o == lamp; });
+                msg += "lamp:" + std::to_string(idx) + "!";
+                f_drop_item(lamp);
+                stlutils::erase_at(m_player.lamp_idcs, idx);
+                lamps_subgroup->remove_item(lamp);
+                to_drop_found = true;
+              }
+            }
           }
-          else if (m_player.in_weapons_range(m_player.inv_select_idx_weapon))
+          if (!to_drop_found)
           {
-            auto wpn_idx = m_player.weapon_idcs[m_player.inv_select_idx_weapon - m_player.start_inv_idx_weapons()];
-            auto& weapon = *all_weapons[wpn_idx];
-            f_drop_item(weapon, wpn_idx, m_player.weapon_idcs);
-            msg += weapon.type +":" + std::to_string(wpn_idx) + "!";
-            stlutils::erase(m_player.inv_select_idcs, m_player.inv_select_idx_weapon);
-            m_player.inv_select_idx_weapon = -1;
+            auto* weapons_group = m_inventory->fetch_group("Weapons:");
+            auto* weapons_subgroup_melee = weapons_group->fetch_subgroup(0);
+            auto* selected_inv_item = weapons_subgroup_melee->get_selected_item();
+            if (selected_inv_item != nullptr && selected_inv_item->item != nullptr)
+            {
+              auto* weapon = dynamic_cast<Weapon*>(selected_inv_item->item);
+              if (weapon != nullptr)
+              {
+                auto idx = stlutils::find_if_idx(all_weapons,
+                  [weapon](const auto& o) { return o.get() == weapon; });
+                msg += weapon->type +":" + std::to_string(idx) + "!";
+                f_drop_item(weapon);
+                stlutils::erase_at(m_player.weapon_idcs, idx);
+                weapons_subgroup_melee->remove_item(weapon);
+                to_drop_found = true;
+              }
+            }
           }
-          else if (m_player.in_potions_range(m_player.inv_select_idx_potion))
+          if (!to_drop_found)
           {
-            auto pot_idx = m_player.potion_idcs[m_player.inv_select_idx_potion - m_player.start_inv_idx_potions()];
-            auto& potion = all_potions[pot_idx];
-            f_drop_item(potion, pot_idx, m_player.potion_idcs);
-            msg += "potion:" + std::to_string(pot_idx) + "!";
-            stlutils::erase(m_player.inv_select_idcs, m_player.inv_select_idx_potion);
-            m_player.inv_select_idx_potion = -1;
+            auto* potions_group = m_inventory->fetch_group("Potions:");
+            auto* potions_subgroup = potions_group->fetch_subgroup(0);
+            auto* selected_inv_item = potions_subgroup->get_selected_item();
+            if (selected_inv_item != nullptr && selected_inv_item->item != nullptr)
+            {
+              auto* potion = dynamic_cast<Potion*>(selected_inv_item->item);
+              if (potion != nullptr)
+              {
+                auto idx = stlutils::find_if_idx(all_potions,
+                  [potion](const auto& o) { return &o == potion; });
+                msg += "potion:" + std::to_string(idx) + "!";
+                f_drop_item(potion);
+                stlutils::erase_at(m_player.potion_idcs, idx);
+                potions_subgroup->remove_item(potion);
+                to_drop_found = true;
+              }
+            }
           }
-          else if (m_player.in_armour_range(m_player.inv_select_idx_armour))
+          if (!to_drop_found)
           {
-            auto a_idx = m_player.armour_idcs[m_player.inv_select_idx_armour - m_player.start_inv_idx_armour()];
-            auto& armour = *all_armour[a_idx];
-            f_drop_item(armour, a_idx, m_player.armour_idcs);
-            msg += armour.type +":" + std::to_string(a_idx) + "!";
-            stlutils::erase(m_player.inv_select_idcs, m_player.inv_select_idx_armour);
-            m_player.inv_select_idx_armour = -1;
+            auto f_try_drop_armour = [&msg, &f_drop_item, &to_drop_found](auto* subgroup, const auto& all_armour, auto& pc_armour_idcs)
+            {
+              if (to_drop_found)
+                return false;
+              auto* selected_inv_item = subgroup->get_selected_item();
+              if (selected_inv_item != nullptr && selected_inv_item->item != nullptr)
+              {
+                auto* armour = dynamic_cast<Armour*>(selected_inv_item->item);
+                if (armour != nullptr)
+                {
+                  auto idx = stlutils::find_if_idx(all_armour, [armour](const auto& o) { return o.get() == armour; });
+                  msg += armour->type +":" + std::to_string(idx) + "!";
+                  f_drop_item(armour);
+                  stlutils::erase_at(pc_armour_idcs, idx);
+                  subgroup->remove_item(armour);
+                  to_drop_found = true;
+                  return true;
+                }
+              }
+              return false;
+            };
+            
+            auto* armour_group = m_inventory->fetch_group("Armour:");
+            if (!f_try_drop_armour(armour_group->fetch_subgroup(ARMOUR_Shield),
+                                   all_armour, m_player.armour_idcs))
+              if (!f_try_drop_armour(armour_group->fetch_subgroup(ARMOUR_Gambeson),
+                                     all_armour, m_player.armour_idcs))
+                if (!f_try_drop_armour(armour_group->fetch_subgroup(ARMOUR_ChainMailleHauberk),
+                                       all_armour, m_player.armour_idcs))
+                  if (!f_try_drop_armour(armour_group->fetch_subgroup(ARMOUR_PlatedBodyArmour),
+                                         all_armour, m_player.armour_idcs))
+                    if (!f_try_drop_armour(armour_group->fetch_subgroup(ARMOUR_PaddedCoif),
+                                           all_armour, m_player.armour_idcs))
+                      if (!f_try_drop_armour(armour_group->fetch_subgroup(ARMOUR_ChainMailleCoif),
+                                             all_armour, m_player.armour_idcs))
+                        f_try_drop_armour(armour_group->fetch_subgroup(ARMOUR_Helmet),
+                                          all_armour, m_player.armour_idcs);
           }
-          else
+          if (!to_drop_found)
           {
             msg += "Invalid Item!";
             std::cerr << "ERROR: Attempted to drop invalid item!" << std::endl;
@@ -567,10 +637,7 @@ namespace dung
       else if (str::to_lower(curr_key) == 's' || curr_special_key == keyboard::SpecialKey::Down)
       {
         if (m_player.show_inventory)
-        {
-          m_player.inv_hilite_idx++;
-          m_player.inv_hilite_idx = m_player.inv_hilite_idx % m_player.num_items();
-        }
+          m_inventory->inc_hilite();
         else if (is_inside_curr_bb(curr_pos.r + 1, curr_pos.c) &&
                  m_player.allow_move() &&
                  m_environment->allow_move_to(curr_pos.r + 1, curr_pos.c))
@@ -579,11 +646,7 @@ namespace dung
       else if (str::to_lower(curr_key) == 'w' || curr_special_key == keyboard::SpecialKey::Up)
       {
         if (m_player.show_inventory)
-        {
-          m_player.inv_hilite_idx--;
-          if (m_player.inv_hilite_idx < 0)
-            m_player.inv_hilite_idx = m_player.num_items() - 1;
-        }
+          m_inventory->dec_hilite();
         else if (is_inside_curr_bb(curr_pos.r - 1, curr_pos.c) &&
                  m_player.allow_move() &&
                  m_environment->allow_move_to(curr_pos.r - 1, curr_pos.c))
@@ -593,31 +656,7 @@ namespace dung
       {
         if (m_player.show_inventory)
         {
-          const int hilite_idx = m_player.inv_hilite_idx;
-          if (stlutils::contains(m_player.inv_select_idcs, hilite_idx))
-          {
-            stlutils::erase(m_player.inv_select_idcs, hilite_idx);
-            if (m_player.in_keys_range(hilite_idx))
-              m_player.inv_select_idx_key = -1;
-            else if (m_player.in_lamps_range(hilite_idx))
-              m_player.inv_select_idx_lamp = -1;
-            else if (m_player.in_weapons_range(hilite_idx))
-              m_player.inv_select_idx_weapon = -1;
-            else if (m_player.in_potions_range(hilite_idx))
-              m_player.inv_select_idx_potion = -1;
-          }
-          else
-          {
-            m_player.inv_select_idcs.emplace_back(hilite_idx);
-            if (m_player.in_keys_range(hilite_idx))
-              m_player.inv_select_idx_key = hilite_idx;
-            else if (m_player.in_lamps_range(hilite_idx))
-              m_player.inv_select_idx_lamp = hilite_idx;
-            else if (m_player.in_weapons_range(hilite_idx))
-              m_player.inv_select_idx_weapon = hilite_idx;
-            else if (m_player.in_potions_range(hilite_idx))
-              m_player.inv_select_idx_potion = hilite_idx;
-          }
+          m_inventory->toggle_hilited_selection();
         }
         else
         {
@@ -650,7 +689,7 @@ namespace dung
             {
               if (door->is_locked)
               {
-                if (m_player.using_key_id(all_keys, door->key_id))
+                if (m_player.using_key_id(m_inventory.get(), door->key_id))
                 {
                   // Currently doesn't support locking the door again.
                   // Not sure if we need that. Maybe do it in the far future...
@@ -660,7 +699,7 @@ namespace dung
                                                "The door is unlocked!",
                                                MessageHandler::Level::Guide);
                   
-                  m_player.remove_key_by_key_id(all_keys, door->key_id);
+                  m_player.remove_key_by_key_id(m_inventory.get(), all_keys, door->key_id);
                   message_handler->add_message(static_cast<float>(real_time_s),
                                                "You cast a vanishing spell on the key!",
                                                MessageHandler::Level::Guide);
@@ -699,20 +738,6 @@ namespace dung
             auto& key = all_keys[key_idx];
             if (key.pos == curr_pos && !key.picked_up)
             {
-              for (int& sel_idx : m_player.inv_select_idcs)
-                if (m_player.start_inv_idx_lamps() <= sel_idx)
-                  sel_idx++;
-              if (m_player.inv_select_idx_lamp != -1)
-                m_player.inv_select_idx_lamp++;
-              if (m_player.inv_select_idx_weapon != -1)
-                m_player.inv_select_idx_weapon++;
-              if (m_player.inv_select_idx_potion != -1)
-                m_player.inv_select_idx_potion++;
-              if (m_player.inv_select_idx_armour != -1)
-                m_player.inv_select_idx_armour++;
-              if (m_player.start_inv_idx_lamps() <= m_player.inv_hilite_idx)
-                m_player.inv_hilite_idx++;
-                
               m_player.key_idcs.emplace_back(key_idx);
               key.picked_up = true;
               message_handler->add_message(static_cast<float>(real_time_s),
@@ -724,18 +749,6 @@ namespace dung
             auto& lamp = all_lamps[lamp_idx];
             if (lamp.pos == curr_pos && !lamp.picked_up)
             {
-              for (int& sel_idx : m_player.inv_select_idcs)
-                if (m_player.start_inv_idx_weapons() <= sel_idx)
-                  sel_idx++;
-              if (m_player.inv_select_idx_weapon != -1)
-                m_player.inv_select_idx_weapon++;
-              if (m_player.inv_select_idx_potion != -1)
-                m_player.inv_select_idx_potion++;
-              if (m_player.inv_select_idx_armour != -1)
-                m_player.inv_select_idx_armour++;
-              if (m_player.start_inv_idx_weapons() <= m_player.inv_hilite_idx)
-                m_player.inv_hilite_idx++;
-                
               m_player.lamp_idcs.emplace_back(lamp_idx);
               lamp.picked_up = true;
               auto lamp_type = lamp.get_type_str();
@@ -749,16 +762,6 @@ namespace dung
             auto& weapon = all_weapons[wpn_idx];
             if (weapon->pos == curr_pos && !weapon->picked_up)
             {
-              for (int& sel_idx : m_player.inv_select_idcs)
-                if (m_player.start_inv_idx_potions() <= sel_idx)
-                  sel_idx++;
-              if (m_player.inv_select_idx_potion != -1)
-                m_player.inv_select_idx_potion++;
-              if (m_player.inv_select_idx_armour != -1)
-                m_player.inv_select_idx_armour++;
-              if (m_player.start_inv_idx_potions() <= m_player.inv_hilite_idx)
-                m_player.inv_hilite_idx++;
-                
               m_player.weapon_idcs.emplace_back(wpn_idx);
               weapon->picked_up = true;
               message_handler->add_message(static_cast<float>(real_time_s),
@@ -770,13 +773,6 @@ namespace dung
             auto& potion = all_potions[pot_idx];
             if (potion.pos == curr_pos && !potion.picked_up)
             {
-              for (int& sel_idx : m_player.inv_select_idcs)
-                if (m_player.start_inv_idx_armour() <= sel_idx)
-                  sel_idx++;
-              if (m_player.inv_select_idx_armour != -1)
-                m_player.inv_select_idx_armour++;
-              if (m_player.start_inv_idx_armour() <= m_player.inv_hilite_idx)
-                m_player.inv_hilite_idx++;
               m_player.potion_idcs.emplace_back(pot_idx);
               potion.picked_up = true;
               message_handler->add_message(static_cast<float>(real_time_s),
@@ -857,7 +853,7 @@ namespace dung
       }
       else if (str::to_lower(curr_key) == 'c')
       {
-        auto* potion = m_player.get_selected_potion(all_potions);
+        auto* potion = m_player.get_selected_potion(m_inventory.get());
         if (potion != nullptr)
         {
           auto hp = potion->get_hp();
@@ -886,7 +882,7 @@ namespace dung
                                              MessageHandler::Level::Guide);
               break;
           }
-          m_player.remove_selected_potion(all_potions);
+          m_player.remove_selected_potion(m_inventory.get(), all_potions);
           message_handler->add_message(static_cast<float>(real_time_s),
                                        "You throw away the empty vial.",
                                        MessageHandler::Level::Guide);
@@ -1010,6 +1006,45 @@ namespace dung
       m_screen_helper = std::make_unique<ScreenHelper>();
       m_environment = std::make_unique<Environment>();
       m_environment->load_textures(exe_folder, texture_params);
+      m_inventory = std::make_unique<Inventory>();
+      
+      if (false)
+      {
+        InvGroup keys_group { "Keys:" };
+        InvSubGroup keys_sg0;
+        keys_sg0.add_item("Apa");
+        keys_sg0.add_item("Gpa");
+        keys_sg0.add_item("Hpa");
+        keys_sg0.add_item("Ipa");
+        keys_sg0.add_item("Jpa");
+        keys_group.add_subgroup(keys_sg0);
+        m_inventory->add_group(keys_group);
+        
+        InvGroup lamps_group { "Lamps:" };
+        InvSubGroup lamps_sg0;
+        lamps_sg0.set_title("Torches:");
+        lamps_sg0.add_item("Bpa");
+        lamps_sg0.add_item("Fpa");
+        lamps_sg0.add_item("Ppa");
+        lamps_group.add_subgroup(lamps_sg0);
+        InvSubGroup lamps_sg1;
+        lamps_sg1.set_title("Lanterns:");
+        lamps_sg1.add_item("Cpa");
+        lamps_sg1.add_item("Dpa");
+        lamps_sg1.add_item("Epa");
+        lamps_sg1.add_item("Kpa");
+        lamps_sg1.add_item("Lpa");
+        lamps_sg1.add_item("Mpa");
+        lamps_sg1.add_item("Npa");
+        lamps_sg1.add_item("Opa");
+        lamps_sg1.add_item("Qpa");
+        lamps_sg1.add_item("Rpa");
+        lamps_sg1.add_item("Spa");
+        lamps_sg1.add_item("Tpa");
+        lamps_sg1.add_item("Upa");
+        lamps_group.add_subgroup(lamps_sg1);
+        m_inventory->add_group(lamps_group);
+      }
     }
     
     void load_dungeon(BSPTree* bsp_tree)
@@ -1385,7 +1420,7 @@ namespace dung
       update_sun(static_cast<float>(real_time_s));
       
       auto fow_radius = 5.5f;
-      auto* lamp = m_player.get_selected_lamp(all_lamps);
+      auto* lamp = m_player.get_selected_lamp(m_inventory.get());
       if (lamp != nullptr)
       {
         math::maximize(fow_radius, lamp->radius);
@@ -1395,7 +1430,9 @@ namespace dung
       set_visibilities(fow_radius, m_player.pos);
       
       auto& curr_pos = m_player.pos;
-      handle_keys(kpd, real_time_s);
+      handle_keyboard(kpd, real_time_s);
+      
+      update_inventory();
       
       // Fog of war
       if (use_fog_of_war)
@@ -1475,7 +1512,7 @@ namespace dung
             int npc_attack_roll = rnd::dice(20) + npc.thac0 + npc.get_melee_attack_bonus();
         
             // Calculate the player's total armor class
-            int player_ac = m_player.calc_armour_class(all_armour);
+            int player_ac = m_player.calc_armour_class(m_inventory.get());
         
             // Determine if NPC hits the player
             // e.g. d12 + 1 + (2 + 10/2) >= (10 + 10/2)
@@ -1502,7 +1539,7 @@ namespace dung
             // Roll a d20 for the player's attack roll (if the NPC is visible)
             if (npc.visible)
             {
-              const auto* weapon = m_player.get_selected_weapon(all_weapons);
+              const auto* weapon = m_player.get_selected_melee_weapon(m_inventory.get());
               int player_attack_roll = rnd::dice(20) + m_player.thac0 + m_player.get_melee_attack_bonus();
               int npc_ac = npc.calc_armour_class();
         
@@ -1549,9 +1586,12 @@ namespace dung
       mb_args.h_align_offs = mb_h_align_offs;
       mb_args.framed_mode = framed_mode;
       message_handler->update(sh, static_cast<float>(real_time_s), mb_args);
-      
+        
       if (m_player.show_inventory)
-        draw_inventory(sh);
+      {
+        m_inventory->set_bounding_box({ 2, 2, NR - 5, NC - 5 });
+        m_inventory->draw(sh);
+      }
         
       draw_health_bars(sh);
       draw_strength_bar(sh);
