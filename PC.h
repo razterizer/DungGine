@@ -11,7 +11,9 @@
 #include "Items.h"
 #include "PlayerBase.h"
 #include "Inventory.h"
+#include "ScreenHelper.h"
 #include <Core/StlUtils.h>
+#include <Termin8or/ParticleSystem.h>
 
 
 namespace dung
@@ -31,16 +33,79 @@ namespace dung
     bool show_inventory = false;
     float weight_capacity = 50.f;
     
+    ParticleHandler fire_smoke_engine { 500 };
+    
+    ColorGradient smoke_fg_0
+    {
+      {
+        { 0.f, Color::Red },
+        { 0.25f, Color::Yellow },
+        { 0.35f, Color::LightGray },
+        { 0.85f, Color::DarkGray },
+      }
+    };
+    ColorGradient smoke_fg_1
+    {
+      {
+        { 0.f, Color::Red },
+        { 0.3f, Color::Yellow },
+        { 0.45f, Color::DarkGray },
+        { 0.9f, Color::LightGray },
+      }
+    };
+    ColorGradient smoke_bg_0
+    {
+      {
+        { 0.f, Color::DarkRed },
+        { 0.3f, Color::DarkGray },
+        { 0.9f, Color::Black },
+      }
+    };
+    ColorGradient smoke_bg_1
+    {
+      {
+        { 0.f, Color::DarkRed },
+        { 0.4f, Color::Black },
+        { 0.9f, Color::DarkGray },
+      }
+    };
+    std::vector<std::pair<float, std::pair<ColorGradient, ColorGradient>>> smoke_color_gradients;
+    std::vector<std::string> smoke_txt { "&", "*", "&", "%", "&", "@" };
+    
     PC()
     {
       character = '@';
       style = { Color::Magenta, Color::White };
+      smoke_color_gradients.emplace_back(0.5f, std::pair { smoke_fg_0, smoke_bg_0 });
+      smoke_color_gradients.emplace_back(0.6f, std::pair { smoke_fg_1, smoke_bg_1 });
     }
     
-    void update()
+    void update(ScreenHelper* screen_helper, Inventory* inventory, float sim_dt, float sim_time)
     {
       update_los();
       update_terrain();
+      
+      const float vel_x = -10*los_c;
+      const float vel_y = -10*los_r;
+      const float acc = 0.f, life_time = 0.2f;
+      float spread = 23.f;
+      const int cluster_size = 10;
+      auto* curr_lamp = get_selected_lamp(inventory);
+      bool trg = false;
+      if (curr_lamp != nullptr)
+      {
+        curr_lamp->update(sim_dt);
+        if (curr_lamp->t_life_time < 1.f)
+          trg = curr_lamp->lamp_type == Lamp::LampType::Torch;
+        spread = curr_lamp->radius*2.f;
+      }
+      fire_smoke_engine.update(screen_helper->get_screen_pos(pos), trg, vel_x, vel_y, acc, spread, life_time, cluster_size, sim_dt, sim_time);
+    }
+    
+    template<int NR, int NC>
+    void draw(SpriteHandler<NR, NC>& sh, float sim_time)
+    {
+      fire_smoke_engine.draw(sh, smoke_txt, smoke_color_gradients, sim_time);
     }
     
     int calc_armour_class(Inventory* inventory) const

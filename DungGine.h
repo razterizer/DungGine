@@ -1373,7 +1373,7 @@ namespace dung
       return true;
     }
     
-    void update(double real_time_s, float sim_dt_s, const keyboard::KeyPressData& kpd, bool* game_over)
+    void update(double real_time_s, float sim_time_s, float sim_dt_s, const keyboard::KeyPressData& kpd, bool* game_over)
     {
       utils::try_set(game_over, m_player.health <= 0);
       if (utils::try_get(game_over))
@@ -1435,7 +1435,7 @@ namespace dung
       // PC LOS etc.
       bool was_alive = m_player.health > 0;
       m_player.on_terrain = m_environment->get_terrain(m_player.pos);
-      m_player.update();
+      m_player.update(m_screen_helper.get(), m_inventory.get(), sim_dt_s, sim_time_s);
       if (was_alive && m_player.health <= 0)
       {
         message_handler->add_message(static_cast<float>(real_time_s),
@@ -1532,7 +1532,7 @@ namespace dung
     
     
     template<int NR, int NC>
-    void draw(SpriteHandler<NR, NC>& sh, double real_time_s, int anim_ctr,
+    void draw(SpriteHandler<NR, NC>& sh, double real_time_s, float sim_time_s, int anim_ctr,
               ui::VerticalAlignment mb_v_align = ui::VerticalAlignment::CENTER,
               ui::HorizontalAlignment mb_h_align = ui::HorizontalAlignment::CENTER,
               int mb_v_align_offs = 0, int mb_h_align_offs = 0,
@@ -1710,6 +1710,8 @@ namespace dung
         if (is_wet(m_player.on_terrain))
           if (anim_ctr % 3 == 0)
             sh.write_buffer("*", math::roundI(pc_scr_pos.r - m_player.los_r), math::roundI(pc_scr_pos.c - m_player.los_c), Color::White, Color::Transparent2);
+            
+        m_player.draw(sh, sim_time_s);
       }
       
       // Items and NPCs

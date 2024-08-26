@@ -97,8 +97,8 @@ public:
       
       sh.clear();
       bool game_over = false;
-      dungeon_engine->update(get_real_time_s(), get_sim_dt_s(), kpd, &game_over);
-      dungeon_engine->draw(sh, get_real_time_s(), anim_ctr);
+      dungeon_engine->update(get_real_time_s(), get_sim_time_s(), get_sim_dt_s(), kpd, &game_over);
+      dungeon_engine->draw(sh, get_real_time_s(), get_sim_time_s(), anim_ctr);
       sh.print_screen_buffer(t, Color::Black);
 #endif
     }
@@ -147,11 +147,11 @@ private:
     if (test_type == TestType::DungeonRuntime)
     {
       bool game_over = false;
-      dungeon_engine->update(get_real_time_s(), get_sim_dt_s(), kpd, &game_over);
+      dungeon_engine->update(get_real_time_s(), get_sim_time_s(), get_sim_dt_s(), kpd, &game_over);
       if (game_over)
         set_state_game_over();
       
-      dungeon_engine->draw(sh, get_real_time_s(), anim_ctr, ui::VerticalAlignment::CENTER, ui::HorizontalAlignment::CENTER, 4, 0);
+      dungeon_engine->draw(sh, get_real_time_s(), get_sim_time_s(), anim_ctr, ui::VerticalAlignment::CENTER, ui::HorizontalAlignment::CENTER, 4, 0);
     }
   }
   

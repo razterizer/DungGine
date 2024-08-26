@@ -62,8 +62,10 @@ namespace dung
       weight = 0.4f;
       price = math::roundI(20*rnd::randn_clamp(200.f, 100.f, 0.f, 1e4f))/20.f;
       radius = rnd::randn_range_clamp(1.5f, globals::max_fow_radius);
+      radius_0 = radius;
       angle_deg = rnd::randn_range_clamp(2.f, 358.f);
       light_type = rnd::rand_enum<Lamp::LightType>();
+      life_time_s = rnd::randn_clamp(200.f, 350.f, 30.f, 1000.f);
       switch (light_type)
       {
         case LightType::Isotropic:
@@ -98,7 +100,21 @@ namespace dung
     enum class LampType { MagicLamp, Lantern, Torch };
     LampType lamp_type = LampType::MagicLamp;
     float radius = 2.5f;
+    float radius_0 = 2.5f;
     float angle_deg = 45.f;
+    float life_time_s = 200.f;
+    float t_life_time = 0.f;
+    float time_used_s = 0.f;
+    
+    void update(float dt)
+    {
+      if (lamp_type == LampType::Torch)
+      {
+        time_used_s += dt;
+        t_life_time = math::value_to_param(time_used_s, 0.f, life_time_s);
+        radius = math::lerp(t_life_time, radius_0, 0.f);
+      }
+    }
     
     virtual void set_visibility(bool use_fog_of_war, bool fow_near, bool is_night) override
     {
