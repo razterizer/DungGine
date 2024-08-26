@@ -105,9 +105,9 @@ namespace dung
         auto* potion = dynamic_cast<Potion*>(selected_inv_item->item);
         if (potion != nullptr)
         {
-          subgroup->remove_item(potion);
           auto idx = stlutils::find_if_idx(all_potions, [potion](const auto& p) { return &p == potion; });
-          stlutils::erase_at(potion_idcs, idx);
+          subgroup->remove_item(potion);
+          stlutils::erase(potion_idcs, idx);
           stlutils::erase_if(all_potions, [potion](const auto& p) { return &p == potion; });
         }
       }
