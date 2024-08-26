@@ -17,7 +17,7 @@ namespace dung
     
     static const float max_fow_radius = 10.f; //5.5f;
     
-    static const float px_aspect = 1.8f;
+    static const float px_aspect = 1.75f;
   }
 
 }
