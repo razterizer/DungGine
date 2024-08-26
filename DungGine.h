@@ -1007,44 +1007,6 @@ namespace dung
       m_environment = std::make_unique<Environment>();
       m_environment->load_textures(exe_folder, texture_params);
       m_inventory = std::make_unique<Inventory>();
-      
-      if (false)
-      {
-        InvGroup keys_group { "Keys:" };
-        InvSubGroup keys_sg0;
-        keys_sg0.add_item("Apa");
-        keys_sg0.add_item("Gpa");
-        keys_sg0.add_item("Hpa");
-        keys_sg0.add_item("Ipa");
-        keys_sg0.add_item("Jpa");
-        keys_group.add_subgroup(keys_sg0);
-        m_inventory->add_group(keys_group);
-        
-        InvGroup lamps_group { "Lamps:" };
-        InvSubGroup lamps_sg0;
-        lamps_sg0.set_title("Torches:");
-        lamps_sg0.add_item("Bpa");
-        lamps_sg0.add_item("Fpa");
-        lamps_sg0.add_item("Ppa");
-        lamps_group.add_subgroup(lamps_sg0);
-        InvSubGroup lamps_sg1;
-        lamps_sg1.set_title("Lanterns:");
-        lamps_sg1.add_item("Cpa");
-        lamps_sg1.add_item("Dpa");
-        lamps_sg1.add_item("Epa");
-        lamps_sg1.add_item("Kpa");
-        lamps_sg1.add_item("Lpa");
-        lamps_sg1.add_item("Mpa");
-        lamps_sg1.add_item("Npa");
-        lamps_sg1.add_item("Opa");
-        lamps_sg1.add_item("Qpa");
-        lamps_sg1.add_item("Rpa");
-        lamps_sg1.add_item("Spa");
-        lamps_sg1.add_item("Tpa");
-        lamps_sg1.add_item("Upa");
-        lamps_group.add_subgroup(lamps_sg1);
-        m_inventory->add_group(lamps_group);
-      }
     }
     
     void load_dungeon(BSPTree* bsp_tree)
