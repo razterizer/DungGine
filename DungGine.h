@@ -1435,7 +1435,7 @@ namespace dung
       // PC LOS etc.
       bool was_alive = m_player.health > 0;
       m_player.on_terrain = m_environment->get_terrain(m_player.pos);
-      m_player.update(m_screen_helper.get(), m_inventory.get(), sim_dt_s, sim_time_s);
+      m_player.update(m_screen_helper.get(), m_inventory.get(), sim_time_s, sim_dt_s);
       if (was_alive && m_player.health <= 0)
       {
         message_handler->add_message(static_cast<float>(real_time_s),
@@ -1448,7 +1448,7 @@ namespace dung
       for (auto& npc : all_npcs)
       {
         npc.on_terrain = m_environment->get_terrain(npc.pos);
-        npc.update(curr_pos, m_environment.get(), sim_dt_s);
+        npc.update(curr_pos, m_environment.get(), sim_time_s, sim_dt_s);
         
         if (npc.is_hostile && !npc.was_hostile)
           broadcast([&npc](auto* listener) { listener->on_fight_begin(&npc); });
@@ -1725,13 +1725,28 @@ namespace dung
       
       for (const auto& npc : all_npcs)
       {
-        f_render_item(npc);
+        bool swimming = is_wet(npc.on_terrain) && npc.can_swim && !npc.can_fly;
+        bool dead_on_liquid = npc.health <= 0 && swimming;
+        if (!dead_on_liquid || sim_time_s - npc.death_time_s < 1.5f)
+          f_render_item(npc);
         
-        if (npc.visible && npc.health > 0 && is_wet(npc.on_terrain) && npc.can_swim && !npc.can_fly)
+        if (npc.visible && is_wet(npc.on_terrain))
         {
           auto npc_scr_pos = m_screen_helper->get_screen_pos(npc.pos);
-          if (anim_ctr % 3 == 0)
-            sh.write_buffer("*", math::roundI(npc_scr_pos.r - npc.los_r), math::roundI(npc_scr_pos.c - npc.los_c), Color::White, Color::Transparent2);
+          if (npc.health > 0 && npc.can_swim && !npc.can_fly)
+          {
+            if (anim_ctr % 3 == 0)
+              sh.write_buffer("*", math::roundI(npc_scr_pos.r - npc.los_r), math::roundI(npc_scr_pos.c - npc.los_c), Color::White, Color::Transparent2);
+          }
+          else if (npc.health <= 0)
+          {
+            if (math::in_range<float>(sim_time_s - npc.death_time_s, 0.5f, 1.f, Range::Closed))
+            {
+              for (int r_offs = -1; r_offs <= +1; ++r_offs)
+                for (int c_offs = -1; c_offs <= +1; ++c_offs)
+                  sh.write_buffer("*", npc_scr_pos.r + r_offs, npc_scr_pos.c + c_offs, Color::White, Color::Transparent2);
+            }
+          }
         }
         
         if (npc.debug)

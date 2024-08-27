@@ -106,6 +106,9 @@ namespace dung
     bool was_hostile = false;
     OneShot trg_info_hostile_npc;
     
+    float death_time_s = 0.f;
+    OneShot trg_death;
+    
   private:
     
     void move(const RC& pc_pos, Environment* environment, float dt)
@@ -631,10 +634,12 @@ namespace dung
                        ((this->is_underground || is_night) && !this->light));
     }
     
-    void update(const RC& pc_pos, Environment* environment, float dt)
+    void update(const RC& pc_pos, Environment* environment, float time, float dt)
     {
       if (health <= 0)
       {
+        if (trg_death.once())
+          death_time_s = time;
         character = '&';
         style = { Color::Red, Color::DarkGray };
         return;

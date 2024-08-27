@@ -80,7 +80,7 @@ namespace dung
       smoke_color_gradients.emplace_back(0.6f, std::pair { smoke_fg_1, smoke_bg_1 });
     }
     
-    void update(ScreenHelper* screen_helper, Inventory* inventory, float sim_dt, float sim_time)
+    void update(ScreenHelper* screen_helper, Inventory* inventory, float sim_time, float sim_dt)
     {
       update_los();
       update_terrain();
