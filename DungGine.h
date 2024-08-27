@@ -515,7 +515,7 @@ namespace dung
                 auto idx = stlutils::find_if_idx(all_keys, [key](const auto& o) { return &o == key; });
                 msg += "key:" + std::to_string(key->key_id) + "!";
                 f_drop_item(key);
-                stlutils::erase_at(m_player.key_idcs, idx);
+                stlutils::erase(m_player.key_idcs, idx);
                 keys_subgroup->remove_item(key);
                 to_drop_found = true;
               }
@@ -534,7 +534,7 @@ namespace dung
                 auto idx = stlutils::find_if_idx(all_lamps, [lamp](const auto& o) { return &o == lamp; });
                 msg += "lamp:" + std::to_string(idx) + "!";
                 f_drop_item(lamp);
-                stlutils::erase_at(m_player.lamp_idcs, idx);
+                stlutils::erase(m_player.lamp_idcs, idx);
                 lamps_subgroup->remove_item(lamp);
                 to_drop_found = true;
               }
@@ -554,7 +554,7 @@ namespace dung
                   [weapon](const auto& o) { return o.get() == weapon; });
                 msg += weapon->type +":" + std::to_string(idx) + "!";
                 f_drop_item(weapon);
-                stlutils::erase_at(m_player.weapon_idcs, idx);
+                stlutils::erase(m_player.weapon_idcs, idx);
                 weapons_subgroup_melee->remove_item(weapon);
                 to_drop_found = true;
               }
@@ -574,7 +574,7 @@ namespace dung
                   [potion](const auto& o) { return &o == potion; });
                 msg += "potion:" + std::to_string(idx) + "!";
                 f_drop_item(potion);
-                stlutils::erase_at(m_player.potion_idcs, idx);
+                stlutils::erase(m_player.potion_idcs, idx);
                 potions_subgroup->remove_item(potion);
                 to_drop_found = true;
               }
@@ -595,7 +595,7 @@ namespace dung
                   auto idx = stlutils::find_if_idx(all_armour, [armour](const auto& o) { return o.get() == armour; });
                   msg += armour->type +":" + std::to_string(idx) + "!";
                   f_drop_item(armour);
-                  stlutils::erase_at(pc_armour_idcs, idx);
+                  stlutils::erase(pc_armour_idcs, idx);
                   subgroup->remove_item(armour);
                   to_drop_found = true;
                   return true;
