@@ -109,6 +109,11 @@ namespace dung
       fire_smoke_engine.draw(sh, smoke_txt, smoke_color_gradients, sim_time);
     }
     
+    bool has_weight_capacity(float item_weight) const
+    {
+      return curr_tot_inv_weight + item_weight <= weight_capacity;
+    }
+    
     int calc_armour_class(Inventory* inventory) const
     {
       int tot_protection = 0;
