@@ -32,6 +32,7 @@ namespace dung
     std::vector<int> armour_idcs;
     bool show_inventory = false;
     float weight_capacity = 50.f;
+    float curr_tot_inv_weight = 0.f;
     
     ParticleHandler fire_smoke_engine { 500 };
     
