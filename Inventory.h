@@ -134,6 +134,26 @@ namespace dung
     }
     
     int size() const { return use_title + static_cast<int>(m_items.size()); }
+    
+    std::vector<InvItem>::iterator begin()
+    {
+      return m_items.begin();
+    }
+    
+    std::vector<InvItem>::iterator end()
+    {
+      return m_items.end();
+    }
+    
+    std::vector<InvItem>::const_iterator begin() const
+    {
+      return m_items.cbegin();
+    }
+    
+    std::vector<InvItem>::const_iterator end() const
+    {
+      return m_items.cend();
+    }
   };
   
   // ////////////////
@@ -227,6 +247,16 @@ namespace dung
     std::vector<InvSubGroup>::iterator end()
     {
       return m_subgroups.end();
+    }
+    
+    std::vector<InvSubGroup>::const_iterator begin() const
+    {
+      return m_subgroups.cbegin();
+    }
+    
+    std::vector<InvSubGroup>::const_iterator end() const
+    {
+      return m_subgroups.cend();
     }
   };
 
@@ -390,6 +420,25 @@ namespace dung
       drawing::draw_box(sh, m_bb, { Color::White, Color::DarkGray }, ' ');
     }
     
+    std::vector<InvGroup>::iterator begin()
+    {
+      return m_groups.begin();
+    }
+    
+    std::vector<InvGroup>::iterator end()
+    {
+      return m_groups.end();
+    }
+    
+    std::vector<InvGroup>::const_iterator cbegin() const
+    {
+      return m_groups.cbegin();
+    }
+    
+    std::vector<InvGroup>::const_iterator cend() const
+    {
+      return m_groups.cend();
+    }
     
   };
 
