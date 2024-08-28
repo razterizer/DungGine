@@ -740,15 +740,24 @@ namespace dung
                 break;
           }
           
+          std::string too_heavy_msg_template = " is too heavy to carry.\nYou need to drop items from your inventory!";
+          
           for (size_t key_idx = 0; key_idx < all_keys.size(); ++key_idx)
           {
             auto& key = all_keys[key_idx];
             if (key.pos == curr_pos && !key.picked_up)
             {
-              m_player.key_idcs.emplace_back(key_idx);
-              key.picked_up = true;
-              message_handler->add_message(static_cast<float>(real_time_s),
-                                           "You picked up a key!", MessageHandler::Level::Guide);
+              if (m_player.has_weight_capacity(key.weight))
+              {
+                m_player.key_idcs.emplace_back(key_idx);
+                key.picked_up = true;
+                message_handler->add_message(static_cast<float>(real_time_s),
+                                             "You picked up a key!", MessageHandler::Level::Guide);
+              }
+              else
+                message_handler->add_message(static_cast<float>(real_time_s),
+                                             "Key" + too_heavy_msg_template,
+                                             MessageHandler::Level::Warning);
             }
           }
           for (size_t lamp_idx = 0; lamp_idx < all_lamps.size(); ++lamp_idx)
@@ -756,12 +765,19 @@ namespace dung
             auto& lamp = all_lamps[lamp_idx];
             if (lamp.pos == curr_pos && !lamp.picked_up)
             {
-              m_player.lamp_idcs.emplace_back(lamp_idx);
-              lamp.picked_up = true;
               auto lamp_type = lamp.get_type_str();
-              message_handler->add_message(static_cast<float>(real_time_s),
-                                           "You picked up " + str::indef_art(lamp_type) + "!",
-                                           MessageHandler::Level::Guide);
+              if (m_player.has_weight_capacity(lamp.weight))
+              {
+                m_player.lamp_idcs.emplace_back(lamp_idx);
+                lamp.picked_up = true;
+                message_handler->add_message(static_cast<float>(real_time_s),
+                                             "You picked up " + str::indef_art(lamp_type) + "!",
+                                             MessageHandler::Level::Guide);
+              }
+              else
+                message_handler->add_message(static_cast<float>(real_time_s),
+                                             str::anfangify(lamp_type) + too_heavy_msg_template,
+                                             MessageHandler::Level::Warning);
             }
           }
           for (size_t wpn_idx = 0; wpn_idx < all_weapons.size(); ++wpn_idx)
@@ -769,10 +785,17 @@ namespace dung
             auto& weapon = all_weapons[wpn_idx];
             if (weapon->pos == curr_pos && !weapon->picked_up)
             {
-              m_player.weapon_idcs.emplace_back(wpn_idx);
-              weapon->picked_up = true;
-              message_handler->add_message(static_cast<float>(real_time_s),
-                                           "You picked up " + str::indef_art(weapon->type) + "!", MessageHandler::Level::Guide);
+              if (m_player.has_weight_capacity(weapon->weight))
+              {
+                m_player.weapon_idcs.emplace_back(wpn_idx);
+                weapon->picked_up = true;
+                message_handler->add_message(static_cast<float>(real_time_s),
+                                             "You picked up " + str::indef_art(weapon->type) + "!", MessageHandler::Level::Guide);
+              }
+              else
+                message_handler->add_message(static_cast<float>(real_time_s),
+                                             str::anfangify(weapon->type) + too_heavy_msg_template,
+                                             MessageHandler::Level::Warning);
             }
           }
           for (size_t pot_idx = 0; pot_idx < all_potions.size(); ++pot_idx)
@@ -780,10 +803,17 @@ namespace dung
             auto& potion = all_potions[pot_idx];
             if (potion.pos == curr_pos && !potion.picked_up)
             {
-              m_player.potion_idcs.emplace_back(pot_idx);
-              potion.picked_up = true;
-              message_handler->add_message(static_cast<float>(real_time_s),
-                                           "You picked up a potion!", MessageHandler::Level::Guide);
+              if (m_player.has_weight_capacity(potion.weight))
+              {
+                m_player.potion_idcs.emplace_back(pot_idx);
+                potion.picked_up = true;
+                message_handler->add_message(static_cast<float>(real_time_s),
+                                             "You picked up a potion!", MessageHandler::Level::Guide);
+              }
+              else
+                message_handler->add_message(static_cast<float>(real_time_s),
+                                             "Potion" + too_heavy_msg_template,
+                                             MessageHandler::Level::Warning);
             }
           }
           for (size_t a_idx = 0; a_idx < all_armour.size(); ++a_idx)
@@ -791,11 +821,18 @@ namespace dung
             auto& armour = all_armour[a_idx];
             if (armour->pos == curr_pos && !armour->picked_up)
             {
-              m_player.armour_idcs.emplace_back(a_idx);
-              armour->picked_up = true;
-              message_handler->add_message(static_cast<float>(real_time_s),
-                                           "You picked up " + str::indef_art(armour->type) + "!",
-                                           MessageHandler::Level::Guide);
+              if (m_player.has_weight_capacity(armour->weight))
+              {
+                m_player.armour_idcs.emplace_back(a_idx);
+                armour->picked_up = true;
+                message_handler->add_message(static_cast<float>(real_time_s),
+                                             "You picked up " + str::indef_art(armour->type) + "!",
+                                             MessageHandler::Level::Guide);
+              }
+              else
+                message_handler->add_message(static_cast<float>(real_time_s),
+                                             str::anfangify(armour->type) + too_heavy_msg_template,
+                                             MessageHandler::Level::Warning);
             }
           }
         }
