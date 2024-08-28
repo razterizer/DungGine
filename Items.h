@@ -73,24 +73,26 @@ namespace dung
       radius = rnd::randn_range_clamp(1.5f, globals::max_fow_radius);
       radius_0 = radius;
       lamp_type = a_lamp_type;
-      life_time_s = rnd::randn_clamp(200.f, 350.f, 30.f, 1000.f);
       switch (lamp_type)
       {
         case LampType::MagicLamp:
           light_type = LightType::Isotropic;
           angle_deg = 0.f;
+          life_time_s = rnd::randn_clamp(800.f, 350.f, 420.f, 1800.f); // 7 - 30 min.
           character = '*';
           style.fg_color = Color::Magenta;
           break;
         case LampType::Lantern:
           light_type = LightType::Directional;
           angle_deg = rnd::randn_range_clamp(2.f, 90.f);
+          life_time_s = rnd::randn_clamp(400.f, 350.f, 180.f, 900.f); // 3 - 15 min.
           character = 'G';
           style.fg_color = color::get_random_color({ Color::Red, Color::Green });
           break;
         case LampType::Torch:
           light_type = LightType::Directional;
           angle_deg = rnd::randn_range_clamp(80.f, 358.f);
+          life_time_s = rnd::randn_clamp(150.f, 350.f, 30.f, 300.f); // 0.5 - 5 min.
           character = 'Y';
           style.fg_color = Color::Yellow;
           break;
@@ -110,12 +112,9 @@ namespace dung
     
     void update(float dt)
     {
-      if (lamp_type == LampType::Torch)
-      {
-        time_used_s += dt;
-        t_life_time = math::value_to_param(time_used_s, 0.f, life_time_s);
-        radius = math::lerp(t_life_time, radius_0, 0.f);
-      }
+      time_used_s += dt;
+      t_life_time = math::value_to_param(time_used_s, 0.f, life_time_s);
+      radius = math::lerp(t_life_time, radius_0, 0.f);
     }
     
     virtual void set_visibility(bool use_fog_of_war, bool fow_near, bool is_night) override
