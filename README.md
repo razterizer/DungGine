@@ -41,7 +41,7 @@ See the next section for a summary over these two classes.
       When `use_per_room_lat_long_for_sun_dir` is `true` then use `latitude = Latitude::Equator` and `longitude = Longitude::F` to start with. Other values will shift the map over the globe so to speak, but with these starting settings the rooms at the top of the map will be the at the north pole and the rooms at the bottom of the map will be at the south pole. When `use_per_room_lat_long_for_sun_dir` is `false` then the specified latitude and longitude will be used globally across the whole map and the the function default args is a good starting point.
   - `configure_sun_rand(float minutes_per_day = 20.f, float minutes_per_year = 120.f, Latitude latitude = Latitude::NorthernHemisphere, Longitude longitude = Longitude::F, bool use_per_room_lat_long_for_sun_dir = true)` : Same as above but randomizes the initial direction of the sun.
   - `place_keys(bool only_place_on_dry_land)` : Places the keys in rooms, randomly all over the world.
-  - `place_lamps(int num_lamps, bool only_place_on_dry_land)` : Places `num_lamps` lamps in rooms, randomly all over the world.
+  - `place_lamps(int num_torches, int num_lanterns, int num_magic_lamps, bool only_place_on_dry_land)` : Places `num_torches` torches, `num_lanterns` lanterns and `num_magic_lamps` magic lamps in rooms, randomly all over the world.
   - `place_weapons(int num_weapons, bool only_place_on_dry_land)` : Places `num_weapons` weapons in rooms, randomly all over the world.
   - `place_potions(int num_potions, bool only_place_on_dry_land)` : Places `num_potions` potions in rooms, randomly all over the world.
   - `place_armour(int num_armour, bool only_place_on_dry_land)` : Places `num_armour` armour parts in rooms, randomly all over the world.
@@ -128,7 +128,7 @@ dungeon_engine.style_dungeon();
 if (!dungeon_engine.place_player(sh.size()))
   std::cerr << "ERROR : Unable to place the playable character!" << std::endl;
 dungeon_engine->place_keys(true);
-dungeon_engine->place_lamps(20, true);
+dungeon_engine->place_lamps(20, 5, 3, true);
 dungeon_engine->place_weapons(100, true);
 dungeon_engine->place_potions(100, true);
 dungeon_engine.set_screen_scrolling_mode(ScreenScrollingMode::WhenOutsideScreen);
@@ -185,9 +185,10 @@ dungeon_engine.style_dungeon();
 if (!dungeon_engine.place_player(sh.size()))
   std::cerr << "ERROR : Unable to place the playable character!" << std::endl;
 dungeon_engine->place_keys(true);
-dungeon_engine->place_lamps(20, true);
+dungeon_engine->place_lamps(20, 15, 5, true);
 dungeon_engine->place_weapons(150, true);
 dungeon_engine->place_potions(150, true);
+dungeon_engine->place_armour(150, true);
 dungeon_engine->place_npcs(100, false);
 dungeon_engine.set_screen_scrolling_mode(ScreenScrollingMode::WhenOutsideScreen);
 
