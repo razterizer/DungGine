@@ -73,19 +73,12 @@ namespace dung
     std::vector<std::pair<float, std::pair<ColorGradient, ColorGradient>>> smoke_color_gradients;
     std::vector<std::string> smoke_txt { "&", "*", "&", "%", "&", "@" };
     
-    PC()
-    {
-      character = '@';
-      style = { Color::Magenta, Color::White };
-      smoke_color_gradients.emplace_back(0.5f, std::pair { smoke_fg_0, smoke_bg_0 });
-      smoke_color_gradients.emplace_back(0.6f, std::pair { smoke_fg_1, smoke_bg_1 });
-    }
+    // ////////////////////////////////
     
-    void update(ScreenHelper* screen_helper, Inventory* inventory, float sim_time, float sim_dt)
+  private:
+  
+    void update_fire_smoke(ScreenHelper* screen_helper, Inventory* inventory, float sim_time, float sim_dt)
     {
-      update_los();
-      update_terrain();
-      
       const float vel_x = -10*los_c;
       const float vel_y = -10*los_r;
       const float acc = 0.f, life_time = 0.2f;
@@ -101,6 +94,23 @@ namespace dung
         spread = curr_lamp->radius*2.f;
       }
       fire_smoke_engine.update(screen_helper->get_screen_pos(pos), trg, vel_x, vel_y, acc, spread, life_time, cluster_size, sim_dt, sim_time);
+    }
+    
+  public:
+    
+    PC()
+    {
+      character = '@';
+      style = { Color::Magenta, Color::White };
+      smoke_color_gradients.emplace_back(0.5f, std::pair { smoke_fg_0, smoke_bg_0 });
+      smoke_color_gradients.emplace_back(0.6f, std::pair { smoke_fg_1, smoke_bg_1 });
+    }
+    
+    void update(ScreenHelper* screen_helper, Inventory* inventory, float sim_time, float sim_dt)
+    {
+      update_los();
+      update_terrain();
+      update_fire_smoke(screen_helper, inventory, sim_time, sim_dt);
     }
     
     template<int NR, int NC>
