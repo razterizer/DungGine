@@ -380,6 +380,11 @@ namespace dung
     {
       toggle_state(hilite_idx, InvItemState::SWITCH_SELECTION);
     }
+    
+    void reset_hilite()
+    {
+      toggle_state(hilite_idx, InvItemState::RESET_HILITE);
+    }
       
     template<int NR, int NC>
     void draw(SpriteHandler<NR, NC>& sh) const
