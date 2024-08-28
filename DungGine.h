@@ -513,7 +513,7 @@ namespace dung
           {
             auto* keys_group = m_inventory->fetch_group("Keys:");
             auto* keys_subgroup = keys_group->fetch_subgroup(0);
-            auto* selected_inv_item = keys_subgroup->get_selected_item();
+            auto* selected_inv_item = keys_subgroup->get_hilited_item();
             if (selected_inv_item != nullptr && selected_inv_item->item != nullptr && selected_inv_item->hilited)
             {
               auto* key = dynamic_cast<Key*>(selected_inv_item->item);
@@ -532,7 +532,7 @@ namespace dung
           {
             auto* lamps_group = m_inventory->fetch_group("Lamps:");
             auto* lamps_subgroup = lamps_group->fetch_subgroup(0);
-            auto* selected_inv_item = lamps_subgroup->get_selected_item();
+            auto* selected_inv_item = lamps_subgroup->get_hilited_item();
             if (selected_inv_item != nullptr && selected_inv_item->item != nullptr)
             {
               auto* lamp = dynamic_cast<Lamp*>(selected_inv_item->item);
@@ -551,7 +551,7 @@ namespace dung
           {
             auto* weapons_group = m_inventory->fetch_group("Weapons:");
             auto* weapons_subgroup_melee = weapons_group->fetch_subgroup(0);
-            auto* selected_inv_item = weapons_subgroup_melee->get_selected_item();
+            auto* selected_inv_item = weapons_subgroup_melee->get_hilited_item();
             if (selected_inv_item != nullptr && selected_inv_item->item != nullptr)
             {
               auto* weapon = dynamic_cast<Weapon*>(selected_inv_item->item);
@@ -571,7 +571,7 @@ namespace dung
           {
             auto* potions_group = m_inventory->fetch_group("Potions:");
             auto* potions_subgroup = potions_group->fetch_subgroup(0);
-            auto* selected_inv_item = potions_subgroup->get_selected_item();
+            auto* selected_inv_item = potions_subgroup->get_hilited_item();
             if (selected_inv_item != nullptr && selected_inv_item->item != nullptr)
             {
               auto* potion = dynamic_cast<Potion*>(selected_inv_item->item);
@@ -593,7 +593,7 @@ namespace dung
             {
               if (to_drop_found)
                 return false;
-              auto* selected_inv_item = subgroup->get_selected_item();
+              auto* selected_inv_item = subgroup->get_hilited_item();
               if (selected_inv_item != nullptr && selected_inv_item->item != nullptr)
               {
                 auto* armour = dynamic_cast<Armour*>(selected_inv_item->item);
@@ -632,9 +632,13 @@ namespace dung
             msg += "Invalid Item!";
             std::cerr << "ERROR: Attempted to drop invalid item!" << std::endl;
           }
-          message_handler->add_message(static_cast<float>(real_time_s),
-                                       msg,
-                                       MessageHandler::Level::Guide);
+          if (to_drop_found)
+          {
+            m_inventory->reset_hilite();
+            message_handler->add_message(static_cast<float>(real_time_s),
+                                         msg,
+                                         MessageHandler::Level::Guide);
+          }
         }
         else if (is_inside_curr_bb(curr_pos.r, curr_pos.c + 1) &&
                  m_player.allow_move() &&
