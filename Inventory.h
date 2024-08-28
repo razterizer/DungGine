@@ -89,6 +89,13 @@ namespace dung
         return &(*it);
       return nullptr;
     }
+    InvItem* get_hilited_item()
+    {
+      auto it = stlutils::find_if(m_items, [](const auto& ii) { return ii.hilited; });
+      if (it != m_items.end())
+        return &(*it);
+      return nullptr;
+    }
     
     void toggle_state(int idx, InvItemState state)
     {
