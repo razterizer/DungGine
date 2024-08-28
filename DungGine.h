@@ -1177,15 +1177,27 @@ namespace dung
       return true;
     }
     
-    bool place_lamps(int num_lamps, bool only_place_on_dry_land)
+    bool place_lamps(int num_torches, int num_lanterns, int num_magic_lamps, bool only_place_on_dry_land)
     {
       const auto world_size = m_environment->get_world_size();
       const int c_max_num_iters = 1e5;
       int num_iters = 0;
       bool valid_pos = false;
+      const int num_lamps = num_torches + num_lanterns + num_magic_lamps;
+      int ctr_torches = 0;
+      int ctr_lanterns = 0;
+      int ctr_magic_lamps = 0;
       for (int lamp_idx = 0; lamp_idx < num_lamps; ++lamp_idx)
       {
         Lamp lamp;
+        Lamp::LampType lamp_type = Lamp::LampType::Torch;
+        if (ctr_torches++ < num_torches)
+          lamp_type = Lamp::LampType::Torch;
+        else if (ctr_lanterns++ < num_lanterns)
+          lamp_type = Lamp::LampType::Lantern;
+        else if (ctr_magic_lamps++ < num_magic_lamps)
+          lamp_type = Lamp::LampType::MagicLamp;
+        lamp.init_rand(lamp_type);
         do
         {
           if (lamp_idx == 0 && num_iters < 50)

@@ -55,49 +55,51 @@ namespace dung
   
   struct Lamp : Item
   {
+    enum class LampType { MagicLamp, Lantern, Torch, NUM_ITEMS };
+  
     Lamp()
     {
       character = 'Y';
       style.fg_color = Color::Yellow;
       weight = 0.4f;
       price = math::roundI(20*rnd::randn_clamp(200.f, 100.f, 0.f, 1e4f))/20.f;
+    }
+    void init_rand()
+    {
+      init_rand(rnd::rand_enum<Lamp::LampType>());
+    }
+    void init_rand(Lamp::LampType a_lamp_type)
+    {
       radius = rnd::randn_range_clamp(1.5f, globals::max_fow_radius);
       radius_0 = radius;
-      angle_deg = rnd::randn_range_clamp(2.f, 358.f);
-      light_type = rnd::rand_enum<Lamp::LightType>();
+      lamp_type = a_lamp_type;
       life_time_s = rnd::randn_clamp(200.f, 350.f, 30.f, 1000.f);
-      switch (light_type)
-      {
-        case LightType::Isotropic:
-          lamp_type = LampType::MagicLamp;
-          break;
-        case LightType::Directional:
-          if (angle_deg < 90)
-            lamp_type = LampType::Lantern;
-          lamp_type = LampType::Torch;
-          break;
-        default:
-          break;
-      }
       switch (lamp_type)
       {
         case LampType::MagicLamp:
+          light_type = LightType::Isotropic;
+          angle_deg = 0.f;
           character = '*';
           style.fg_color = Color::Magenta;
           break;
         case LampType::Lantern:
+          light_type = LightType::Directional;
+          angle_deg = rnd::randn_range_clamp(2.f, 90.f);
           character = 'G';
           style.fg_color = color::get_random_color({ Color::Red, Color::Green });
           break;
         case LampType::Torch:
+          light_type = LightType::Directional;
+          angle_deg = rnd::randn_range_clamp(80.f, 358.f);
           character = 'Y';
           style.fg_color = Color::Yellow;
+          break;
+        default:
           break;
       }
     }
     enum class LightType { Isotropic, Directional, NUM_ITEMS };
     LightType light_type = LightType::Isotropic;
-    enum class LampType { MagicLamp, Lantern, Torch };
     LampType lamp_type = LampType::MagicLamp;
     float radius = 2.5f;
     float radius_0 = 2.5f;
@@ -135,8 +137,9 @@ namespace dung
           return "lantern";
         case LampType::Torch:
           return "torch";
+        default:
+          return "unknown lamp";
       }
-      return "unknown lamp";
     }
   };
   
