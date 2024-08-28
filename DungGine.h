@@ -153,11 +153,11 @@ namespace dung
         auto& weapon = all_weapons[wpn_idx];
         std::string item_str = "  ";
         if (dynamic_cast<Sword*>(weapon.get()) != nullptr)
-          item_str += "Sword:";
+          item_str += "Sword";
         else if (dynamic_cast<Dagger*>(weapon.get()) != nullptr)
-          item_str += "Dagger:";
+          item_str += "Dagger";
         else if (dynamic_cast<Flail*>(weapon.get()) != nullptr)
-          item_str += "Flail:";
+          item_str += "Flail";
         else
           item_str += "<Weapon>";
         item_str += ":";
@@ -202,32 +202,32 @@ namespace dung
         InvSubGroup* armour_subgroup = nullptr;
         if (dynamic_cast<Shield*>(armour.get()) != nullptr)
         {
-          item_str += "Shield:";
+          item_str += "Shield";
           armour_subgroup = armour_subgroup_shields;
         }
         else if (dynamic_cast<Gambeson*>(armour.get()) != nullptr)
         {
-          item_str += "Gambeson:";
+          item_str += "Gambeson";
           armour_subgroup = armour_subgroup_gambesons;
         }
         else if (dynamic_cast<ChainMailleHauberk*>(armour.get()) != nullptr)
         {
-          item_str += "C.M. Hauberk:";
+          item_str += "C.M.H.";
           armour_subgroup = armour_subgroup_chainmaillehauberks;
         }
         else if (dynamic_cast<PlatedBodyArmour*>(armour.get()) != nullptr)
         {
-          item_str += "P. Body Armour:";
+          item_str += "P.B.A.";
           armour_subgroup = armour_subgroup_platedbodyarmour;
         }
         else if (dynamic_cast<PaddedCoif*>(armour.get()) != nullptr)
         {
-          item_str += "Padded Coif:";
+          item_str += "P. Coif";
           armour_subgroup = armour_subgroup_paddedcoifs;
         }
         else if (dynamic_cast<ChainMailleCoif*>(armour.get()) != nullptr)
         {
-          item_str += "C.M. Coif:";
+          item_str += "C.M. Coif";
           armour_subgroup = armour_subgroup_chainmaillecoifs;
         }
         else if (dynamic_cast<Helmet*>(armour.get()) != nullptr)
