@@ -95,6 +95,8 @@ namespace dung
       auto num_inv_potions = static_cast<int>(m_player.potion_idcs.size());
       auto num_inv_armour = static_cast<int>(m_player.armour_idcs.size());
       
+      m_player.curr_tot_inv_weight = 0.f;
+      
       auto f_format_item_str = [](std::string& item_str, float weight, float price, int hp)
       {
         std::ostringstream oss;
@@ -128,6 +130,7 @@ namespace dung
         f_format_item_str(item_str, key.weight, key.price, 0);
         if (keys_subgroup->find_item(&key) == nullptr)
           keys_subgroup->add_item(item_str, &key);
+        m_player.curr_tot_inv_weight += key.weight;
       }
       
       auto* lamps_group = m_inventory->fetch_group("Lamps:");
@@ -142,6 +145,7 @@ namespace dung
         f_format_item_str(item_str, lamp.weight, lamp.price, 0);
         if (lamps_subgroup->find_item(&lamp) == nullptr)
           lamps_subgroup->add_item(item_str, &lamp);
+        m_player.curr_tot_inv_weight += lamp.weight;
       }
       
       auto* weapons_group = m_inventory->fetch_group("Weapons:");
@@ -165,6 +169,7 @@ namespace dung
         f_format_item_str(item_str, weapon->weight, weapon->price, weapon->damage);
         if (weapons_subgroup_melee->find_item(weapon.get()) == nullptr)
           weapons_subgroup_melee->add_item(item_str, weapon.get());
+        m_player.curr_tot_inv_weight += weapon->weight;
       }
       
       auto* potions_group = m_inventory->fetch_group("Potions:");
@@ -177,6 +182,7 @@ namespace dung
         f_format_item_str(item_str, potion.weight, potion.price, 0);
         if (potions_subgroup->find_item(&potion) == nullptr)
           potions_subgroup->add_item(item_str, &potion);
+        m_player.curr_tot_inv_weight += potion.weight;
       }
       
       auto* armour_group = m_inventory->fetch_group("Armour:");
@@ -243,6 +249,7 @@ namespace dung
         if (armour_subgroup != nullptr)
           if (armour_subgroup->find_item(armour.get()) == nullptr)
             armour_subgroup->add_item(item_str, armour.get());
+        m_player.curr_tot_inv_weight += armour->weight;
       }
     }
     
