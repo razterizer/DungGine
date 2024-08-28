@@ -232,7 +232,7 @@ namespace dung
         }
         else if (dynamic_cast<Helmet*>(armour.get()) != nullptr)
         {
-          item_str += "Helmet:";
+          item_str += "Helmet";
           armour_subgroup = armour_subgroup_helmets;
         }
         else
