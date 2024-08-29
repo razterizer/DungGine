@@ -72,6 +72,18 @@ namespace dung
     }
   }
   
+  bool allow_move_to(Terrain terrain)
+  {
+    switch (terrain)
+    {
+      case Terrain::Mountain: return false;
+      case Terrain::Tree: return false;
+      case Terrain::Column: return false;
+      case Terrain::Masonry: return false;
+      default: return true;
+    }
+  }
+  
   std::string terrain2str(Terrain terrain)
   {
     switch (terrain)
