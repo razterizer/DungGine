@@ -84,6 +84,57 @@ namespace dung
     }
   }
   
+  // 1 : Most viscous.
+  // 0 : Least viscous.
+  std::optional<float> get_wet_viscosity(Terrain terrain)
+  {
+    switch (terrain)
+    {
+      case Terrain::Water: return 0.05f;
+      case Terrain::Lava: return 0.9f;
+      case Terrain::Swamp: return 0.7f;
+      case Terrain::Poison: return 0.2f;
+      case Terrain::Acid: return 0.1f;
+      case Terrain::Tar: return 0.8f;
+      default:
+        return {};
+    }
+  }
+  
+  // 1 : highest resistance : hardest to walk over/in.
+  // 0 : lowest resistance : easiest to walk over/in.
+  // Some values are a bit arbitrary.
+  std::optional<float> get_dry_resistance(Terrain terrain)
+  {
+    switch (terrain)
+    {
+      case Terrain::Default:  return 0.f;
+      case Terrain::Void:     return 0.f;
+      case Terrain::Stone:    return 0.f;
+      case Terrain::Cave:     return 0.f;
+      case Terrain::Mine:     return 0.f;
+      case Terrain::Tile:     return 0.f;
+      case Terrain::Ice:      return 0.f;
+      case Terrain::Rope:     return 0.1f;
+      case Terrain::Grass:    return 0.15f;
+      case Terrain::Wood:     return 0.15f;
+      case Terrain::Gravel:   return 0.25f;
+      case Terrain::Path:     return 0.25f;
+      case Terrain::Bone:     return 0.3f;
+      case Terrain::Sand:     return 0.55f;
+      case Terrain::Metal:    return 0.65f;
+      case Terrain::Silver:   return 0.65f;
+      case Terrain::Gold:     return 0.65f;
+      case Terrain::Shrub:    return 0.7f;
+      case Terrain::Brick:    return 0.75f;
+      case Terrain::Tree:     return 1.f;
+      case Terrain::Column:   return 1.f;
+      case Terrain::Masonry:  return 1.f;
+      case Terrain::Mountain: return 1.f;
+      default: return {};
+    }
+  }
+  
   std::string terrain2str(Terrain terrain)
   {
     switch (terrain)
