@@ -37,12 +37,17 @@ namespace dung
     
     bool allow_move()
     {
-      if (on_terrain == Terrain::Sand)
-        return rnd::rand() < 0.4f;
-      if (on_terrain == Terrain::Grass)
-        return rnd::rand() < 0.8f;
       if (weakness > 0)
         return !rnd::one_in(2 + strength - weakness);
+        
+      auto dry_resistance = get_dry_resistance(on_terrain);
+      if (dry_resistance.has_value())
+        return rnd::rand() >= dry_resistance.value();
+        
+      auto wet_viscosity = get_wet_viscosity(on_terrain);
+      if (wet_viscosity.has_value())
+        return rnd::rand() >= wet_viscosity.value();
+        
       return true;
     }
     
