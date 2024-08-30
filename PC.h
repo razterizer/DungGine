@@ -79,8 +79,8 @@ namespace dung
   
     void update_fire_smoke(ScreenHelper* screen_helper, Inventory* inventory, float sim_time, float sim_dt)
     {
-      const float vel_x = -10*los_c;
-      const float vel_y = -10*los_r;
+      const float vel_r = -10*los_r;
+      const float vel_c = -10*los_c;
       const float acc = 0.f, life_time = 0.2f;
       float spread = 23.f;
       const int cluster_size = 10;
@@ -93,7 +93,7 @@ namespace dung
           trg = curr_lamp->lamp_type == Lamp::LampType::Torch;
         spread = curr_lamp->radius*2.f;
       }
-      fire_smoke_engine.update(screen_helper->get_screen_pos(pos), trg, vel_x, vel_y, acc, spread, life_time, cluster_size, sim_dt, sim_time);
+      fire_smoke_engine.update(screen_helper->get_screen_pos(pos), trg, vel_r, vel_c, acc, spread, life_time, cluster_size, sim_dt, sim_time);
     }
     
   public:
