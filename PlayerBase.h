@@ -37,18 +37,22 @@ namespace dung
     
     bool allow_move()
     {
+      bool can_move_base = true;
       if (weakness > 0)
-        return !rnd::one_in(2 + strength - weakness);
+        can_move_base = !rnd::one_in(2 + strength - weakness);
         
-      auto dry_resistance = get_dry_resistance(on_terrain);
-      if (dry_resistance.has_value())
-        return rnd::rand() >= dry_resistance.value();
+      if (can_move_base)
+      {
+        auto dry_resistance = get_dry_resistance(on_terrain);
+        if (dry_resistance.has_value())
+          return rnd::rand() >= dry_resistance.value();
         
-      auto wet_viscosity = get_wet_viscosity(on_terrain);
-      if (wet_viscosity.has_value())
-        return rnd::rand() >= wet_viscosity.value();
+        auto wet_viscosity = get_wet_viscosity(on_terrain);
+        if (wet_viscosity.has_value())
+          return rnd::rand() >= wet_viscosity.value();
+      }
         
-      return true;
+      return false;
     }
     
   protected:
