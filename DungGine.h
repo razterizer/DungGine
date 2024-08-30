@@ -1826,13 +1826,13 @@ namespace dung
           if (npc.curr_room != nullptr)
           {
             auto scr_pos_room = m_screen_helper->get_screen_pos(npc.curr_room->bb_leaf_room.center());
-            bresenham::plot_line(sh, scr_pos.c, scr_pos.r, scr_pos_room.c, scr_pos_room.r,
+            bresenham::plot_line(sh, scr_pos, scr_pos_room,
                     ".", Color::White, Color::Transparent2);
           }
           if (npc.curr_corridor != nullptr)
           {
             auto scr_pos_corr = m_screen_helper->get_screen_pos(npc.curr_corridor->bb.center());
-            bresenham::plot_line(sh, scr_pos.c, scr_pos.r, scr_pos_corr.c, scr_pos_corr.r,
+            bresenham::plot_line(sh, scr_pos, scr_pos_corr,
                     ".", Color::White, Color::Transparent2);
           }
         }
