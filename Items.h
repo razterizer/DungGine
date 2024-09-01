@@ -46,7 +46,7 @@ namespace dung
     {
       character = 'F';
       style.fg_color = color::get_random_color(key_fg_palette);
-      weight = 0.1f;
+      weight = rnd::randn_range_clamp(0.01f, 0.1f);
       price = math::roundI(20*rnd::randn_clamp(20.f, 30.f, 0.f, 1e4f))/20.f;
     }
     
@@ -81,6 +81,7 @@ namespace dung
           life_time_s = rnd::randn_clamp(800.f, 350.f, 420.f, 1800.f); // 7 - 30 min.
           character = '*';
           style.fg_color = Color::Magenta;
+          weight = rnd::randn_range_clamp(0.05f, 0.2f);
           break;
         case LampType::Lantern:
           light_type = LightType::Directional;
@@ -88,6 +89,7 @@ namespace dung
           life_time_s = rnd::randn_clamp(400.f, 350.f, 180.f, 900.f); // 3 - 15 min.
           character = 'G';
           style.fg_color = color::get_random_color({ Color::Red, Color::Green });
+          weight = rnd::randn_range_clamp(0.05f, 0.3f);
           break;
         case LampType::Torch:
           light_type = LightType::Directional;
@@ -95,6 +97,7 @@ namespace dung
           life_time_s = rnd::randn_clamp(150.f, 350.f, 30.f, 300.f); // 0.5 - 5 min.
           character = 'Y';
           style.fg_color = Color::Yellow;
+          weight = rnd::randn_range_clamp(0.4f, 1.5f);
           break;
         default:
           break;
@@ -157,7 +160,7 @@ namespace dung
     {
       character = 'T';
       style.fg_color = Color::LightGray;
-      weight = 2.f;
+      weight = rnd::randn_range_clamp(1.f, 5.f);
       price = math::roundI(20*rnd::randn_clamp(4e3f, 500.f, 0.f, 5e6f))/20.f;
       type = "sword";
       damage = rnd::randn_clamp_int(7.f, 10.f, 4, 50);
@@ -170,7 +173,7 @@ namespace dung
     {
       character = 'V';
       style.fg_color = Color::LightGray;
-      weight = 2.f;
+      weight = rnd::randn_range_clamp(0.02f, 0.7f);
       price = math::roundI(20*rnd::randn_clamp(5e2f, 500.f, 0.f, 1e4f))/20.f;
       type = "dagger";
       damage = rnd::randn_clamp_int(3.f, 3.f, 1, 7);
@@ -183,7 +186,7 @@ namespace dung
     {
       character = 'J';
       style.fg_color = Color::DarkGray;
-      weight = 2.f;
+      weight = rnd::randn_range_clamp(1.f, 1.8f);
       price = math::roundI(20*rnd::randn_clamp(1e3f, 500.f, 0.f, 5e5f))/20.f;
       type = "flail";
       damage = rnd::randn_clamp_int(5.f, 10.f, 3, 30);
@@ -201,7 +204,7 @@ namespace dung
     {
       character = rnd::rand_select<char>({ 'u', 'U', 'b' });
       style.fg_color = color::get_random_color(potion_fg_palette);
-      weight = 0.08f;
+      weight = rnd::randn_range_clamp(0.02f, 0.4f);
       price = math::roundI(20*rnd::randn_clamp(1e3f, 500.f, 0.f, 5e5f))/20.f;
       health = math::roundI(rnd::randn_clamp(.05f, 0.1f, 0, 1.f)*globals::max_health);
       poison = rnd::one_in(50);
@@ -237,9 +240,9 @@ namespace dung
       character = 'D';
       style.fg_color = Color::LightGray;
       type = "shield";
-      weight = 5.f;
       price = math::roundI(20*rnd::randn_clamp(1e3f, 500.f, 0.f, 5e4f))/20.f;
       protection = rnd::randn_clamp_int(2.f, 15.f, 0, 50);
+      weight = protection * 0.5f * (1.f + 0.2f*(rnd::rand() - 0.5f));
     }
   };
   
@@ -250,9 +253,9 @@ namespace dung
       character = 'H';
       style.fg_color = Color::White;
       type = "gambeson";
-      weight = 1.5f;
       price = math::roundI(20*rnd::randn_clamp(5e2f, 200.f, 0.f, 5e3f))/20.f;
       protection = rnd::randn_clamp_int(0.5f, 12.f, 0, 10);
+      weight = protection * 0.25f * (1.f + 0.2f*(rnd::rand() - 0.5f));
     }
   };
   
@@ -263,8 +266,8 @@ namespace dung
       character = '#';
       style.fg_color = Color::LightGray;
       type = "chain maille hauberk";
-      weight = 4.f;
       protection = rnd::randn_clamp_int(5.f, 18.f, 0, 40);
+      weight = protection * 0.62f * (1.f + 0.2f*(rnd::rand() - 0.5f));
     }
   };
   
@@ -275,9 +278,9 @@ namespace dung
       character = 'M';
       style.fg_color = Color::LightGray;
       type = "plated body armour";
-      weight = 10.f;
       price = math::roundI(20*rnd::randn_clamp(2e4f, 5000.f, 0.f, 1e6f))/20.f;
       protection = rnd::randn_clamp_int(10.f, 20.f, 0, 100);
+      weight = protection * 0.67f * (1.f + 0.2f*(rnd::rand() - 0.5f));
     }
   };
   
@@ -288,8 +291,8 @@ namespace dung
       character = 'C';
       style.fg_color = Color::White;
       type = "padded coif";
-      weight = 0.1f;
       protection = rnd::randn_clamp_int(0.5f, 12.f, 0, 10);
+      weight = protection * 0.016f * (1.f + 0.2f*(rnd::rand() - 0.5f));
     }
   };
   
@@ -300,8 +303,8 @@ namespace dung
       character = '2';
       style.fg_color = Color::LightGray;
       type = "chain maille coif";
-      weight = 0.7f;
       protection = rnd::randn_clamp_int(5.f, 18.f, 0, 40);
+      weight = protection * 0.061f * (1.f + 0.2f*(rnd::rand() - 0.5f));
     }
   };
   
@@ -312,8 +315,8 @@ namespace dung
       character = 'Q';
       style.fg_color = Color::LightGray;
       type = "helmet";
-      weight = 1.3f;
       protection = rnd::randn_clamp_int(10.f, 20.f, 0, 100);
+      weight = protection * 0.087f * (1.f + 0.2f*(rnd::rand() - 0.5f));
     }
   };
 }
