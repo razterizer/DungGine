@@ -31,7 +31,8 @@ namespace dung
     std::vector<int> potion_idcs;
     std::vector<int> armour_idcs;
     bool show_inventory = false;
-    float weight_capacity = 50.f;
+    float weight_capacity_soft = 50.f;
+    float weight_capacity_hard = 70.f;
     float curr_tot_inv_weight = 0.f;
     
     ParticleHandler fire_smoke_engine { 500 };
@@ -111,6 +112,8 @@ namespace dung
       update_los();
       update_terrain();
       update_fire_smoke(screen_helper, inventory, sim_time, sim_dt);
+      
+      weight_strain = math::value_to_param_clamped(curr_tot_inv_weight, weight_capacity_soft, weight_capacity_hard);
     }
     
     template<int NR, int NC>
@@ -121,7 +124,7 @@ namespace dung
     
     bool has_weight_capacity(float item_weight) const
     {
-      return curr_tot_inv_weight + item_weight <= weight_capacity;
+      return curr_tot_inv_weight + item_weight <= weight_capacity_hard;
     }
     
     int calc_armour_class(Inventory* inventory) const

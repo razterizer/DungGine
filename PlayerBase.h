@@ -30,6 +30,7 @@ namespace dung
     int endurance = 10;
     int weakness = 0;
     int thac0 = 1;
+    float weight_strain = 0.f;
     
     Terrain on_terrain = Terrain::Default;
     bool can_swim = true;
@@ -92,6 +93,10 @@ namespace dung
         
         if (rnd::one_in(1 + strength - weakness))
           health -= math::roundI(globals::max_health*fluid_damage);
+      }
+      else if (weight_strain > 0.f)
+      {
+        weakness = weight_strain * strength;
       }
       else
       {
