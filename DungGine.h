@@ -1003,7 +1003,7 @@ namespace dung
       for (int i = 0; i < 10; ++i)
         pc_hb[i] = m_player.health > static_cast<int>(i*pc_ratio) ? '#' : ' ';
       health_bars.emplace_back(pc_hb);
-      styles.emplace_back(Style { Color::Cyan, Color::Transparent2 });
+      styles.emplace_back(Style { Color::Magenta, Color::Transparent2 });
       
       for (const auto& npc : all_npcs)
       {
