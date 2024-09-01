@@ -70,7 +70,7 @@ namespace dung
     }
     void init_rand(Lamp::LampType a_lamp_type)
     {
-      radius = rnd::randn_range_clamp(1.5f, globals::max_fow_radius);
+      radius = rnd::randn_clamp(globals::max_fow_radius*0.8f, globals::max_fow_radius*0.25f, 1.5f, globals::max_fow_radius);
       radius_0 = radius;
       lamp_type = a_lamp_type;
       switch (lamp_type)
