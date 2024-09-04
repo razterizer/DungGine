@@ -37,7 +37,7 @@ namespace dung
     
     ParticleHandler fire_smoke_engine { 500 };
     
-    ColorGradient smoke_fg_0
+    Gradient<Color> smoke_fg_0
     {
       {
         { 0.f, Color::Red },
@@ -46,7 +46,7 @@ namespace dung
         { 0.85f, Color::DarkGray },
       }
     };
-    ColorGradient smoke_fg_1
+    Gradient<Color> smoke_fg_1
     {
       {
         { 0.f, Color::Red },
@@ -55,7 +55,7 @@ namespace dung
         { 0.9f, Color::LightGray },
       }
     };
-    ColorGradient smoke_bg_0
+    Gradient<Color> smoke_bg_0
     {
       {
         { 0.f, Color::DarkRed },
@@ -63,7 +63,7 @@ namespace dung
         { 0.9f, Color::Black },
       }
     };
-    ColorGradient smoke_bg_1
+    Gradient<Color> smoke_bg_1
     {
       {
         { 0.f, Color::DarkRed },
@@ -71,7 +71,7 @@ namespace dung
         { 0.9f, Color::DarkGray },
       }
     };
-    std::vector<std::pair<float, std::pair<ColorGradient, ColorGradient>>> smoke_color_gradients;
+    std::vector<std::pair<float, std::pair<Gradient<Color>, Gradient<Color>>>> smoke_color_gradients;
     std::vector<std::string> smoke_txt { "&", "*", "&", "%", "&", "@" };
     
     // ////////////////////////////////
