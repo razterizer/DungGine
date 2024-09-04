@@ -37,42 +37,66 @@ namespace dung
     
     ParticleHandler fire_smoke_engine { 500 };
     
-    Gradient<Color> smoke_fg_0
+    ParticleGradientGroup smoke_0
     {
       {
-        { 0.f, Color::Red },
-        { 0.25f, Color::Yellow },
-        { 0.35f, Color::LightGray },
-        { 0.85f, Color::DarkGray },
+        {
+          { 0.f, Color::Red },
+          { 0.25f, Color::Yellow },
+          { 0.35f, Color::LightGray },
+          { 0.85f, Color::DarkGray },
+        }
+      },
+      {
+        {
+          { 0.f, Color::DarkRed },
+          { 0.3f, Color::DarkGray },
+          { 0.9f, Color::Black },
+        }
+      },
+      {
+        {
+          { 0.0000f, "&" },
+          { 0.1667f, "*" },
+          { 0.3333f, "&" },
+          { 0.5000f, "%" },
+          { 0.6667f, "&" },
+          { 0.8333f, "@" }
+        }
       }
     };
-    Gradient<Color> smoke_fg_1
+    
+    ParticleGradientGroup smoke_1
     {
       {
-        { 0.f, Color::Red },
-        { 0.3f, Color::Yellow },
-        { 0.45f, Color::DarkGray },
-        { 0.9f, Color::LightGray },
-      }
-    };
-    Gradient<Color> smoke_bg_0
-    {
+        {
+          { 0.f, Color::Red },
+          { 0.3f, Color::Yellow },
+          { 0.45f, Color::DarkGray },
+          { 0.9f, Color::LightGray },
+        }
+      },
       {
-        { 0.f, Color::DarkRed },
-        { 0.3f, Color::DarkGray },
-        { 0.9f, Color::Black },
-      }
-    };
-    Gradient<Color> smoke_bg_1
-    {
+        {
+          { 0.f, Color::DarkRed },
+          { 0.4f, Color::Black },
+          { 0.9f, Color::DarkGray },
+        }
+      },
       {
-        { 0.f, Color::DarkRed },
-        { 0.4f, Color::Black },
-        { 0.9f, Color::DarkGray },
+        {
+          { 0.0000f, "&" },
+          { 0.1667f, "*" },
+          { 0.3333f, "&" },
+          { 0.5000f, "%" },
+          { 0.6667f, "&" },
+          { 0.8333f, "@" }
+        }
       }
     };
-    std::vector<std::pair<float, std::pair<Gradient<Color>, Gradient<Color>>>> smoke_color_gradients;
-    std::vector<std::string> smoke_txt { "&", "*", "&", "%", "&", "@" };
+    
+
+    std::vector<std::pair<float, ParticleGradientGroup>> smoke_color_gradients;
     
     // ////////////////////////////////
     
@@ -103,8 +127,8 @@ namespace dung
     {
       character = '@';
       style = { Color::Magenta, Color::White };
-      smoke_color_gradients.emplace_back(0.5f, std::pair { smoke_fg_0, smoke_bg_0 });
-      smoke_color_gradients.emplace_back(0.6f, std::pair { smoke_fg_1, smoke_bg_1 });
+      smoke_color_gradients.emplace_back(0.5f, smoke_0);
+      smoke_color_gradients.emplace_back(0.6f, smoke_1);
     }
     
     void update(ScreenHelper* screen_helper, Inventory* inventory, float sim_time, float sim_dt)
@@ -119,7 +143,7 @@ namespace dung
     template<int NR, int NC>
     void draw(SpriteHandler<NR, NC>& sh, float sim_time)
     {
-      fire_smoke_engine.draw(sh, smoke_txt, smoke_color_gradients, sim_time);
+      fire_smoke_engine.draw(sh, smoke_color_gradients, sim_time);
     }
     
     bool has_weight_capacity(float item_weight) const
