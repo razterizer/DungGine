@@ -15,6 +15,8 @@
 #include <Core/StlUtils.h>
 #include <Termin8or/ParticleSystem.h>
 
+//#define DEBUG_FIRE_SMOKE
+
 
 namespace dung
 {
@@ -41,25 +43,29 @@ namespace dung
     {
       {
         {
-          { 0.f, Color::Red },
-          { 0.25f, Color::Yellow },
-          { 0.35f, Color::LightGray },
-          { 0.85f, Color::DarkGray },
+          { 0.00f, Color::White },
+          { 0.27f, Color::Red },
+          { 0.60f, Color::Yellow },
+          { 0.75f, Color::LightGray },
+          { 0.88f, Color::DarkGray },
         }
       },
       {
         {
-          { 0.f, Color::DarkRed },
-          { 0.3f, Color::DarkGray },
-          { 0.9f, Color::Black },
+          { 0.12f, Color::Blue },
+          { 0.20f, Color::White },
+          { 0.30f, Color::Yellow },   // 0.125f
+          { 0.55f, Color::DarkRed },  // 0.375f
+          { 0.70f, Color::DarkGray }, // 0.625f
+          { 0.85f, Color::Black },    // 0.875f
         }
       },
       {
         {
-          { 0.0000f, "&" },
-          { 0.1667f, "*" },
-          { 0.3333f, "&" },
-          { 0.5000f, "%" },
+          { 0.0000f, "o" },
+          { 0.25f, "v" },
+          { 0.45f, "s" },
+          { 0.65f, "%" },
           { 0.6667f, "&" },
           { 0.8333f, "@" }
         }
@@ -70,17 +76,21 @@ namespace dung
     {
       {
         {
-          { 0.f, Color::Red },
-          { 0.3f, Color::Yellow },
-          { 0.45f, Color::DarkGray },
-          { 0.9f, Color::LightGray },
+          { 0.10f, Color::White },
+          { 0.37f, Color::Red },
+          { 0.70f, Color::Yellow },
+          { 0.85f, Color::LightGray },
+          { 0.98f, Color::DarkGray },
         }
       },
       {
         {
-          { 0.f, Color::DarkRed },
-          { 0.4f, Color::Black },
-          { 0.9f, Color::DarkGray },
+          { 0.12f, Color::Blue },
+          { 0.30f, Color::White },
+          { 0.50f, Color::Yellow },   // 0.125f
+          { 0.74f, Color::DarkRed },  // 0.375f
+          { 0.86f, Color::DarkGray }, // 0.625f
+          { 1.00f, Color::Black },    // 0.875f
         }
       },
       {
@@ -144,6 +154,23 @@ namespace dung
     void draw(SpriteHandler<NR, NC>& sh, float sim_time)
     {
       fire_smoke_engine.draw(sh, smoke_color_gradients, sim_time);
+#ifdef DEBUG_FIRE_SMOKE
+      int c_offs = 0;
+      for (const auto& grad : smoke_color_gradients)
+      {
+        const auto& g = grad.second;
+        float t_prev = 0.f;
+        for (int i = 0; i < NR; ++i)
+        {
+          float t = static_cast<float>(i)/(NR - 1);
+          sh.write_buffer(g.string_gradient(t), i, 30 + c_offs, g.fg_color_gradient(t), g.bg_color_gradient(t));
+          if (std::floor(t*4) - std::floor(t_prev*4) == 1)
+            sh.write_buffer("#", i, 29, Color::White);
+          t_prev = t;
+        }
+        c_offs++;
+      }
+#endif
     }
     
     bool has_weight_capacity(float item_weight) const
