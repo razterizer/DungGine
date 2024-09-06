@@ -242,7 +242,7 @@ namespace dung
       type = "shield";
       price = math::roundI(20*rnd::randn_clamp(1e3f, 500.f, 0.f, 5e4f))/20.f;
       protection = rnd::randn_clamp_int(2.f, 15.f, 0, 50);
-      weight = protection * 0.5f * (1.f + 0.2f*(rnd::rand() - 0.5f));
+      weight = protection * 0.5f * (1.f + 0.6f*(rnd::rand() - 0.6f));
     }
   };
   
@@ -255,7 +255,7 @@ namespace dung
       type = "gambeson";
       price = math::roundI(20*rnd::randn_clamp(5e2f, 200.f, 0.f, 5e3f))/20.f;
       protection = rnd::randn_clamp_int(0.5f, 12.f, 0, 10);
-      weight = protection * 0.25f * (1.f + 0.2f*(rnd::rand() - 0.5f));
+      weight = protection * 0.25f * (1.f + 0.3f*(rnd::rand() - 0.6f));
     }
   };
   
@@ -267,7 +267,7 @@ namespace dung
       style.fg_color = Color::LightGray;
       type = "chain maille hauberk";
       protection = rnd::randn_clamp_int(5.f, 18.f, 0, 40);
-      weight = protection * 0.62f * (1.f + 0.2f*(rnd::rand() - 0.5f));
+      weight = protection * 0.62f * (1.f + 0.5f*(rnd::rand() - 0.6f));
     }
   };
   
@@ -280,7 +280,7 @@ namespace dung
       type = "plated body armour";
       price = math::roundI(20*rnd::randn_clamp(2e4f, 5000.f, 0.f, 1e6f))/20.f;
       protection = rnd::randn_clamp_int(10.f, 20.f, 0, 100);
-      weight = protection * 0.67f * (1.f + 0.2f*(rnd::rand() - 0.5f));
+      weight = protection * 0.67f * (1.f + 0.6f*(rnd::rand() - 0.6f));
     }
   };
   
@@ -292,7 +292,7 @@ namespace dung
       style.fg_color = Color::White;
       type = "padded coif";
       protection = rnd::randn_clamp_int(0.5f, 12.f, 0, 10);
-      weight = protection * 0.016f * (1.f + 0.2f*(rnd::rand() - 0.5f));
+      weight = protection * 0.016f * (1.f + 0.4f*(rnd::rand() - 0.6f));
     }
   };
   
@@ -304,7 +304,7 @@ namespace dung
       style.fg_color = Color::LightGray;
       type = "chain maille coif";
       protection = rnd::randn_clamp_int(5.f, 18.f, 0, 40);
-      weight = protection * 0.061f * (1.f + 0.2f*(rnd::rand() - 0.5f));
+      weight = protection * 0.061f * (1.f + 0.3f*(rnd::rand() - 0.6f));
     }
   };
   
@@ -316,7 +316,7 @@ namespace dung
       style.fg_color = Color::LightGray;
       type = "helmet";
       protection = rnd::randn_clamp_int(10.f, 20.f, 0, 100);
-      weight = protection * 0.087f * (1.f + 0.2f*(rnd::rand() - 0.5f));
+      weight = protection * 0.087f * (1.f + 0.4f*(rnd::rand() - 0.6f));
     }
   };
 }
