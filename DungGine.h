@@ -395,7 +395,7 @@ namespace dung
         // idx = 0 .. 14
         // r = 2, c = 4 => idx = r * (c_len + 1) + c = 2*5 + 4 = 14.
         int idx = p.r * (size.c + 1) + p.c;
-        if (0 <= idx && idx < field->size())
+        if (0 <= idx && idx < static_cast<int>(field->size()))
           (*field)[idx] = set_val;
       };
       
