@@ -168,7 +168,12 @@ namespace dung
         inside_room = curr_room->is_inside_room({r, c}, &location_corr);
       if (inside_room || inside_corr)
       {
-        if (environment->allow_move_to(r, c) || (can_swim && is_wet(environment->get_terrain(r, c))) || can_fly)
+        bool ok_move_to = environment->allow_move_to(r, c);
+        bool wet = is_wet(environment->get_terrain(r, c));
+        bool allow_walking = ok_move_to && !wet;
+        bool allow_swimming = ok_move_to && can_swim && wet;
+        bool allow_flying = can_fly;
+        if (allow_walking || allow_swimming || allow_flying)
         {
           pos.r = r;
           pos.c = c;
