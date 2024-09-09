@@ -1804,7 +1804,13 @@ namespace dung
             {
               for (int r_offs = -1; r_offs <= +1; ++r_offs)
                 for (int c_offs = -1; c_offs <= +1; ++c_offs)
-                  sh.write_buffer("*", npc_scr_pos.r + r_offs, npc_scr_pos.c + c_offs, Color::White, Color::Transparent2);
+                {
+                  RC offs_pos { r_offs, c_offs };
+                  RC npc_scr_offs_pos = npc_scr_pos + offs_pos;
+                  RC npc_world_offs_pos = npc.pos + offs_pos;
+                  if (m_environment->is_inside_any_room(npc_world_offs_pos))
+                    sh.write_buffer("*", npc_scr_offs_pos.r, npc_scr_offs_pos.c, Color::White, Color::Transparent2);
+                }
             }
           }
         }
