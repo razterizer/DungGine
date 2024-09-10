@@ -693,11 +693,13 @@ namespace dung
       {
         fog_of_war = curr_room->is_in_fog_of_war(pos);
         light = curr_room->is_in_light(pos);
+        is_underground = environment->is_underground(curr_room);
       }
       else if (inside_corr && curr_corridor != nullptr)
       {
         fog_of_war = curr_corridor->is_in_fog_of_war(pos);
         light = curr_corridor->is_in_light(pos);
+        is_underground = environment->is_underground(curr_corridor);
       }
 
       if (debug)
