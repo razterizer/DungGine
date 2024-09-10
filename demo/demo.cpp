@@ -107,6 +107,7 @@ public:
       std::cout << "curr rnd seed = " << curr_rnd_seed << std::endl;
       //rnd::srand(1626475275); // Terrain offset bug.
       //rnd::srand(3074848586); // Torch fire-smoke test.
+      //rnd::srand(4133950669); // Drown animation test.
       //rnd::srand(0x1337f00d + 5); // Use srand_time() after map generation.
       
       bsp_tree.generate(200, 400, dung::Orientation::Vertical);
