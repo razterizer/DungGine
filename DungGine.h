@@ -1881,7 +1881,8 @@ namespace dung
                                       m_sun_dir, m_solar_motion,
                                       m_t_solar_period, m_season,
                                       m_use_per_room_lat_long_for_sun_dir,
-                                      m_screen_helper.get());
+                                      m_screen_helper.get(),
+                                      debug);
     }
     
   };
