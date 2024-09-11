@@ -16,7 +16,7 @@ fi
 ### Post-Build Actions ###
 
 mkdir -p bin/fonts/
-cp ../../../lib/Termin8or/fonts/* bin/fonts/
+cp ../../Termin8or/fonts/* bin/fonts/
 
 mkdir -p bin/textures/
 cp textures/* bin/textures/
