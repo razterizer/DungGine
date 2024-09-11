@@ -36,6 +36,6 @@ jobs:
       - name: Build project
         run: |
           cd demo
-          ./build.sh
+          ./build_demo.sh
         continue-on-error: false # Ensure errors are not bypassed
 
