@@ -47,4 +47,4 @@ jobs:
       - name: Run build.bat
         run: |
           cd demo
-          call .\build_demo.bat
+          .\build_demo.bat
