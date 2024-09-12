@@ -14,6 +14,7 @@
 		0709B9AB2C6E445100A43834 /* PlayerBase.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PlayerBase.h; sourceTree = "<group>"; };
 		0709B9AF2C700CE900A43834 /* DungGineListener.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DungGineListener.h; sourceTree = "<group>"; };
 		0709B9B12C73B7CD00A43834 /* Inventory.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Inventory.h; sourceTree = "<group>"; };
+		0709B9B32C9374D100A43834 /* build_demo.bat */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = build_demo.bat; sourceTree = "<group>"; };
 		071942492C458746008BD519 /* SolarMotionPatterns.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SolarMotionPatterns.h; sourceTree = "<group>"; };
 		0719424A2C49D65F008BD519 /* NPC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NPC.h; sourceTree = "<group>"; };
 		07C2A7842C2616FC00869A56 /* RoomStyle.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RoomStyle.h; sourceTree = "<group>"; };
@@ -56,6 +57,7 @@
 			children = (
 				07D769AD2C6044E800BCA669 /* textures */,
 				07D769AC2C6044E000BCA669 /* build_demo.sh */,
+				0709B9B32C9374D100A43834 /* build_demo.bat */,
 				07D769A82C603CC300BCA669 /* demo.cpp */,
 			);
 			path = demo;
