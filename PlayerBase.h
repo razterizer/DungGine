@@ -10,6 +10,13 @@
 namespace dung
 {
 
+  struct BloodSplat
+  {
+    RC pos;
+    int shape = 1;
+    BloodSplat(const RC& p, int s) : pos(p), shape(s) {}
+  };
+
   struct PlayerBase
   {
     char character;
@@ -35,6 +42,8 @@ namespace dung
     Terrain on_terrain = Terrain::Default;
     bool can_swim = true;
     bool can_fly = false;
+    
+    std::vector<BloodSplat> blood_splats;
     
     bool allow_move()
     {

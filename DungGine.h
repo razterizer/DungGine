@@ -1596,7 +1596,8 @@ namespace dung
               ui::VerticalAlignment mb_v_align = ui::VerticalAlignment::CENTER,
               ui::HorizontalAlignment mb_h_align = ui::HorizontalAlignment::CENTER,
               int mb_v_align_offs = 0, int mb_h_align_offs = 0,
-              bool framed_mode = false)
+              bool framed_mode = false,
+              bool gore = false)
     {
       const auto& room_corridor_map = m_environment->get_room_corridor_map();
       const auto& door_vec = m_environment->fetch_doors();
@@ -1739,10 +1740,17 @@ namespace dung
                               scr_pos.r + r_offs,
                               scr_pos.c + c_offs,
                               fight_style);
+              return RC { r_offs, c_offs };
             };
-            f_render_fight(npc_scr_pos, dp);
+            auto offs = f_render_fight(npc_scr_pos, dp);
+            if (rnd::one_in(15))
+              m_player.blood_splats.emplace_back(m_player.pos + offs, rnd::dice(4));
             if (npc.visible)
-              f_render_fight(pc_scr_pos, -dp);
+            {
+              auto offs = f_render_fight(pc_scr_pos, -dp);
+              if (rnd::one_in(15))
+                npc.blood_splats.emplace_back(npc.pos + offs, rnd::dice(4));
+            }
           }
         }
       }
@@ -1875,6 +1883,35 @@ namespace dung
         
       for (const auto& armour : all_armour)
         f_render_item(*armour);
+        
+      if (gore)
+      {
+        auto f_draw_blood_splat = [&sh](const RC& scr_pos, int shape)
+        {
+          std::string str = "";
+          switch (shape)
+          {
+            case 1: str = " "; break;
+            case 2: str = "."; break;
+            case 3: str = ":"; break;
+            case 4: str = "~"; break;
+          }
+          sh.write_buffer(str, scr_pos.r, scr_pos.c, Color::Red, Color::DarkRed);
+        };
+        for (const auto& bs : m_player.blood_splats)
+        {
+          auto bs_scr_pos = m_screen_helper->get_screen_pos(bs.pos);
+          f_draw_blood_splat(bs_scr_pos, bs.shape);
+        }
+        for (const auto& npc : all_npcs)
+        {
+          for (const auto& bs : npc.blood_splats)
+          {
+            auto bs_scr_pos = m_screen_helper->get_screen_pos(bs.pos);
+            f_draw_blood_splat(bs_scr_pos, bs.shape);
+          }
+        }
+      }
       
       m_environment->draw_environment(sh, real_time_s,
                                       use_fog_of_war,
