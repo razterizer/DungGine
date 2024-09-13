@@ -20,6 +20,9 @@ if exist "%ProgramFiles(x86)%\Microsoft Visual Studio\2022\Enterprise\VC\Auxilia
  
 echo Building on Windows...
 echo Building with VC++...
+
+REM Ensure the 'bin' directory exists
+if not exist bin mkdir bin
  
 REM Compile the demo using VC++
 cl /std:c++20 /EHsc /Fe:bin/demo.exe /Fo:bin/demo.obj .\demo.cpp /I../..
