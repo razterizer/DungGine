@@ -19,9 +19,6 @@ static TestType test_type = TestType::DungeonRuntime;
 class Game : public GameEngine<>, public dung::DungGineListener
 {
 public:
-#ifdef _WIN32
-syntax_error
-#endif
   Game(int argc, char** argv, const GameEngineParams& params)
     : GameEngine(argv[0], params)
   {}
