@@ -1,4 +1,4 @@
-name: Build Check
+name: build check ubuntu
 
 on:
   push:
@@ -37,29 +37,3 @@ jobs:
           ./build_demo.sh
         continue-on-error: false # Ensure errors are not bypassed
   
-  build-windows:
-    runs-on: windows-latest
-  
-    steps:
-      # Step 1: Checkout the repository
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      # Step 2: Move to the parent directory and fetch dependencies
-      - name: Fetch dependencies
-        run: |
-          cd ..
-          git clone https://github.com/razterizer/Core.git
-          git clone https://github.com/razterizer/Termin8or.git
-          # git clone https://github.com/razterizer/8Beat.git
-          # git clone https://github.com/razterizer/AudioLibSwitcher_OpenAL.git --recurse-submodules
-
-      # # Step 3: Install OpenAL
-      # - name: Install OpenAL
-      #   run: sudo apt install libopenal-dev
-
-      # Step 3: Change to the correct directory and build
-      - name: Run build.bat
-        run: |
-          cd demo
-          .\build_demo.bat
