@@ -1,7 +1,7 @@
 # DungGine
 
 ![GitHub License](https://img.shields.io/github/license/razterizer/DungGine?color=blue)
-[![build check ubuntu](https://github.com/razterizer/DungGine/actions/workflows/build-check-ubuntu.yml/badge.svg)](https://github.com/razterizer/DungGine/actions/workflows/build-check-ubuntu.yml)
+[![build check ubuntu](https://github.com/razterizer/DungGine/actions/workflows/build-ubuntu.yml/badge.svg)](https://github.com/razterizer/DungGine/actions/workflows/build-ubuntu.yml)
 
 <img width="568" alt="image" src="https://github.com/user-attachments/assets/c3075838-7f15-4679-862e-ce47780c9b39">
 
