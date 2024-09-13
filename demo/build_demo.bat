@@ -34,7 +34,7 @@ if %errorlevel% neq 0 (
  
 REM Create necessary directories and copy resources
 if not exist bin\fonts mkdir bin\fonts
-xcopy /Y /E ..\..\..\lib\Termin8or\fonts bin\fonts
+xcopy /Y /E ..\..\Termin8or\fonts bin\fonts
  
 if not exist bin\textures mkdir bin\textures
 xcopy /Y /E textures bin\textures
