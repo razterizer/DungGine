@@ -37,14 +37,14 @@ jobs:
           ./build_demo.sh
         continue-on-error: false # Ensure errors are not bypassed
   
-  #build-windows:
-  #  runs-on: windows-latest
-  #
-  #  steps:
-  #    - name: Checkout repository
-  #      uses: actions/checkout@v3
-  #
-  #    - name: Run build.bat
-  #      run: |
-  #        cd demo
-  #        .\build_demo.bat
+  build-windows:
+    runs-on: windows-latest
+  
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+  
+      - name: Run build.bat
+        run: |
+          cd demo
+          .\build_demo.bat
