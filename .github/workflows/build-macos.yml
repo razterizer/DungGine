@@ -9,7 +9,7 @@ on:
       - main
 
 jobs:
-  build-ubuntu:
+  build-macos:
     runs-on: macos-latest
     
     steps:
