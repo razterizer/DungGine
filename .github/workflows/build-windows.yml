@@ -23,36 +23,15 @@ jobs:
           cd ..
           git clone https://github.com/razterizer/Core.git
           git clone https://github.com/razterizer/Termin8or.git
-          git clone https://github.com/razterizer/AudioLibSwitcher_OpenAL.git --recurse-submodules
+          # git clone https://github.com/razterizer/8Beat.git
+          # git clone https://github.com/razterizer/AudioLibSwitcher_OpenAL.git --recurse-submodules
+      # # Step 3: Install OpenAL
+      # - name: Install OpenAL
+      #   run: sudo apt install libopenal-dev
 
-      # Step 3: Create 3rdparty directories
-      - name: Create 3rdparty directories
-        run: |
-          New-Item -ItemType Directory -Force -Path $env:GITHUB_WORKSPACE\..\..\3rdparty\include\OpenAL_Soft
-          New-Item -ItemType Directory -Force -Path $env:GITHUB_WORKSPACE\..\..\3rdparty\lib
-
-      # Step 4: Download OpenAL Soft
-      - name: Download OpenAL Soft
-        run: curl -L https://www.openal-soft.org/openal-binaries/openal-soft-1.23.1-bin.zip -o openal-soft.zip
-
-      # Step 5: Unzip OpenAL Soft
-      - name: Unzip OpenAL Soft
-        run: |
-          Expand-Archive -Path openal-soft.zip -DestinationPath openal-soft
-
-      # Step 6: Copy OpenAL Soft files
-      - name: Copy OpenAL Soft files
-        run: |
-          Copy-Item -Path openal-soft\include\AL\* -Destination $env:GITHUB_WORKSPACE\..\..\3rdparty\include\OpenAL_Soft\ -Force
-          Copy-Item -Path openal-soft\bin\Win64\OpenAL32.dll -Destination $env:GITHUB_WORKSPACE\..\..\3rdparty\lib\ -Force
-          Copy-Item -Path openal-soft\lib\Win64\OpenAL32.lib -Destination $env:GITHUB_WORKSPACE\..\..\3rdparty\lib\ -Force
-
-      # Step 7: Fix step for libsndfile (if needed, add relevant logic)
-      # Example: Downloading and moving sndfile files if necessary
-
-      # Step 8: Change to the correct directory and build
+      # Step 3: Change to the correct directory and build
       - name: Run build.bat
-        continue-on-error: false  # Ensure errors are not bypassed
+        continue-on-error: false # Ensure errors are not bypassed
         run: |
-          cd demos
-          .\build_demo_1.bat
+          cd demo
+          .\build_demo.bat
