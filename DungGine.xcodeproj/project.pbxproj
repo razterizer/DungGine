@@ -15,6 +15,9 @@
 		0709B9AF2C700CE900A43834 /* DungGineListener.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DungGineListener.h; sourceTree = "<group>"; };
 		0709B9B12C73B7CD00A43834 /* Inventory.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Inventory.h; sourceTree = "<group>"; };
 		0709B9B32C9374D100A43834 /* build_demo.bat */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = build_demo.bat; sourceTree = "<group>"; };
+		0709B9BB2C95829400A43834 /* build-windows.yml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.yaml; name = "build-windows.yml"; path = ".github/workflows/build-windows.yml"; sourceTree = "<group>"; };
+		0709B9BC2C95829400A43834 /* build-ubuntu.yml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.yaml; name = "build-ubuntu.yml"; path = ".github/workflows/build-ubuntu.yml"; sourceTree = "<group>"; };
+		0709B9BD2C95829400A43834 /* build-macos.yml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.yaml; name = "build-macos.yml"; path = ".github/workflows/build-macos.yml"; sourceTree = "<group>"; };
 		071942492C458746008BD519 /* SolarMotionPatterns.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SolarMotionPatterns.h; sourceTree = "<group>"; };
 		0719424A2C49D65F008BD519 /* NPC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NPC.h; sourceTree = "<group>"; };
 		07C2A7842C2616FC00869A56 /* RoomStyle.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RoomStyle.h; sourceTree = "<group>"; };
@@ -52,6 +55,16 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		0709B9BA2C95825200A43834 /* workflows */ = {
+			isa = PBXGroup;
+			children = (
+				0709B9BD2C95829400A43834 /* build-macos.yml */,
+				0709B9BC2C95829400A43834 /* build-ubuntu.yml */,
+				0709B9BB2C95829400A43834 /* build-windows.yml */,
+			);
+			name = workflows;
+			sourceTree = "<group>";
+		};
 		07D769A72C603C9800BCA669 /* demo */ = {
 			isa = PBXGroup;
 			children = (
@@ -80,6 +93,7 @@
 				07E6EACC2C150C23007BBC6B /* LICENSE */,
 				07E6EACD2C150C23007BBC6B /* README.md */,
 				07D769A72C603C9800BCA669 /* demo */,
+				0709B9BA2C95825200A43834 /* workflows */,
 				07C2A7892C2A29CF00869A56 /* Orientation.h */,
 				07E6EACA2C14CFD3007BBC6B /* BSPTree.h */,
 				07D769B32C69EB9A00BCA669 /* Environment.h */,
