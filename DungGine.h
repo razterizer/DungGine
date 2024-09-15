@@ -1924,8 +1924,6 @@ namespace dung
       {
         auto f_draw_blood_splat = [&sh](const RC& scr_pos, const BloodSplat& bs)
         {
-          if (!bs.visible)
-            return;
           std::string str = "";
           switch (bs.shape)
           {
@@ -1934,7 +1932,7 @@ namespace dung
             case 3: str = ":"; break;
             case 4: str = "~"; break;
           }
-          auto style = styles::make_shaded_style(Color::Red, bs.light ? color::ShadeType::Bright : color::ShadeType::Dark);
+          auto style = styles::make_shaded_style(Color::Red, bs.visible ? color::ShadeType::Bright : color::ShadeType::Dark);
           sh.write_buffer(str, scr_pos.r, scr_pos.c, style);
         };
         for (const auto& bs : m_player.blood_splats)
