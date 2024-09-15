@@ -1766,7 +1766,7 @@ namespace dung
               return RC { r_offs, c_offs };
             };
             auto offs = f_render_fight(npc_scr_pos, dp);
-            if (rnd::one_in(15))
+            if (rnd::one_in(15) && m_environment->is_inside_any_room(m_player.pos + offs))
             {
               auto& bs = m_player.blood_splats.emplace_back(m_player.pos + offs, rnd::dice(4));
               bs.curr_room = m_player.curr_room;
@@ -1779,7 +1779,7 @@ namespace dung
             if (npc.visible)
             {
               auto offs = f_render_fight(pc_scr_pos, -dp);
-              if (rnd::one_in(15))
+              if (rnd::one_in(15) && m_environment->is_inside_any_room(npc.pos + offs))
               {
                 auto& bs = npc.blood_splats.emplace_back(npc.pos + offs, rnd::dice(4));
                 bs.curr_room = npc.curr_room;
