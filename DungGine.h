@@ -271,6 +271,14 @@ namespace dung
       for (auto& armour : all_armour)
         *get_field_ptr(armour.get()) = clear_val;
         
+      for (auto& bs : m_player.blood_splats)
+        *get_field_ptr(&bs) = clear_val;
+        
+      for (auto& npc : all_npcs)
+        for (auto& bs : npc.blood_splats)
+          *get_field_ptr(&bs) = clear_val;
+        
+      // #NOTE: fog_of_war and light vars set by NPC class itself.
       //for (auto& npc : all_npcs)
       //  *get_field_ptr(&npc) = clear_val;
       
@@ -370,7 +378,15 @@ namespace dung
           
       for (auto& armour : all_armour)
         f_set_item_field(*armour);
+        
+      for (auto& bs : m_player.blood_splats)
+        f_set_item_field(bs);
+        
+      for (auto& npc : all_npcs)
+        for (auto& bs : npc.blood_splats)
+          f_set_item_field(bs);
       
+      // #NOTE: fog_of_war and light vars set by NPC class itself.
       //for (auto& npc : all_npcs)
       //  if (distance(npc.pos, curr_pos) <= c_fow_dist)
       //    *get_field_ptr(&npc) = set_val;
@@ -991,6 +1007,13 @@ namespace dung
         
       for (auto& npc : all_npcs)
         npc.set_visibility(use_fog_of_war, f_fow_near(npc), f_calc_night(npc));
+        
+      for (auto& bs : m_player.blood_splats)
+        bs.set_visibility(use_fog_of_war, f_calc_night(bs));
+      
+      for (auto& npc : all_npcs)
+        for (auto& bs : npc.blood_splats)
+          bs.set_visibility(use_fog_of_war, f_calc_night(bs));
     }
     
     template<int NR, int NC>
@@ -1744,12 +1767,25 @@ namespace dung
             };
             auto offs = f_render_fight(npc_scr_pos, dp);
             if (rnd::one_in(15))
-              m_player.blood_splats.emplace_back(m_player.pos + offs, rnd::dice(4));
+            {
+              auto& bs = m_player.blood_splats.emplace_back(m_player.pos + offs, rnd::dice(4));
+              bs.curr_room = m_player.curr_room;
+              bs.curr_corridor = m_player.curr_corridor;
+              if (m_player.is_inside_curr_room())
+                bs.is_underground = m_environment->is_underground(m_player.curr_room);
+              else if (m_player.is_inside_curr_corridor())
+                bs.is_underground = m_environment->is_underground(m_player.curr_corridor);
+            }
             if (npc.visible)
             {
               auto offs = f_render_fight(pc_scr_pos, -dp);
               if (rnd::one_in(15))
-                npc.blood_splats.emplace_back(npc.pos + offs, rnd::dice(4));
+              {
+                auto& bs = npc.blood_splats.emplace_back(npc.pos + offs, rnd::dice(4));
+                bs.curr_room = npc.curr_room;
+                bs.curr_corridor = npc.curr_corridor;
+                bs.is_underground = npc.is_underground;
+              }
             }
           }
         }
@@ -1886,29 +1922,32 @@ namespace dung
         
       if (gore)
       {
-        auto f_draw_blood_splat = [&sh](const RC& scr_pos, int shape)
+        auto f_draw_blood_splat = [&sh](const RC& scr_pos, const BloodSplat& bs)
         {
+          if (!bs.visible)
+            return;
           std::string str = "";
-          switch (shape)
+          switch (bs.shape)
           {
             case 1: str = " "; break;
             case 2: str = "."; break;
             case 3: str = ":"; break;
             case 4: str = "~"; break;
           }
-          sh.write_buffer(str, scr_pos.r, scr_pos.c, Color::Red, Color::DarkRed);
+          auto style = styles::make_shaded_style(Color::Red, bs.light ? color::ShadeType::Bright : color::ShadeType::Dark);
+          sh.write_buffer(str, scr_pos.r, scr_pos.c, style);
         };
         for (const auto& bs : m_player.blood_splats)
         {
           auto bs_scr_pos = m_screen_helper->get_screen_pos(bs.pos);
-          f_draw_blood_splat(bs_scr_pos, bs.shape);
+          f_draw_blood_splat(bs_scr_pos, bs);
         }
         for (const auto& npc : all_npcs)
         {
           for (const auto& bs : npc.blood_splats)
           {
             auto bs_scr_pos = m_screen_helper->get_screen_pos(bs.pos);
-            f_draw_blood_splat(bs_scr_pos, bs.shape);
+            f_draw_blood_splat(bs_scr_pos, bs);
           }
         }
       }

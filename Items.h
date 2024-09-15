@@ -7,27 +7,22 @@
 
 #pragma once
 #include "Globals.h"
+#include "DungObject.h"
 
 namespace dung
 {
   
-  struct Item
+  struct Item : DungObject
   {
     virtual ~Item() = default;
   
-    RC pos; // world pos
     bool picked_up = false;
     Style style = { Color::White, Color::Transparent2 };
     char character = '?';
-    bool fog_of_war = true;
-    bool light = false;
-    bool visible = false;
     bool visible_near = false;
     float weight = 0.f; // kg-ish.
     float price = 0.f;  // SEK-ish.
-    bool is_underground = false;
-    BSPNode* curr_room = nullptr;
-    Corridor* curr_corridor = nullptr;
+    
     
     virtual void set_visibility(bool use_fog_of_war, bool fow_near, bool is_night)
     {

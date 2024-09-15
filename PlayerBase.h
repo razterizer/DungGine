@@ -6,15 +6,24 @@
 //
 
 #pragma once
+#include "DungObject.h"
+
 
 namespace dung
 {
 
-  struct BloodSplat
+  struct BloodSplat : DungObject
   {
-    RC pos;
     int shape = 1;
-    BloodSplat(const RC& p, int s) : pos(p), shape(s) {}
+    BloodSplat(const RC& p, int s) : shape(s)
+    {
+      pos = p;
+    }
+    void set_visibility(bool use_fog_of_war, bool is_night)
+    {
+      visible = !((use_fog_of_war && this->fog_of_war) ||
+                  ((this->is_underground || is_night) && !this->light));
+    }
   };
 
   struct PlayerBase
