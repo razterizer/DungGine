@@ -639,6 +639,13 @@ namespace dung
                        ((this->is_underground || is_night) && !this->light));
     }
     
+    void trigger_hostility(const RC& pc_pos)
+    {
+      auto dist_to_pc = distance(pos, pc_pos);
+      if (dist_to_pc < c_dist_hostile_hyst_on)
+          is_hostile = true;
+    }
+    
     void update(const RC& pc_pos, Environment* environment, float time, float dt)
     {
       if (health <= 0)
@@ -675,13 +682,13 @@ namespace dung
       {
         if (dist_to_pc < c_dist_hostile_hyst_on)
           is_hostile = true;
-        else if (dist_to_pc > c_dist_hostile_hyst_off)
-          is_hostile = false;
       }
+      if (dist_to_pc > c_dist_hostile_hyst_off)
+        is_hostile = false;
       
-      if (enemy && dist_to_pc < c_dist_fight)
+      if ((enemy || is_hostile) && dist_to_pc < c_dist_fight)
         state = State::Fight;
-      else if (enemy && dist_to_pc < c_dist_pursue)
+      else if ((enemy || is_hostile) && dist_to_pc < c_dist_pursue)
         state = State::Pursue;
       else if (dist_to_pc > c_dist_patroll)
         state = State::Patroll;

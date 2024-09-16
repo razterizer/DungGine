@@ -540,6 +540,11 @@ namespace dung
                                        MessageHandler::Level::Guide);
         }
       }
+      else if (str::to_lower(curr_key) == 'f')
+      {
+        for (auto& npc : m_all_npcs)
+          npc.trigger_hostility(m_player.pos);
+      }
     }
 
   };
