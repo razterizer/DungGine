@@ -19,6 +19,7 @@
 		0709B9BC2C95829400A43834 /* build-ubuntu.yml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.yaml; name = "build-ubuntu.yml"; path = ".github/workflows/build-ubuntu.yml"; sourceTree = "<group>"; };
 		0709B9BD2C95829400A43834 /* build-macos.yml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.yaml; name = "build-macos.yml"; path = ".github/workflows/build-macos.yml"; sourceTree = "<group>"; };
 		0709B9C62C977C4E00A43834 /* DungObject.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DungObject.h; sourceTree = "<group>"; };
+		0709B9C72C98102400A43834 /* Keyboard.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Keyboard.h; sourceTree = "<group>"; };
 		071942492C458746008BD519 /* SolarMotionPatterns.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SolarMotionPatterns.h; sourceTree = "<group>"; };
 		0719424A2C49D65F008BD519 /* NPC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NPC.h; sourceTree = "<group>"; };
 		07C2A7842C2616FC00869A56 /* RoomStyle.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RoomStyle.h; sourceTree = "<group>"; };
@@ -99,6 +100,7 @@
 				07E6EACA2C14CFD3007BBC6B /* BSPTree.h */,
 				07D769B32C69EB9A00BCA669 /* Environment.h */,
 				07D769B42C6B422700BCA669 /* ScreenHelper.h */,
+				0709B9C72C98102400A43834 /* Keyboard.h */,
 				07E6EAD62C1B53B8007BBC6B /* DungGine.h */,
 				07E6EAD72C1C2657007BBC6B /* DungGineStyles.h */,
 				07C2A7842C2616FC00869A56 /* RoomStyle.h */,
