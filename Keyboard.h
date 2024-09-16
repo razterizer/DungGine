@@ -24,44 +24,44 @@ namespace dung
     
     PC& m_player;
     
-    std::vector<Key>& all_keys;
+    std::vector<Key>& m_all_keys;
     // Lamps illuminate items and NPCs. If you've already discovered an item or
     //   NPC using a lamp (and after FOW been cleared),
     //   then they will still be visible when the room is not lit.
     // Lamps will not work in surface level rooms.
-    std::vector<Lamp>& all_lamps;
-    std::vector<std::unique_ptr<Weapon>>& all_weapons;
-    std::vector<Potion>& all_potions;
-    std::vector<std::unique_ptr<Armour>>& all_armour;
+    std::vector<Lamp>& m_all_lamps;
+    std::vector<std::unique_ptr<Weapon>>& m_all_weapons;
+    std::vector<Potion>& m_all_potions;
+    std::vector<std::unique_ptr<Armour>>& m_all_armour;
     
-    std::vector<NPC>& all_npcs;
+    std::vector<NPC>& m_all_npcs;
     
-    ui::TextBoxDebug& tbd;
+    ui::TextBoxDebug& m_tbd;
     
-    bool& debug;
+    bool& m_debug;
     
   public:
     Keyboard(Environment* environment, Inventory* inventory, MessageHandler* msg_handler,
              PC& pc,
-             std::vector<Key>& a_all_keys,
-             std::vector<Lamp>& a_all_lamps,
-             std::vector<std::unique_ptr<Weapon>>& a_all_weapons,
-             std::vector<Potion>& a_all_potions,
-             std::vector<std::unique_ptr<Armour>>& a_all_armour,
-             std::vector<NPC>& a_all_npcs,
-             ui::TextBoxDebug& a_tbd, bool& a_debug)
+             std::vector<Key>& all_keys,
+             std::vector<Lamp>& all_lamps,
+             std::vector<std::unique_ptr<Weapon>>& all_weapons,
+             std::vector<Potion>& all_potions,
+             std::vector<std::unique_ptr<Armour>>& all_armour,
+             std::vector<NPC>& all_npcs,
+             ui::TextBoxDebug& tbd, bool& debug)
       : m_environment(environment)
       , m_inventory(inventory)
       , message_handler(msg_handler)
       , m_player(pc)
-      , all_keys(a_all_keys)
-      , all_lamps(a_all_lamps)
-      , all_weapons(a_all_weapons)
-      , all_potions(a_all_potions)
-      , all_armour(a_all_armour)
-      , all_npcs(a_all_npcs)
-      , tbd(a_tbd)
-      , debug(a_debug)
+      , m_all_keys(all_keys)
+      , m_all_lamps(all_lamps)
+      , m_all_weapons(all_weapons)
+      , m_all_potions(all_potions)
+      , m_all_armour(all_armour)
+      , m_all_npcs(all_npcs)
+      , m_tbd(tbd)
+      , m_debug(debug)
     {}
   
     void handle_keyboard(const keyboard::KeyPressData& kpd, double real_time_s)
@@ -123,7 +123,7 @@ namespace dung
               auto* key = dynamic_cast<Key*>(selected_inv_item->item);
               if (key != nullptr)
               {
-                auto idx = stlutils::find_if_idx(all_keys, [key](const auto& o) { return &o == key; });
+                auto idx = stlutils::find_if_idx(m_all_keys, [key](const auto& o) { return &o == key; });
                 msg += "key:" + std::to_string(key->key_id) + "!";
                 f_drop_item(key);
                 stlutils::erase(m_player.key_idcs, idx);
@@ -142,7 +142,7 @@ namespace dung
               auto* lamp = dynamic_cast<Lamp*>(selected_inv_item->item);
               if (lamp != nullptr)
               {
-                auto idx = stlutils::find_if_idx(all_lamps, [lamp](const auto& o) { return &o == lamp; });
+                auto idx = stlutils::find_if_idx(m_all_lamps, [lamp](const auto& o) { return &o == lamp; });
                 msg += "lamp:" + std::to_string(idx) + "!";
                 f_drop_item(lamp);
                 stlutils::erase(m_player.lamp_idcs, idx);
@@ -161,7 +161,7 @@ namespace dung
               auto* weapon = dynamic_cast<Weapon*>(selected_inv_item->item);
               if (weapon != nullptr)
               {
-                auto idx = stlutils::find_if_idx(all_weapons,
+                auto idx = stlutils::find_if_idx(m_all_weapons,
                   [weapon](const auto& o) { return o.get() == weapon; });
                 msg += weapon->type +":" + std::to_string(idx) + "!";
                 f_drop_item(weapon);
@@ -181,7 +181,7 @@ namespace dung
               auto* potion = dynamic_cast<Potion*>(selected_inv_item->item);
               if (potion != nullptr)
               {
-                auto idx = stlutils::find_if_idx(all_potions,
+                auto idx = stlutils::find_if_idx(m_all_potions,
                   [potion](const auto& o) { return &o == potion; });
                 msg += "potion:" + std::to_string(idx) + "!";
                 f_drop_item(potion);
@@ -217,19 +217,19 @@ namespace dung
             
             auto* armour_group = m_inventory->fetch_group("Armour:");
             if (!f_try_drop_armour(armour_group->fetch_subgroup(ARMOUR_Shield),
-                                   all_armour, m_player.armour_idcs))
+                                   m_all_armour, m_player.armour_idcs))
               if (!f_try_drop_armour(armour_group->fetch_subgroup(ARMOUR_Gambeson),
-                                     all_armour, m_player.armour_idcs))
+                                     m_all_armour, m_player.armour_idcs))
                 if (!f_try_drop_armour(armour_group->fetch_subgroup(ARMOUR_ChainMailleHauberk),
-                                       all_armour, m_player.armour_idcs))
+                                       m_all_armour, m_player.armour_idcs))
                   if (!f_try_drop_armour(armour_group->fetch_subgroup(ARMOUR_PlatedBodyArmour),
-                                         all_armour, m_player.armour_idcs))
+                                         m_all_armour, m_player.armour_idcs))
                     if (!f_try_drop_armour(armour_group->fetch_subgroup(ARMOUR_PaddedCoif),
-                                           all_armour, m_player.armour_idcs))
+                                           m_all_armour, m_player.armour_idcs))
                       if (!f_try_drop_armour(armour_group->fetch_subgroup(ARMOUR_ChainMailleCoif),
-                                             all_armour, m_player.armour_idcs))
+                                             m_all_armour, m_player.armour_idcs))
                         f_try_drop_armour(armour_group->fetch_subgroup(ARMOUR_Helmet),
-                                          all_armour, m_player.armour_idcs);
+                                          m_all_armour, m_player.armour_idcs);
           }
           if (!to_drop_found)
           {
@@ -277,7 +277,7 @@ namespace dung
         {
           message_handler->clear_curr_message();
           
-          tbd.clear();
+          m_tbd.clear();
           
           auto slos_r = math::sgn(m_player.los_r);
           auto slos_c = math::sgn(m_player.los_c);
@@ -314,7 +314,7 @@ namespace dung
                                                "The door is unlocked!",
                                                MessageHandler::Level::Guide);
                   
-                  m_player.remove_key_by_key_id(m_inventory, all_keys, door->key_id);
+                  m_player.remove_key_by_key_id(m_inventory, m_all_keys, door->key_id);
                   message_handler->add_message(static_cast<float>(real_time_s),
                                                "You cast a vanishing spell on the key!",
                                                MessageHandler::Level::Guide);
@@ -350,9 +350,9 @@ namespace dung
           
           std::string too_heavy_msg_template = " is too heavy to carry.\nYou need to drop items from your inventory!";
           
-          for (size_t key_idx = 0; key_idx < all_keys.size(); ++key_idx)
+          for (size_t key_idx = 0; key_idx < m_all_keys.size(); ++key_idx)
           {
-            auto& key = all_keys[key_idx];
+            auto& key = m_all_keys[key_idx];
             if (key.pos == curr_pos && !key.picked_up)
             {
               if (m_player.has_weight_capacity(key.weight))
@@ -368,9 +368,9 @@ namespace dung
                                              MessageHandler::Level::Warning);
             }
           }
-          for (size_t lamp_idx = 0; lamp_idx < all_lamps.size(); ++lamp_idx)
+          for (size_t lamp_idx = 0; lamp_idx < m_all_lamps.size(); ++lamp_idx)
           {
-            auto& lamp = all_lamps[lamp_idx];
+            auto& lamp = m_all_lamps[lamp_idx];
             if (lamp.pos == curr_pos && !lamp.picked_up)
             {
               auto lamp_type = lamp.get_type_str();
@@ -388,9 +388,9 @@ namespace dung
                                              MessageHandler::Level::Warning);
             }
           }
-          for (size_t wpn_idx = 0; wpn_idx < all_weapons.size(); ++wpn_idx)
+          for (size_t wpn_idx = 0; wpn_idx < m_all_weapons.size(); ++wpn_idx)
           {
-            auto& weapon = all_weapons[wpn_idx];
+            auto& weapon = m_all_weapons[wpn_idx];
             if (weapon->pos == curr_pos && !weapon->picked_up)
             {
               if (m_player.has_weight_capacity(weapon->weight))
@@ -406,9 +406,9 @@ namespace dung
                                              MessageHandler::Level::Warning);
             }
           }
-          for (size_t pot_idx = 0; pot_idx < all_potions.size(); ++pot_idx)
+          for (size_t pot_idx = 0; pot_idx < m_all_potions.size(); ++pot_idx)
           {
-            auto& potion = all_potions[pot_idx];
+            auto& potion = m_all_potions[pot_idx];
             if (potion.pos == curr_pos && !potion.picked_up)
             {
               if (m_player.has_weight_capacity(potion.weight))
@@ -424,9 +424,9 @@ namespace dung
                                              MessageHandler::Level::Warning);
             }
           }
-          for (size_t a_idx = 0; a_idx < all_armour.size(); ++a_idx)
+          for (size_t a_idx = 0; a_idx < m_all_armour.size(); ++a_idx)
           {
-            auto& armour = all_armour[a_idx];
+            auto& armour = m_all_armour[a_idx];
             if (armour->pos == curr_pos && !armour->picked_up)
             {
               if (m_player.has_weight_capacity(armour->weight))
@@ -451,20 +451,20 @@ namespace dung
       }
       else if (curr_key == '+')
       {
-        for (auto& npc : all_npcs)
+        for (auto& npc : m_all_npcs)
           math::toggle(npc.debug);
       }
       else if (curr_key == '?')
-        math::toggle(debug);
+        math::toggle(m_debug);
       else if (str::to_lower(curr_key) == 'i')
       {
-        for (const auto& key : all_keys)
+        for (const auto& key : m_all_keys)
         {
           if (key.visible_near)
             message_handler->add_message(static_cast<float>(real_time_s),
                                          "You see a key nearby!", MessageHandler::Level::Guide);
         }
-        for (const auto& lamp : all_lamps)
+        for (const auto& lamp : m_all_lamps)
         {
           if (lamp.visible_near)
           {
@@ -473,25 +473,25 @@ namespace dung
                                          "You see " + str::indef_art(lamp_type) + " nearby!", MessageHandler::Level::Guide);
           }
         }
-        for (const auto& weapon : all_weapons)
+        for (const auto& weapon : m_all_weapons)
         {
           if (weapon->visible_near)
             message_handler->add_message(static_cast<float>(real_time_s),
                                          "You can see " + str::indef_art(weapon->type) + " nearby!", MessageHandler::Level::Guide);
         }
-        for (const auto& potion : all_potions)
+        for (const auto& potion : m_all_potions)
         {
           if (potion.visible_near)
             message_handler->add_message(static_cast<float>(real_time_s),
                                          "You can see a potion nearby!", MessageHandler::Level::Guide);
         }
-        for (const auto& armour : all_armour)
+        for (const auto& armour : m_all_armour)
         {
           if (armour->visible_near)
             message_handler->add_message(static_cast<float>(real_time_s),
                                          "You can see " + str::indef_art(armour->type) + " nearby!", MessageHandler::Level::Guide);
         }
-        for (const auto& npc : all_npcs)
+        for (const auto& npc : m_all_npcs)
         {
           if (npc.visible_near)
           {
@@ -534,7 +534,7 @@ namespace dung
                                              MessageHandler::Level::Guide);
               break;
           }
-          m_player.remove_selected_potion(m_inventory, all_potions);
+          m_player.remove_selected_potion(m_inventory, m_all_potions);
           message_handler->add_message(static_cast<float>(real_time_s),
                                        "You throw away the empty vial.",
                                        MessageHandler::Level::Guide);
