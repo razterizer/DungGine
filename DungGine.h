@@ -403,17 +403,17 @@ namespace dung
       {
         if (field == nullptr)
           return;
-        if (p.r < 0 || p.c < 0 || p.r > bb.r_len || p.c > bb.c_len)
+        if (p.r < 0 || p.c < 0 || p.r >= bb.r_len || p.c >= bb.c_len)
           return;
         // ex:
-        // +---+
-        // |   |
-        // +---+
-        // r_len = 2, c_len = 4
+        // +---+ 01234
+        // |   | 56789
+        // +---+ ABCDE
+        // r_len = 3, c_len = 5
         // FOW size = 3*5
         // idx = 0 .. 14
-        // r = 2, c = 4 => idx = r * (c_len + 1) + c = 2*5 + 4 = 14.
-        int idx = p.r * (size.c + 1) + p.c;
+        // r = 2, c = 4 => idx = r * c_len + c = 2*5 + 4 = 14.
+        int idx = p.r * size.c + p.c;
         if (0 <= idx && idx < static_cast<int>(field->size()))
           (*field)[idx] = set_val;
       };
@@ -443,11 +443,11 @@ namespace dung
         if (curr_pos.r - bb.top() <= 1)
           r_room = 0;
         else if (bb.bottom() - curr_pos.r <= 1)
-          r_room = bb.r_len;
+          r_room = bb.r_len - 1;
         if (curr_pos.c - bb.left() <= 1)
           c_room = 0;
         else if (bb.right() - curr_pos.c <= 1)
-          c_room = bb.c_len;
+          c_room = bb.c_len - 1;
         
         if (r_room >= 0 && c_room >= 0)
           set_field({ r_room, c_room });

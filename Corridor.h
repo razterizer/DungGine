@@ -38,7 +38,7 @@ namespace dung
             doors[1]->open_or_no_door() : doors[0]->open_or_no_door();
           int top_offs = top_door_open ? 0 : -1;
           int bottom_offs = bottom_door_open ? 0 : -1;
-          if (bb.c_len < 2)
+          if (bb.c_len < 3)
           {
             utils::try_set(location, ttl::BBLocation::Inside);
             return bb.is_inside_offs(pos, top_offs, bottom_offs, 0, 0);
@@ -54,7 +54,7 @@ namespace dung
             doors[1]->open_or_no_door() : doors[0]->open_or_no_door();
           int left_offs = left_door_open ? 0 : -1;
           int right_offs = right_door_open ? 0 : -1;
-          if (bb.r_len < 2)
+          if (bb.r_len < 3)
           {
             utils::try_set(location, ttl::BBLocation::Inside);
             return bb.is_inside_offs(pos, 0, 0, left_offs, right_offs);
@@ -70,7 +70,7 @@ namespace dung
     bool is_in_fog_of_war(const RC& world_pos)
     {
       auto local_pos = world_pos - bb.pos();
-      auto idx = local_pos.r * (bb.c_len + 1) + local_pos.c;
+      auto idx = local_pos.r * bb.c_len + local_pos.c;
       if (math::in_range<int>(idx, 0, fog_of_war.size(), Range::ClosedOpen))
         return fog_of_war[idx];
       return true;
@@ -79,7 +79,7 @@ namespace dung
     bool is_in_light(const RC& world_pos)
     {
       auto local_pos = world_pos - bb.pos();
-      auto idx = local_pos.r * (bb.c_len + 1) + local_pos.c;
+      auto idx = local_pos.r * bb.c_len + local_pos.c;
       if (math::in_range<int>(idx, 0, light.size(), Range::ClosedOpen))
         return light[idx];
       return false;

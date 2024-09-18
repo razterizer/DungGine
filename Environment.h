@@ -97,10 +97,10 @@ namespace dung
         {
           // #NOTE: Here we assume all textures in the animation batch are of the same size.
           const auto& tex = fill_textures.front();
-          if (tex.size.r >= leaf->bb_leaf_room.r_len && tex.size.c >= leaf->bb_leaf_room.c_len)
+          if (tex.size.r >= leaf->bb_leaf_room.r_len - 1 && tex.size.c >= leaf->bb_leaf_room.c_len - 1)
           {
-            room_style.tex_pos.r = rnd::rand_int(0, tex.size.r - leaf->bb_leaf_room.r_len + 1);
-            room_style.tex_pos.c = rnd::rand_int(0, tex.size.c - leaf->bb_leaf_room.c_len + 1);
+            room_style.tex_pos.r = rnd::rand_int(0, tex.size.r - leaf->bb_leaf_room.r_len);
+            room_style.tex_pos.c = rnd::rand_int(0, tex.size.c - leaf->bb_leaf_room.c_len);
           }
         }
         
@@ -313,11 +313,11 @@ namespace dung
         // Fog of war
         if (use_fog_of_war)
         {
-          for (int r = 0; r <= bb.r_len; ++r)
+          for (int r = 0; r < bb.r_len; ++r)
           {
-            for (int c = 0; c <= bb.c_len; ++c)
+            for (int c = 0; c < bb.c_len; ++c)
             {
-              if (room->fog_of_war[r * (bb.c_len + 1) + c])
+              if (room->fog_of_war[r * bb.c_len + c])
                 sh.write_buffer(".", bb_scr_pos.r + r, bb_scr_pos.c + c, Color::Black, Color::Black);
             }
           }
@@ -375,11 +375,11 @@ namespace dung
         // Fog of war
         if (use_fog_of_war)
         {
-          for (int r = 0; r <= bb.r_len; ++r)
+          for (int r = 0; r < bb.r_len; ++r)
           {
-            for (int c = 0; c <= bb.c_len; ++c)
+            for (int c = 0; c < bb.c_len; ++c)
             {
-              if (corr->fog_of_war[r * (bb.c_len + 1) + c])
+              if (corr->fog_of_war[r * bb.c_len + c])
                 sh.write_buffer(".", bb_scr_pos.r + r, bb_scr_pos.c + c, Color::Black, Color::Black);
             }
           }

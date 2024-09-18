@@ -241,7 +241,7 @@ namespace dung
           num_tries++;
         } while (bb_leaf_room.r_len < min_room_length || bb_leaf_room.c_len < min_room_length);
         
-        size_t surf_area = (bb_leaf_room.r_len + 1) * (bb_leaf_room.c_len + 1);
+        size_t surf_area = bb_leaf_room.r_len * bb_leaf_room.c_len;
         fog_of_war.resize(surf_area, true);
         light.resize(surf_area, false);
       }
@@ -285,7 +285,7 @@ namespace dung
       if (!is_leaf())
         return true;
       auto local_pos = world_pos - bb_leaf_room.pos();
-      auto idx = local_pos.r * (bb_leaf_room.c_len + 1) + local_pos.c;
+      auto idx = local_pos.r * bb_leaf_room.c_len + local_pos.c;
       if (math::in_range<int>(idx, 0, fog_of_war.size(), Range::ClosedOpen))
         return fog_of_war[idx];
       return true;
@@ -296,7 +296,7 @@ namespace dung
       if (!is_leaf())
         return false;
       auto local_pos = world_pos - bb_leaf_room.pos();
-      auto idx = local_pos.r * (bb_leaf_room.c_len + 1) + local_pos.c;
+      auto idx = local_pos.r * bb_leaf_room.c_len + local_pos.c;
       if (math::in_range<int>(idx, 0, light.size(), Range::ClosedOpen))
         return light[idx];
       return false;
@@ -373,9 +373,9 @@ namespace dung
               int r1 = std::min(bb_A.bottom(), bb_B.bottom());
               if (r0 > r1)
                 return false;
-              if (bb_A.top() < bb_B.top() && bb_A.bottom() - bb_B.top() < 2*min_corridor_half_width + 1)
+              if (bb_A.top() < bb_B.top() && bb_A.bottom() - bb_B.top() < 2*min_corridor_half_width)
                 return false;
-              if (bb_B.top() < bb_A.top() && bb_B.bottom() - bb_A.top() < 2*min_corridor_half_width + 1)
+              if (bb_B.top() < bb_A.top() && bb_B.bottom() - bb_A.top() < 2*min_corridor_half_width)
                 return false;
               bool collided = false;
               auto collides_with_bb = [r0, r1, c0, c1](const ttl::Rectangle bb) -> bool
@@ -415,9 +415,9 @@ namespace dung
                 if (it == room_corridor_map.end())
                 {
                   auto* corr = corridors.emplace_back(std::make_unique<Corridor>()).get();
-                  corr->bb = { (r0 + r1)/2 - min_corridor_half_width, c0, 2*min_corridor_half_width, c1 - c0 };
+                  corr->bb = { (r0 + r1)/2 - min_corridor_half_width, c0, 2*min_corridor_half_width + 1, c1 - c0 + 1 };
                   corr->orientation = Orientation::Horizontal;
-                  size_t surf_area = (corr->bb.r_len + 1) * (corr->bb.c_len + 1);
+                  size_t surf_area = corr->bb.r_len * corr->bb.c_len;
                   corr->fog_of_war.resize(surf_area, true);
                   corr->light.resize(surf_area, false);
                   room_corridor_map[key] = corr;
@@ -441,9 +441,9 @@ namespace dung
               int c1 = std::min(bb_A.right(), bb_B.right());
               if (c0 > c1)
                 return false;
-              if (bb_A.left() < bb_B.left() && bb_A.right() - bb_B.left() < 2*min_corridor_half_width + 1)
+              if (bb_A.left() < bb_B.left() && bb_A.right() - bb_B.left() < 2*min_corridor_half_width)
                 return false;
-              if (bb_B.left() < bb_A.left() && bb_B.right() - bb_A.left() < 2*min_corridor_half_width + 1)
+              if (bb_B.left() < bb_A.left() && bb_B.right() - bb_A.left() < 2*min_corridor_half_width)
                 return false;
               bool collided = false;
               auto collides_with_bb = [r0, r1, c0, c1](const ttl::Rectangle bb) -> bool
@@ -483,9 +483,9 @@ namespace dung
                 if (it == room_corridor_map.end())
                 {
                   auto* corr = corridors.emplace_back(std::make_unique<Corridor>()).get();
-                  corr->bb = { r0, (c0 + c1)/2 - min_corridor_half_width, r1 - r0, 2*min_corridor_half_width };
+                  corr->bb = { r0, (c0 + c1)/2 - min_corridor_half_width, r1 - r0 + 1, 2*min_corridor_half_width + 1 };
                   corr->orientation = Orientation::Vertical;
-                  size_t surf_area = (corr->bb.r_len + 1) * (corr->bb.c_len + 1);
+                  size_t surf_area = corr->bb.r_len * corr->bb.c_len;
                   corr->fog_of_war.resize(surf_area, true);
                   corr->light.resize(surf_area, false);
                   room_corridor_map[key] = corr;

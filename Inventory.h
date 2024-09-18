@@ -393,7 +393,7 @@ namespace dung
       
       int num_lines = size();
       
-      int r_offs = std::max(0, hilite_idx - (m_bb.r_len - rb0_items - 1));
+      int r_offs = std::max(0, hilite_idx - (m_bb.r_len - rb0_items - 2));
         
       for (int r = 0; r < num_lines; ++r)
       {
@@ -424,7 +424,7 @@ namespace dung
         }
         int rb_items = rb0_items + r - r_offs;
         int cb_items = cb0_items + c_offs;
-        if (math::in_range<int>(rb_items, rb0_items, m_bb.r_len, Range::ClosedOpen))
+        if (math::in_range<int>(rb_items, rb0_items, m_bb.r_len - 2, Range::Closed))
           sh.write_buffer(text, m_bb.top() + rb_items, m_bb.left() + cb_items, style);
       }
       
