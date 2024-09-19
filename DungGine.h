@@ -1083,15 +1083,17 @@ namespace dung
               return weapon->damage + bonus;
             };
         
-            // NPC attack roll
-            int npc_attack_roll = rnd::dice(20) + npc.thac0 + npc.get_melee_attack_bonus();
+            int blind_attack_penalty = (npc.visible ? 0 : 12) + rnd::rand_int(0, 8);
         
-            // Calculate the player's total armor class
+            // NPC attack roll.
+            int npc_attack_roll = rnd::dice(20) + npc.thac0 + npc.get_melee_attack_bonus() - blind_attack_penalty;
+        
+            // Calculate the player's total armor class.
             int player_ac = m_player.calc_armour_class(m_inventory.get());
         
-            // Determine if NPC hits the player
-            // e.g. d12 + 1 + (2 + 10/2) >= (10 + 10/2)
-            // d12 + 8 >= 15
+            // Determine if NPC hits the player.
+            // e.g. d12 + 1 + (2 + 10/2) >= (10 + 10/2).
+            // d12 + 8 >= 15.
             if (npc_attack_roll >= player_ac)
             {
               // NPC hits the player
@@ -1111,29 +1113,27 @@ namespace dung
               }
             }
             
-            // Roll a d20 for the player's attack roll (if the NPC is visible)
-            if (npc.visible)
+            // Roll a d20 for the player's attack roll (if the NPC is visible).
+            // If invisible, then roll a d32 instead.
+            const auto* weapon = m_player.get_selected_melee_weapon(m_inventory.get());
+            int player_attack_roll = rnd::dice(20) + m_player.thac0 + m_player.get_melee_attack_bonus() - blind_attack_penalty;
+            int npc_ac = npc.calc_armour_class();
+            
+            // Determine if player hits the NPC.
+            if (player_attack_roll >= npc_ac)
             {
-              const auto* weapon = m_player.get_selected_melee_weapon(m_inventory.get());
-              int player_attack_roll = rnd::dice(20) + m_player.thac0 + m_player.get_melee_attack_bonus();
-              int npc_ac = npc.calc_armour_class();
-        
-              // Determine if player hits the NPC
-              if (player_attack_roll >= npc_ac)
+              // PC hits the NPC.
+              int damage = f_calc_damage(weapon, m_player.get_melee_damage_bonus());
+              
+              // Apply damage to the NPC.
+              bool was_alive = npc.health > 0;
+              npc.health -= damage;
+              if (was_alive && npc.health <= 0)
               {
-                // PC hits the NPC
-                int damage = f_calc_damage(weapon, m_player.get_melee_damage_bonus());
-        
-                // Apply damage to the NPC
-                bool was_alive = npc.health > 0;
-                npc.health -= damage;
-                if (was_alive && npc.health <= 0)
-                {
-                  message_handler->add_message(static_cast<float>(real_time_s),
-                                               "You killed the " + race2str(npc.npc_race) + "!",
-                                               MessageHandler::Level::Guide);
-                  broadcast([](auto* listener) { listener->on_npc_death(); });
-                }
+                message_handler->add_message(static_cast<float>(real_time_s),
+                                             "You killed the " + race2str(npc.npc_race) + "!",
+                                             MessageHandler::Level::Guide);
+                broadcast([](auto* listener) { listener->on_npc_death(); });
               }
             }
           }
@@ -1296,7 +1296,7 @@ namespace dung
               return RC { r_offs, c_offs };
             };
             auto offs = f_render_fight(npc_scr_pos, dp);
-            if (rnd::one_in(15) && m_environment->is_inside_any_room(m_player.pos + offs))
+            if (rnd::one_in(npc.visible ? 20 : 28) && m_environment->is_inside_any_room(m_player.pos + offs))
             {
               auto& bs = m_player.blood_splats.emplace_back(m_player.pos + offs, rnd::dice(4));
               bs.curr_room = m_player.curr_room;
@@ -1309,7 +1309,7 @@ namespace dung
             if (npc.visible)
             {
               auto offs = f_render_fight(pc_scr_pos, -dp);
-              if (rnd::one_in(15) && m_environment->is_inside_any_room(npc.pos + offs))
+              if (rnd::one_in(npc.visible ? 20 : 28) && m_environment->is_inside_any_room(npc.pos + offs))
               {
                 auto& bs = npc.blood_splats.emplace_back(npc.pos + offs, rnd::dice(4));
                 bs.curr_room = npc.curr_room;
