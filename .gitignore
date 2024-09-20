@@ -27,3 +27,7 @@ x64/
 x86/
 
 *.vcxproj.user
+
+### External Tools ###
+
+.aider*
