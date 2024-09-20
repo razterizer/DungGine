@@ -9,7 +9,7 @@ on:
       - main
 
 jobs:
-  build-windows:
+  build-demo:
     runs-on: windows-latest
   
     steps:
