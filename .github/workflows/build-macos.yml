@@ -1,4 +1,4 @@
-name: build check macos
+name: build macos
 
 on:
   push:

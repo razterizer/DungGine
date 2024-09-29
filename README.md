@@ -2,9 +2,9 @@
 
 ![GitHub License](https://img.shields.io/github/license/razterizer/DungGine?color=blue)
 
-[![build check ubuntu](https://github.com/razterizer/DungGine/actions/workflows/build-ubuntu.yml/badge.svg)](https://github.com/razterizer/DungGine/actions/workflows/build-ubuntu.yml)
-[![build check macos](https://github.com/razterizer/DungGine/actions/workflows/build-macos.yml/badge.svg)](https://github.com/razterizer/DungGine/actions/workflows/build-macos.yml)
-[![build check ubuntu](https://github.com/razterizer/DungGine/actions/workflows/build-windows.yml/badge.svg)](https://github.com/razterizer/DungGine/actions/workflows/build-windows.yml)
+[![build ubuntu](https://github.com/razterizer/DungGine/actions/workflows/build-ubuntu.yml/badge.svg)](https://github.com/razterizer/DungGine/actions/workflows/build-ubuntu.yml)
+[![build macos](https://github.com/razterizer/DungGine/actions/workflows/build-macos.yml/badge.svg)](https://github.com/razterizer/DungGine/actions/workflows/build-macos.yml)
+[![build ubuntu](https://github.com/razterizer/DungGine/actions/workflows/build-windows.yml/badge.svg)](https://github.com/razterizer/DungGine/actions/workflows/build-windows.yml)
 
 <img width="568" alt="image" src="https://github.com/user-attachments/assets/c3075838-7f15-4679-862e-ce47780c9b39">
 

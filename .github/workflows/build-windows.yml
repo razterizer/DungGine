@@ -1,4 +1,4 @@
-name: build check windows
+name: build windows
 
 on:
   push:

@@ -1,4 +1,4 @@
-name: build check ubuntu
+name: build ubuntu
 
 on:
   push:
