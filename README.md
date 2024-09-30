@@ -6,6 +6,13 @@
 [![build macos](https://github.com/razterizer/DungGine/actions/workflows/build-macos.yml/badge.svg)](https://github.com/razterizer/DungGine/actions/workflows/build-macos.yml)
 [![build ubuntu](https://github.com/razterizer/DungGine/actions/workflows/build-windows.yml/badge.svg)](https://github.com/razterizer/DungGine/actions/workflows/build-windows.yml)
 
+![Top Languages](https://img.shields.io/github/languages/top/razterizer/DungGine)
+![Goto](https://img.shields.io/github/search/razterizer/DungGine/goto)
+![Commit Activity](https://img.shields.io/github/commit-activity/t/razterizer/DungGine)
+![Last Commit](https://img.shields.io/github/last-commit/razterizer/DungGine?color=blue)
+![Contributors](https://img.shields.io/github/contributors/razterizer/DungGine?color=blue)
+<!-- ![Languages](https://img.shields.io/github/languages/count/razterizer/DungGine) -->
+
 <img width="568" alt="image" src="https://github.com/user-attachments/assets/c3075838-7f15-4679-862e-ce47780c9b39">
 
 ![dunggine_demo-comp](https://github.com/user-attachments/assets/b476eeb8-4d47-46f8-a5c1-403906555174)
