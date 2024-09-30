@@ -79,6 +79,8 @@ namespace dung
     ui::TextBox tb_health, tb_strength;
     ui::TextBoxDebug tbd;
     
+    bool stall_game = false;
+    
     // /////////////////////
     
     void update_sun(float real_time_s)
@@ -991,6 +993,8 @@ namespace dung
       utils::try_set(game_over, m_player.health <= 0);
       if (utils::try_get(game_over))
         return;
+        
+      stall_game = m_player.show_inventory;
     
       update_sun(static_cast<float>(real_time_s));
       
@@ -1008,6 +1012,9 @@ namespace dung
       m_keyboard->handle_keyboard(kpd, real_time_s);
       
       update_inventory();
+      
+      if (stall_game)
+        return;
       
       // Fog of war
       if (use_fog_of_war)
