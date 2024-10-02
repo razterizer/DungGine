@@ -114,7 +114,7 @@ namespace dung
       }
       else if (weight_strain > 0.f)
       {
-        weakness = weight_strain * strength;
+        weakness = static_cast<int>(weight_strain * strength);
       }
       else
       {
