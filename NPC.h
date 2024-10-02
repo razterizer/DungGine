@@ -98,8 +98,8 @@ namespace dung
     int weapon_idx = -1;
     
     const float c_dist_fight = 2.f + 1e-2f;
-    const float c_dist_pursue = 7.f + 1e-2;
-    const float c_dist_patroll = 12.f + 1e-2;
+    const float c_dist_pursue = 7.f + 1e-2f;
+    const float c_dist_patroll = 12.f + 1e-2f;
     const float c_dist_hostile_hyst_on = 2.f + 1e-2f;
     const float c_dist_hostile_hyst_off = 3.f + 1e-2f;
     const int c_fight_min_dist = 1;
