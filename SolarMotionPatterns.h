@@ -391,6 +391,8 @@ namespace dung
           }
         case Latitude::NUM_ITEMS: // Error state
           return SolarDirection::Nadir;
+        default: // Error state too
+          return SolarDirection::Nadir;
       }
     }
   };
