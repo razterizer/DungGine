@@ -168,7 +168,7 @@ namespace dung
       case Terrain::Gold: return "Gold";
       case Terrain::Bone: return "Bone";
       case Terrain::Rope: return "Rope";
-      default: return: "n/a";
+      default: return "n/a";
     }
   }
 
