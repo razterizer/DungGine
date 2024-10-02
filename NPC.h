@@ -48,7 +48,8 @@ namespace dung
       case Race::Griffin: return "griffin";
       case Race::Ghoul: return "ghoul";
       case Race::Dragon: return "dragon";
-      case Race::NUM_ITEMS: return "n/a";
+      case Race::NUM_ITEMS: return "error";
+      default: return "n/a";
     }
   }
   
