@@ -79,8 +79,8 @@ namespace dung
     {
       if (pos != last_pos)
       {
-        los_r = static_cast<int>(pos.r - last_pos.r);
-        los_c = static_cast<int>(pos.c - last_pos.c);
+        los_r = static_cast<float>(pos.r - last_pos.r);
+        los_c = static_cast<float>(pos.c - last_pos.c);
         los_r += last_los_r;
         los_c += last_los_c;
         math::normalize(los_r, los_c);
