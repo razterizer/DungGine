@@ -181,8 +181,8 @@ namespace dung
         }
         else
         {
-          pos_r = pos.r;
-          pos_c = pos.c;
+          pos_r = static_cast<float>(pos.r);
+          pos_c = static_cast<float>(pos.c);
         }
         wall_coll_resolve_ctr = 0;
         wall_coll_resolve = false;
@@ -201,8 +201,8 @@ namespace dung
           location = location_room;
         else if (inside_corr && location_corr != ttl::BBLocation::None)
           location = location_corr;
-        pos_r = pos.r;
-        pos_c = pos.c;
+        pos_r = static_cast<float>(pos.r);
+        pos_c = static_cast<float>(pos.c);
         const float c_res_acc = 0.f;
         const float c_res_vel = 5.f;
         switch (location)
@@ -268,8 +268,8 @@ namespace dung
   
     void init(const std::vector<std::unique_ptr<Weapon>>& all_weapons)
     {
-      pos_r = pos.r;
-      pos_c = pos.c;
+      pos_r = static_cast<float>(pos.r);
+      pos_c = static_cast<float>(pos.c);
       
       npc_race = rnd::rand_enum<Race>();
       npc_class = rnd::rand_enum<Class>();
