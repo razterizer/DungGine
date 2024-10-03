@@ -588,7 +588,7 @@ namespace dung
       tb_args.base.box_style = { Color::White, Color::DarkBlue };
     
       std::string strength_bar = str::rep_char(' ', 10);
-      float pc_ratio = m_player.strength / 10;
+      float pc_ratio = m_player.strength / 10.f;
       for (int i = 0; i < 10; ++i)
         strength_bar[i] = (m_player.strength - m_player.weakness) > static_cast<int>(i*pc_ratio)
         ? '=' : ' ';
