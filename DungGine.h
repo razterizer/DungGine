@@ -25,7 +25,7 @@
 #include <Core/events/EventBroadcaster.h>
 #include <Core/Utils.h>
 
-using namespace utils;
+using namespace utils::literals;
 
 namespace dung
 {
