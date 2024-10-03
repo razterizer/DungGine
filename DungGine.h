@@ -1290,6 +1290,9 @@ namespace dung
               std::string fight_str = rnd::rand_select(c_fight_strings);
               auto dir = static_cast<int>(f_dp_to_dir(dp));
               
+              if (dir >= static_cast<int>(FightDir::NUM_ITEMS))
+                return RC { 0, 0 };
+              
               auto r_offs = rnd::randn_select(0.f, 1.f, std::vector {
                 fight_r_offs[(num_dir + dir - 1)%num_dir],
                 fight_r_offs[dir],
