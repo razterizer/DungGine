@@ -357,7 +357,7 @@ namespace dung
             {
               if (m_player.has_weight_capacity(key.weight))
               {
-                m_player.key_idcs.emplace_back(key_idx);
+                m_player.key_idcs.emplace_back(static_cast<int>(key_idx));
                 key.picked_up = true;
                 message_handler->add_message(static_cast<float>(real_time_s),
                                              "You picked up a key!", MessageHandler::Level::Guide);

@@ -187,7 +187,7 @@ namespace dung
     
     InvSubGroup* fetch_subgroup(int subgroup_idx)
     {
-      if (math::in_range<int>(subgroup_idx, 0, m_subgroups.size(), Range::ClosedOpen))
+      if (math::in_range<int>(subgroup_idx, 0, stlutils::sizeI(m_subgroups), Range::ClosedOpen))
         return &m_subgroups[subgroup_idx];
       else
       {
