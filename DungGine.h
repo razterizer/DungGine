@@ -801,7 +801,7 @@ namespace dung
     bool place_weapons(int num_weapons, bool only_place_on_dry_land)
     {
       const auto world_size = m_environment->get_world_size();
-      const int c_max_num_iters = 1e5;
+      const int c_max_num_iters = 1e5_i;
       int num_iters = 0;
       bool valid_pos = false;
       for (int wpn_idx = 0; wpn_idx < num_weapons; ++wpn_idx)
