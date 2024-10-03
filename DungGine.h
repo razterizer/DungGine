@@ -359,7 +359,7 @@ namespace dung
               if (lo_angle_rad > hi_angle_rad)
                 hi_angle_rad += math::c_2pi;
                 
-              float curr_angle_rad = std::atan2f(-(obj.pos.r - curr_pos.r), obj.pos.c - curr_pos.c);
+              float curr_angle_rad = static_cast<float>(std::atan2(-(obj.pos.r - curr_pos.r), obj.pos.c - curr_pos.c));
               f_normalize_angle(curr_angle_rad);
               if (curr_angle_rad < lo_angle_rad)
                 curr_angle_rad += math::c_2pi;
