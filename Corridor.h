@@ -71,7 +71,7 @@ namespace dung
     {
       auto local_pos = world_pos - bb.pos();
       auto idx = local_pos.r * bb.c_len + local_pos.c;
-      if (math::in_range(idx, 0, static_cast<int>(fog_of_war.size()), Range::ClosedOpen))
+      if (math::in_range<int>(idx, 0, static_cast<int>(fog_of_war.size()), Range::ClosedOpen))
         return fog_of_war[idx];
       return true;
     }
