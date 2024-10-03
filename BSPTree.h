@@ -286,7 +286,7 @@ namespace dung
         return true;
       auto local_pos = world_pos - bb_leaf_room.pos();
       auto idx = local_pos.r * bb_leaf_room.c_len + local_pos.c;
-      if (math::in_range<int>(idx, 0, stlutils::sizeI(fog_of_war)), Range::ClosedOpen))
+      if (math::in_range<int>(idx, 0, stlutils::sizeI(fog_of_war), Range::ClosedOpen))
         return fog_of_war[idx];
       return true;
     }
