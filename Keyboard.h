@@ -376,7 +376,7 @@ namespace dung
               auto lamp_type = lamp.get_type_str();
               if (m_player.has_weight_capacity(lamp.weight))
               {
-                m_player.lamp_idcs.emplace_back(lamp_idx);
+                m_player.lamp_idcs.emplace_back(static_cast<int>(lamp_idx));
                 lamp.picked_up = true;
                 message_handler->add_message(static_cast<float>(real_time_s),
                                              "You picked up " + str::indef_art(lamp_type) + "!",
@@ -395,7 +395,7 @@ namespace dung
             {
               if (m_player.has_weight_capacity(weapon->weight))
               {
-                m_player.weapon_idcs.emplace_back(wpn_idx);
+                m_player.weapon_idcs.emplace_back(static_cast<int>(wpn_idx));
                 weapon->picked_up = true;
                 message_handler->add_message(static_cast<float>(real_time_s),
                                              "You picked up " + str::indef_art(weapon->type) + "!", MessageHandler::Level::Guide);
@@ -413,7 +413,7 @@ namespace dung
             {
               if (m_player.has_weight_capacity(potion.weight))
               {
-                m_player.potion_idcs.emplace_back(pot_idx);
+                m_player.potion_idcs.emplace_back(static_cast<int>(pot_idx));
                 potion.picked_up = true;
                 message_handler->add_message(static_cast<float>(real_time_s),
                                              "You picked up a potion!", MessageHandler::Level::Guide);
@@ -431,7 +431,7 @@ namespace dung
             {
               if (m_player.has_weight_capacity(armour->weight))
               {
-                m_player.armour_idcs.emplace_back(a_idx);
+                m_player.armour_idcs.emplace_back(static_cast<int>(a_idx));
                 armour->picked_up = true;
                 message_handler->add_message(static_cast<float>(real_time_s),
                                              "You picked up " + str::indef_art(armour->type) + "!",
