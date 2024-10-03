@@ -80,7 +80,7 @@ namespace dung
     {
       auto local_pos = world_pos - bb.pos();
       auto idx = local_pos.r * bb.c_len + local_pos.c;
-      if (math::in_range<int>(idx, 0, light.size(), Range::ClosedOpen))
+      if (math::in_range<int>(idx, 0, static_cast<int>(light.size()), Range::ClosedOpen))
         return light[idx];
       return false;
     }
