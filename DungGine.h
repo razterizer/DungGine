@@ -737,7 +737,7 @@ namespace dung
     bool place_lamps(int num_torches, int num_lanterns, int num_magic_lamps, bool only_place_on_dry_land)
     {
       const auto world_size = m_environment->get_world_size();
-      const int c_max_num_iters = 1e5;
+      const int c_max_num_iters = 1e5_i;
       int num_iters = 0;
       bool valid_pos = false;
       const int num_lamps = num_torches + num_lanterns + num_magic_lamps;
