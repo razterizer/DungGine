@@ -894,7 +894,7 @@ namespace dung
     bool place_armour(int num_armour, bool only_place_on_dry_land)
     {
       const auto world_size = m_environment->get_world_size();
-      const int c_max_num_iters = 1e5;
+      const int c_max_num_iters = 1e5_i;
       int num_iters = 0;
       bool valid_pos = false;
       for (int a_idx = 0; a_idx < num_armour; ++a_idx)
@@ -947,7 +947,7 @@ namespace dung
     bool place_npcs(int num_npcs, bool only_place_on_dry_land)
     {
       const auto world_size = m_environment->get_world_size();
-      const int c_max_num_iters = 1e5;
+      const int c_max_num_iters = 1e5_i;
       int num_iters = 0;
       bool valid_pos = false;
       for (int npc_idx = 0; npc_idx < num_npcs; ++npc_idx)
