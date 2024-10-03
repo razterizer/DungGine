@@ -69,7 +69,7 @@ namespace dung
       if (use_title && idx == 0)
         return title;
       int rel_idx = idx - use_title;
-      if (math::in_range<int>(rel_idx, 0, static_cast<int>(m_items.size()), Range::ClosedOpen))
+      if (math::in_range<int>(rel_idx, 0, stlutils::sizeI(m_items), Range::ClosedOpen))
         return m_items[rel_idx];
       return {};
     };
@@ -105,7 +105,7 @@ namespace dung
     
       if (state == InvItemState::SWITCH_SELECTION)
       {
-        if (math::in_range<int>(selection_idx, 0, static_cast<int>(m_items.size()), Range::ClosedOpen))
+        if (math::in_range<int>(selection_idx, 0, stlutils::sizeI(m_items), Range::ClosedOpen))
         {
           auto& item = m_items[selection_idx];
           if (!same_selection)
@@ -118,7 +118,7 @@ namespace dung
       else if (state == InvItemState::SET_HILITE)
         hilite_idx = rel_idx;
         
-      if (math::in_range<int>(rel_idx, 0, static_cast<int>(m_items.size()), Range::ClosedOpen))
+      if (math::in_range<int>(rel_idx, 0, stlutils::sizeI(m_items), Range::ClosedOpen))
       {
         auto& item = m_items[rel_idx];
         switch (state)
@@ -140,7 +140,7 @@ namespace dung
         hilite_idx = -1;
     }
     
-    int size() const { return use_title + static_cast<int>(m_items.size()); }
+    int size() const { return use_title + stlutils::sizeI(m_items); }
     
     std::vector<InvItem>::iterator begin()
     {

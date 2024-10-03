@@ -70,8 +70,8 @@ namespace dung
           break;
         case ScreenScrollingMode::PageWise:
         {
-          int offs_v = -static_cast<int>(std::round(m_screen_in_world.r_len*t_scroll_amount));
-          int offs_h = -static_cast<int>(std::round(m_screen_in_world.c_len*t_scroll_amount));
+          int offs_v = -math::roundI(m_screen_in_world.r_len*t_scroll_amount);
+          int offs_h = -math::roundI(m_screen_in_world.c_len*t_scroll_amount);
           if (!m_screen_in_world.is_inside_offs(world_pos, offs_v, offs_h))
             m_screen_in_world.set_pos(world_pos - m_screen_in_world.size()/2);
           break;

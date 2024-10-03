@@ -96,11 +96,11 @@ namespace dung
     
     void update_inventory()
     {
-      auto num_inv_keys = static_cast<int>(m_player.key_idcs.size());
-      auto num_inv_lamps = static_cast<int>(m_player.lamp_idcs.size());
-      auto num_inv_wpns = static_cast<int>(m_player.weapon_idcs.size());
-      auto num_inv_potions = static_cast<int>(m_player.potion_idcs.size());
-      auto num_inv_armour = static_cast<int>(m_player.armour_idcs.size());
+      auto num_inv_keys = stlutils::sizeI(m_player.key_idcs);
+      auto num_inv_lamps = stlutils::sizeI(m_player.lamp_idcs);
+      auto num_inv_wpns = stlutils::sizeI(m_player.weapon_idcs);
+      auto num_inv_potions = stlutils::sizeI(m_player.potion_idcs);
+      auto num_inv_armour = stlutils::sizeI(m_player.armour_idcs);
       
       m_player.curr_tot_inv_weight = 0.f;
       
@@ -109,13 +109,13 @@ namespace dung
         std::ostringstream oss;
         oss << std::setprecision(1) << std::fixed << weight;
         std::string weight_str = oss.str() + " kg";
-        item_str += str::rep_char(' ', 25 - static_cast<int>(item_str.size()) - static_cast<int>(weight_str.size())) + weight_str;
+        item_str += str::rep_char(' ', 25 - stlutils::sizeI(item_str) - stlutils::sizeI(weight_str)) + weight_str;
         
         oss.str("");
         oss.clear();
         oss << std::setprecision(2) << std::fixed << price;
         std::string price_str = oss.str() + " FK"; // Fantasy-Kronor.
-        item_str += str::rep_char(' ', 42 - static_cast<int>(item_str.size()) - static_cast<int>(price_str.size())) + price_str;
+        item_str += str::rep_char(' ', 42 - stlutils::sizeI(item_str) - stlutils::sizeI(price_str)) + price_str;
         
         if (hp > 0)
         {
@@ -123,7 +123,7 @@ namespace dung
           oss.clear();
           oss << std::setprecision(0) << std::fixed << hp;
           std::string hp_str = oss.str() + " hp";
-          item_str += str::rep_char(' ', 52 - static_cast<int>(item_str.size()) - static_cast<int>(hp_str.size())) + hp_str;
+          item_str += str::rep_char(' ', 52 - stlutils::sizeI(item_str) - stlutils::sizeI(hp_str)) + hp_str;
         }
       };
       

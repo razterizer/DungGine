@@ -275,7 +275,7 @@ namespace dung
       npc_class = rnd::rand_enum<Class>();
       
       int ctr = 0;
-      const int num_weapons = static_cast<int>(all_weapons.size());
+      const int num_weapons = stlutils::sizeI(all_weapons);
       if (!all_weapons.empty() && !rnd::one_in(4))
       {
         do
