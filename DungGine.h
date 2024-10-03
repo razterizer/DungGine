@@ -23,6 +23,7 @@
 #include <Termin8or/MessageHandler.h>
 #include <Core/FolderHelper.h>
 #include <Core/events/EventBroadcaster.h>
+#include <Core/Utils.h>
 
 
 namespace dung
@@ -638,7 +639,7 @@ namespace dung
       
       const auto& room_corridor_map = m_environment->get_room_corridor_map();
       
-      const int c_max_num_iters = 1e5;
+      const int c_max_num_iters = 1e5_i;
       int num_iters = 0;
       do
       {
