@@ -1280,19 +1280,13 @@ namespace dung
             };
             const auto num_dir = static_cast<int>(FightDir::NUM_ITEMS);
             
-            auto f_render_fight = [&](const RC& scr_pos, const RC& dp)
+            auto f_calc_fight_offs = [&](const RC& dp)
             {
-              styles::Style fight_style
-              {
-                color::get_random_color(c_fight_colors),
-                Color::Transparent2
-              };
-              std::string fight_str = rnd::rand_select(c_fight_strings);
               auto dir = static_cast<int>(f_dp_to_dir(dp));
               
               if (dir >= static_cast<int>(FightDir::NUM_ITEMS))
                 return RC { 0, 0 };
-              
+                
               auto r_offs = rnd::randn_select(0.f, 1.f, std::vector {
                 fight_r_offs[(num_dir + dir - 1)%num_dir],
                 fight_r_offs[dir],
@@ -1301,32 +1295,50 @@ namespace dung
                 fight_c_offs[(num_dir + dir - 1)%num_dir],
                 fight_c_offs[dir],
                 fight_c_offs[(dir + 1)%num_dir] });
-              sh.write_buffer(fight_str,
-                              scr_pos.r + r_offs,
-                              scr_pos.c + c_offs,
-                              fight_style);
               return RC { r_offs, c_offs };
             };
-            auto offs = f_render_fight(npc_scr_pos, dp);
-            if (rnd::one_in(npc.visible ? 20 : 28) && m_environment->is_inside_any_room(m_player.pos + offs))
+            auto f_render_fight = [&](const RC& scr_pos, const RC& offs)
             {
-              auto& bs = m_player.blood_splats.emplace_back(m_player.pos + offs, rnd::dice(4));
-              bs.curr_room = m_player.curr_room;
-              bs.curr_corridor = m_player.curr_corridor;
-              if (m_player.is_inside_curr_room())
-                bs.is_underground = m_environment->is_underground(m_player.curr_room);
-              else if (m_player.is_inside_curr_corridor())
-                bs.is_underground = m_environment->is_underground(m_player.curr_corridor);
+              styles::Style fight_style
+              {
+                color::get_random_color(c_fight_colors),
+                Color::Transparent2
+              };
+              std::string fight_str = rnd::rand_select(c_fight_strings);
+              
+              sh.write_buffer(fight_str,
+                              scr_pos.r + offs.r,
+                              scr_pos.c + offs.c,
+                              fight_style);
+            };
+            auto offs = f_calc_fight_offs(dp);
+            if (m_environment->is_inside_any_room(m_player.pos + offs))
+            {
+              f_render_fight(npc_scr_pos, offs);
+              if (rnd::one_in(npc.visible ? 20 : 28))
+              {
+                auto& bs = m_player.blood_splats.emplace_back(m_player.pos + offs, rnd::dice(4));
+                bs.curr_room = m_player.curr_room;
+                bs.curr_corridor = m_player.curr_corridor;
+                if (m_player.is_inside_curr_room())
+                  bs.is_underground = m_environment->is_underground(m_player.curr_room);
+                else if (m_player.is_inside_curr_corridor())
+                  bs.is_underground = m_environment->is_underground(m_player.curr_corridor);
+              }
             }
             if (npc.visible)
             {
-              auto offs = f_render_fight(pc_scr_pos, -dp);
-              if (rnd::one_in(npc.visible ? 20 : 28) && m_environment->is_inside_any_room(npc.pos + offs))
+              auto offs = f_calc_fight_offs(-dp);
+              if (m_environment->is_inside_any_room(npc.pos + offs))
               {
-                auto& bs = npc.blood_splats.emplace_back(npc.pos + offs, rnd::dice(4));
-                bs.curr_room = npc.curr_room;
-                bs.curr_corridor = npc.curr_corridor;
-                bs.is_underground = npc.is_underground;
+                f_render_fight(pc_scr_pos, offs);
+                if (rnd::one_in(npc.visible ? 20 : 28))
+                {
+                  auto& bs = npc.blood_splats.emplace_back(npc.pos + offs, rnd::dice(4));
+                  bs.curr_room = npc.curr_room;
+                  bs.curr_corridor = npc.curr_corridor;
+                  bs.is_underground = npc.is_underground;
+                }
               }
             }
           }
