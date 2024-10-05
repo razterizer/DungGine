@@ -154,7 +154,10 @@ private:
       if (game_over)
         set_state_game_over();
       
-      dungeon_engine->draw(sh, get_real_time_s(), get_sim_time_s(), anim_ctr, ui::VerticalAlignment::CENTER, ui::HorizontalAlignment::CENTER, 4, 0, false, true);
+      if (framed_mode)
+        draw_frame(sh, Color::White);
+      
+      dungeon_engine->draw(sh, get_real_time_s(), get_sim_time_s(), anim_ctr, ui::VerticalAlignment::CENTER, ui::HorizontalAlignment::CENTER, 4, 0, framed_mode, use_gore);
     }
   }
   
@@ -170,6 +173,9 @@ private:
   
   dung::DungGineTextureParams texture_params;
   std::unique_ptr<dung::DungGine> dungeon_engine;
+  
+  bool framed_mode = false;
+  bool use_gore = true;
 };
 
 int main(int argc, char** argv)

@@ -546,7 +546,7 @@ namespace dung
     }
     
     template<int NR, int NC>
-    void draw_health_bars(SpriteHandler<NR, NC>& sh)
+    void draw_health_bars(SpriteHandler<NR, NC>& sh, bool framed_mode)
     {
       std::vector<std::string> health_bars;
       std::vector<Style> styles;
@@ -574,17 +574,18 @@ namespace dung
       tb_args.v_align = ui::VerticalAlignment::TOP;
       tb_args.h_align = ui::HorizontalAlignment::LEFT;
       tb_args.base.box_style = { Color::White, Color::DarkBlue };
-      tb_args.framed_mode = false;
+      tb_args.framed_mode = framed_mode;
       tb_health.set_text(health_bars, styles);
       tb_health.calc_pre_draw(str::Adjustment::Left);
       tb_health.draw(sh, tb_args);
     }
     
     template<int NR, int NC>
-    void draw_strength_bar(SpriteHandler<NR, NC>& sh)
+    void draw_strength_bar(SpriteHandler<NR, NC>& sh, bool framed_mode)
     {
       ui::TextBoxDrawingArgsPos tb_args;
-      tb_args.pos = { 1, 12 };
+      int offs = framed_mode ? 1 : 0;
+      tb_args.pos = { 1 + offs, 12 + offs };
       tb_args.base.box_style = { Color::White, Color::DarkBlue };
     
       std::string strength_bar = str::rep_char(' ', 10);
@@ -1178,8 +1179,8 @@ namespace dung
         m_inventory->draw(sh);
       }
         
-      draw_health_bars(sh);
-      draw_strength_bar(sh);
+      draw_health_bars(sh, framed_mode);
+      draw_strength_bar(sh, framed_mode);
       
       auto pc_scr_pos = m_screen_helper->get_screen_pos(m_player.pos);
       
@@ -1354,7 +1355,7 @@ namespace dung
           ui::TextBoxDrawingArgsAlign tbd_args;
           tbd_args.v_align = ui::VerticalAlignment::TOP;
           tbd_args.base.box_style = { Color::Blue, Color::Yellow };
-          tbd_args.framed_mode = false;
+          tbd_args.framed_mode = framed_mode;
           tbd.calc_pre_draw(str::Adjustment::Left);
           tbd.draw(sh, tbd_args);
         }
