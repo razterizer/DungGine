@@ -1385,7 +1385,7 @@ namespace dung
       {
         bool swimming = is_wet(npc.on_terrain) && npc.can_swim && !npc.can_fly;
         bool dead_on_liquid = npc.health <= 0 && swimming;
-        if (!dead_on_liquid || sim_time_s - npc.death_time_s < 1.5f)
+        if (!dead_on_liquid || sim_time_s - npc.death_time_s < 1.5f + (npc.can_fly ? 0.5f : 0.f))
           f_render_item(npc);
         
         if (npc.visible && is_wet(npc.on_terrain))
@@ -1398,11 +1398,38 @@ namespace dung
           }
           else if (npc.health <= 0)
           {
-            if (math::in_range<float>(sim_time_s - npc.death_time_s, 0.5f, 1.f, Range::Closed))
+            float time_delay = 0.f;
+            if (npc.can_fly)
+            {
+              if (math::in_range<float>(sim_time_s - npc.death_time_s, 1.f, 1.5f, Range::Closed))
+              {
+                //    ***
+                //   *   *
+                //    ***
+                for (int r_offs = -1; r_offs <= +1; ++r_offs)
+                  for (int c_offs = -2; c_offs <= +2; ++c_offs)
+                  {
+                    if (r_offs != 0 && std::abs(c_offs) == 2)
+                      continue;
+                    if (r_offs == 0 && std::abs(c_offs) < 2)
+                      continue;
+                    if (r_offs == 0 && c_offs == 0)
+                      continue;
+                    RC offs_pos { r_offs, c_offs };
+                    RC npc_scr_offs_pos = npc_scr_pos + offs_pos;
+                    RC npc_world_offs_pos = npc.pos + offs_pos;
+                    if (m_environment->is_inside_any_room(npc_world_offs_pos))
+                      sh.write_buffer("*", npc_scr_offs_pos.r, npc_scr_offs_pos.c, Color::White, Color::Transparent2);
+                  }
+              }
+            }
+            if (math::in_range<float>(sim_time_s - npc.death_time_s - time_delay, 0.5f, 1.f, Range::Closed))
             {
               for (int r_offs = -1; r_offs <= +1; ++r_offs)
                 for (int c_offs = -1; c_offs <= +1; ++c_offs)
                 {
+                  if (r_offs == 0 && c_offs == 0)
+                    continue;
                   RC offs_pos { r_offs, c_offs };
                   RC npc_scr_offs_pos = npc_scr_pos + offs_pos;
                   RC npc_world_offs_pos = npc.pos + offs_pos;
