@@ -1068,15 +1068,19 @@ namespace dung
       }
       
       // NPCs
-      for (auto& npc : all_npcs)
       {
-        npc.on_terrain = m_environment->get_terrain(npc.pos);
-        npc.update(curr_pos, m_environment.get(), sim_time_s, sim_dt_s);
+        BSPNode* pc_room = m_player.is_inside_curr_room() ? m_player.curr_room : nullptr;
+        Corridor* pc_corr = m_player.is_inside_curr_corridor() ? m_player.curr_corridor : nullptr;
+        for (auto& npc : all_npcs)
+        {
+          npc.on_terrain = m_environment->get_terrain(npc.pos);
+          npc.update(curr_pos, pc_room, pc_corr, m_environment.get(), sim_time_s, sim_dt_s);
         
-        if (npc.is_hostile && !npc.was_hostile)
-          broadcast([&npc](auto* listener) { listener->on_fight_begin(&npc); });
-        else if (!npc.is_hostile && npc.was_hostile)
-          broadcast([&npc](auto* listener) { listener->on_fight_end(&npc); });
+          if (npc.is_hostile && !npc.was_hostile)
+            broadcast([&npc](auto* listener) { listener->on_fight_begin(&npc); });
+          else if (!npc.is_hostile && npc.was_hostile)
+            broadcast([&npc](auto* listener) { listener->on_fight_end(&npc); });
+        }
       }
       
       // Fighting
@@ -1192,7 +1196,7 @@ namespace dung
           if (npc.health <= 0)
             continue;
           
-          if (npc.is_hostile)
+          if (npc.state == State::Fight)
           {
             if (npc.trg_info_hostile_npc.once())
             {

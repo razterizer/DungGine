@@ -647,7 +647,8 @@ namespace dung
           is_hostile = true;
     }
     
-    void update(const RC& pc_pos, Environment* environment, float time, float dt)
+    void update(const RC& pc_pos, BSPNode* pc_room, Corridor* pc_corr,
+                Environment* environment, float time, float dt)
     {
       if (health <= 0)
       {
@@ -687,11 +688,43 @@ namespace dung
       if (dist_to_pc > c_dist_hostile_hyst_off)
         is_hostile = false;
       
-      if ((enemy || is_hostile) && dist_to_pc < c_dist_fight)
+      bool can_see_pc = false;
+      if (inside_room)
+      {
+        if (pc_corr != nullptr)
+        {
+          for (int i = 0; i < 2; ++i)
+            if (stlutils::contains(curr_room->doors, pc_corr->doors[i]))
+              if (pc_corr->doors[i]->open_or_no_door())
+              {
+                can_see_pc = true;
+                break;
+              }
+        }
+        else if (pc_room == curr_room)
+          can_see_pc = true;
+      }
+      if (inside_corr)
+      {
+        if (pc_room != nullptr)
+        {
+          for (int i = 0; i < 2; ++i)
+            if (stlutils::contains(pc_room->doors, curr_corridor->doors[i]))
+              if (curr_corridor->doors[i]->open_or_no_door())
+              {
+                can_see_pc = true;
+                break;
+              }
+        }
+        else if (pc_corr == curr_corridor)
+          can_see_pc = true;
+      }
+      
+      if ((enemy || is_hostile) && can_see_pc && dist_to_pc < c_dist_fight)
         state = State::Fight;
-      else if ((enemy || is_hostile) && dist_to_pc < c_dist_pursue)
+      else if ((enemy || is_hostile) && can_see_pc && dist_to_pc < c_dist_pursue)
         state = State::Pursue;
-      else if (dist_to_pc > c_dist_patroll)
+      else if (!can_see_pc || dist_to_pc > c_dist_patroll)
         state = State::Patroll;
       
       if (allow_move())
