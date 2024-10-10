@@ -1388,8 +1388,8 @@ namespace dung
       
       for (const auto& npc : all_npcs)
       {
-        bool swimming = is_wet(npc.on_terrain) && npc.can_swim && !npc.can_fly;
-        bool dead_on_liquid = npc.health <= 0 && swimming;
+        //bool swimming = is_wet(npc.on_terrain) && npc.can_swim && !npc.can_fly;
+        bool dead_on_liquid = npc.health <= 0 && is_wet(npc.on_terrain); //&& swimming;
         if (!dead_on_liquid || sim_time_s - npc.death_time_s < 1.5f + (npc.can_fly ? 0.5f : 0.f))
           f_render_item(npc);
         
