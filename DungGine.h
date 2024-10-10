@@ -1371,7 +1371,7 @@ namespace dung
         sh.write_buffer(std::string(1, m_player.character), pc_scr_pos.r, pc_scr_pos.c, m_player.style);
         
         if (is_wet(m_player.on_terrain))
-          if (anim_ctr % 3 == 0)
+          if (anim_ctr % 3 == 0 && m_player.is_moving)
             sh.write_buffer("*", math::roundI(pc_scr_pos.r - m_player.los_r), math::roundI(pc_scr_pos.c - m_player.los_c), Color::White, Color::Transparent2);
             
         m_player.draw(sh, sim_time_s);
@@ -1398,7 +1398,7 @@ namespace dung
           auto npc_scr_pos = m_screen_helper->get_screen_pos(npc.pos);
           if (npc.health > 0 && npc.can_swim && !npc.can_fly)
           {
-            if (anim_ctr % 3 == 0)
+            if (anim_ctr % 3 == 0 && npc.is_moving)
               sh.write_buffer("*", math::roundI(npc_scr_pos.r - npc.los_r), math::roundI(npc_scr_pos.c - npc.los_c), Color::White, Color::Transparent2);
           }
           else if (npc.health <= 0)
