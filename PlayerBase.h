@@ -36,6 +36,7 @@ namespace dung
     float los_c = 0.f;
     float last_los_r = 0.f;
     float last_los_c = 0.f;
+    bool is_moving = false;
     
     BSPNode* curr_room = nullptr;
     Corridor* curr_corridor = nullptr;
@@ -77,6 +78,7 @@ namespace dung
   protected:
     void update_los()
     {
+      is_moving = false;
       if (pos != last_pos)
       {
         los_r = static_cast<float>(pos.r - last_pos.r);
@@ -86,6 +88,7 @@ namespace dung
         math::normalize(los_r, los_c);
         last_los_r = los_r;
         last_los_c = los_c;
+        is_moving = true;
       }
       last_pos = pos;
     }
