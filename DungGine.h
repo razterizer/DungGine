@@ -1322,7 +1322,7 @@ namespace dung
               f_render_fight(npc_scr_pos, offs);
               if (rnd::one_in(npc.visible ? 20 : 28))
               {
-                auto& bs = m_player.blood_splats.emplace_back(m_player.pos + offs, rnd::dice(4));
+                auto& bs = m_player.blood_splats.emplace_back(m_environment.get(), m_player.pos + offs, rnd::dice(4), sim_time_s, offs);
                 bs.curr_room = m_player.curr_room;
                 bs.curr_corridor = m_player.curr_corridor;
                 if (m_player.is_inside_curr_room())
@@ -1339,7 +1339,7 @@ namespace dung
                 f_render_fight(pc_scr_pos, offs);
                 if (rnd::one_in(npc.visible ? 20 : 28))
                 {
-                  auto& bs = npc.blood_splats.emplace_back(npc.pos + offs, rnd::dice(4));
+                  auto& bs = npc.blood_splats.emplace_back(m_environment.get(), npc.pos + offs, rnd::dice(4), sim_time_s, offs);
                   bs.curr_room = npc.curr_room;
                   bs.curr_corridor = npc.curr_corridor;
                   bs.is_underground = npc.is_underground;
@@ -1349,6 +1349,12 @@ namespace dung
           }
         }
       }
+      
+      for (auto& bs : m_player.blood_splats)
+        bs.update(sim_time_s);
+      for (auto& npc : all_npcs)
+        for (auto& bs : npc.blood_splats)
+          bs.update(sim_time_s);
 
       if (debug)
       {
@@ -1510,6 +1516,8 @@ namespace dung
       {
         auto f_draw_blood_splat = [&sh](const RC& scr_pos, const BloodSplat& bs)
         {
+          if (is_wet(bs.terrain) && !bs.alive)
+            return;
           std::string str = "";
           switch (bs.shape)
           {

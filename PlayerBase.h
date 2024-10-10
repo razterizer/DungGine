@@ -15,14 +15,55 @@ namespace dung
   struct BloodSplat : DungObject
   {
     int shape = 1;
-    BloodSplat(const RC& p, int s) : shape(s)
+    
+    // For diffusion on liquids.
+    RC dir { 0, 0 };
+    float pos_r = 0.f;
+    float pos_c = 0.f;
+    const float life_time = 5.f;
+    float time_stamp = 0.f;
+    float speed = 0.05f;
+    bool alive = true;
+    Terrain terrain = Terrain::Void;
+    Environment* environment;
+    
+    BloodSplat(Environment* env, const RC& p, int s, float ts, const RC& d)
+      : shape(s)
+      , dir(d)
+      , time_stamp(ts)
+      , environment(env)
     {
       pos = p;
+      pos_r = static_cast<float>(p.r);
+      pos_c = static_cast<float>(p.c);
     }
+    
     void set_visibility(bool use_fog_of_war, bool is_night)
     {
       visible = !((use_fog_of_war && this->fog_of_war) ||
                   ((this->is_underground || is_night) && !this->light));
+    }
+    
+    void update(float curr_time)
+    {
+      terrain = environment->get_terrain(pos);
+      
+      alive = curr_time < time_stamp + life_time;
+    
+      if (is_wet(terrain) && alive)
+      {
+        pos_r += speed * (dir.r + rnd::rand_float(-1.5f, +1.5f) + 1.5f*std::sin(math::c_2pi*2.5f*curr_time));
+        pos_c += speed * (dir.c + rnd::rand_float(-1.5f, +1.5f) + 1.5f*std::cos(math::c_2pi*2.5f*curr_time));
+        auto pos_ri = static_cast<int>(math::roundI(pos_r));
+        auto pos_ci = static_cast<int>(math::roundI(pos_c));
+        if (environment->is_inside_any_room({ pos_ri, pos_ci }))
+        {
+          pos.r = pos_ri;
+          pos.c = pos_ci;
+        }
+      }
+      
+      terrain = environment->get_terrain(pos);
     }
   };
 
