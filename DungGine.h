@@ -1371,14 +1371,28 @@ namespace dung
         }
       }
       
+      auto f_draw_swim_anim = [anim_ctr, &sh, this](bool is_moving,
+                                                    const RC& pos, const RC& scr_pos,
+                                                    float los_r, float los_c)
+      {
+        if (anim_ctr % 3 == 0 && is_moving)
+        {
+          RC swim_pos { math::roundI(pos.r - los_r), math::roundI(pos.c - los_c) };
+          if (m_environment->is_inside_any_room(swim_pos))
+          {
+            RC swim_pos_scr { math::roundI(scr_pos.r - los_r), math::roundI(scr_pos.c - los_c) };
+            sh.write_buffer("*", swim_pos_scr.r, swim_pos_scr.c, Color::White, Color::Transparent2);
+          }
+        }
+      };
+      
       // PC
       if (m_player.is_spawned)
       {
         sh.write_buffer(std::string(1, m_player.character), pc_scr_pos.r, pc_scr_pos.c, m_player.style);
         
         if (is_wet(m_player.on_terrain))
-          if (anim_ctr % 3 == 0 && m_player.is_moving)
-            sh.write_buffer("*", math::roundI(pc_scr_pos.r - m_player.los_r), math::roundI(pc_scr_pos.c - m_player.los_c), Color::White, Color::Transparent2);
+          f_draw_swim_anim(m_player.is_moving, m_player.pos, pc_scr_pos, m_player.los_r, m_player.los_c);
             
         m_player.draw(sh, sim_time_s);
       }
@@ -1403,10 +1417,7 @@ namespace dung
         {
           auto npc_scr_pos = m_screen_helper->get_screen_pos(npc.pos);
           if (npc.health > 0 && npc.can_swim && !npc.can_fly)
-          {
-            if (anim_ctr % 3 == 0 && npc.is_moving)
-              sh.write_buffer("*", math::roundI(npc_scr_pos.r - npc.los_r), math::roundI(npc_scr_pos.c - npc.los_c), Color::White, Color::Transparent2);
-          }
+            f_draw_swim_anim(npc.is_moving, npc.pos, npc_scr_pos, npc.los_r, npc.los_c);
           else if (npc.health <= 0)
           {
             float time_delay = 0.f;
