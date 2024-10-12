@@ -859,14 +859,11 @@ namespace dung
         Potion potion;
         do
         {
-          if (num_iters < 50)
+          potion.pos =
           {
-            potion.pos =
-            {
-              rnd::rand_int(0, world_size.r),
-              rnd::rand_int(0, world_size.c)
-            };
-          }
+            rnd::rand_int(0, world_size.r),
+            rnd::rand_int(0, world_size.c)
+          };
           BSPNode* room = nullptr;
           valid_pos = m_environment->is_inside_any_room(potion.pos, &room);
           if (only_place_on_dry_land &&
