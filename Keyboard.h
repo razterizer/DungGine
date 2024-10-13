@@ -114,6 +114,8 @@ namespace dung
           
           std::string msg = "You dropped an item: ";
           bool to_drop_found = false;
+          bool dropped_over_liquid = !is_dry(m_player.on_terrain);
+          
           {
             auto* keys_group = m_inventory->fetch_group("Keys:");
             auto* keys_subgroup = keys_group->fetch_subgroup(0);
@@ -129,6 +131,8 @@ namespace dung
                 stlutils::erase(m_player.key_idcs, idx);
                 keys_subgroup->remove_item(key);
                 to_drop_found = true;
+                if (dropped_over_liquid)
+                  stlutils::erase_if(m_all_keys, [key](const auto& k) { return &k == key; });
               }
             }
           }
@@ -148,6 +152,8 @@ namespace dung
                 stlutils::erase(m_player.lamp_idcs, idx);
                 lamps_subgroup->remove_item(lamp);
                 to_drop_found = true;
+                if (dropped_over_liquid)
+                  stlutils::erase_if(m_all_lamps, [lamp](const auto& l) { return &l == lamp; });
               }
             }
           }
@@ -168,6 +174,8 @@ namespace dung
                 stlutils::erase(m_player.weapon_idcs, idx);
                 weapons_subgroup_melee->remove_item(weapon);
                 to_drop_found = true;
+                if (dropped_over_liquid)
+                  stlutils::erase_if(m_all_weapons, [weapon](const auto& w) { return w.get() == weapon; });
               }
             }
           }
@@ -188,12 +196,15 @@ namespace dung
                 stlutils::erase(m_player.potion_idcs, idx);
                 potions_subgroup->remove_item(potion);
                 to_drop_found = true;
+                if (dropped_over_liquid)
+                  stlutils::erase_if(m_all_potions, [potion](const auto& p) { return &p == potion; });
               }
             }
           }
           if (!to_drop_found)
           {
-            auto f_try_drop_armour = [&msg, &f_drop_item, &to_drop_found](auto* subgroup, const auto& all_armour, auto& pc_armour_idcs)
+            auto f_try_drop_armour = [&msg, &f_drop_item, &to_drop_found, dropped_over_liquid]
+                                    (auto* subgroup, auto& all_armour, auto& pc_armour_idcs)
             {
               if (to_drop_found)
                 return false;
@@ -209,6 +220,8 @@ namespace dung
                   stlutils::erase(pc_armour_idcs, idx);
                   subgroup->remove_item(armour);
                   to_drop_found = true;
+                  if (dropped_over_liquid)
+                    stlutils::erase_if(all_armour, [armour](const auto& a) { return a.get() == armour; });
                   return true;
                 }
               }
@@ -242,6 +255,10 @@ namespace dung
             message_handler->add_message(static_cast<float>(real_time_s),
                                          msg,
                                          MessageHandler::Level::Guide);
+            if (dropped_over_liquid)
+              message_handler->add_message(static_cast<float>(real_time_s),
+                                           "Item was dropped over the " + terrain2str(m_player.on_terrain) + " and is now forever lost.",
+                                           MessageHandler::Level::Warning);
           }
         }
         else if (is_inside_curr_bb(curr_pos.r, curr_pos.c + 1) &&
