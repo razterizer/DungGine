@@ -132,7 +132,7 @@ namespace dung
                 keys_subgroup->remove_item(key);
                 to_drop_found = true;
                 if (dropped_over_liquid)
-                  stlutils::erase_if(m_all_keys, [key](const auto& k) { return &k == key; });
+                  stlutils::erase_if(m_all_keys, [key](const auto& o) { return &o == key; });
               }
             }
           }
@@ -153,7 +153,7 @@ namespace dung
                 lamps_subgroup->remove_item(lamp);
                 to_drop_found = true;
                 if (dropped_over_liquid)
-                  stlutils::erase_if(m_all_lamps, [lamp](const auto& l) { return &l == lamp; });
+                  stlutils::erase_if(m_all_lamps, [lamp](const auto& o) { return &o == lamp; });
               }
             }
           }
@@ -175,7 +175,7 @@ namespace dung
                 weapons_subgroup_melee->remove_item(weapon);
                 to_drop_found = true;
                 if (dropped_over_liquid)
-                  stlutils::erase_if(m_all_weapons, [weapon](const auto& w) { return w.get() == weapon; });
+                  stlutils::erase_if(m_all_weapons, [weapon](const auto& o) { return o.get() == weapon; });
               }
             }
           }
@@ -197,7 +197,7 @@ namespace dung
                 potions_subgroup->remove_item(potion);
                 to_drop_found = true;
                 if (dropped_over_liquid)
-                  stlutils::erase_if(m_all_potions, [potion](const auto& p) { return &p == potion; });
+                  stlutils::erase_if(m_all_potions, [potion](const auto& o) { return &o == potion; });
               }
             }
           }
@@ -221,7 +221,7 @@ namespace dung
                   subgroup->remove_item(armour);
                   to_drop_found = true;
                   if (dropped_over_liquid)
-                    stlutils::erase_if(all_armour, [armour](const auto& a) { return a.get() == armour; });
+                    stlutils::erase_if(all_armour, [armour](const auto& o) { return o.get() == armour; });
                   return true;
                 }
               }
