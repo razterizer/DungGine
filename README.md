@@ -200,7 +200,7 @@ if (!dungeon_engine.place_player(sh.size()))
 dungeon_engine->place_keys(true);
 dungeon_engine->place_lamps(20, 15, 5, true);
 dungeon_engine->place_weapons(150, true);
-dungeon_engine->place_potions(150, true);
+dungeon_engine->place_potions(100, true);
 dungeon_engine->place_armour(150, true);
 dungeon_engine->place_npcs(100, false);
 dungeon_engine.set_screen_scrolling_mode(ScreenScrollingMode::WhenOutsideScreen);
