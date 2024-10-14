@@ -35,9 +35,9 @@ See the next section for a summary over these two classes.
   - `pad_rooms(int min_rnd_wall_padding = 1, int max_rnd_wall_padding = 4)` : Pads the regions into rooms.
   - `create_corridors(int min_corridor_half_width = 1)` : Non-recursive method of creating corridors on leaf-level.
   - `create_doors(int max_num_locked_doors, bool allow_passageways)` : Creates doors between rooms and corridors. You need to first have called `generate()`, `pad_rooms()` and `create_corridors()` before calling this function.
-  - `draw_regions(SpriteHandler<NR, NC>& sh, int r0 = 0, int c0 = 0, const styles::Style& border_style = { Color::Black, Color::Yellow })` : Draws the regions.
-  - `draw_rooms(SpriteHandler<NR, NC>& sh, int r0 = 0, int c0 = 0, const styles::Style& room_style = { Color::White, Color::DarkRed })` : Draws the rooms.
-  - `draw_corridors(SpriteHandler<NR, NC>& sh, int r0 = 0, int c0 = 0, const styles::Style& corridor_outline_style = { Color::Green, Color::DarkGreen }, const styles::Style& corridor_fill_style = { Color::Black, Color::Green })` : Draws the non-recursive corridors.
+  - `draw_regions(ScreenHandler<NR, NC>& sh, int r0 = 0, int c0 = 0, const styles::Style& border_style = { Color::Black, Color::Yellow })` : Draws the regions.
+  - `draw_rooms(ScreenHandler<NR, NC>& sh, int r0 = 0, int c0 = 0, const styles::Style& room_style = { Color::White, Color::DarkRed })` : Draws the rooms.
+  - `draw_corridors(ScreenHandler<NR, NC>& sh, int r0 = 0, int c0 = 0, const styles::Style& corridor_outline_style = { Color::Green, Color::DarkGreen }, const styles::Style& corridor_fill_style = { Color::Black, Color::Green })` : Draws the non-recursive corridors.
   - `print_tree()` : Debug printing of the tree.
   - `fetch_leaves()` : Fetches the leaves of the BSP tree where the rooms are stored.
   - `get_room_corridor_map()` : Function that retrieves the room and corridor relationship data structure.
@@ -61,7 +61,7 @@ See the next section for a summary over these two classes.
   - `place_npcs(int num_npcs, bool only_place_on_dry_land)` : Places `num_npcs` NPCs in rooms, randomly all over the world.
   - `set_screen_scrolling_mode(ScreenScrollingMode mode, float t_page = 0.2f)` : Sets the screen scrolling mode to either `AlwaysInCentre`, `PageWise` or `WhenOutsideScreen`. `t_page` is used with `PageWise` mode.
   - `update(double real_time_s, float sim_time_s, float sim_dt_s, const keyboard::KeyPressData& kpd, bool* game_over)` : Updating the state of the dungeon engine. Manages things such as the change of direction of the sun for the shadows of rooms that are not under the ground and key-presses for control of the playable character.
-  - `draw(SpriteHandler<NR, NC>& sh, double real_time_s, float sim_time_s, int anim_ctr, ui::VerticalAlignment mb_v_align = ui::VerticalAlignment::CENTER, ui::HorizontalAlignment mb_h_align = ui::HorizontalAlignment::CENTER, int mb_v_align_offs = 0, int mb_h_align_offs = 0, bool framed_mode = false, gore = false)` : Draws the whole dungeon world with NPCs and the PC along with items strewn all over the place. Use mb_v_align and mb_h_align to place the messagebox along with mb_v_align_offs, mb_h_align_offs and framed_mode. If `gore = true` then PC and NPCs will leave tracks of blood during fights.
+  - `draw(ScreenHandler<NR, NC>& sh, double real_time_s, float sim_time_s, int anim_ctr, ui::VerticalAlignment mb_v_align = ui::VerticalAlignment::CENTER, ui::HorizontalAlignment mb_h_align = ui::HorizontalAlignment::CENTER, int mb_v_align_offs = 0, int mb_h_align_offs = 0, bool framed_mode = false, gore = false)` : Draws the whole dungeon world with NPCs and the PC along with items strewn all over the place. Use mb_v_align and mb_h_align to place the messagebox along with mb_v_align_offs, mb_h_align_offs and framed_mode. If `gore = true` then PC and NPCs will leave tracks of blood during fights.
 
 ## Texturing
 
@@ -103,7 +103,7 @@ bsp_tree.pad_rooms(4); // arguments: min_rnd_wall_padding = 4, [max_rnd_wall_pad
 bsp_tree.create_corridors(1); // argument: min_corridor_half_width = 1, (1 means it will be three chars wide).
 
 Text t;
-SpriteHandler<NR, NC> sh;
+ScreenHandler<NR, NC> sh;
 Color bg_color = Color::Default;
 
 dung::DungGine dungeon_engine;
@@ -123,7 +123,7 @@ dung::BSPTree bsp_tree { 4 }; // argument: `min_room_length = 4`.
 dung::DungGineTextureParams texture_params;
 std::unique_ptr<dung::DungGine> dungeon_engine;
 Text t;
-SpriteHandler<NR, NC> sh;
+ScreenHandler<NR, NC> sh;
 Color bg_color = Color::Black;
 int anim_ctr = 0;
 
@@ -170,7 +170,7 @@ dung::BSPTree bsp_tree { 4 }; // argument: `min_room_length = 4`.
 dung::DungGineTextureParams texture_params;
 std::unique_ptr<dung::DungGine> dungeon_engine;
 Text t;
-SpriteHandler<NR, NC> sh;
+ScreenHandler<NR, NC> sh;
 Color bg_color = Color::Black;
 int anim_ctr = 0;
 

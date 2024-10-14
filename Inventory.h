@@ -7,7 +7,7 @@
 
 #pragma once
 #include "Items.h"
-#include <Termin8or/SpriteHandler.h>
+#include <Termin8or/ScreenHandler.h>
 #include <Termin8or/Drawing.h>
 #include <Termin8or/Rectangle.h>
 
@@ -387,7 +387,7 @@ namespace dung
     }
       
     template<int NR, int NC>
-    void draw(SpriteHandler<NR, NC>& sh) const
+    void draw(ScreenHandler<NR, NC>& sh) const
     {
       sh.write_buffer(str::adjust_str("Inventory", str::Adjustment::Center, m_bb.c_len), m_bb.top() + rb0_title, m_bb.left(), Color::White, Color::Transparent2);
       

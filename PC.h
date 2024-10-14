@@ -151,7 +151,7 @@ namespace dung
     }
     
     template<int NR, int NC>
-    void draw(SpriteHandler<NR, NC>& sh, float sim_time)
+    void draw(ScreenHandler<NR, NC>& sh, float sim_time)
     {
       fire_smoke_engine.draw(sh, smoke_color_gradients, sim_time);
 #ifdef DEBUG_FIRE_SMOKE

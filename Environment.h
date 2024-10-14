@@ -10,7 +10,7 @@
 #include "RoomStyle.h"
 #include "Terrain.h"
 #include "ScreenHelper.h"
-#include <Termin8or/SpriteHandler.h>
+#include <Termin8or/ScreenHandler.h>
 #include <optional>
 
 
@@ -287,7 +287,7 @@ namespace dung
     }
     
     template<int NR, int NC>
-    void draw_environment(SpriteHandler<NR, NC>& sh, double real_time_s,
+    void draw_environment(ScreenHandler<NR, NC>& sh, double real_time_s,
                           bool use_fog_of_war,
                           SolarDirection sun_dir, SolarMotionPatterns& solar_motion,
                           float t_solar_period, Season season,

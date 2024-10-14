@@ -9,7 +9,7 @@
 #include "Door.h"
 #include "Corridor.h"
 #include <Termin8or/RC.h>
-#include <Termin8or/SpriteHandler.h>
+#include <Termin8or/ScreenHandler.h>
 #include <Termin8or/Drawing.h>
 #include <Core/Rand.h>
 #include <Core/Math.h>
@@ -171,7 +171,7 @@ namespace dung
     }
     
     template<int NR, int NC>
-    void draw_regions(SpriteHandler<NR, NC>& sh,
+    void draw_regions(ScreenHandler<NR, NC>& sh,
                       int r0, int c0,
                       const styles::Style& border_style) const
     {
@@ -184,7 +184,7 @@ namespace dung
     }
     
     template<int NR, int NC>
-    void draw_rooms(SpriteHandler<NR, NC>& sh,
+    void draw_rooms(ScreenHandler<NR, NC>& sh,
                     int r0, int c0,
                     const styles::Style& room_style) const
     {
@@ -634,7 +634,7 @@ namespace dung
     }
     
     template<int NR, int NC>
-    void draw_regions(SpriteHandler<NR, NC>& sh,
+    void draw_regions(ScreenHandler<NR, NC>& sh,
                       int r0 = 0, int c0 = 0,
                       const styles::Style& border_style = { Color::Black, Color::Yellow }) const
     {
@@ -642,7 +642,7 @@ namespace dung
     }
     
     template<int NR, int NC>
-    void draw_rooms(SpriteHandler<NR, NC>& sh,
+    void draw_rooms(ScreenHandler<NR, NC>& sh,
                     int r0 = 0, int c0 = 0,
                     const styles::Style& room_style = { Color::White, Color::DarkRed }) const
     {
@@ -650,7 +650,7 @@ namespace dung
     }
     
     template<int NR, int NC>
-    void draw_corridors(SpriteHandler<NR, NC>& sh,
+    void draw_corridors(ScreenHandler<NR, NC>& sh,
                         int r0 = 0, int c0 = 0,
                         const styles::Style& corridor_outline_style = { Color::Green, Color::DarkGreen },
                         const styles::Style& corridor_fill_style = { Color::Black, Color::Green }) const

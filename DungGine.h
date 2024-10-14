@@ -546,7 +546,7 @@ namespace dung
     }
     
     template<int NR, int NC>
-    void draw_health_bars(SpriteHandler<NR, NC>& sh, bool framed_mode)
+    void draw_health_bars(ScreenHandler<NR, NC>& sh, bool framed_mode)
     {
       std::vector<std::string> health_bars;
       std::vector<Style> styles;
@@ -581,7 +581,7 @@ namespace dung
     }
     
     template<int NR, int NC>
-    void draw_strength_bar(SpriteHandler<NR, NC>& sh, bool framed_mode)
+    void draw_strength_bar(ScreenHandler<NR, NC>& sh, bool framed_mode)
     {
       ui::TextBoxDrawingArgsPos tb_args;
       int offs = framed_mode ? 1 : 0;
@@ -1156,7 +1156,7 @@ namespace dung
     
     
     template<int NR, int NC>
-    void draw(SpriteHandler<NR, NC>& sh, double real_time_s, float sim_time_s, int anim_ctr,
+    void draw(ScreenHandler<NR, NC>& sh, double real_time_s, float sim_time_s, int anim_ctr,
               ui::VerticalAlignment mb_v_align = ui::VerticalAlignment::CENTER,
               ui::HorizontalAlignment mb_h_align = ui::HorizontalAlignment::CENTER,
               int mb_v_align_offs = 0, int mb_h_align_offs = 0,
