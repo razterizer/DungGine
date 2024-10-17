@@ -7,6 +7,7 @@
 [![build ubuntu](https://github.com/razterizer/DungGine/actions/workflows/build-windows.yml/badge.svg)](https://github.com/razterizer/DungGine/actions/workflows/build-windows.yml)
 
 ![Top Languages](https://img.shields.io/github/languages/top/razterizer/DungGine)
+![GitHub repo size](https://img.shields.io/github/repo-size/razterizer/DungGine)
 ![Goto](https://img.shields.io/github/search/razterizer/DungGine/goto)
 ![Commit Activity](https://img.shields.io/github/commit-activity/t/razterizer/DungGine)
 ![Last Commit](https://img.shields.io/github/last-commit/razterizer/DungGine?color=blue)
