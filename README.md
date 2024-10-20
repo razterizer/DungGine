@@ -1,6 +1,7 @@
 # DungGine
 
 ![GitHub License](https://img.shields.io/github/license/razterizer/DungGine?color=blue)
+![Static Badge](https://img.shields.io/badge/linkage-header_only-yellow)
 
 [![build ubuntu](https://github.com/razterizer/DungGine/actions/workflows/build-ubuntu.yml/badge.svg)](https://github.com/razterizer/DungGine/actions/workflows/build-ubuntu.yml)
 [![build macos](https://github.com/razterizer/DungGine/actions/workflows/build-macos.yml/badge.svg)](https://github.com/razterizer/DungGine/actions/workflows/build-macos.yml)
