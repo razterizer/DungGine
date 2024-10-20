@@ -22,7 +22,7 @@
 (Gif animation produced using [`terminalizer`](https://github.com/faressoft/terminalizer) and [`gifsicle`](https://github.com/kohler/gifsicle).)
 -->
 
-### Ubuntu
+### Ubuntu WSL
 ![ubuntu_QPClLlbOCK](https://github.com/user-attachments/assets/464e2a23-dd11-499e-9537-c422bd1a4217)
 
 ### Windows
