@@ -69,7 +69,7 @@ public:
       sh.clear();
       bsp_tree.draw_rooms(sh);
       bsp_tree.draw_corridors(sh);
-      sh.print_screen_buffer(t, bg_color);
+      sh.print_screen_buffer(bg_color);
       
       //sh.clear();
       //bsp_tree.draw_rooms(sh);
@@ -80,7 +80,7 @@ public:
       bsp_tree.draw_corridors(sh);
       bsp_tree.draw_regions(sh, 0, 0);
       bsp_tree.draw_rooms(sh);
-      sh.print_screen_buffer(t, bg_color);
+      sh.print_screen_buffer(bg_color);
       
       //sh.clear();
       //bsp_tree.draw_regions(sh, 0, 0);
@@ -99,7 +99,7 @@ public:
       bool game_over = false;
       dungeon_engine->update(get_real_time_s(), get_sim_time_s(), get_sim_dt_s(), kpd, &game_over);
       dungeon_engine->draw(sh, get_real_time_s(), get_sim_time_s(), anim_ctr);
-      sh.print_screen_buffer(t, Color::Black);
+      sh.print_screen_buffer(Color::Black);
 #endif
     }
     else if (test_type == TestType::DungeonRuntime)
