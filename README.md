@@ -111,7 +111,6 @@ bsp_tree.generate(29, 79, dung::Orientation::Vertical); // arguments: world_size
 bsp_tree.pad_rooms(4); // arguments: min_rnd_wall_padding = 4, [max_rnd_wall_padding = 4].
 bsp_tree.create_corridors(1); // argument: min_corridor_half_width = 1, (1 means it will be three chars wide).
 
-Text t;
 ScreenHandler<NR, NC> sh;
 Color bg_color = Color::Default;
 
@@ -119,7 +118,7 @@ dung::DungGine dungeon_engine;
 dungeon_engine.load_dungeon(&bsp_tree);
 dungeon_engine.style_dungeon();
 dungeon_engine.draw(sh, get_real_time_s(), get_sim_time_s(), 0);
-sh.print_screen_buffer(t, bg_color);
+sh.print_screen_buffer(bg_color);
 ```
 
 <img width="560" alt="image" src="https://github.com/razterizer/DungGine/assets/32767250/7417d29d-1d2a-47b6-b926-31a9ae0177b2">
@@ -131,7 +130,6 @@ sh.print_screen_buffer(t, bg_color);
 dung::BSPTree bsp_tree { 4 }; // argument: `min_room_length = 4`.
 dung::DungGineTextureParams texture_params;
 std::unique_ptr<dung::DungGine> dungeon_engine;
-Text t;
 ScreenHandler<NR, NC> sh;
 Color bg_color = Color::Black;
 int anim_ctr = 0;
@@ -162,7 +160,7 @@ dungeon_engine->update(get_real_time_s(), get_sim_time_s(), get_sim_time_dt(), k
 if (game_over)
   set_state_game_over();
 dungeon_engine->draw(sh, get_real_time_s(), get_sim_time_s(), anim_ctr);
-sh.print_screen_buffer(t, bg_color);
+sh.print_screen_buffer(bg_color);
 anim_ctr++;
 ```
 
@@ -178,7 +176,6 @@ To move the character in a game loop, use function `update()` to allow keystroke
 dung::BSPTree bsp_tree { 4 }; // argument: `min_room_length = 4`.
 dung::DungGineTextureParams texture_params;
 std::unique_ptr<dung::DungGine> dungeon_engine;
-Text t;
 ScreenHandler<NR, NC> sh;
 Color bg_color = Color::Black;
 int anim_ctr = 0;
@@ -221,6 +218,6 @@ dungeon_engine->update(get_real_time_s(), get_sim_time_s(), get_sim_time_dt(), k
 if (game_over)
   set_state_game_over();
 dungeon_engine->draw(sh, get_real_time_s(), get_sim_time_s(), anim_ctr, ui::VerticalAlignment::BOTTOM, ui::HorizontalAlignment::CENTER, -5, 0, false, true);
-sh.print_screen_buffer(t, bg_color);
+sh.print_screen_buffer(bg_color);
 anim_ctr++;
 ```
