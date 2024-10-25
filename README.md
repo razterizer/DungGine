@@ -35,6 +35,16 @@ The engine works very well together with the `GameEngine` class of lib [`Termin8
 There are two main classes for this dungeon generator: `BSPTree` that is responsible for creating the rooms, corridors and doors in the "dungeon", and then there is the class `DungGine` that is the dungeon game engine itself.
 See the next section for a summary over these two classes.
 
+## Keys
+
+* `WASD keys` or `arrow keys` to control the direction of the PC or browse inventory objects.
+* `Space` to pick up items, open doors or equip items in the inventory UI.
+* `-` to open and close the inventory.
+* `F` to fight friendlies (hostile NPCs will always start the fight). When running away from them, they will quickly forget and forgive.
+* `D` to drop a hilited item when in the inventory.
+* `C` to consume a potion.
+* `I` to identify things the PC can see.
+
 ## Headers
 
 * `BSPTree.h`
