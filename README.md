@@ -45,6 +45,40 @@ See the next section for a summary over these two classes.
 * `C` to consume a potion.
 * `I` to identify things the PC can see.
 
+## NPCs
+
+There are a bunch of different NPCs and that have different behaviours. The following are supported:
+
+* human
+* elf
+* half elf
+* gnome
+* halfling
+* dwarf
+* half orc
+* ogre
+* hobgoblin
+* goblin
+* orc
+* troll
+* monster
+* lich
+* lich king
+* basilisk
+* bear
+* kobold
+* skeleton
+* giant
+* huge spider
+* wolf
+* wyvern
+* griffin
+* ghoul
+* dragon
+
+They all look different visually and have different walking styles etc.
+Some can swim, some can fly, and some can only walk.
+
 ## Headers
 
 * `BSPTree.h`
