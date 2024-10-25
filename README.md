@@ -35,6 +35,25 @@ The engine works very well together with the `GameEngine` class of lib [`Termin8
 There are two main classes for this dungeon generator: `BSPTree` that is responsible for creating the rooms, corridors and doors in the "dungeon", and then there is the class `DungGine` that is the dungeon game engine itself.
 See the next section for a summary over these two classes.
 
+## Features
+
+There is no skill progression yet and underground rooms are currently mixed with surface-level rooms, so there are some things to improve on in the future. But it does feature:
+
+* an inventory system
+* items to pick up
+* combat-system (THAC0-based)
+* some gore
+* light-field
+* fog-of-war
+* season-based and location-based wall shadows for surface level rooms
+* particle physics-based fire/smoke
+* material based textures. So that when you design a texture in TextUR, DungGine treats different parts of the terrain differently, such as different viscosity and friction etc
+* different scrolling-modes for tracking the PC
+
+and stuff like that.
+The corridors are all straight (for now). Other than that, I think the BSP generation is pretty standard.
+Items you can pick up are keys, torches, lanterns, magic lamps (isotropic light), potions (some contain poison, so gotta watch out), weapons and armour.
+
 ## Keys
 
 * `WASD keys` or `arrow keys` to control the direction of the PC or browse inventory objects.
