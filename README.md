@@ -133,8 +133,8 @@ Some can swim, some can fly, and some can only walk.
   - `place_armour(int num_armour, bool only_place_on_dry_land)` : Places `num_armour` armour parts in rooms, randomly all over the world.
   - `place_npcs(int num_npcs, bool only_place_on_dry_land)` : Places `num_npcs` NPCs in rooms, randomly all over the world.
   - `set_screen_scrolling_mode(ScreenScrollingMode mode, float t_page = 0.2f)` : Sets the screen scrolling mode to either `AlwaysInCentre`, `PageWise` or `WhenOutsideScreen`. `t_page` is used with `PageWise` mode.
-  - `update(double real_time_s, float sim_time_s, float sim_dt_s, const keyboard::KeyPressData& kpd, bool* game_over)` : Updating the state of the dungeon engine. Manages things such as the change of direction of the sun for the shadows of rooms that are not under the ground and key-presses for control of the playable character.
-  - `draw(ScreenHandler<NR, NC>& sh, double real_time_s, float sim_time_s, int anim_ctr, ui::VerticalAlignment mb_v_align = ui::VerticalAlignment::CENTER, ui::HorizontalAlignment mb_h_align = ui::HorizontalAlignment::CENTER, int mb_v_align_offs = 0, int mb_h_align_offs = 0, bool framed_mode = false, gore = false)` : Draws the whole dungeon world with NPCs and the PC along with items strewn all over the place. Use mb_v_align and mb_h_align to place the messagebox along with mb_v_align_offs, mb_h_align_offs and framed_mode. If `gore = true` then PC and NPCs will leave tracks of blood during fights.
+  - `update(int frame_ctr, float fps, double real_time_s, float sim_time_s, float sim_dt_s, float fire_smoke_dt_factor, const keyboard::KeyPressDataPair& kpdp, bool* game_over)` : Updating the state of the dungeon engine. Manages things such as the change of direction of the sun for the shadows of rooms that are not under the ground and key-presses for control of the playable character.
+  - `draw(ScreenHandler<NR, NC>& sh, double real_time_s, float sim_time_s, int anim_ctr_swim, int anim_ctr_fight, ui::VerticalAlignment mb_v_align = ui::VerticalAlignment::CENTER, ui::HorizontalAlignment mb_h_align = ui::HorizontalAlignment::CENTER, int mb_v_align_offs = 0, int mb_h_align_offs = 0, bool framed_mode = false, bool gore = false)` : Draws the whole dungeon world with NPCs and the PC along with items strewn all over the place. Use mb_v_align and mb_h_align to place the messagebox along with mb_v_align_offs, mb_h_align_offs and framed_mode. If `gore = true` then PC and NPCs will leave tracks of blood during fights.
 
 ## Texturing
 
@@ -181,7 +181,7 @@ Color bg_color = Color::Default;
 dung::DungGine dungeon_engine;
 dungeon_engine.load_dungeon(&bsp_tree);
 dungeon_engine.style_dungeon();
-dungeon_engine.draw(sh, get_real_time_s(), get_sim_time_s(), 0);
+dungeon_engine.draw(sh, get_real_time_s(), get_sim_time_s(), 0, 0);
 sh.print_screen_buffer(bg_color);
 ```
 
@@ -197,6 +197,7 @@ std::unique_ptr<dung::DungGine> dungeon_engine;
 ScreenHandler<NR, NC> sh;
 Color bg_color = Color::Black;
 int anim_ctr = 0;
+const float fire_smoke_dt_factor = 0.5f;
 
 // Initializations
 bsp_tree.generate(200, 400, dung::Orientation::Vertical); // arguments: world_size_rows, world_size_cols,
@@ -220,10 +221,14 @@ dungeon_engine.set_screen_scrolling_mode(ScreenScrollingMode::WhenOutsideScreen)
 // In game loop:
 sh.clear();
 bool game_over = false;
-dungeon_engine->update(get_real_time_s(), get_sim_time_s(), get_sim_time_dt(), kpd, &game_over); // arg0 : time from game start, arg3 : keyboard::KeyPressData object, arg4 : retrieves game over state.
+dungeon_engine->update(get_frame_count(), get_real_fps(), 
+  get_real_time_s(), get_sim_time_s(), get_sim_dt_s(),
+  fire_smoke_dt_factor,
+  kpdp, &game_over); // arg0 : time from game start, arg3 : keyboard::KeyPressData object, arg4 : retrieves game over state.
 if (game_over)
   set_state_game_over();
-dungeon_engine->draw(sh, get_real_time_s(), get_sim_time_s(), anim_ctr);
+dungeon_engine->draw(sh, get_real_time_s(), get_sim_time_s(),
+  get_anim_count(0), get_anim_count(1));
 sh.print_screen_buffer(bg_color);
 anim_ctr++;
 ```
@@ -243,6 +248,7 @@ std::unique_ptr<dung::DungGine> dungeon_engine;
 ScreenHandler<NR, NC> sh;
 Color bg_color = Color::Black;
 int anim_ctr = 0;
+const float fire_smoke_dt_factor = 0.5f;
 
 // Initializations
 bsp_tree.generate(200, 400, dung::Orientation::Vertical); // arguments: world_size_rows, world_size_cols,
@@ -278,10 +284,16 @@ dungeon_engine.set_screen_scrolling_mode(ScreenScrollingMode::WhenOutsideScreen)
 // In game loop:
 sh.clear();
 bool game_over = false;
-dungeon_engine->update(get_real_time_s(), get_sim_time_s(), get_sim_time_dt(), kpd, &game_over); // arg0 : time from game start, arg3 : keyboard::KeyPressData object, arg4 : retrieves game over state.
+dungeon_engine->update(get_frame_count(), get_real_fps(),
+  get_real_time_s(), get_sim_time_s(), get_sim_dt_s(),
+  fire_smoke_dt_factor,
+  kpdp, &game_over); // arg0 : time from game start, arg3 : keyboard::KeyPressData object, arg4 : retrieves game over state.
 if (game_over)
   set_state_game_over();
-dungeon_engine->draw(sh, get_real_time_s(), get_sim_time_s(), anim_ctr, ui::VerticalAlignment::BOTTOM, ui::HorizontalAlignment::CENTER, -5, 0, false, true);
+dungeon_engine->draw(sh, get_real_time_s(), get_sim_time_s(),
+  get_anim_count(0), get_anim_count(1),
+  ui::VerticalAlignment::BOTTOM, ui::HorizontalAlignment::CENTER,
+  -5, 0, false, true);
 sh.print_screen_buffer(bg_color);
 anim_ctr++;
 ```
