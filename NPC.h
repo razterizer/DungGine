@@ -648,7 +648,9 @@ namespace dung
     }
     
     void update(const RC& pc_pos, BSPNode* pc_room, Corridor* pc_corr,
-                Environment* environment, float time, float dt)
+                Environment* environment,
+                bool do_los_terrainos, bool do_move,
+                float time, float dt)
     {
       if (health <= 0)
       {
@@ -659,8 +661,11 @@ namespace dung
         return;
       }
       
-      update_los();
-      update_terrain();
+      if (do_los_terrainos)
+      {
+        update_los();
+        update_terrain();
+      }
       
       if (rnd::one_in(prob_slow_fast))
       {

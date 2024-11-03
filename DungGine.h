@@ -599,6 +599,254 @@ namespace dung
       tb_strength.draw(sh, tb_args);
     }
     
+    void update_fighting(float real_time_s)
+    {
+      if (m_player.health > 0)
+      {
+        for (auto& npc : all_npcs)
+        {
+          if (npc.health > 0 && npc.state == State::Fight)
+          {
+            auto f_calc_damage = [](const Weapon* weapon, int bonus)
+            {
+              if (weapon == nullptr)
+                return 1 + bonus; // Fists with strength bonus
+              return weapon->damage + bonus;
+            };
+        
+            int blind_attack_penalty = (npc.visible ? 0 : 12) + rnd::rand_int(0, 8);
+        
+            // NPC attack roll.
+            int npc_attack_roll = rnd::dice(20) + npc.thac0 + npc.get_melee_attack_bonus() - blind_attack_penalty;
+        
+            // Calculate the player's total armor class.
+            int player_ac = m_player.calc_armour_class(m_inventory.get());
+        
+            // Determine if NPC hits the player.
+            // e.g. d12 + 1 + (2 + 10/2) >= (10 + 10/2).
+            // d12 + 8 >= 15.
+            if (npc_attack_roll >= player_ac)
+            {
+              // NPC hits the player
+              int damage = 1; // Default damage for fists
+              if (npc.weapon_idx != -1)
+                damage = f_calc_damage(all_weapons[npc.weapon_idx].get(), npc.get_melee_damage_bonus());
+        
+              // Apply damage to the player
+              bool was_alive = m_player.health > 0;
+              m_player.health -= damage;
+              if (was_alive && m_player.health <= 0)
+              {
+                message_handler->add_message(real_time_s,
+                                             "You were killed!",
+                                             MessageHandler::Level::Fatal);
+                broadcast([](auto* listener) { listener->on_pc_death(); });
+              }
+            }
+            
+            // Roll a d20 for the player's attack roll (if the NPC is visible).
+            // If invisible, then roll a d32 instead.
+            const auto* weapon = m_player.get_selected_melee_weapon(m_inventory.get());
+            int player_attack_roll = rnd::dice(20) + m_player.thac0 + m_player.get_melee_attack_bonus() - blind_attack_penalty;
+            int npc_ac = npc.calc_armour_class();
+            
+            // Determine if player hits the NPC.
+            if (player_attack_roll >= npc_ac)
+            {
+              // PC hits the NPC.
+              int damage = f_calc_damage(weapon, m_player.get_melee_damage_bonus());
+              
+              // Apply damage to the NPC.
+              bool was_alive = npc.health > 0;
+              npc.health -= damage;
+              if (was_alive && npc.health <= 0)
+              {
+                message_handler->add_message(real_time_s,
+                                             "You killed the " + race2str(npc.npc_race) + "!",
+                                             MessageHandler::Level::Guide);
+                broadcast([](auto* listener) { listener->on_npc_death(); });
+              }
+            }
+          }
+        }
+      }
+    }
+    
+    template<int NR, int NC>
+    void draw_fighting(ScreenHandler<NR, NC>& sh, const RC& pc_scr_pos, bool do_update_fight, float real_time_s, float sim_time_s)
+    {
+      if (m_player.health > 0)
+      {
+        for (auto& npc : all_npcs)
+        {
+          if (npc.health <= 0)
+            continue;
+          
+          if (npc.state == State::Fight)
+          {
+            if (npc.trg_info_hostile_npc.once())
+            {
+              std::string message = "You are being attacked";
+              std::string race = race2str(npc.npc_race);
+              if (npc.visible && !race.empty())
+                message += " by " + str::indef_art(race);
+              message += "!";
+              message_handler->add_message(real_time_s,
+                                           message, MessageHandler::Level::Warning);
+            }
+          }
+          else
+            npc.trg_info_hostile_npc.reset();
+          
+          if (npc.state == State::Fight)
+          {
+            auto npc_scr_pos = m_screen_helper->get_screen_pos(npc.pos);
+            
+            // [side_case, base_case, side_case]
+            // Case NW (dp = [1, 1]):
+            //O#
+            //#*
+            // r + [1, 1, 0]
+            // c + [0, 1, 1]
+            //
+            // Case W (dp = [0, 1]):
+            // #
+            //O*
+            // #
+            // r + [1, 0, -1]
+            // c + [1, 1,  1]
+            //
+            // Case SW (dp = [-1, 1]):
+            //#*
+            //O#
+            // r + [0, -1, -1]
+            // c + [1,  1,  0]
+            //
+            // Case S (dp = [-1, 0]):
+            //#*#
+            // O
+            // r + [-1, -1, -1]
+            // c + [ 1,  0, -1]
+            //
+            // Case SE (dp = [-1, -1]):
+            //*#
+            //#O
+            // r + [-1, -1,  0]
+            // c + [ 0, -1, -1]
+            //
+            // Case E (dp = [0, -1]):
+            //#
+            //*O
+            //#
+            // r + [-1,  0,  1]
+            // c + [-1, -1, -1]
+            //
+            // Case NE (dp = [1, -1]):
+            //#O
+            //*#
+            // r + [ 0,  1, 1]
+            // c + [-1, -1, 0]
+            //
+            // Case N (dp = [1, 0]):
+            // O
+            //#*#
+            // r + [ 1, 1, 1]
+            // c + [-1, 0, 1]
+            
+            auto dp = m_player.pos - npc.pos;
+            dp.r = math::sgn(dp.r);
+            dp.c = math::sgn(dp.c);
+            
+            auto f_dp_to_dir = [](const RC& dp)
+            {
+              if (dp == RC { 1, 1 }) return FightDir::NW;
+              if (dp == RC { 0, 1 }) return FightDir::W;
+              if (dp == RC { -1, 1 }) return FightDir::SW;
+              if (dp == RC { -1, 0 }) return FightDir::S;
+              if (dp == RC { -1, -1 }) return FightDir::SE;
+              if (dp == RC { 0, -1 }) return FightDir::E;
+              if (dp == RC { 1, -1 }) return FightDir::NE;
+              if (dp == RC { 1, 0 }) return FightDir::N;
+              return FightDir::NUM_ITEMS;
+            };
+            const auto num_dir = static_cast<int>(FightDir::NUM_ITEMS);
+            
+            auto f_calc_fight_offs = [&](const RC& dp)
+            {
+              auto dir = static_cast<int>(f_dp_to_dir(dp));
+              
+              if (dir >= static_cast<int>(FightDir::NUM_ITEMS))
+                return RC { 0, 0 };
+                
+              auto r_offs = rnd::randn_select(0.f, 1.f, std::vector {
+                fight_r_offs[(num_dir + dir - 1)%num_dir],
+                fight_r_offs[dir],
+                fight_r_offs[(dir + 1)%num_dir] });
+              auto c_offs = rnd::randn_select(0.f, 1.f, std::vector {
+                fight_c_offs[(num_dir + dir - 1)%num_dir],
+                fight_c_offs[dir],
+                fight_c_offs[(dir + 1)%num_dir] });
+              return RC { r_offs, c_offs };
+            };
+            auto f_render_fight = [&](PlayerBase* pb, const RC& scr_pos, const RC& offs)
+            {
+              // #FIXME:
+              if (do_update_fight)
+              {
+                pb->cached_fight_style = styles::Style
+                {
+                  color::get_random_color(c_fight_colors),
+                  Color::Transparent2
+                };
+                pb->cached_fight_str = rnd::rand_select(c_fight_strings);
+              }
+              auto fight_style = pb->cached_fight_style;
+              auto fight_str = pb->cached_fight_str;
+              
+              sh.write_buffer(fight_str,
+                              scr_pos.r + offs.r,
+                              scr_pos.c + offs.c,
+                              fight_style);
+            };
+            if (do_update_fight)
+              m_player.cached_fight_offs = f_calc_fight_offs(dp);
+            auto offs = m_player.cached_fight_offs;
+            if (m_environment->is_inside_any_room(m_player.pos + offs))
+            {
+              f_render_fight(&m_player, npc_scr_pos, offs);
+              if (do_update_fight && rnd::one_in(npc.visible ? 20 : 28))
+              {
+                auto& bs = m_player.blood_splats.emplace_back(m_environment.get(), m_player.pos + offs, rnd::dice(4), sim_time_s, offs);
+                bs.curr_room = m_player.curr_room;
+                bs.curr_corridor = m_player.curr_corridor;
+                if (m_player.is_inside_curr_room())
+                  bs.is_underground = m_environment->is_underground(m_player.curr_room);
+                else if (m_player.is_inside_curr_corridor())
+                  bs.is_underground = m_environment->is_underground(m_player.curr_corridor);
+              }
+            }
+            if (npc.visible)
+            {
+              if (do_update_fight)
+                npc.cached_fight_offs = f_calc_fight_offs(-dp);
+              auto offs = npc.cached_fight_offs;
+              if (m_environment->is_inside_any_room(npc.pos + offs))
+              {
+                f_render_fight(&npc, pc_scr_pos, offs);
+                if (do_update_fight && rnd::one_in(npc.visible ? 20 : 28))
+                {
+                  auto& bs = npc.blood_splats.emplace_back(m_environment.get(), npc.pos + offs, rnd::dice(4), sim_time_s, offs);
+                  bs.curr_room = npc.curr_room;
+                  bs.curr_corridor = npc.curr_corridor;
+                  bs.is_underground = npc.is_underground;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    
   public:
     DungGine(const std::string& exe_folder, bool use_fow, DungGineTextureParams texture_params = {})
       : message_handler(std::make_unique<MessageHandler>())
@@ -988,13 +1236,20 @@ namespace dung
       return true;
     }
     
-    void update(double real_time_s, float sim_time_s, float sim_dt_s, const keyboard::KeyPressData& kpd, bool* game_over)
+    void update(int frame_ctr, float fps,
+                double real_time_s, float sim_time_s, float sim_dt_s,
+                float fire_smoke_dt_factor, 
+                const keyboard::KeyPressDataPair& kpdp, bool* game_over)
     {
       utils::try_set(game_over, m_player.health <= 0);
       if (utils::try_get(game_over))
         return;
         
       stall_game = m_player.show_inventory;
+      
+      bool do_los_terrainos = frame_ctr % std::max(1, math::roundI(fps / 5)) == 0;
+      bool do_npc_move = frame_ctr % std::max(1, math::roundI(fps / 4)) == 0;
+      bool do_fight = frame_ctr % std::max(1, math::roundI(fps / 3)) == 0;
     
       update_sun(static_cast<float>(real_time_s));
       
@@ -1009,7 +1264,7 @@ namespace dung
       set_visibilities(fow_radius, m_player.pos);
       
       auto& curr_pos = m_player.pos;
-      m_keyboard->handle_keyboard(kpd, real_time_s);
+      m_keyboard->handle_keyboard(kpdp, real_time_s);
       
       update_inventory();
       
@@ -1055,7 +1310,9 @@ namespace dung
       // PC LOS etc.
       bool was_alive = m_player.health > 0;
       m_player.on_terrain = m_environment->get_terrain(m_player.pos);
-      m_player.update(m_screen_helper.get(), m_inventory.get(), sim_time_s, sim_dt_s);
+      m_player.update(m_screen_helper.get(), m_inventory.get(),
+                      do_los_terrainos,
+                      sim_time_s, sim_dt_s * fire_smoke_dt_factor);
       if (was_alive && m_player.health <= 0)
       {
         message_handler->add_message(static_cast<float>(real_time_s),
@@ -1071,7 +1328,9 @@ namespace dung
         for (auto& npc : all_npcs)
         {
           npc.on_terrain = m_environment->get_terrain(npc.pos);
-          npc.update(curr_pos, pc_room, pc_corr, m_environment.get(), sim_time_s, sim_dt_s);
+          npc.update(curr_pos, pc_room, pc_corr, m_environment.get(),
+                     do_los_terrainos, do_npc_move,
+                     sim_time_s, sim_dt_s);
         
           if (npc.is_hostile && !npc.was_hostile)
             broadcast([&npc](auto* listener) { listener->on_fight_begin(&npc); });
@@ -1080,83 +1339,16 @@ namespace dung
         }
       }
       
-      // Fighting
-      if (m_player.health > 0)
-      {
-        for (auto& npc : all_npcs)
-        {
-          if (npc.health > 0 && npc.state == State::Fight)
-          {
-            auto f_calc_damage = [](const Weapon* weapon, int bonus)
-            {
-              if (weapon == nullptr)
-                return 1 + bonus; // Fists with strength bonus
-              return weapon->damage + bonus;
-            };
-        
-            int blind_attack_penalty = (npc.visible ? 0 : 12) + rnd::rand_int(0, 8);
-        
-            // NPC attack roll.
-            int npc_attack_roll = rnd::dice(20) + npc.thac0 + npc.get_melee_attack_bonus() - blind_attack_penalty;
-        
-            // Calculate the player's total armor class.
-            int player_ac = m_player.calc_armour_class(m_inventory.get());
-        
-            // Determine if NPC hits the player.
-            // e.g. d12 + 1 + (2 + 10/2) >= (10 + 10/2).
-            // d12 + 8 >= 15.
-            if (npc_attack_roll >= player_ac)
-            {
-              // NPC hits the player
-              int damage = 1; // Default damage for fists
-              if (npc.weapon_idx != -1)
-                damage = f_calc_damage(all_weapons[npc.weapon_idx].get(), npc.get_melee_damage_bonus());
-        
-              // Apply damage to the player
-              bool was_alive = m_player.health > 0;
-              m_player.health -= damage;
-              if (was_alive && m_player.health <= 0)
-              {
-                message_handler->add_message(static_cast<float>(real_time_s),
-                                             "You were killed!",
-                                             MessageHandler::Level::Fatal);
-                broadcast([](auto* listener) { listener->on_pc_death(); });
-              }
-            }
-            
-            // Roll a d20 for the player's attack roll (if the NPC is visible).
-            // If invisible, then roll a d32 instead.
-            const auto* weapon = m_player.get_selected_melee_weapon(m_inventory.get());
-            int player_attack_roll = rnd::dice(20) + m_player.thac0 + m_player.get_melee_attack_bonus() - blind_attack_penalty;
-            int npc_ac = npc.calc_armour_class();
-            
-            // Determine if player hits the NPC.
-            if (player_attack_roll >= npc_ac)
-            {
-              // PC hits the NPC.
-              int damage = f_calc_damage(weapon, m_player.get_melee_damage_bonus());
-              
-              // Apply damage to the NPC.
-              bool was_alive = npc.health > 0;
-              npc.health -= damage;
-              if (was_alive && npc.health <= 0)
-              {
-                message_handler->add_message(static_cast<float>(real_time_s),
-                                             "You killed the " + race2str(npc.npc_race) + "!",
-                                             MessageHandler::Level::Guide);
-                broadcast([](auto* listener) { listener->on_npc_death(); });
-              }
-            }
-          }
-        }
-      }
+      if (do_fight)
+        update_fighting(static_cast<float>(real_time_s));
       
       m_screen_helper->update_scrolling(curr_pos);
     }
     
     
     template<int NR, int NC>
-    void draw(ScreenHandler<NR, NC>& sh, double real_time_s, float sim_time_s, int anim_ctr,
+    void draw(ScreenHandler<NR, NC>& sh, double real_time_s, float sim_time_s,
+              int anim_ctr_swim, int anim_ctr_fight,
               ui::VerticalAlignment mb_v_align = ui::VerticalAlignment::CENTER,
               ui::HorizontalAlignment mb_h_align = ui::HorizontalAlignment::CENTER,
               int mb_v_align_offs = 0, int mb_h_align_offs = 0,
@@ -1185,167 +1377,7 @@ namespace dung
       
       auto pc_scr_pos = m_screen_helper->get_screen_pos(m_player.pos);
       
-      // Fighting
-      if (m_player.health > 0)
-      {
-        for (auto& npc : all_npcs)
-        {
-          if (npc.health <= 0)
-            continue;
-          
-          if (npc.state == State::Fight)
-          {
-            if (npc.trg_info_hostile_npc.once())
-            {
-              std::string message = "You are being attacked";
-              std::string race = race2str(npc.npc_race);
-              if (npc.visible && !race.empty())
-                message += " by " + str::indef_art(race);
-              message += "!";
-              message_handler->add_message(static_cast<float>(real_time_s),
-                                           message, MessageHandler::Level::Warning);
-            }
-          }
-          else
-            npc.trg_info_hostile_npc.reset();
-          
-          if (npc.state == State::Fight)
-          {
-            auto npc_scr_pos = m_screen_helper->get_screen_pos(npc.pos);
-            
-            // [side_case, base_case, side_case]
-            // Case NW (dp = [1, 1]):
-            //O#
-            //#*
-            // r + [1, 1, 0]
-            // c + [0, 1, 1]
-            //
-            // Case W (dp = [0, 1]):
-            // #
-            //O*
-            // #
-            // r + [1, 0, -1]
-            // c + [1, 1,  1]
-            //
-            // Case SW (dp = [-1, 1]):
-            //#*
-            //O#
-            // r + [0, -1, -1]
-            // c + [1,  1,  0]
-            //
-            // Case S (dp = [-1, 0]):
-            //#*#
-            // O
-            // r + [-1, -1, -1]
-            // c + [ 1,  0, -1]
-            //
-            // Case SE (dp = [-1, -1]):
-            //*#
-            //#O
-            // r + [-1, -1,  0]
-            // c + [ 0, -1, -1]
-            //
-            // Case E (dp = [0, -1]):
-            //#
-            //*O
-            //#
-            // r + [-1,  0,  1]
-            // c + [-1, -1, -1]
-            //
-            // Case NE (dp = [1, -1]):
-            //#O
-            //*#
-            // r + [ 0,  1, 1]
-            // c + [-1, -1, 0]
-            //
-            // Case N (dp = [1, 0]):
-            // O
-            //#*#
-            // r + [ 1, 1, 1]
-            // c + [-1, 0, 1]
-            
-            auto dp = m_player.pos - npc.pos;
-            dp.r = math::sgn(dp.r);
-            dp.c = math::sgn(dp.c);
-            
-            auto f_dp_to_dir = [](const RC& dp)
-            {
-              if (dp == RC { 1, 1 }) return FightDir::NW;
-              if (dp == RC { 0, 1 }) return FightDir::W;
-              if (dp == RC { -1, 1 }) return FightDir::SW;
-              if (dp == RC { -1, 0 }) return FightDir::S;
-              if (dp == RC { -1, -1 }) return FightDir::SE;
-              if (dp == RC { 0, -1 }) return FightDir::E;
-              if (dp == RC { 1, -1 }) return FightDir::NE;
-              if (dp == RC { 1, 0 }) return FightDir::N;
-              return FightDir::NUM_ITEMS;
-            };
-            const auto num_dir = static_cast<int>(FightDir::NUM_ITEMS);
-            
-            auto f_calc_fight_offs = [&](const RC& dp)
-            {
-              auto dir = static_cast<int>(f_dp_to_dir(dp));
-              
-              if (dir >= static_cast<int>(FightDir::NUM_ITEMS))
-                return RC { 0, 0 };
-                
-              auto r_offs = rnd::randn_select(0.f, 1.f, std::vector {
-                fight_r_offs[(num_dir + dir - 1)%num_dir],
-                fight_r_offs[dir],
-                fight_r_offs[(dir + 1)%num_dir] });
-              auto c_offs = rnd::randn_select(0.f, 1.f, std::vector {
-                fight_c_offs[(num_dir + dir - 1)%num_dir],
-                fight_c_offs[dir],
-                fight_c_offs[(dir + 1)%num_dir] });
-              return RC { r_offs, c_offs };
-            };
-            auto f_render_fight = [&](const RC& scr_pos, const RC& offs)
-            {
-              styles::Style fight_style
-              {
-                color::get_random_color(c_fight_colors),
-                Color::Transparent2
-              };
-              std::string fight_str = rnd::rand_select(c_fight_strings);
-              
-              sh.write_buffer(fight_str,
-                              scr_pos.r + offs.r,
-                              scr_pos.c + offs.c,
-                              fight_style);
-            };
-            auto offs = f_calc_fight_offs(dp);
-            if (m_environment->is_inside_any_room(m_player.pos + offs))
-            {
-              f_render_fight(npc_scr_pos, offs);
-              if (rnd::one_in(npc.visible ? 20 : 28))
-              {
-                auto& bs = m_player.blood_splats.emplace_back(m_environment.get(), m_player.pos + offs, rnd::dice(4), sim_time_s, offs);
-                bs.curr_room = m_player.curr_room;
-                bs.curr_corridor = m_player.curr_corridor;
-                if (m_player.is_inside_curr_room())
-                  bs.is_underground = m_environment->is_underground(m_player.curr_room);
-                else if (m_player.is_inside_curr_corridor())
-                  bs.is_underground = m_environment->is_underground(m_player.curr_corridor);
-              }
-            }
-            if (npc.visible)
-            {
-              auto offs = f_calc_fight_offs(-dp);
-              if (m_environment->is_inside_any_room(npc.pos + offs))
-              {
-                f_render_fight(pc_scr_pos, offs);
-                if (rnd::one_in(npc.visible ? 20 : 28))
-                {
-                  auto& bs = npc.blood_splats.emplace_back(m_environment.get(), npc.pos + offs, rnd::dice(4), sim_time_s, offs);
-                  bs.curr_room = npc.curr_room;
-                  bs.curr_corridor = npc.curr_corridor;
-                  bs.is_underground = npc.is_underground;
-                }
-              }
-            }
-          }
-        }
-      }
+      draw_fighting(sh, pc_scr_pos, anim_ctr_fight % 2 == 0, static_cast<float>(real_time_s), sim_time_s);
       
       for (auto& bs : m_player.blood_splats)
         bs.update(sim_time_s);
@@ -1368,11 +1400,11 @@ namespace dung
         }
       }
       
-      auto f_draw_swim_anim = [anim_ctr, &sh, this](bool is_moving,
+      auto f_draw_swim_anim = [anim_ctr_swim, &sh, this](bool is_moving,
                                                     const RC& pos, const RC& scr_pos,
                                                     float los_r, float los_c)
       {
-        if (anim_ctr % 3 == 0 && is_moving)
+        if (anim_ctr_swim % 3 == 0 && is_moving)
         {
           RC swim_pos { math::roundI(pos.r - los_r), math::roundI(pos.c - los_c) };
           if (m_environment->is_inside_any_room(swim_pos))

@@ -141,10 +141,15 @@ namespace dung
       smoke_color_gradients.emplace_back(0.6f, smoke_1);
     }
     
-    void update(ScreenHelper* screen_helper, Inventory* inventory, float sim_time, float sim_dt)
+    void update(ScreenHelper* screen_helper, Inventory* inventory,
+                bool do_los_terrainos,
+                float sim_time, float sim_dt)
     {
-      update_los();
-      update_terrain();
+      if (do_los_terrainos)
+      {
+        update_los();
+        update_terrain();
+      }
       update_fire_smoke(screen_helper, inventory, sim_time, sim_dt);
       
       weight_strain = math::value_to_param_clamped(curr_tot_inv_weight, weight_capacity_soft, weight_capacity_hard);

@@ -64,10 +64,12 @@ namespace dung
       , m_debug(debug)
     {}
   
-    void handle_keyboard(const keyboard::KeyPressData& kpd, double real_time_s)
+    void handle_keyboard(const keyboard::KeyPressDataPair& kpdp, double real_time_s)
     {
-      auto curr_key = keyboard::get_char_key(kpd);
-      auto curr_special_key = keyboard::get_special_key(kpd);
+      auto curr_key = keyboard::get_char_key(kpdp.transient);
+      auto curr_special_key = keyboard::get_special_key(kpdp.transient);
+      //auto curr_key_held = keyboard::get_char_key(kpdp.held);
+      //auto curr_special_key_held = keyboard::get_special_key(kpdp.held);
     
       auto& curr_pos = m_player.pos;
       

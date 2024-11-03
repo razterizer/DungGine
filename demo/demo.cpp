@@ -21,7 +21,12 @@ class Game : public GameEngine<>, public dung::DungGineListener
 public:
   Game(int argc, char** argv, const GameEngineParams& params)
     : GameEngine(argv[0], params)
-  {}
+  {
+    GameEngine::set_real_fps(15);
+    GameEngine::set_sim_delay_us(10'000);
+    GameEngine::set_anim_rate(0, 3); // swim animation
+    GameEngine::set_anim_rate(1, 4); // fight animation
+  }
   
   virtual ~Game() override
   {
@@ -97,8 +102,12 @@ public:
       
       sh.clear();
       bool game_over = false;
-      dungeon_engine->update(get_real_time_s(), get_sim_time_s(), get_sim_dt_s(), kpd, &game_over);
-      dungeon_engine->draw(sh, get_real_time_s(), get_sim_time_s(), anim_ctr);
+      dungeon_engine->update(get_frame_count(), get_real_fps(),
+                             get_real_time_s(), get_sim_time_s(), get_sim_dt_s(),
+                             fire_smoke_dt_factor,
+                             kpdp, &game_over);
+      dungeon_engine->draw(sh, get_real_time_s(), get_sim_time_s(),
+                           get_anim_count(0), get_anim_count(1));
       sh.print_screen_buffer(Color::Black);
 #endif
     }
@@ -150,14 +159,20 @@ private:
     if (test_type == TestType::DungeonRuntime)
     {
       bool game_over = false;
-      dungeon_engine->update(get_real_time_s(), get_sim_time_s(), get_sim_dt_s(), kpd, &game_over);
+      dungeon_engine->update(get_frame_count(), get_real_fps(),
+                             get_real_time_s(), get_sim_time_s(), get_sim_dt_s(),
+                             fire_smoke_dt_factor,
+                             kpdp, &game_over);
       if (game_over)
         set_state_game_over();
       
       if (framed_mode)
         draw_frame(sh, Color::White);
       
-      dungeon_engine->draw(sh, get_real_time_s(), get_sim_time_s(), anim_ctr, ui::VerticalAlignment::CENTER, ui::HorizontalAlignment::CENTER, 4, 0, framed_mode, use_gore);
+      dungeon_engine->draw(sh, get_real_time_s(), get_sim_time_s(),
+                           get_anim_count(0), get_anim_count(1),
+                           ui::VerticalAlignment::CENTER, ui::HorizontalAlignment::CENTER,
+                           4, 0, framed_mode, use_gore);
     }
   }
   
@@ -176,6 +191,8 @@ private:
   
   bool framed_mode = false;
   bool use_gore = true;
+  
+  float fire_smoke_dt_factor = 0.5f;
 };
 
 int main(int argc, char** argv)
