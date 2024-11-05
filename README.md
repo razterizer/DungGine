@@ -10,11 +10,9 @@
 
 ![Top Languages](https://img.shields.io/github/languages/top/razterizer/DungGine)
 ![GitHub repo size](https://img.shields.io/github/repo-size/razterizer/DungGine)
-<!-- ![Goto](https://img.shields.io/github/search/razterizer/DungGine/goto) -->
 ![Commit Activity](https://img.shields.io/github/commit-activity/t/razterizer/DungGine)
 ![Last Commit](https://img.shields.io/github/last-commit/razterizer/DungGine?color=blue)
 ![Contributors](https://img.shields.io/github/contributors/razterizer/DungGine?color=blue)
-<!-- ![Languages](https://img.shields.io/github/languages/count/razterizer/DungGine) -->
 
 <img width="568" alt="image" src="https://github.com/user-attachments/assets/c3075838-7f15-4679-862e-ce47780c9b39">
 
