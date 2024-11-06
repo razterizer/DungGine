@@ -140,6 +140,20 @@ Texturing done using the editor [`TextUR`](https://github.com/razterizer/TextUR)
 Use the `TextUR` command line argument `-c` to convert a normal/fill texture to a shadow texture.
 `DungGine` supports texture animations.
 
+## Demo - Build and Run
+
+Build by going to `<my_source_code_dir>/DungGine/demo/` (preferrably `<my_source_code_dir>/lib/DungGine/demo/`) and build with `build_demo.sh` for Linux/MacOS or `build_demo.bat` for Windows.
+
+### Linux / MacOS
+
+Then you run by typing `bin/demo`.
+
+### Windows
+
+Then you run by cd to `demo.vs` followed by `x64\Release\demo`.
+
+Alternatively, you can open the solution `demo.vs/demo.vs.sln` and build and run from there.
+
 ## Examples
 
 ```cpp
