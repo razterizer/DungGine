@@ -26,6 +26,10 @@
 		072AE8042D0E7BBE004F92D3 /* fetch-dependencies.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = "fetch-dependencies.py"; sourceTree = SOURCE_ROOT; };
 		072AE8052D0E7BFB004F92D3 /* build_demo_ubsan.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = build_demo_ubsan.sh; sourceTree = "<group>"; };
 		072AE8062D0E7BFC004F92D3 /* build_demo_asan.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = build_demo_asan.sh; sourceTree = "<group>"; };
+		072AE8072D0E7D3B004F92D3 /* setup_and_build_demo.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = setup_and_build_demo.sh; sourceTree = SOURCE_ROOT; };
+		072AE8082D0E7D3B004F92D3 /* setup_and_build_demo.bat */ = {isa = PBXFileReference; lastKnownFileType = text; path = setup_and_build_demo.bat; sourceTree = SOURCE_ROOT; };
+		072AE8092D0E7E0F004F92D3 /* run_demo.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = run_demo.sh; sourceTree = "<group>"; };
+		072AE80A2D0E7E0F004F92D3 /* run_demo.bat */ = {isa = PBXFileReference; lastKnownFileType = text; path = run_demo.bat; sourceTree = "<group>"; };
 		07C2A7842C2616FC00869A56 /* RoomStyle.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RoomStyle.h; sourceTree = "<group>"; };
 		07C2A7852C2618A500869A56 /* Items.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Items.h; sourceTree = "<group>"; };
 		07C2A7862C261B3C00869A56 /* PC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PC.h; sourceTree = "<group>"; };
@@ -74,12 +78,16 @@
 		072AE8022D0E7AEA004F92D3 /* scripts */ = {
 			isa = PBXGroup;
 			children = (
+				072AE8082D0E7D3B004F92D3 /* setup_and_build_demo.bat */,
+				072AE8072D0E7D3B004F92D3 /* setup_and_build_demo.sh */,
 				072AE8042D0E7BBE004F92D3 /* fetch-dependencies.py */,
 				072AE8032D0E7BBD004F92D3 /* dependencies */,
 				0709B9B32C9374D100A43834 /* build_demo.bat */,
 				07D769AC2C6044E000BCA669 /* build_demo.sh */,
 				072AE8052D0E7BFB004F92D3 /* build_demo_ubsan.sh */,
 				072AE8062D0E7BFC004F92D3 /* build_demo_asan.sh */,
+				072AE80A2D0E7E0F004F92D3 /* run_demo.bat */,
+				072AE8092D0E7E0F004F92D3 /* run_demo.sh */,
 			);
 			name = scripts;
 			sourceTree = "<group>";
