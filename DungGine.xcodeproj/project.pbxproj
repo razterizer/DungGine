@@ -67,12 +67,20 @@
 			name = workflows;
 			sourceTree = "<group>";
 		};
+		072AE8022D0E7AEA004F92D3 /* scripts */ = {
+			isa = PBXGroup;
+			children = (
+				0709B9B32C9374D100A43834 /* build_demo.bat */,
+				07D769AC2C6044E000BCA669 /* build_demo.sh */,
+			);
+			name = scripts;
+			sourceTree = "<group>";
+		};
 		07D769A72C603C9800BCA669 /* demo */ = {
 			isa = PBXGroup;
 			children = (
+				072AE8022D0E7AEA004F92D3 /* scripts */,
 				07D769AD2C6044E800BCA669 /* textures */,
-				07D769AC2C6044E000BCA669 /* build_demo.sh */,
-				0709B9B32C9374D100A43834 /* build_demo.bat */,
 				07D769A82C603CC300BCA669 /* demo.cpp */,
 			);
 			path = demo;
