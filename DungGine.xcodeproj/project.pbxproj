@@ -24,6 +24,8 @@
 		0719424A2C49D65F008BD519 /* NPC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NPC.h; sourceTree = "<group>"; };
 		072AE8032D0E7BBD004F92D3 /* dependencies */ = {isa = PBXFileReference; lastKnownFileType = text; path = dependencies; sourceTree = SOURCE_ROOT; };
 		072AE8042D0E7BBE004F92D3 /* fetch-dependencies.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = "fetch-dependencies.py"; sourceTree = SOURCE_ROOT; };
+		072AE8052D0E7BFB004F92D3 /* build_demo_ubsan.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = build_demo_ubsan.sh; sourceTree = "<group>"; };
+		072AE8062D0E7BFC004F92D3 /* build_demo_asan.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = build_demo_asan.sh; sourceTree = "<group>"; };
 		07C2A7842C2616FC00869A56 /* RoomStyle.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RoomStyle.h; sourceTree = "<group>"; };
 		07C2A7852C2618A500869A56 /* Items.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Items.h; sourceTree = "<group>"; };
 		07C2A7862C261B3C00869A56 /* PC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PC.h; sourceTree = "<group>"; };
@@ -76,6 +78,8 @@
 				072AE8032D0E7BBD004F92D3 /* dependencies */,
 				0709B9B32C9374D100A43834 /* build_demo.bat */,
 				07D769AC2C6044E000BCA669 /* build_demo.sh */,
+				072AE8052D0E7BFB004F92D3 /* build_demo_ubsan.sh */,
+				072AE8062D0E7BFC004F92D3 /* build_demo_asan.sh */,
 			);
 			name = scripts;
 			sourceTree = "<group>";
