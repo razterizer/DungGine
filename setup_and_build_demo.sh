@@ -1,7 +1,7 @@
 #!/bin/bash
 
 REPO_DIR="DungGine"
-BUILD_DIR="demos"
+BUILD_DIR="demo"
 
 cd ..
 
