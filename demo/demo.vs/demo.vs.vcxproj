@@ -115,8 +115,8 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy $(SolutionDir)\..\textures\ $(TargetDir)\textures\ /Y
-xcopy $(SolutionDir)\..\..\..\Termin8or\fonts\* $(TargetDir)\fonts\ /Y</Command>
+      <Command>xcopy "$(SolutionDir)\..\textures\" "$(TargetDir)\textures\" /Y
+xcopy "$(SolutionDir)\..\..\..\Termin8or\fonts\*" "$(TargetDir)\fonts\" /Y</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -137,8 +137,8 @@ xcopy $(SolutionDir)\..\..\..\Termin8or\fonts\* $(TargetDir)\fonts\ /Y</Command>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy $(SolutionDir)\..\textures\ $(TargetDir)\textures\ /Y
-xcopy $(SolutionDir)\..\..\..\Termin8or\fonts\* $(TargetDir)\fonts\ /Y</Command>
+      <Command>xcopy "$(SolutionDir)\..\textures\" "$(TargetDir)\textures\" /Y
+xcopy "$(SolutionDir)\..\..\..\Termin8or\fonts\*" "$(TargetDir)\fonts\" /Y</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
