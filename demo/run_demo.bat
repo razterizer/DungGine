@@ -1,1 +1,1 @@
-x64\Release\demo.exe
+demo.vs\x64\Release\demo.vs.exe
