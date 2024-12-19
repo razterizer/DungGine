@@ -142,17 +142,66 @@ Use the `TextUR` command line argument `-c` to convert a normal/fill texture to 
 
 ## Demo - Build and Run
 
-Build by going to `<my_source_code_dir>/DungGine/demo/` (preferrably `<my_source_code_dir>/lib/DungGine/demo/`) and build with `build_demo.sh` for Linux/MacOS or `build_demo.bat` for Windows.
+When you clone this repo. The repo workspace/checkout dir should preferrably be located in a superfolder named `lib` in order for other libraries and programs to know where to look for it.
 
-### Linux / MacOS
+There are two options on dealing with repo dependencies:
 
-Then you run by typing `bin/demo`.
+### Repo Dependencies Option 1
+
+This method will ensure that you are running the latest stable versions of the dependencies that work with `DungGine`.
+
+The script `fetch-dependencies.py` used for this was created by [Thibaut Buchert](https://github.com/thibautbuchert).
+`fetch-dependencies.py` is used in the following scripts below:
+
+After a successful build, the scripts will then prompt you with the question if you want to run the demo.
+
+When the script has been successfully run for the first time, you can then go to sub-folder `demo` and use the `build_demo.sh` / `build_demo.bat` script instead, and after you have built, just run the `run_demo.sh` or `run_demo.bat` script.
+
+#### Windows
+
+Run the following script:
+```sh
+setup_and_build_demo.bat
+```
+
+#### MacOS / Linux
+
+Run the following script:
+```sh
+setup_and_build_demo.sh
+```
+
+### Repo Dependencies Option 2
+
+In this method we basically outline the things done in the `setup_and_build_demo`-scripts in Option 1.
+
+This method is more suitable for development as we're not necessarily working with "locked" dependencies.
+
+You need the following header-only libraries:
+* https://github.com/razterizer/Core
+* https://github.com/razterizer/Termin8or
+
+Make sure the folder structure looks like this:
+```
+<my_source_code_dir>/lib/Core/                   ; Core repo workspace/checkout goes here.
+<my_source_code_dir>/lib/Termin8or/              ; Termin8or repo workspace/checkout goes here.
+<my_source_code_dir>DungGine/                    ; DungGine repo workspace/checkout goes here.
+```
+
+These repos are not guaranteed to all the time work with the latest version of `DungGine`. If you want the more stable aproach then look at Option 1 instead.
 
 ### Windows
 
-Then you run by cd to `demo.vs` followed by `x64\Release\demo`.
+Then just open `<my_source_code_dir>/DungGine/demo/demo.vs.sln` and build and run. That's it!
 
-Alternatively, you can open the solution `demo.vs/demo.vs.sln` and build and run from there.
+You can also build it by going to `<my_source_code_dir>/DungGine/demo/` and build with `build_demo.bat`.
+Then you run by typing `run_demo.bat`.
+
+### MacOS / Linux
+
+Goto `<my_source_code_dir>/DungGine/demo/` and build with `./build_demo.sh`.
+
+Then run by typing `run_demo.sh` or simply `./bin/demo`.
 
 ## Examples
 
