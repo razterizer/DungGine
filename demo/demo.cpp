@@ -206,6 +206,21 @@ int main(int argc, char** argv)
   params.screen_bg_color_title = Color::DarkYellow;
   params.screen_bg_color_instructions = Color::Black;
 
+  if (argc >= 3 && strcmp(argv[1], "--log_mode") == 0)
+  {
+    if (strcmp(argv[2], "record") == 0)
+      params.log_mode = LogMode::Record;
+    else if (strcmp(argv[2], "replay") == 0)
+      params.log_mode = LogMode::Replay;
+    params.xcode_log_filepath = "../../../../../../../../Documents/xcode/lib/DungGine/demo";
+  }
+  
+  if (argc >= 2 && strcmp(argv[1], "--help") == 0)
+  {
+    std::cout << "demo ([--help] | [--log_mode (record | replay)])" << std::endl;
+    return EXIT_SUCCESS;
+  }
+
   Game game(argc, argv, params);
 
   game.init();
