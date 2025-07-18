@@ -72,5 +72,3 @@ jobs:
           publish_dir: loc-badge
           publish_branch: gh-pages
           force_orphan: true
-
-  
