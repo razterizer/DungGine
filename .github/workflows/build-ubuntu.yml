@@ -61,20 +61,25 @@ jobs:
           </svg>
           EOF
 
-      # Step 6: Commit and push the badge to the "badges" branch
+      # Step 5: Commit and push the badge to the "badges" branch
       - name: Commit and push badge to badges branch
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
-          # Check out the "badges" branch (create it if it doesn't exist)
+          # Fetch the latest badges branch
           git fetch origin badges || true
           git checkout badges || git checkout --orphan badges
+
+          # Merge remote changes if the branch already exists
+          git pull origin badges --rebase || true
 
           # Copy badge to the branch and commit
           cp -r badges/* .
           git add loc-badge.svg
           git commit -m "Update LOC badge" || echo "No changes to commit"
-          git push origin badges
+
+          # Push the updated branch
+          git push origin badges --force
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
