@@ -36,4 +36,39 @@ jobs:
           cd demo
           ./build_demo.sh
         continue-on-error: false # Ensure errors are not bypassed
+      
+      # Step 4: Install scc
+      - name: Install scc
+        run: |
+          curl -LO https://github.com/boyter/scc/releases/latest/download/scc-x86_64-unknown-linux-gnu.tar.gz
+          tar -xzf scc-x86_64-unknown-linux-gnu.tar.gz
+          chmod +x scc
+          sudo mv scc /usr/local/bin/
+
+      # Step 5: Run scc and create badge
+      - name: Count C++ LOC and generate badge
+        run: |
+          mkdir -p loc-badge
+          scc --include-ext cpp,hpp --output json > loc-badge/raw.json
+
+          LOC=$(jq '[.[] | select(.language=="C++") | .code] | add' loc-badge/raw.json)
+
+          cat <<EOF > loc-badge/loc-badge.json
+          {
+            "schemaVersion": 1,
+            "label": "C++ LOC",
+            "message": "${LOC} lines",
+            "color": "blue"
+          }
+          EOF
+
+      # Step 6: Push badge to gh-pages
+      - name: Publish badge to gh-pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: loc-badge
+          publish_branch: gh-pages
+          force_orphan: true
+
   
