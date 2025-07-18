@@ -61,7 +61,7 @@ jobs:
           </svg>
           EOF
 
-      # Step 5: Commit and push the badge to the "badges" branch
+      # Step 6: Commit and push the badge to the "badges" branch
       - name: Commit and push badge to badges branch
         run: |
           git config --global user.name "github-actions[bot]"
