@@ -36,22 +36,12 @@ jobs:
           cd demo
           ./build_demo.sh
         continue-on-error: false # Ensure errors are not bypassed
-      
-      # Step 4: Install scc
-      - name: Install scc
-        run: |
-          SCC_VERSION=$(curl -s https://api.github.com/repos/boyter/scc/releases/latest | jq -r '.tag_name')
-          DOWNLOAD_URL=$(curl -s https://api.github.com/repos/boyter/scc/releases/latest | jq -r ".assets[] | select(.name | endswith(\"x86_64-unknown-linux-gnu.tar.gz\")) | .browser_download_url")
-          curl -L -o scc.tar.gz "$DOWNLOAD_URL"
-          tar -xzf scc.tar.gz
-          chmod +x scc
-          sudo mv scc /usr/local/bin/
 
       # Step 5: Run scc and create badge
       - name: Count C++ LOC and generate badge
         run: |
           mkdir -p loc-badge
-          scc --include-ext cpp,hpp --output json > loc-badge/raw.json
+          scc --include-ext cpp,h --output json > loc-badge/raw.json
 
           LOC=$(jq '[.[] | select(.language=="C++") | .code] | add' loc-badge/raw.json)
 
