@@ -10,7 +10,6 @@
 
 ![Top Languages](https://img.shields.io/github/languages/top/razterizer/DungGine)
 ![GitHub repo size](https://img.shields.io/github/repo-size/razterizer/DungGine)
-![](https://tokei.rs/b1/github/razterizer/DungGine)
 ![C++ LOC](https://raw.githubusercontent.com/razterizer/DungGine/badges/loc-badge.svg)
 ![Commit Activity](https://img.shields.io/github/commit-activity/t/razterizer/DungGine)
 ![Last Commit](https://img.shields.io/github/last-commit/razterizer/DungGine?color=blue)
