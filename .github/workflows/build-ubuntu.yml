@@ -36,4 +36,31 @@ jobs:
           cd demo
           ./build_demo.sh
         continue-on-error: false # Ensure errors are not bypassed
-  
+
+      # Step 4: Install cloc
+      - name: Install cloc
+        run: sudo apt-get install -y cloc
+      
+      # Step 5: Count C++ LOC and generate badge
+      - name: Count C++ LOC and generate badge
+        run: |
+          mkdir -p loc-badge
+          CLOC_RESULT=$(cloc --include-lang=C++ --json . | jq '.["C++"].code')
+
+          cat <<EOF > loc-badge/loc-badge.json
+          {
+            "schemaVersion": 1,
+            "label": "C++ LOC",
+            "message": "${CLOC_RESULT} lines",
+            "color": "blue"
+          }
+          EOF
+
+      # Step 6: Publish badge to gh-pages
+      - name: Publish badge to gh-pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: loc-badge
+          publish_branch: gh-pages
+          force_orphan: true
