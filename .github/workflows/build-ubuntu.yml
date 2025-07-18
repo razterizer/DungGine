@@ -40,8 +40,9 @@ jobs:
       # Step 4: Install scc
       - name: Install scc
         run: |
-          curl -LO https://github.com/boyter/scc/releases/latest/download/scc-x86_64-unknown-linux-gnu.tar.gz
-          tar -xzf scc-x86_64-unknown-linux-gnu.tar.gz
+          SCC_VERSION=$(curl -s https://api.github.com/repos/boyter/scc/releases/latest | jq -r '.tag_name')
+          curl -L -o scc.tar.gz https://github.com/boyter/scc/releases/download/${SCC_VERSION}/scc-x86_64-unknown-linux-gnu.tar.gz
+          tar -xzf scc.tar.gz
           chmod +x scc
           sudo mv scc /usr/local/bin/
 
