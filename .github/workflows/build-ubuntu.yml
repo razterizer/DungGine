@@ -47,24 +47,26 @@ jobs:
           mkdir -p badges
           CLOC_RESULT=$(cloc --include-ext=cpp,h --json . | jq '.SUM.code')
 
-          # Convert the number to a human-readable format (e.g., 5.7k instead of 5700)
-          units=( "" "k" "M" "G" "T" )
-          value=$CLOC_RESULT
-          unit_idx=0
-          while [ "$value" -ge 1000 ] && [ $unit_idx -lt 4 ]; do
-            value=$((value / 1000))
-            unit_idx=$((unit_idx + 1))
-          done
-          HUMAN_READABLE=$(printf "%.1f%s" "$CLOC_RESULT" "${units[$unit_idx]}")
+          if [ "$CLOC_RESULT" -lt 10000 ]; then
+            HUMAN_READABLE=$(printf "%'d" "$CLOC_RESULT" | sed 's/,/ /g')
+          else
+            HUMAN_READABLE=$(awk "BEGIN { printf \"%.1f k\", $CLOC_RESULT / 1000 }")
+          fi
+
+          # Estimate value text width (7px per character as an approximation)
+          VALUE_TEXT_WIDTH=$(( ${#HUMAN_READABLE} * 7 + 10 ))  # +10 for padding
+          LEFT_RECT_WIDTH=70
+          TOTAL_WIDTH=$((LEFT_RECT_WIDTH + VALUE_TEXT_WIDTH))
+          TEXT_X=$((LEFT_RECT_WIDTH + VALUE_TEXT_WIDTH / 2))
 
           # Create SVG badge
           cat <<EOF > badges/loc-badge.svg
-          <svg xmlns="http://www.w3.org/2000/svg" width="150" height="20" role="img" aria-label="C++ lines: $HUMAN_READABLE">
+          <svg xmlns="http://www.w3.org/2000/svg" width="$TOTAL_WIDTH" height="20" role="img" aria-label="C++ lines: $HUMAN_READABLE">
             <title>C++ lines: $HUMAN_READABLE</title>
-            <rect width="70" height="20" fill="#555"/>
-            <rect x="70" width="80" height="20" fill="#007ec6"/>
-            <text x="35" y="14" fill="#fff" font-family="Verdana" font-size="11" text-anchor="middle">C++ lines</text>
-            <text x="105" y="14" fill="#fff" font-family="Verdana" font-size="11" text-anchor="middle">$HUMAN_READABLE</text>
+            <rect width="$LEFT_RECT_WIDTH" height="20" fill="#555"/>
+            <rect x="$LEFT_RECT_WIDTH" width="$VALUE_TEXT_WIDTH" height="20" fill="#007ec6"/>
+            <text x="$((LEFT_RECT_WIDTH / 2))" y="14" fill="#fff" font-family="Verdana" font-size="11" text-anchor="middle">C++ lines</text>
+            <text x="$TEXT_X" y="14" fill="#fff" font-family="Verdana" font-size="11" text-anchor="middle">$HUMAN_READABLE</text>
           </svg>
           EOF
 
