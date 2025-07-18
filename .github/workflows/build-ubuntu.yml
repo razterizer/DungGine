@@ -48,7 +48,14 @@ jobs:
           CLOC_RESULT=$(cloc --include-ext=cpp,h --json . | jq '.SUM.code')
 
           # Convert the number to a human-readable format (e.g., 5.7k instead of 5700)
-          HUMAN_READABLE=$(echo $CLOC_RESULT | awk '{split(" k M G T", v); for (i=1; $1>=1000 && i<length(v); i++) $1/=1000; printf "%.1f%s", $1, v[i]}')
+          units=( "" "k" "M" "G" "T" )
+          value=$CLOC_RESULT
+          unit_idx=0
+          while [ "$value" -ge 1000 ] && [ $unit_idx -lt 4 ]; do
+            value=$((value / 1000))
+            unit_idx=$((unit_idx + 1))
+          done
+          HUMAN_READABLE=$(printf "%.1f%s" "$CLOC_RESULT" "${units[$unit_idx]}")
 
           # Create SVG badge
           cat <<EOF > badges/loc-badge.svg
