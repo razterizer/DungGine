@@ -3,12 +3,24 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 56;
+	objectVersion = 70;
 	objects = {
 
 /* Begin PBXBuildFile section */
 		07D769AA2C603CC300BCA669 /* demo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07D769A82C603CC300BCA669 /* demo.cpp */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		075D41942E28B68E005DD356 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		0709B9AB2C6E445100A43834 /* PlayerBase.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PlayerBase.h; sourceTree = "<group>"; };
@@ -30,6 +42,7 @@
 		072AE8082D0E7D3B004F92D3 /* setup_and_build_demo.bat */ = {isa = PBXFileReference; lastKnownFileType = text; path = setup_and_build_demo.bat; sourceTree = SOURCE_ROOT; };
 		072AE8092D0E7E0F004F92D3 /* run_demo.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = run_demo.sh; sourceTree = "<group>"; };
 		072AE80A2D0E7E0F004F92D3 /* run_demo.bat */ = {isa = PBXFileReference; lastKnownFileType = text; path = run_demo.bat; sourceTree = "<group>"; };
+		075D41962E28B68E005DD356 /* demo */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = demo; sourceTree = BUILT_PRODUCTS_DIR; };
 		07C2A7842C2616FC00869A56 /* RoomStyle.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RoomStyle.h; sourceTree = "<group>"; };
 		07C2A7852C2618A500869A56 /* Items.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Items.h; sourceTree = "<group>"; };
 		07C2A7862C261B3C00869A56 /* PC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PC.h; sourceTree = "<group>"; };
@@ -54,7 +67,18 @@
 		07E6EAD72C1C2657007BBC6B /* DungGineStyles.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DungGineStyles.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		075D41972E28B68F005DD356 /* demo */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = demo; sourceTree = "<group>"; };
+/* End PBXFileSystemSynchronizedRootGroup section */
+
 /* Begin PBXFrameworksBuildPhase section */
+		075D41932E28B68E005DD356 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		07E6EAC12C14CEA8007BBC6B /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -140,6 +164,7 @@
 				07D769B22C68D06D00BCA669 /* Terrain.h */,
 				0709B9AF2C700CE900A43834 /* DungGineListener.h */,
 				0709B9B12C73B7CD00A43834 /* Inventory.h */,
+				075D41972E28B68F005DD356 /* demo */,
 				07E6EAC42C14CEA8007BBC6B /* Products */,
 			);
 			sourceTree = "<group>";
@@ -148,6 +173,7 @@
 			isa = PBXGroup;
 			children = (
 				07E6EAC32C14CEA8007BBC6B /* libDungGine.a */,
+				075D41962E28B68E005DD356 /* demo */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -165,6 +191,28 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
+		075D41952E28B68E005DD356 /* demo */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 075D419C2E28B68F005DD356 /* Build configuration list for PBXNativeTarget "demo" */;
+			buildPhases = (
+				075D41922E28B68E005DD356 /* Sources */,
+				075D41932E28B68E005DD356 /* Frameworks */,
+				075D41942E28B68E005DD356 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				075D41972E28B68F005DD356 /* demo */,
+			);
+			name = demo;
+			packageProductDependencies = (
+			);
+			productName = demo;
+			productReference = 075D41962E28B68E005DD356 /* demo */;
+			productType = "com.apple.product-type.tool";
+		};
 		07E6EAC22C14CEA8007BBC6B /* DungGine */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 07E6EAC72C14CEA8007BBC6B /* Build configuration list for PBXNativeTarget "DungGine" */;
@@ -191,6 +239,9 @@
 				BuildIndependentTargetsInParallel = 1;
 				LastUpgradeCheck = 1540;
 				TargetAttributes = {
+					075D41952E28B68E005DD356 = {
+						CreatedOnToolsVersion = 16.4;
+					};
 					07E6EAC22C14CEA8007BBC6B = {
 						CreatedOnToolsVersion = 15.4;
 					};
@@ -210,11 +261,19 @@
 			projectRoot = "";
 			targets = (
 				07E6EAC22C14CEA8007BBC6B /* DungGine */,
+				075D41952E28B68E005DD356 /* demo */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXSourcesBuildPhase section */
+		075D41922E28B68E005DD356 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		07E6EAC02C14CEA8007BBC6B /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -226,6 +285,30 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
+		075D419A2E28B68F005DD356 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = HFL2Q84SZB;
+				ENABLE_HARDENED_RUNTIME = YES;
+				HEADER_SEARCH_PATHS = ..;
+				MACOSX_DEPLOYMENT_TARGET = 15.5;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		075D419B2E28B68F005DD356 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = HFL2Q84SZB;
+				ENABLE_HARDENED_RUNTIME = YES;
+				HEADER_SEARCH_PATHS = ..;
+				MACOSX_DEPLOYMENT_TARGET = 15.5;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 		07E6EAC52C14CEA8007BBC6B /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -374,6 +457,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		075D419C2E28B68F005DD356 /* Build configuration list for PBXNativeTarget "demo" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				075D419A2E28B68F005DD356 /* Debug */,
+				075D419B2E28B68F005DD356 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		07E6EABE2C14CEA8007BBC6B /* Build configuration list for PBXProject "DungGine" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
