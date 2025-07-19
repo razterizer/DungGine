@@ -43,32 +43,57 @@ jobs:
       
       # Step 5: Count C++ LOC and generate badge as SVG
       - name: Count C++ LOC and generate badge
-        run: |
-          mkdir -p badges
-          CLOC_RESULT=$(cloc --include-ext=cpp,h --json . | jq '.SUM.code')
+  run: |
+    mkdir -p badges
+    CLOC_RESULT=$(cloc --include-ext=cpp,h --json . | jq '.SUM.code')
 
-          if [ "$CLOC_RESULT" -lt 10000 ]; then
-            HUMAN_READABLE=$(printf "%'d" "$CLOC_RESULT" | sed 's/,/ /g')
-          else
-            HUMAN_READABLE=$(awk "BEGIN { printf \"%.1f k\", $CLOC_RESULT / 1000 }")
-          fi
+    if [ "$CLOC_RESULT" -lt 10000 ]; then
+      HUMAN_READABLE=$(printf "%'d" "$CLOC_RESULT" | sed 's/,/ /g')
+    else
+      HUMAN_READABLE=$(awk "BEGIN { printf \"%.1f k\", $CLOC_RESULT / 1000 }")
+    fi
 
-          # Estimate value text width (7px per character as an approximation)
-          VALUE_TEXT_WIDTH=$(( ${#HUMAN_READABLE} * 7 + 10 ))  # +10 for padding
-          LEFT_RECT_WIDTH=70
-          TOTAL_WIDTH=$((LEFT_RECT_WIDTH + VALUE_TEXT_WIDTH))
-          TEXT_X=$((LEFT_RECT_WIDTH + VALUE_TEXT_WIDTH / 2))
+    LABEL="C++ lines"
+    LABEL_LEN=${#LABEL}
+    VALUE_LEN=${#HUMAN_READABLE}
 
-          # Create SVG badge
-          cat <<EOF > badges/loc-badge.svg
-          <svg xmlns="http://www.w3.org/2000/svg" width="$TOTAL_WIDTH" height="20" role="img" aria-label="C++ lines: $HUMAN_READABLE">
-            <title>C++ lines: $HUMAN_READABLE</title>
-            <rect width="$LEFT_RECT_WIDTH" height="20" fill="#555" rx="3" ry="3" />
-            <rect x="$LEFT_RECT_WIDTH" width="$VALUE_TEXT_WIDTH" height="20" fill="#007ec6" rx="3" ry="3" />
-            <text x="$((LEFT_RECT_WIDTH / 2))" y="14" fill="#fff" font-family="Verdana" font-size="11" text-anchor="middle">C++ lines</text>
-            <text x="$TEXT_X" y="14" fill="#fff" font-family="Verdana" font-size="11" text-anchor="middle">$HUMAN_READABLE</text>
-          </svg>
-          EOF
+    # Text length in 1/10 px units (shields.io uses 90-110 per char as base)
+    LABEL_TEXTLEN=$((LABEL_LEN * 70))
+    VALUE_TEXTLEN=$((VALUE_LEN * 70))
+
+    # Box widths in normal px (scale 0.1 used later)
+    LABEL_WIDTH=$((LABEL_TEXTLEN / 10 + 10))
+    VALUE_WIDTH=$((VALUE_TEXTLEN / 10 + 10))
+    TOTAL_WIDTH=$((LABEL_WIDTH + VALUE_WIDTH))
+
+    # Positions for centered text
+    LABEL_CENTER=$((LABEL_WIDTH * 10 / 2))
+    VALUE_CENTER=$((LABEL_WIDTH * 10 + VALUE_WIDTH * 10 / 2))
+
+    # Create SVG
+    cat <<EOF > badges/loc-badge.svg
+      <svg xmlns="http://www.w3.org/2000/svg" width="$TOTAL_WIDTH" height="20" role="img" aria-label="$LABEL: $HUMAN_READABLE">
+        <title>$LABEL: $HUMAN_READABLE</title>
+        <linearGradient id="s" x2="0" y2="100%">
+          <stop offset="0" stop-color="#bbb" stop-opacity=".1"/>
+          <stop offset="1" stop-opacity=".1"/>
+        </linearGradient>
+        <clipPath id="r">
+          <rect width="$TOTAL_WIDTH" height="20" rx="3" fill="#fff"/>
+        </clipPath>
+        <g clip-path="url(#r)">
+          <rect width="$LABEL_WIDTH" height="20" fill="#555"/>
+          <rect x="$LABEL_WIDTH" width="$VALUE_WIDTH" height="20" fill="#007ec6"/>
+          <rect width="$TOTAL_WIDTH" height="20" fill="url(#s)"/>
+        </g>
+        <g fill="#fff" text-anchor="middle" font-family="Verdana,Geneva,DejaVu Sans,sans-serif" text-rendering="geometricPrecision" font-size="110">
+          <text aria-hidden="true" x="$LABEL_CENTER" y="150" fill="#010101" fill-opacity=".3" transform="scale(.1)" textLength="$LABEL_TEXTLEN">$LABEL</text>
+          <text x="$LABEL_CENTER" y="140" transform="scale(.1)" fill="#fff" textLength="$LABEL_TEXTLEN">$LABEL</text>
+          <text aria-hidden="true" x="$VALUE_CENTER" y="150" fill="#010101" fill-opacity=".3" transform="scale(.1)" textLength="$VALUE_TEXTLEN">$HUMAN_READABLE</text>
+          <text x="$VALUE_CENTER" y="140" transform="scale(.1)" fill="#fff" textLength="$VALUE_TEXTLEN">$HUMAN_READABLE</text>
+        </g>
+      </svg>
+      EOF
 
       # Step 6: Commit and push the badge to the "badges" branch
       - name: Commit and push badge to badges branch
