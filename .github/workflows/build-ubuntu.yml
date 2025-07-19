@@ -63,8 +63,8 @@ jobs:
           cat <<EOF > badges/loc-badge.svg
           <svg xmlns="http://www.w3.org/2000/svg" width="$TOTAL_WIDTH" height="20" role="img" aria-label="C++ lines: $HUMAN_READABLE">
             <title>C++ lines: $HUMAN_READABLE</title>
-            <rect width="$LEFT_RECT_WIDTH" height="20" fill="#555"/>
-            <rect x="$LEFT_RECT_WIDTH" width="$VALUE_TEXT_WIDTH" height="20" fill="#007ec6"/>
+            <rect width="$LEFT_RECT_WIDTH" height="20" fill="#555" rx="3" ry="3" />
+            <rect x="$LEFT_RECT_WIDTH" width="$VALUE_TEXT_WIDTH" height="20" fill="#007ec6" rx="3" ry="3" />
             <text x="$((LEFT_RECT_WIDTH / 2))" y="14" fill="#fff" font-family="Verdana" font-size="11" text-anchor="middle">C++ lines</text>
             <text x="$TEXT_X" y="14" fill="#fff" font-family="Verdana" font-size="11" text-anchor="middle">$HUMAN_READABLE</text>
           </svg>
