@@ -36,24 +36,32 @@ jobs:
           cd demo
           ./build_demo.sh
         continue-on-error: false # Ensure errors are not bypassed
+    
+  generate-loc-badge:
+    runs-on: ubuntu-latest
 
-      # Step 4: Install cloc
+    steps:
+      # Step 1: Checkout the repository
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        
+      # Step 2: Install cloc
       - name: Install cloc
         run: sudo apt-get install -y cloc
       
-      # Step 5: Count C++ LOC and generate badge as SVG
+      # Step 3: Count C++ LOC and generate badge as SVG
       - name: Count C++ LOC and generate badge
         run: |
           mkdir -p badges
           CLOC_RESULT=$(cloc --include-ext=cpp,h --json . | jq '.SUM.code')
-          echo "$(CLOC_RESULT)"
+          echo "$CLOC_RESULT"
 
           if [ "$CLOC_RESULT" -lt 10000 ]; then
             HUMAN_READABLE=$(printf "%'d" "$CLOC_RESULT" | sed 's/,/ /g')
           else
             HUMAN_READABLE=$(awk "BEGIN { printf \"%.1f k\", $CLOC_RESULT / 1000 }")
           fi
- 
+
           LABEL="C++ lines"
           LABEL_LEN=${#LABEL}
           VALUE_LEN=${#HUMAN_READABLE}
@@ -96,7 +104,7 @@ jobs:
           </svg>
           EOF
 
-      # Step 6: Commit and push the badge to the "badges" branch
+      # Step 4: Commit and push the badge to the "badges" branch
       - name: Commit and push badge to badges branch
         run: |
           git config --global user.name "github-actions[bot]"
