@@ -37,9 +37,6 @@ jobs:
           ./build_demo.sh
         continue-on-error: false # Ensure errors are not bypassed
 
-     - name: Debug: List all files
-       run: find . -type f -exec ls -lh {} \;
-
       - name: Upload binary artifact
         uses: actions/upload-artifact@v4
         with:
