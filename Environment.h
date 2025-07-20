@@ -10,6 +10,7 @@
 #include "RoomStyle.h"
 #include "Terrain.h"
 #include "ScreenHelper.h"
+#include "Comparison.h"
 #include <Termin8or/ScreenHandler.h>
 #include <optional>
 
@@ -31,8 +32,8 @@ namespace dung
     BSPTree* m_bsp_tree;
     std::vector<BSPNode*> m_leaves;
     
-    std::map<BSPNode*, RoomStyle> m_room_styles;
-    std::map<Corridor*, RoomStyle> m_corridor_styles;
+    std::map<BSPNode*, RoomStyle, PtrLess<BSPNode>> m_room_styles;
+    std::map<Corridor*, RoomStyle, PtrLess<Corridor>> m_corridor_styles;
     
     double dt_texture_anim_s = 0.1;
     double texture_anim_time_stamp = 0.;
