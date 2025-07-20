@@ -16,9 +16,13 @@ namespace dung
 {
 
   struct Door;
+  
+  int global_corridor_id = 0;
 
   struct Corridor
   {
+    int id = global_corridor_id++;
+  
     ttl::Rectangle bb;
     Orientation orientation = Orientation::Vertical;
     std::array<Door*, 2> doors;
