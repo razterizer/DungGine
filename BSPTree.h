@@ -8,6 +8,7 @@
 #pragma once
 #include "Door.h"
 #include "Corridor.h"
+#include "Comparison.h"
 #include <Termin8or/RC.h>
 #include <Termin8or/ScreenHandler.h>
 #include <Termin8or/Drawing.h>
@@ -308,27 +309,6 @@ namespace dung
   };
       
   // //////////////////////////////////////////////////////////////
-
-  template<typename T>
-  struct PtrLess
-  {
-    bool operator()(const T* lhs, const T* rhs) const
-    {
-      return lhs->id < rhs->id; // or compare by position, bounding box, etc.
-    }
-  };
-
-  template<typename T>
-  struct PtrPairLess
-  {
-    bool operator()(const std::pair<T*, T*>& a,
-                    const std::pair<T*, T*>& b) const
-    {
-      if (a.first->id == b.first->id)
-          return a.second->id < b.second->id;
-      return a.first->id < b.first->id;
-    }
-  };
 
   class BSPTree final
   {
