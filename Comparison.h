@@ -5,6 +5,8 @@
 //  Created by Rasmus Anthin on 2025-07-20.
 //
 
+#pragma once
+
 template<typename T>
 struct PtrLess
 {
