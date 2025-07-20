@@ -43,6 +43,7 @@
 		072AE8092D0E7E0F004F92D3 /* run_demo.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = run_demo.sh; sourceTree = "<group>"; };
 		072AE80A2D0E7E0F004F92D3 /* run_demo.bat */ = {isa = PBXFileReference; lastKnownFileType = text; path = run_demo.bat; sourceTree = "<group>"; };
 		075D41962E28B68E005DD356 /* demo */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = demo; sourceTree = BUILT_PRODUCTS_DIR; };
+		075D423C2E2CA41C005DD356 /* Comparison.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Comparison.h; sourceTree = "<group>"; };
 		07C2A7842C2616FC00869A56 /* RoomStyle.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RoomStyle.h; sourceTree = "<group>"; };
 		07C2A7852C2618A500869A56 /* Items.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Items.h; sourceTree = "<group>"; };
 		07C2A7862C261B3C00869A56 /* PC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PC.h; sourceTree = "<group>"; };
@@ -146,6 +147,7 @@
 				0709B9BA2C95825200A43834 /* workflows */,
 				07C2A7892C2A29CF00869A56 /* Orientation.h */,
 				07E6EACA2C14CFD3007BBC6B /* BSPTree.h */,
+				075D423C2E2CA41C005DD356 /* Comparison.h */,
 				07D769B32C69EB9A00BCA669 /* Environment.h */,
 				07D769B42C6B422700BCA669 /* ScreenHelper.h */,
 				0709B9C72C98102400A43834 /* Keyboard.h */,
@@ -288,6 +290,7 @@
 		075D419A2E28B68F005DD356 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = HFL2Q84SZB;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -300,6 +303,7 @@
 		075D419B2E28B68F005DD356 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = HFL2Q84SZB;
 				ENABLE_HARDENED_RUNTIME = YES;
