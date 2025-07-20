@@ -37,6 +37,42 @@ jobs:
           ./build_demo.sh
         continue-on-error: false # Ensure errors are not bypassed
     
+      - name: Upload binary artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: demo-binary
+          path: |
+            bin/demo
+            # Add more paths if needed
+
+  valgrind-check:
+    runs-on: ubuntu-latest
+    needs: build-demo
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Fetch dependencies
+        run: |
+          cd ..
+          git clone https://github.com/razterizer/Core.git
+          git clone https://github.com/razterizer/Termin8or.git
+
+      - name: Install Valgrind
+        run: sudo apt-get update && sudo apt-get install -y valgrind
+
+      - name: Download binary artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: demo-binary
+          path: bin
+
+      - name: Run Valgrind
+        run: |
+          chmod +x bin/demo
+          valgrind --leak-check=full --track-origins=yes ./bin/demo --log_mode replay
+
   generate-loc-badge:
     runs-on: ubuntu-latest
 
