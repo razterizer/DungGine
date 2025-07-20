@@ -75,8 +75,12 @@ namespace dung
   
   // //////////////////////////////////////////////////////////////
 
+  int global_bsp_node_id = 0;
+
   struct BSPNode final
   {
+    int id = global_bsp_node_id++;
+  
     // The current room will be split into two rooms along this direction.
     Orientation orientation = Orientation::Vertical;
     // Length fraction of current room along the direction of the other orientation.
@@ -305,6 +309,25 @@ namespace dung
       
   // //////////////////////////////////////////////////////////////
 
+  struct BSPNodePtrLess
+  {
+    bool operator()(const BSPNode* lhs, const BSPNode* rhs) const
+    {
+      return lhs->id < rhs->id; // or compare by position, bounding box, etc.
+    }
+  };
+
+  struct BSPNodePairLess
+  {
+    bool operator()(const std::pair<BSPNode*, BSPNode*>& a,
+                    const std::pair<BSPNode*, BSPNode*>& b) const
+    {
+      if (a.first->id == b.first->id)
+          return a.second->id < b.second->id;
+      return a.first->id < b.first->id;
+    }
+  };
+
   class BSPTree final
   {
     BSPNode m_root;
@@ -312,7 +335,7 @@ namespace dung
     
     std::vector<std::unique_ptr<Corridor>> corridors;
     std::vector<std::unique_ptr<Door>> doors;
-    std::map<std::pair<BSPNode*, BSPNode*>, Corridor*> room_corridor_map;
+    std::map<std::pair<BSPNode*, BSPNode*>, Corridor*, BSPNodePairLess> room_corridor_map;
     
   public:
     BSPTree() = default;
@@ -619,7 +642,7 @@ namespace dung
       }
     }
     
-    std::map<std::pair<BSPNode*, BSPNode*>, Corridor*> get_room_corridor_map() const
+    std::map<std::pair<BSPNode*, BSPNode*>, Corridor*, BSPNodePairLess> get_room_corridor_map() const
     {
       return room_corridor_map;
     }
