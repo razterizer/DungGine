@@ -129,7 +129,7 @@ namespace dung
       return m_bsp_tree->get_world_size();
     }
     
-    std::map<std::pair<BSPNode*, BSPNode*>, Corridor*, BSPNodePairLess> get_room_corridor_map() const
+    std::map<std::pair<BSPNode*, BSPNode*>, Corridor*, PtrPairLess<BSPNode>> get_room_corridor_map() const
     {
       return m_bsp_tree->get_room_corridor_map();
     }

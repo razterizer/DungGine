@@ -309,18 +309,20 @@ namespace dung
       
   // //////////////////////////////////////////////////////////////
 
-  struct BSPNodePtrLess
+  template<typename T>
+  struct PtrLess
   {
-    bool operator()(const BSPNode* lhs, const BSPNode* rhs) const
+    bool operator()(const T* lhs, const T* rhs) const
     {
       return lhs->id < rhs->id; // or compare by position, bounding box, etc.
     }
   };
 
-  struct BSPNodePairLess
+  template<typename T>
+  struct PtrPairLess
   {
-    bool operator()(const std::pair<BSPNode*, BSPNode*>& a,
-                    const std::pair<BSPNode*, BSPNode*>& b) const
+    bool operator()(const std::pair<T*, T*>& a,
+                    const std::pair<T*, T*>& b) const
     {
       if (a.first->id == b.first->id)
           return a.second->id < b.second->id;
@@ -335,7 +337,7 @@ namespace dung
     
     std::vector<std::unique_ptr<Corridor>> corridors;
     std::vector<std::unique_ptr<Door>> doors;
-    std::map<std::pair<BSPNode*, BSPNode*>, Corridor*, BSPNodePairLess> room_corridor_map;
+    std::map<std::pair<BSPNode*, BSPNode*>, Corridor*, PtrPairLess<BSPNode>> room_corridor_map;
     
   public:
     BSPTree() = default;
@@ -642,7 +644,7 @@ namespace dung
       }
     }
     
-    std::map<std::pair<BSPNode*, BSPNode*>, Corridor*, BSPNodePairLess> get_room_corridor_map() const
+    std::map<std::pair<BSPNode*, BSPNode*>, Corridor*, PtrPairLess<BSPNode>> get_room_corridor_map() const
     {
       return room_corridor_map;
     }
