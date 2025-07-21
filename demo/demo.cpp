@@ -210,7 +210,7 @@ int main(int argc, char** argv)
   {
     if (strcmp(argv[i], "--help") == 0)
     {
-      std::cout << "demo --help | (--log_mode (record | replay)) | --suppress_tty_output | --suppress_tty_input" << std::endl;
+      std::cout << "demo --help | [--log_mode (record | replay)] [--suppress_tty_output] [--suppress_tty_input]" << std::endl;
       return EXIT_SUCCESS;
     }
     
