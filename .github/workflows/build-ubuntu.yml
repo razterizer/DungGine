@@ -73,7 +73,7 @@ jobs:
         run: |
           cd demo
           rm rec.txt # remove if any checked in.
-          cp rec_test.txt rec.txt
+          cp rec_valgrind.txt rec.txt
           chmod +x bin/demo
           valgrind --leak-check=full --track-origins=yes ./bin/demo --log_mode replay
 
