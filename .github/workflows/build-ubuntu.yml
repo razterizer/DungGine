@@ -71,7 +71,7 @@ jobs:
 
       - name: Run Valgrind
         run: |
-          ls -la
+          cd demo
           chmod +x bin/demo
           valgrind --leak-check=full --track-origins=yes ./bin/demo --log_mode replay
 
