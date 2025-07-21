@@ -208,6 +208,12 @@ int main(int argc, char** argv)
   
   for (int i = 1; i < argc; ++i)
   {
+    if (strcmp(argv[i], "--help") == 0)
+    {
+      std::cout << "demo --help | (--log_mode (record | replay)) | --suppress_tty_output | --suppress_tty_input" << std::endl;
+      return EXIT_SUCCESS;
+    }
+    
     if (strcmp(argv[i],  "--suppress_tty_output") == 0)
       params.suppress_tty_output = true;
     else if (strcmp(argv[i], "--suppress_tty_input") == 0)
@@ -220,12 +226,6 @@ int main(int argc, char** argv)
         params.log_mode = LogMode::Replay;
       params.xcode_log_filepath = "../../../../../../../../Documents/xcode/lib/DungGine/demo";
     }
-  }
-  
-  if (argc >= 2 && strcmp(argv[1], "--help") == 0)
-  {
-    std::cout << "demo --help | (--log_mode (record | replay)) | --suppress_tty_output | --suppress_tty_input" << std::endl;
-    return EXIT_SUCCESS;
   }
 
   Game game(argc, argv, params);
