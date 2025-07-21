@@ -37,13 +37,14 @@ jobs:
           ./build_demo.sh
         continue-on-error: false # Ensure errors are not bypassed
 
+      - name: Debug List all files
+        run: find . -type f -exec ls -lh {} \;
+
       - name: Upload binary artifact
         uses: actions/upload-artifact@v4
         with:
           name: demo-binary
-          path: |
-            bin/demo
-            # Add more paths if needed
+          path: demo/bin
 
   valgrind-check:
     runs-on: ubuntu-latest
@@ -66,10 +67,11 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: demo-binary
-          path: bin
+          path: demo/bin
 
       - name: Run Valgrind
         run: |
+          cd demo
           chmod +x bin/demo
           valgrind --leak-check=full --track-origins=yes ./bin/demo --log_mode replay
 
