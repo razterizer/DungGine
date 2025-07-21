@@ -72,10 +72,10 @@ jobs:
       - name: Run Valgrind
         run: |
           cd demo
-          rm rec.txt # remove if any checked in.
+          # rm rec.txt # remove if any checked in.
           cp rec_valgrind.txt rec.txt
           chmod +x bin/demo
-          valgrind --leak-check=full --track-origins=yes ./bin/demo --log_mode replay
+          valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes ./bin/demo --log_mode replay
 
   generate-loc-badge:
     runs-on: ubuntu-latest
