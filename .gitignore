@@ -35,3 +35,4 @@ x86/
 ### Misc Files ###
 
 rec*.txt
+!rec_test.txt
