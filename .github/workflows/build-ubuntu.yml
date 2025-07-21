@@ -44,7 +44,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: demo-binary
-          path: '**/bin/*'   # fallback, update this if you know exact path
+          path: demo/bin
 
   valgrind-check:
     runs-on: ubuntu-latest
@@ -67,7 +67,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: demo-binary
-          path: bin
+          path: demo/bin
 
       - name: Run Valgrind
         run: |
