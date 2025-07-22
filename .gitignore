@@ -1,0 +1,38 @@
+### XCode ###
+
+# Ignore Xcode worspace settings
+*.xcsettings
+
+# Ignore Xcode user-specific files
+xcuserdata/
+*.xcuserstate
+
+# Ignore Xcode project shared data, including xcshareddata and xcdebugger
+xcshareddata/
+xcdebugger/
+
+# Ignore bin-folders
+bin/
+bin_linux/
+bin_windows/
+
+# Ignore breakpoints list
+*.xcbkptlist
+
+### Visual Studio ###
+
+.vs/
+
+x64/
+x86/
+
+*.vcxproj.user
+
+### External Tools ###
+
+.aider*
+
+### Misc Files ###
+
+rec*.txt
+!rec_valgrind.txt
