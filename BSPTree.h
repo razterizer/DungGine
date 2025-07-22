@@ -415,7 +415,9 @@ namespace dung
               }
               if (!collided)
               {
-                auto key = std::pair { std::min(leaf_A, leaf_B), std::max(leaf_A, leaf_B) };
+                auto* min_leaf = stlutils::select_if(leaf_A, leaf_B, [](auto* a, auto* b) { return a->id < b->id; });
+                auto* max_leaf = stlutils::select_if(leaf_A, leaf_B, [](auto* a, auto* b) { return a->id > b->id; });
+                auto key = std::pair { min_leaf, max_leaf };
                 auto it = room_corridor_map.find(key);
                 if (it == room_corridor_map.end())
                 {
@@ -483,7 +485,9 @@ namespace dung
               }
               if (!collided)
               {
-                auto key = std::pair { std::min(leaf_A, leaf_B), std::max(leaf_A, leaf_B) };
+                auto* min_leaf = stlutils::select_if(leaf_A, leaf_B, [](auto* a, auto* b) { return a->id < b->id; });
+                auto* max_leaf = stlutils::select_if(leaf_A, leaf_B, [](auto* a, auto* b) { return a->id > b->id; });
+                auto key = std::pair { min_leaf, max_leaf };
                 auto it = room_corridor_map.find(key);
                 if (it == room_corridor_map.end())
                 {
