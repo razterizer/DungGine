@@ -208,12 +208,6 @@ int main(int argc, char** argv)
   
   for (int i = 1; i < argc; ++i)
   {
-    if (strcmp(argv[i], "--help") == 0)
-    {
-      std::cout << "demo --help | [--log_mode (record | replay)] [--suppress_tty_output] [--suppress_tty_input]" << std::endl;
-      return EXIT_SUCCESS;
-    }
-    
     if (strcmp(argv[i],  "--suppress_tty_output") == 0)
       params.suppress_tty_output = true;
     else if (strcmp(argv[i], "--suppress_tty_input") == 0)
@@ -229,6 +223,26 @@ int main(int argc, char** argv)
   }
 
   Game game(argc, argv, params);
+  
+  for (int i = 1; i < argc; ++i)
+  {
+    if (strcmp(argv[i], "--help") == 0)
+    {
+      std::cout << "demo --help | [--log_mode (record | replay)] [--suppress_tty_output] [--suppress_tty_input] [--set_fps <fps>] [--set_sim_delay_us <delay_us>]" << std::endl;
+      std::cout << "  default values:" << std::endl;
+      std::cout << "    <fps>      : " << game.get_real_fps() << std::endl;
+      std::cout << "    <delay_us> : " << game.get_sim_delay_us() << std::endl;
+      return EXIT_SUCCESS;
+    }
+  }
+  
+  for (int i = 1; i < argc; ++i)
+  {
+    if (i + 1 < argc && strcmp(argv[i], "--set_fps") == 0)
+      game.set_real_fps(atof(argv[i + 1]));
+    else if (i + 1 < argc && strcmp(argv[i], "--set_sim_delay_us") == 0)
+      game.set_sim_delay_us(atof(argv[i + 1]));
+  }
 
   game.init();
   game.generate_data();
