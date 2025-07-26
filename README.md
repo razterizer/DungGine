@@ -7,6 +7,7 @@
 [![build ubuntu](https://github.com/razterizer/DungGine/actions/workflows/build-ubuntu.yml/badge.svg)](https://github.com/razterizer/DungGine/actions/workflows/build-ubuntu.yml)
 [![build macos](https://github.com/razterizer/DungGine/actions/workflows/build-macos.yml/badge.svg)](https://github.com/razterizer/DungGine/actions/workflows/build-macos.yml)
 [![build ubuntu](https://github.com/razterizer/DungGine/actions/workflows/build-windows.yml/badge.svg)](https://github.com/razterizer/DungGine/actions/workflows/build-windows.yml)
+![Valgrind Status](https://raw.githubusercontent.com/razterizer/DungGine/badges/valgrind-badge.svg)
 
 ![Top Languages](https://img.shields.io/github/languages/top/razterizer/DungGine)
 ![GitHub repo size](https://img.shields.io/github/repo-size/razterizer/DungGine)
