@@ -71,6 +71,7 @@ jobs:
 
       - name: Run Valgrind
         run: |
+          mkdir -p valgrind-output
           cd demo
           # rm rec.txt # remove if any checked in.
           cp rec_valgrind.txt rec.txt
