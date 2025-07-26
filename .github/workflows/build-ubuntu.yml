@@ -76,6 +76,22 @@ jobs:
           cp rec_valgrind.txt rec.txt
           chmod +x bin/demo
           valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes ./bin/demo --log_mode replay --suppress_tty_input --suppress_tty_output
+      
+      - name: Generate Valgrind status
+        run: |
+          if grep -q "definitely lost: 0 bytes" valgrind-output/valgrind.log && grep -q "indirectly lost: 0 bytes" valgrind-output/valgrind.log; then
+            echo "status: passing" > valgrind-output/valgrind-status.yml
+          else
+            echo "status: failing" > valgrind-output/valgrind-status.yml
+          fi
+          
+      - name: Upload Valgrind status
+        uses: actions/upload-artifact@v4
+        with:
+          name: valgrind-status
+          path: |
+            valgrind-output/valgrind-status.yml
+            valgrind-output/valgrind.log
 
   generate-loc-badge:
     runs-on: ubuntu-latest
@@ -144,25 +160,107 @@ jobs:
           </svg>
           EOF
 
-      # Step 4: Commit and push the badge to the "badges" branch
-      - name: Commit and push badge to badges branch
+      # Step 4: Upload badge artifact.
+      - name: Upload LOC badge artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: loc-badge
+          path: badges/loc-badge.svg
+          
+  generate-valgrind-badge:
+    runs-on: ubuntu-latest
+    needs: valgrind-check  # Wait for valgrind to finish
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download Valgrind log artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: valgrind-status
+          path: valgrind-output
+
+      - name: Generate memory leak badge
         run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          mkdir -p badges
+          VALGRIND_LOG="valgrind-output/valgrind.log"
+          if grep -q "definitely lost: 0 bytes" "$VALGRIND_LOG" &&
+             grep -q "indirectly lost: 0 bytes" "$VALGRIND_LOG" &&
+             grep -q "possibly lost: 0 bytes" "$VALGRIND_LOG"; then
+            STATUS="none"
+            COLOR="4c1"
+          else
+            STATUS="found"
+            COLOR="e05d44"
+          fi
 
-          # Fetch the latest badges branch
-          git fetch origin badges || true
-          git checkout badges || git checkout --orphan badges
+          LABEL="memory leaks"
+          VALUE="$STATUS"
+          LABEL_LEN=${#LABEL}
+          VALUE_LEN=${#VALUE}
+          LABEL_TEXTLEN=$((LABEL_LEN * 70))
+          VALUE_TEXTLEN=$((VALUE_LEN * 70))
+          LABEL_WIDTH=$((LABEL_TEXTLEN / 10 + 10))
+          VALUE_WIDTH=$((VALUE_TEXTLEN / 10 + 10))
+          TOTAL_WIDTH=$((LABEL_WIDTH + VALUE_WIDTH))
+          LABEL_CENTER=$((LABEL_WIDTH * 10 / 2))
+          VALUE_CENTER=$((LABEL_WIDTH * 10 + VALUE_WIDTH * 10 / 2))
 
-          # Merge remote changes if the branch already exists
-          git pull origin badges --rebase || true
+          cat <<EOF > badges/valgrind-badge.svg
+          <svg xmlns="http://www.w3.org/2000/svg" width="$TOTAL_WIDTH" height="20" role="img" aria-label="$LABEL: $VALUE">
+            <title>$LABEL: $VALUE</title>
+            <linearGradient id="s" x2="0" y2="100%">
+              <stop offset="0" stop-color="#bbb" stop-opacity=".1"/>
+              <stop offset="1" stop-opacity=".1"/>
+            </linearGradient>
+            <clipPath id="r">
+              <rect width="$TOTAL_WIDTH" height="20" rx="3" fill="#fff"/>
+            </clipPath>
+            <g clip-path="url(#r)">
+              <rect width="$LABEL_WIDTH" height="20" fill="#555"/>
+              <rect x="$LABEL_WIDTH" width="$VALUE_WIDTH" height="20" fill="#$COLOR"/>
+              <rect width="$TOTAL_WIDTH" height="20" fill="url(#s)"/>
+            </g>
+            <g fill="#fff" text-anchor="middle" font-family="Verdana,Geneva,DejaVu Sans,sans-serif" font-size="110">
+              <text aria-hidden="true" x="$LABEL_CENTER" y="150" fill="#010101" fill-opacity=".3" transform="scale(.1)" textLength="$LABEL_TEXTLEN">$LABEL</text>
+              <text x="$LABEL_CENTER" y="140" transform="scale(.1)" fill="#fff" textLength="$LABEL_TEXTLEN">$LABEL</text>
+              <text aria-hidden="true" x="$VALUE_CENTER" y="150" fill="#010101" fill-opacity=".3" transform="scale(.1)" textLength="$VALUE_TEXTLEN">$VALUE</text>
+              <text x="$VALUE_CENTER" y="140" transform="scale(.1)" fill="#fff" textLength="$VALUE_TEXTLEN">$VALUE</text>
+            </g>
+          </svg>
+          EOF
+          
+      - name: Upload Valgrind badge artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: valgrind-badge
+          path: badges/valgrind-badge.svg
 
-          # Copy badge to the branch and commit
-          cp -r badges/* .
-          git add loc-badge.svg
-          git commit -m "Update LOC badge" || echo "No changes to commit"
+  deploy-badges:
+    runs-on: ubuntu-latest
+    needs: [generate-loc-badge, generate-valgrind-badge]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
 
-          # Push the updated branch
-          git push origin badges --force
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Download LOC badge
+        uses: actions/download-artifact@v4
+        with:
+          name: loc-badge
+          path: badges
+
+      - name: Download Valgrind badge
+        uses: actions/download-artifact@v4
+        with:
+          name: valgrind-badge
+          path: badges
+
+      - name: Deploy to badges branch
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./badges
+          publish_branch: badges
+          keep_files: true
+          commit_message: "Update all badges"
+
