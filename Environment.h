@@ -29,7 +29,7 @@ namespace dung
 
   class Environment final
   {
-    BSPTree* m_bsp_tree;
+    BSPTree* m_bsp_tree = nullptr;
     std::vector<BSPNode*> m_leaves;
     
     std::map<BSPNode*, RoomStyle, PtrLess<BSPNode>> m_room_styles;
