@@ -58,7 +58,7 @@ public:
     // /////////
     if (test_type == TestType::DungeonSimple)
     {
-      std::cout << "curr rnd seed = " << curr_rnd_seed << std::endl;
+      std::cout << "curr rnd seed = " << GameEngine::get_curr_rnd_seed() << std::endl;
       //rnd::srand(0x1337f00d); // Use srand_time() after map generation.
       
       bsp_tree.generate(29, 79, dung::Orientation::Vertical);
@@ -113,7 +113,7 @@ public:
     }
     else if (test_type == TestType::DungeonRuntime)
     {
-      std::cout << "curr rnd seed = " << curr_rnd_seed << std::endl;
+      std::cout << "curr rnd seed = " << GameEngine::get_curr_rnd_seed() << std::endl;
       //rnd::srand(1626475275); // Terrain offset bug.
       //rnd::srand(3074848586); // Torch fire-smoke test.
       //rnd::srand(4133950669); // Drown animation test.
