@@ -44,6 +44,7 @@
 		072AE80A2D0E7E0F004F92D3 /* run_demo.bat */ = {isa = PBXFileReference; lastKnownFileType = text; path = run_demo.bat; sourceTree = "<group>"; };
 		075D41962E28B68E005DD356 /* demo */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = demo; sourceTree = BUILT_PRODUCTS_DIR; };
 		075D423C2E2CA41C005DD356 /* Comparison.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Comparison.h; sourceTree = "<group>"; };
+		075D42D92E364B4C005DD356 /* SaveGame.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SaveGame.h; sourceTree = "<group>"; };
 		07C2A7842C2616FC00869A56 /* RoomStyle.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RoomStyle.h; sourceTree = "<group>"; };
 		07C2A7852C2618A500869A56 /* Items.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Items.h; sourceTree = "<group>"; };
 		07C2A7862C261B3C00869A56 /* PC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PC.h; sourceTree = "<group>"; };
@@ -166,6 +167,7 @@
 				07D769B22C68D06D00BCA669 /* Terrain.h */,
 				0709B9AF2C700CE900A43834 /* DungGineListener.h */,
 				0709B9B12C73B7CD00A43834 /* Inventory.h */,
+				075D42D92E364B4C005DD356 /* SaveGame.h */,
 				075D41972E28B68F005DD356 /* demo */,
 				07E6EAC42C14CEA8007BBC6B /* Products */,
 			);
