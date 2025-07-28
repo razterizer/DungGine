@@ -1593,6 +1593,25 @@ namespace dung
                                       debug);
     }
     
+    void save_game(const std::string& savegame_filename, unsigned int curr_rnd_seed)
+    {
+      std::vector<std::string> lines;
+      
+      lines.emplace_back(std::to_string(curr_rnd_seed));
+        
+      TextIO::write_file(savegame_filename, lines);
+    }
+    
+    void load_game(const std::string& savegame_filename, unsigned int* curr_rnd_seed)
+    {
+      std::vector<std::string> lines;
+      
+      TextIO::read_file(savegame_filename, lines);
+      
+      std::istringstream iss(lines[0]);
+      iss >> *curr_rnd_seed;
+    }
+    
   };
   
 }
