@@ -15,7 +15,7 @@ jobs:
     steps:
       # Step 1: Checkout the repository
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       
       # Step 2: Move to the parent directory and fetch dependencies
       - name: Fetch dependencies
@@ -52,7 +52,7 @@ jobs:
     steps:
       # Step 1: Checkout the repository
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       
       # Step 2: Move to the parent directory and fetch dependencies
       - name: Fetch dependencies
@@ -73,7 +73,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Fetch dependencies
         run: |
@@ -121,7 +121,7 @@ jobs:
     steps:
       # Step 1: Checkout the repository
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         
       # Step 2: Install cloc
       - name: Install cloc
