@@ -36,3 +36,6 @@ x86/
 
 rec*.txt
 !rec_valgrind.txt
+
+# Dungeon SaveGame data
+*.dsg
