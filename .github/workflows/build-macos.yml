@@ -37,3 +37,23 @@ jobs:
           ./build_demo.sh
         continue-on-error: false # Ensure errors are not bypassed
   
+  build-demo-with-locked-dependencies:
+    runs-on: ubuntu-latest
+    
+    steps:
+      # Step 1: Checkout the repository
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      
+      # Step 2: Move to the parent directory and fetch dependencies
+      - name: Fetch dependencies
+        run: |
+          cd ..
+          ./DungGine/fetch-dependencies.py DungGine/dependencies -y
+      
+      # Step 3: Change to the correct directory and build
+      - name: Build project
+        run: |
+          cd demo
+          ./build_demo.sh
+        continue-on-error: false # Ensure errors are not bypassed
