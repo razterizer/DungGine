@@ -172,6 +172,28 @@ namespace dung
           return "unknown lamp";
       }
     }
+    
+    virtual void serialize(std::vector<std::string>& lines) const override
+    {
+      Item::serialize(lines);
+    
+      sg::write_var_enum(lines, SG_WRITE_VAR(life_time_s));
+    }
+    
+    virtual std::vector<std::string>::iterator deserialize(std::vector<std::string>::iterator it_line_begin,
+                                                           std::vector<std::string>::iterator it_line_end,
+                                                           Environment* environment) override
+    {
+      it_line_begin = Item::deserialize(it_line_begin, it_line_end, environment);
+      for (auto it_line = it_line_begin + 1; it_line != it_line_end; ++it_line)
+      {
+        if (sg::read_var_enum(&it_line, SG_READ_VAR(life_time_s)))
+        {
+          return it_line;
+        }
+      }
+      return it_line_end;
+    }
   };
   
   struct Weapon : Item
