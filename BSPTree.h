@@ -9,6 +9,7 @@
 #include "Door.h"
 #include "Corridor.h"
 #include "Comparison.h"
+#include "SaveGame.h"
 #include <Termin8or/RC.h>
 #include <Termin8or/ScreenHandler.h>
 #include <Termin8or/Drawing.h>
@@ -306,6 +307,53 @@ namespace dung
       if (math::in_range<int>(idx, 0, stlutils::sizeI(light), Range::ClosedOpen))
         return light[idx];
       return false;
+    }
+    
+    void serialize(std::vector<std::string>& lines) const
+    {
+      if (is_leaf())
+      {
+        sg::write_var(lines, SG_WRITE_VAR(fog_of_war));
+        sg::write_var(lines, SG_WRITE_VAR(light));
+      }
+      else
+      {
+        if (children[0])
+          children[0]->serialize(lines);
+        if (children[1])
+          children[1]->serialize(lines);
+      }
+    }
+    
+    std::vector<std::string>::iterator deserialize(std::vector<std::string>::iterator it_line_begin,
+                                                   std::vector<std::string>::iterator it_line_end)
+    {
+      auto it_line = it_line_begin;
+      if (is_leaf())
+      {
+        auto Nfow = fog_of_war.size();
+        auto Nl = light.size();
+        assert(Nfow > 0);
+        assert(Nl > 0);
+        if (sg::read_var(&it_line, SG_READ_VAR(fog_of_war))) { ++it_line; }
+        else { assert(false); }
+        
+        if (sg::read_var(&it_line, SG_READ_VAR(light))) { ++it_line; }
+        else { assert(false); }
+        
+        assert(Nfow == fog_of_war.size());
+        assert(Nl == light.size());
+        return it_line;
+      }
+      else
+      {
+        if (children[0])
+          it_line = children[0]->deserialize(it_line, it_line_end);
+        if (children[1])
+          it_line = children[1]->deserialize(it_line, it_line_end);
+      }
+      
+      return it_line;
     }
   };
       
@@ -686,6 +734,38 @@ namespace dung
     void print_tree() const
     {
       m_root.print_tree();
+    }
+    
+    void serialize(std::vector<std::string>& lines) const
+    {
+      m_root.serialize(lines);
+      lines.emplace_back("corridors");
+      for (const auto& c : corridors)
+        c->serialize(lines);
+      lines.emplace_back("doors");
+      for (const auto& d : doors)
+        d->serialize(lines);
+    }
+    
+    std::vector<std::string>::iterator deserialize(std::vector<std::string>::iterator it_line_begin,
+                                                   std::vector<std::string>::iterator it_line_end)
+    {
+      // -1 offset is a hack for the ++it_line hack in BSPNode::deserialize().
+      it_line_begin = m_root.deserialize(it_line_begin, it_line_end) - 1;
+      for (auto it_line = it_line_begin + 1; it_line != it_line_end; ++it_line)
+      {
+        if (*it_line == "corridors")
+          for (auto& c : corridors)
+            it_line = c->deserialize(it_line + 1, it_line_end);
+        if (*it_line == "doors")
+        {
+          for (auto& d : doors)
+            it_line = d->deserialize(it_line + 1, it_line_end);
+          return it_line;
+        }
+      }
+      
+      return it_line_end;
     }
   };
   
