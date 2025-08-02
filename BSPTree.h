@@ -326,6 +326,16 @@ namespace dung
       : m_min_room_length(min_room_length)
     {}
     
+    void reset()
+    {
+      global_bsp_node_id = 0;
+      global_corridor_id = 0;
+      m_root = BSPNode {};
+      corridors.clear();
+      doors.clear();
+      room_corridor_map.clear();
+    }
+    
     void generate(int world_size_rows, int world_size_cols,
                   Orientation first_split_orientation)
     {
