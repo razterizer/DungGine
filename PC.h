@@ -336,6 +336,48 @@ namespace dung
         return curr_corridor->is_inside_corridor(pos);
       return false;
     }
+    
+    virtual void serialize(std::vector<std::string>& lines) const override
+    {
+      PlayerBase::serialize(lines);
+      
+      sg::write_var(lines, SG_WRITE_VAR(is_spawned));
+      sg::write_var(lines, SG_WRITE_VAR(base_ac));
+      sg::write_var(lines, SG_WRITE_VAR(key_idcs));
+      sg::write_var(lines, SG_WRITE_VAR(lamp_idcs));
+      sg::write_var(lines, SG_WRITE_VAR(weapon_idcs));
+      sg::write_var(lines, SG_WRITE_VAR(potion_idcs));
+      sg::write_var(lines, SG_WRITE_VAR(armour_idcs));
+      sg::write_var(lines, SG_WRITE_VAR(show_inventory));
+      sg::write_var(lines, SG_WRITE_VAR(weight_capacity_soft));
+      sg::write_var(lines, SG_WRITE_VAR(weight_capacity_hard));
+      sg::write_var(lines, SG_WRITE_VAR(curr_tot_inv_weight));
+    }
+    
+    virtual std::vector<std::string>::iterator deserialize(std::vector<std::string>::iterator it_line_begin,
+                                                           std::vector<std::string>::iterator it_line_end,
+                                                           Environment* environment) override
+    {
+      it_line_begin = PlayerBase::deserialize(it_line_begin, it_line_end, environment);
+      for (auto it_line = it_line_begin + 1; it_line != it_line_end; ++it_line)
+      {
+        if (sg::read_var(&it_line, SG_READ_VAR(is_spawned))) {}
+        else if (sg::read_var(&it_line, SG_READ_VAR(base_ac))) {}
+        else if (sg::read_var(&it_line, SG_READ_VAR(key_idcs))) {}
+        else if (sg::read_var(&it_line, SG_READ_VAR(lamp_idcs))) {}
+        else if (sg::read_var(&it_line, SG_READ_VAR(weapon_idcs))) {}
+        else if (sg::read_var(&it_line, SG_READ_VAR(potion_idcs))) {}
+        else if (sg::read_var(&it_line, SG_READ_VAR(armour_idcs))) {}
+        else if (sg::read_var(&it_line, SG_READ_VAR(show_inventory))) {}
+        else if (sg::read_var(&it_line, SG_READ_VAR(weight_capacity_soft))) {}
+        else if (sg::read_var(&it_line, SG_READ_VAR(weight_capacity_hard))) {}
+        else if (sg::read_var(&it_line, SG_READ_VAR(curr_tot_inv_weight)))
+        {
+          return it_line;
+        }
+      }
+      return it_line_end;
+    }
   };
   
 }
