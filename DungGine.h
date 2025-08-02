@@ -75,8 +75,8 @@ namespace dung
     const std::vector<std::string> c_fight_strings { "(", "#", ")", "%", "*" };
     const std::vector<Color> c_fight_colors { Color::Red, Color::Yellow, Color::Blue, Color::Magenta, Color::White, Color::Black, Color::LightGray, Color::DarkGray };
     enum class FightDir { NW, W, SW, S, SE, E, NE, N, NUM_ITEMS };
-    std::vector<int> fight_r_offs = { 1, 0, -1, -1, -1, 0, 1, 1 };
-    std::vector<int> fight_c_offs = { 1, 1, 1, 0, -1, -1, -1, 0 };
+    const std::vector<int> fight_r_offs = { 1, 0, -1, -1, -1, 0, 1, 1 };
+    const std::vector<int> fight_c_offs = { 1, 1, 1, 0, -1, -1, -1, 0 };
     
     ui::TextBox tb_health, tb_strength;
     ui::TextBoxDebug tbd;
