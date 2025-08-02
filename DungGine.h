@@ -868,6 +868,12 @@ namespace dung
     void load_dungeon(BSPTree* bsp_tree)
     {
       m_environment->load_dungeon(bsp_tree);
+      all_npcs.clear();
+      all_keys.clear();
+      all_lamps.clear();
+      all_weapons.clear();
+      all_potions.clear();
+      all_armour.clear();
     }
     
     void style_dungeon()
