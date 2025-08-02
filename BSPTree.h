@@ -208,6 +208,7 @@ namespace dung
     
     void print_tree(const std::string& indent = "") const
     {
+      std::cout << indent << "Id: " << id << std::endl;
       std::cout << indent << "Level: " << level << std::endl;
       std::cout << indent << "Orientation: " << (orientation == Orientation::Vertical ? "V" : "H") << std::endl;
       std::cout << indent << "Size: [" << size_rows << ", " << size_cols << "]" << std::endl;
