@@ -8,6 +8,7 @@
 #pragma once
 #include "Globals.h"
 #include "DungObject.h"
+#include "SaveGame.h"
 
 namespace dung
 {
@@ -32,6 +33,39 @@ namespace dung
       visible_near = !(picked_up ||
                        (use_fog_of_war && (this->fog_of_war || !fow_near)) ||
                        ((this->is_underground || is_night) && !this->light));
+    }
+    
+    virtual void serialize(std::vector<std::string>& lines) const override
+    {
+      DungObject::serialize(lines);
+      
+      sg::write_var(lines, SG_WRITE_VAR(picked_up));
+      sg::write_var(lines, SG_WRITE_VAR(style));
+      sg::write_var(lines, SG_WRITE_VAR(character));
+      sg::write_var(lines, SG_WRITE_VAR(visible_near));
+      sg::write_var(lines, SG_WRITE_VAR(weight));
+      sg::write_var(lines, SG_WRITE_VAR(price));
+    }
+    
+    virtual std::vector<std::string>::iterator deserialize(std::vector<std::string>::iterator it_line_begin,
+                                                           std::vector<std::string>::iterator it_line_end,
+                                                           Environment* environment) override
+    {
+      it_line_begin = DungObject::deserialize(it_line_begin, it_line_end, environment);
+      for (auto it_line = it_line_begin + 1; it_line != it_line_end; ++it_line)
+      {
+        if (sg::read_var(&it_line, SG_READ_VAR(picked_up))) {}
+        else if (sg::read_var(&it_line, SG_READ_VAR(style))) {}
+        else if (sg::read_var(&it_line, SG_READ_VAR(character))) {}
+        else if (sg::read_var(&it_line, SG_READ_VAR(visible_near))) {}
+        else if (sg::read_var(&it_line, SG_READ_VAR(weight))) {}
+        else if (sg::read_var(&it_line, SG_READ_VAR(price)))
+        {
+          return it_line;
+        }
+      }
+    
+      return it_line_end;
     }
   };
   
