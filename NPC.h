@@ -815,6 +815,96 @@ namespace dung
     {
       return strength / 2; // Example: Strength bonus to damage
     }
+    
+    virtual void serialize(std::vector<std::string>& lines) const override
+    {
+      PlayerBase::serialize(lines);
+      
+      sg::write_var(lines, SG_WRITE_VAR(pos_r));
+      sg::write_var(lines, SG_WRITE_VAR(pos_c));
+      sg::write_var(lines, SG_WRITE_VAR(vel_r));
+      sg::write_var(lines, SG_WRITE_VAR(vel_c));
+      sg::write_var(lines, SG_WRITE_VAR(acc_r));
+      sg::write_var(lines, SG_WRITE_VAR(acc_c));
+      sg::write_var(lines, SG_WRITE_VAR(acc_step));
+      sg::write_var(lines, SG_WRITE_VAR(acc_lim));
+      sg::write_var(lines, SG_WRITE_VAR(vel_lim));
+      sg::write_var(lines, SG_WRITE_VAR(prob_change_acc));
+      sg::write_var(lines, SG_WRITE_VAR(prob_slow_fast));
+      sg::write_var(lines, SG_WRITE_VAR(acc_factor));
+      sg::write_var(lines, SG_WRITE_VAR(vel_factor));
+      sg::write_var(lines, SG_WRITE_VAR(slow));
+      sg::write_var_enum(lines, SG_WRITE_VAR(state));
+      sg::write_var(lines, SG_WRITE_VAR(debug));
+      sg::write_var(lines, SG_WRITE_VAR(wall_coll_resolve));
+      sg::write_var(lines, SG_WRITE_VAR(wall_coll_resolve_ctr));
+      sg::write_var(lines, SG_WRITE_VAR(fog_of_war));
+      sg::write_var(lines, SG_WRITE_VAR(light));
+      sg::write_var(lines, SG_WRITE_VAR(visible));
+      sg::write_var(lines, SG_WRITE_VAR(visible_near));
+      sg::write_var(lines, SG_WRITE_VAR(is_underground));
+      sg::write_var(lines, SG_WRITE_VAR(inside_room));
+      sg::write_var(lines, SG_WRITE_VAR(inside_corr));
+      sg::write_var(lines, SG_WRITE_VAR(enemy));
+      sg::write_var(lines, SG_WRITE_VAR(armor_class));
+      sg::write_var_enum(lines, SG_WRITE_VAR(npc_race));
+      sg::write_var_enum(lines, SG_WRITE_VAR(npc_class));
+      sg::write_var(lines, SG_WRITE_VAR(weapon_idx));
+      sg::write_var(lines, SG_WRITE_VAR(is_hostile));
+      sg::write_var(lines, SG_WRITE_VAR(was_hostile));
+      // OneShot trg_info_hostile_npc;
+      sg::write_var(lines, SG_WRITE_VAR(death_time_s));
+      // OneShot trg_death;
+    }
+    
+    virtual std::vector<std::string>::iterator deserialize(std::vector<std::string>::iterator it_line_begin,
+                                                           std::vector<std::string>::iterator it_line_end,
+                                                           Environment* environment) override
+    {
+      it_line_begin = PlayerBase::deserialize(it_line_begin, it_line_end, environment);
+      for (auto it_line = it_line_begin + 1; it_line != it_line_end; ++it_line)
+      {
+        if (sg::read_var(&it_line, SG_READ_VAR(pos_r))) {}
+        else if (sg::read_var(&it_line, SG_READ_VAR(pos_c))) {}
+        else if (sg::read_var(&it_line, SG_READ_VAR(vel_r))) {}
+        else if (sg::read_var(&it_line, SG_READ_VAR(vel_c))) {}
+        else if (sg::read_var(&it_line, SG_READ_VAR(acc_r))) {}
+        else if (sg::read_var(&it_line, SG_READ_VAR(acc_c))) {}
+        else if (sg::read_var(&it_line, SG_READ_VAR(acc_step))) {}
+        else if (sg::read_var(&it_line, SG_READ_VAR(acc_lim))) {}
+        else if (sg::read_var(&it_line, SG_READ_VAR(vel_lim))) {}
+        else if (sg::read_var(&it_line, SG_READ_VAR(prob_change_acc))) {}
+        else if (sg::read_var(&it_line, SG_READ_VAR(prob_slow_fast))) {}
+        else if (sg::read_var(&it_line, SG_READ_VAR(acc_factor))) {}
+        else if (sg::read_var(&it_line, SG_READ_VAR(vel_factor))) {}
+        else if (sg::read_var(&it_line, SG_READ_VAR(slow))) {}
+        else if (sg::read_var_enum(&it_line, SG_READ_VAR(state))) {}
+        else if (sg::read_var(&it_line, SG_READ_VAR(debug))) {}
+        else if (sg::read_var(&it_line, SG_READ_VAR(wall_coll_resolve))) {}
+        else if (sg::read_var(&it_line, SG_READ_VAR(wall_coll_resolve_ctr))) {}
+        else if (sg::read_var(&it_line, SG_READ_VAR(fog_of_war))) {}
+        else if (sg::read_var(&it_line, SG_READ_VAR(light))) {}
+        else if (sg::read_var(&it_line, SG_READ_VAR(visible))) {}
+        else if (sg::read_var(&it_line, SG_READ_VAR(visible_near))) {}
+        else if (sg::read_var(&it_line, SG_READ_VAR(is_underground))) {}
+        else if (sg::read_var(&it_line, SG_READ_VAR(inside_room))) {}
+        else if (sg::read_var(&it_line, SG_READ_VAR(inside_corr))) {}
+        else if (sg::read_var(&it_line, SG_READ_VAR(enemy))) {}
+        else if (sg::read_var(&it_line, SG_READ_VAR(armor_class))) {}
+        else if (sg::read_var_enum(&it_line, SG_READ_VAR(npc_race))) {}
+        else if (sg::read_var_enum(&it_line, SG_READ_VAR(npc_class))) {}
+        else if (sg::read_var(&it_line, SG_READ_VAR(weapon_idx))) {}
+        else if (sg::read_var(&it_line, SG_READ_VAR(is_hostile))) {}
+        else if (sg::read_var(&it_line, SG_READ_VAR(was_hostile))) {}
+        // OneShot trg_info_hostile_npc;
+        else if (sg::read_var(&it_line, SG_READ_VAR(death_time_s)))
+        {
+          return it_line;
+        }
+        // OneShot trg_death;
+      }
+      return it_line_end;
+    }
 
   };
   
