@@ -7,6 +7,7 @@
 
 #pragma once
 #include "Orientation.h"
+#include "SaveGame.h"
 #include <Core/Utils.h>
 #include <Termin8or/Rectangle.h>
 #include <Core/bool_vector.h>
@@ -87,6 +88,27 @@ namespace dung
       if (math::in_range<int>(idx, 0, stlutils::sizeI(light), Range::ClosedOpen))
         return light[idx];
       return false;
+    }
+    
+    void serialize(std::vector<std::string>& lines) const
+    {
+      sg::write_var(lines, SG_WRITE_VAR(fog_of_war));
+      sg::write_var(lines, SG_WRITE_VAR(light));
+    }
+    
+    std::vector<std::string>::iterator deserialize(std::vector<std::string>::iterator it_line_begin,
+                                                   std::vector<std::string>::iterator it_line_end)
+    {
+      for (auto it_line = it_line_begin; it_line != it_line_end; ++it_line)
+      {
+        if (sg::read_var(&it_line, SG_READ_VAR(fog_of_war))) {}
+        else if (sg::read_var(&it_line, SG_READ_VAR(light)))
+        {
+          return it_line;
+        }
+      }
+      
+      return it_line_end;
     }
   };
 
