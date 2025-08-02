@@ -421,6 +421,17 @@ namespace dung
           return cp.second;
       return nullptr;
     }
+    
+    void serialize(std::vector<std::string>& lines) const
+    {
+      m_bsp_tree->serialize(lines);
+    }
+    
+    std::vector<std::string>::iterator deserialize(std::vector<std::string>::iterator it_line_begin,
+                                                   std::vector<std::string>::iterator it_line_end)
+    {
+      return m_bsp_tree->deserialize(it_line_begin, it_line_end);
+    }
   };
 
 }
