@@ -15,6 +15,8 @@ namespace dung
 
   struct DungObject
   {
+    virtual ~DungObject() = default;
+  
     RC pos; // world pos
     bool fog_of_war = true;
     bool light = false;
