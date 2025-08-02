@@ -67,6 +67,8 @@ namespace dung
     {
       m_bsp_tree = bsp_tree;
       m_leaves = m_bsp_tree->fetch_leaves();
+      m_room_styles.clear();
+      m_corridor_styles.clear();
     }
     
     void style_dungeon(Latitude latitude_0, Longitude longitude_0)
