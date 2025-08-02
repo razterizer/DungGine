@@ -19,6 +19,7 @@
 #include "DungGineListener.h"
 #include "Inventory.h"
 #include "Keyboard.h"
+#include "SaveGame.h"
 #include <Termin8or/Keyboard.h>
 #include <Termin8or/MessageHandler.h>
 #include <Core/FolderHelper.h>
