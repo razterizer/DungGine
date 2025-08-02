@@ -258,6 +258,8 @@ namespace dung
             armour_subgroup->add_item(item_str, armour.get());
         m_player.curr_tot_inv_weight += armour->weight;
       }
+      
+      m_inventory->apply_deserialization_changes();
     }
     
     template<typename Lambda>
