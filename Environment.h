@@ -404,6 +404,23 @@ namespace dung
                           corr->light);
       }
     }
+    
+    BSPNode* find_room(int id) const
+    {
+      for (auto* leaf : m_leaves)
+        if (leaf->id == id)
+          return leaf;
+      return nullptr;
+    }
+    
+    Corridor* find_corridor(int id) const
+    {
+      const auto& room_corridor_map = m_bsp_tree->get_room_corridor_map();
+      for (const auto& cp : room_corridor_map)
+        if (cp.second->id == id)
+          return cp.second;
+      return nullptr;
+    }
   };
 
 }
