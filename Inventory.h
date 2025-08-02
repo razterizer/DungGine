@@ -7,6 +7,7 @@
 
 #pragma once
 #include "Items.h"
+#include "SaveGame.h"
 #include <Termin8or/ScreenHandler.h>
 #include <Termin8or/Drawing.h>
 #include <Termin8or/Rectangle.h>
@@ -279,6 +280,9 @@ namespace dung
     int cb0_items = 2; // col box-relative-pos start items.
     int hilite_idx = 0;
     
+    // Save-game temporaries for delayed application.
+    std::vector<int> sg_hilited_idcs, sg_selected_idcs;
+    
   public:
     void set_bounding_box(const ttl::Rectangle& bb) { m_bb = bb; }
     
@@ -342,6 +346,18 @@ namespace dung
           g.toggle_state(rel_idx, state);
         cum_idx += g.size();
       }
+    }
+    
+    void apply_deserialization_changes()
+    {
+      for (auto idx : sg_hilited_idcs)
+        toggle_state(idx, InvItemState::SET_HILITE);
+        
+      for (auto idx : sg_selected_idcs)
+        toggle_state(idx, InvItemState::SWITCH_SELECTION);
+        
+      sg_hilited_idcs.clear();
+      sg_selected_idcs.clear();
     }
     
     void inc_hilite()
@@ -450,6 +466,58 @@ namespace dung
     std::vector<InvGroup>::const_iterator cend() const
     {
       return m_groups.cend();
+    }
+    
+    void serialize(std::vector<std::string>& lines) const
+    {
+      sg::write_var(lines, SG_WRITE_VAR(hilite_idx));
+      
+      lines.emplace_back("items");
+      int num_lines = size();
+      for (int r = 0; r < num_lines; ++r)
+      {
+        auto item = get_item(r);
+        if (item.hilited || item.selected)
+          lines.emplace_back(std::to_string(r) + " : " + std::to_string(item.hilited) + ", " + std::to_string(item.selected));
+      }
+      lines.emplace_back("-");
+    }
+    
+    std::vector<std::string>::iterator deserialize(std::vector<std::string>::iterator it_line_begin,
+                                                   std::vector<std::string>::iterator it_line_end)
+    {
+      for (auto it_line = it_line_begin; it_line != it_line_end; ++it_line)
+      {
+        if (sg::read_var(&it_line, SG_READ_VAR(hilite_idx))) {}
+        else if (*it_line == "items")
+        {
+          for (auto it_line2 = it_line + 1; it_line2 != it_line_end; ++it_line2)
+          {
+            if (*it_line2 == "-")
+              return it_line2;
+            else
+            {
+              auto tokens = str::tokenize(*it_line2, { ' ', ',', ':' });
+              if (tokens.size() == 3)
+              {
+                int idx = std::atoi(tokens[0].c_str());
+                bool hilited = static_cast<bool>(std::atoi(tokens[1].c_str()));
+                bool selected = static_cast<bool>(std::atoi(tokens[2].c_str()));
+                if (hilited)
+                  sg_hilited_idcs.emplace_back(idx);
+                if (selected)
+                  sg_selected_idcs.emplace_back(idx);
+              }
+              else
+              {
+                std::cerr << "Error in deserialization of inventory item states!\n";
+                return it_line2;
+              }
+            }
+          }
+        }
+      }
+      return it_line_end;
     }
     
   };
