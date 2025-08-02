@@ -7,6 +7,8 @@
 
 #pragma once
 #include "DungObject.h"
+#include "SaveGame.h"
+#include <Termin8or/StringConversion.h>
 
 
 namespace dung
@@ -64,6 +66,45 @@ namespace dung
       }
       
       terrain = environment->get_terrain(pos);
+    }
+    
+    virtual void serialize(std::vector<std::string>& lines) const override
+    {
+      DungObject::serialize(lines);
+    
+      sg::write_var(lines, SG_WRITE_VAR(shape));
+      sg::write_var(lines, SG_WRITE_VAR(dir));
+      sg::write_var(lines, SG_WRITE_VAR(pos_r));
+      sg::write_var(lines, SG_WRITE_VAR(pos_c));
+      //sg::write_var(lines, SG_WRITE_VAR(life_time));
+      sg::write_var(lines, SG_WRITE_VAR(time_stamp));
+      sg::write_var(lines, SG_WRITE_VAR(speed));
+      sg::write_var(lines, SG_WRITE_VAR(alive));
+      sg::write_var(lines, SG_WRITE_VAR(terrain));
+    }
+    
+    virtual std::vector<std::string>::iterator deserialize(std::vector<std::string>::iterator it_line_begin,
+                                                           std::vector<std::string>::iterator it_line_end,
+                                                           Environment* environment) override
+    {
+      it_line_begin = DungObject::deserialize(it_line_begin, it_line_end, environment);
+      for (auto it_line = it_line_begin + 1; it_line != it_line_end; ++it_line)
+      {
+        if (sg::read_var(&it_line, SG_READ_VAR(shape))) {}
+        else if (sg::read_var(&it_line, SG_READ_VAR(dir))) {}
+        else if (sg::read_var(&it_line, SG_READ_VAR(pos_r))) {}
+        else if (sg::read_var(&it_line, SG_READ_VAR(pos_c))) {}
+        //else if (sg::read_var(&it_line, SG_READ_VAR(life_time))) {}
+        else if (sg::read_var(&it_line, SG_READ_VAR(time_stamp))) {}
+        else if (sg::read_var(&it_line, SG_READ_VAR(speed))) {}
+        else if (sg::read_var(&it_line, SG_READ_VAR(alive))) {}
+        else if (sg::read_var(&it_line, SG_READ_VAR(terrain)))
+        {
+          return it_line;
+        }
+      }
+    
+      return it_line_end;
     }
   };
 
