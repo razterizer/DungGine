@@ -7,6 +7,9 @@
 
 #pragma once
 
+#define TERRAIN_TO_STR(sym) case Terrain::sym: return #sym;
+#define STR_TO_TERRAIN(sym) if (str == #sym) return Terrain::sym;
+
 namespace dung
 {
 
@@ -139,37 +142,71 @@ namespace dung
   {
     switch (terrain)
     {
-      case Terrain::Default: return "Default";
-      case Terrain::Void: return "Void";
-      case Terrain::Water: return "Water";
-      case Terrain::Sand: return "Sand";
-      case Terrain::Gravel: return "Gravel";
-      case Terrain::Stone: return "Stone";
-      case Terrain::Mountain: return "Mountain";
-      case Terrain::Lava: return "Lava";
-      case Terrain::Cave: return "Cave";
-      case Terrain::Swamp: return "Swamp";
-      case Terrain::Poison: return "Poison";
-      case Terrain::Acid: return "Acid";
-      case Terrain::Tar: return "Tar";
-      case Terrain::Path: return "Path";
-      case Terrain::Mine: return "Mine";
-      case Terrain::Grass: return "Grass";
-      case Terrain::Shrub: return "Shrub";
-      case Terrain::Tree: return "Tree";
-      case Terrain::Tile: return "Tile";
-      case Terrain::Masonry: return "Masonry";
-      case Terrain::Column: return "Column";
-      case Terrain::Brick: return "Brick";
-      case Terrain::Wood: return "Wood";
-      case Terrain::Ice: return "Ice";
-      case Terrain::Metal: return "Metal";
-      case Terrain::Silver: return "Silver";
-      case Terrain::Gold: return "Gold";
-      case Terrain::Bone: return "Bone";
-      case Terrain::Rope: return "Rope";
+      TERRAIN_TO_STR(Default);
+      TERRAIN_TO_STR(Void);
+      TERRAIN_TO_STR(Water);
+      TERRAIN_TO_STR(Sand);
+      TERRAIN_TO_STR(Gravel);
+      TERRAIN_TO_STR(Stone);
+      TERRAIN_TO_STR(Mountain);
+      TERRAIN_TO_STR(Lava);
+      TERRAIN_TO_STR(Cave);
+      TERRAIN_TO_STR(Swamp);
+      TERRAIN_TO_STR(Poison);
+      TERRAIN_TO_STR(Acid);
+      TERRAIN_TO_STR(Tar);
+      TERRAIN_TO_STR(Path);
+      TERRAIN_TO_STR(Mine);
+      TERRAIN_TO_STR(Grass);
+      TERRAIN_TO_STR(Shrub);
+      TERRAIN_TO_STR(Tree);
+      TERRAIN_TO_STR(Tile);
+      TERRAIN_TO_STR(Masonry);
+      TERRAIN_TO_STR(Column);
+      TERRAIN_TO_STR(Brick);
+      TERRAIN_TO_STR(Wood);
+      TERRAIN_TO_STR(Ice);
+      TERRAIN_TO_STR(Metal);
+      TERRAIN_TO_STR(Silver);
+      TERRAIN_TO_STR(Gold);
+      TERRAIN_TO_STR(Bone);
+      TERRAIN_TO_STR(Rope);
       default: return "n/a";
     }
+  }
+  
+  std::optional<Terrain> str2terrain(const std::string& str)
+  {
+    STR_TO_TERRAIN(Default);
+    STR_TO_TERRAIN(Void);
+    STR_TO_TERRAIN(Water);
+    STR_TO_TERRAIN(Sand);
+    STR_TO_TERRAIN(Gravel);
+    STR_TO_TERRAIN(Stone);
+    STR_TO_TERRAIN(Mountain);
+    STR_TO_TERRAIN(Lava);
+    STR_TO_TERRAIN(Cave);
+    STR_TO_TERRAIN(Swamp);
+    STR_TO_TERRAIN(Poison);
+    STR_TO_TERRAIN(Acid);
+    STR_TO_TERRAIN(Tar);
+    STR_TO_TERRAIN(Path);
+    STR_TO_TERRAIN(Mine);
+    STR_TO_TERRAIN(Grass);
+    STR_TO_TERRAIN(Shrub);
+    STR_TO_TERRAIN(Tree);
+    STR_TO_TERRAIN(Tile);
+    STR_TO_TERRAIN(Masonry);
+    STR_TO_TERRAIN(Column);
+    STR_TO_TERRAIN(Brick);
+    STR_TO_TERRAIN(Wood);
+    STR_TO_TERRAIN(Ice);
+    STR_TO_TERRAIN(Metal);
+    STR_TO_TERRAIN(Silver);
+    STR_TO_TERRAIN(Gold);
+    STR_TO_TERRAIN(Bone);
+    STR_TO_TERRAIN(Rope);
+    return std::nullopt;
   }
 
 }
