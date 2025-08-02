@@ -161,6 +161,99 @@ namespace dung
       return false;
     }
     
+    virtual void serialize(std::vector<std::string>& lines) const
+    {
+      sg::write_var(lines, SG_WRITE_VAR(character));
+      sg::write_var(lines, SG_WRITE_VAR(style));
+      sg::write_var(lines, SG_WRITE_VAR(pos));
+      sg::write_var(lines, SG_WRITE_VAR(last_pos));
+      sg::write_var(lines, SG_WRITE_VAR(los_r));
+      sg::write_var(lines, SG_WRITE_VAR(los_c));
+      sg::write_var(lines, SG_WRITE_VAR(last_los_r));
+      sg::write_var(lines, SG_WRITE_VAR(last_los_c));
+      sg::write_var(lines, SG_WRITE_VAR(is_moving));
+      lines.emplace_back("curr_room:id");
+      lines.emplace_back(std::to_string(curr_room != nullptr ? curr_room->id : -1)); // PC:279
+      lines.emplace_back("curr_corridor:id");
+      lines.emplace_back(std::to_string(curr_corridor != nullptr ? curr_corridor->id : -1)); // PC:218
+      sg::write_var(lines, SG_WRITE_VAR(health));
+      sg::write_var(lines, SG_WRITE_VAR(strength));
+      sg::write_var(lines, SG_WRITE_VAR(dexterity));
+      sg::write_var(lines, SG_WRITE_VAR(endurance));
+      sg::write_var(lines, SG_WRITE_VAR(weakness));
+      sg::write_var(lines, SG_WRITE_VAR(thac0));
+      sg::write_var(lines, SG_WRITE_VAR(weight_strain));
+      sg::write_var(lines, SG_WRITE_VAR(on_terrain));
+      sg::write_var(lines, SG_WRITE_VAR(can_swim));
+      sg::write_var(lines, SG_WRITE_VAR(can_fly));
+      
+      lines.emplace_back("blood_splats");
+      for (const auto& bs : blood_splats)
+        bs.serialize(lines);
+      
+      sg::write_var(lines, SG_WRITE_VAR(cached_fight_offs));
+      sg::write_var(lines, SG_WRITE_VAR(cached_fight_style));
+      sg::write_var(lines, SG_WRITE_VAR(cached_fight_str));
+    }
+    
+    virtual std::vector<std::string>::iterator deserialize(std::vector<std::string>::iterator it_line_begin,
+                                                           std::vector<std::string>::iterator it_line_end,
+                                                           Environment* environment)
+    {
+      for (auto it_line = it_line_begin; it_line != it_line_end; ++it_line)
+      {
+        if (sg::read_var(&it_line, SG_READ_VAR(character))) {}
+        else if (sg::read_var(&it_line, SG_READ_VAR(style))) {}
+        else if (sg::read_var(&it_line, SG_READ_VAR(pos))) {}
+        else if (sg::read_var(&it_line, SG_READ_VAR(last_pos))) {}
+        else if (sg::read_var(&it_line, SG_READ_VAR(los_r))) {}
+        else if (sg::read_var(&it_line, SG_READ_VAR(los_c))) {}
+        else if (sg::read_var(&it_line, SG_READ_VAR(last_los_r))) {}
+        else if (sg::read_var(&it_line, SG_READ_VAR(last_los_c))) {}
+        else if (sg::read_var(&it_line, SG_READ_VAR(is_moving))) {}
+        else if (*it_line == "curr_room:id")
+        {
+          ++it_line;
+          auto room_id = std::atoi(it_line->c_str());
+          auto* room = environment->find_room(room_id);
+          if (room != nullptr)
+            curr_room = room;
+          if (room_id != -1 && room == nullptr)
+            std::cerr << "Error in PlayerBase when parsing curr_room:id = \"" << room_id << "\"!\n";
+        }
+        else if (*it_line == "curr_corridor:id")
+        {
+          ++it_line;
+          auto corr_id = std::atoi(it_line->c_str());
+          auto* corr = environment->find_corridor(corr_id);
+          if (corr != nullptr)
+            curr_corridor = corr;
+          if (corr_id != -1 && corr == nullptr)
+            std::cerr << "Error in PlayerBase when parsing curr_corridor:id = \"" << corr_id << "\"!\n";
+        }
+        else if (sg::read_var(&it_line, SG_READ_VAR(health))) {}
+        else if (sg::read_var(&it_line, SG_READ_VAR(strength))) {}
+        else if (sg::read_var(&it_line, SG_READ_VAR(dexterity))) {}
+        else if (sg::read_var(&it_line, SG_READ_VAR(endurance))) {}
+        else if (sg::read_var(&it_line, SG_READ_VAR(weakness))) {}
+        else if (sg::read_var(&it_line, SG_READ_VAR(thac0))) {}
+        else if (sg::read_var(&it_line, SG_READ_VAR(weight_strain))) {}
+        else if (sg::read_var(&it_line, SG_READ_VAR(on_terrain))) {}
+        else if (sg::read_var(&it_line, SG_READ_VAR(can_swim))) {}
+        else if (sg::read_var(&it_line, SG_READ_VAR(can_fly))) {}
+        else if (*it_line == "blood_splats")
+          for (auto& bs : blood_splats)
+            it_line = bs.deserialize(it_line + 1, it_line_end, environment);
+        else if(sg::read_var(&it_line, SG_READ_VAR(cached_fight_offs))) {}
+        else if (sg::read_var(&it_line, SG_READ_VAR(cached_fight_style))) {}
+        else if (sg::read_var(&it_line, SG_READ_VAR(cached_fight_str)))
+        {
+          return it_line;
+        }
+      }
+      return it_line_end;
+    }
+    
   protected:
     void update_los()
     {
