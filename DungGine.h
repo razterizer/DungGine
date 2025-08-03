@@ -866,6 +866,7 @@ namespace dung
                                               m_player,
                                               all_keys, all_lamps, all_weapons, all_potions, all_armour,
                                               all_npcs,
+                                              trigger_game_save, trigger_game_load,
                                               tbd, debug);
     }
     
