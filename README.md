@@ -50,6 +50,8 @@ There is no skill progression yet and underground rooms are currently mixed with
 * particle physics-based fire/smoke
 * material based textures. So that when you design a texture in TextUR, DungGine treats different parts of the terrain differently, such as different viscosity and friction etc
 * different scrolling-modes for tracking the PC
+* save game feature
+* logging recording and replay (logging is a feature of `Termin8or` and works well together with the save game feature)
 
 and stuff like that.
 The corridors are all straight (for now). Other than that, I think the BSP generation is pretty standard.
@@ -64,8 +66,8 @@ Items you can pick up are keys, torches, lanterns, magic lamps (isotropic light)
 * `D` to drop a hilited item when in the inventory.
 * `C` to consume a potion.
 * `I` to identify things the PC can see.
-* `g` to save game.
-* `G` to load saved game.
+* `g` to save game (need to setup the save game feature properly. See below).
+* `G` to load saved game (need to setup the save game feature properly. See below).
 
 ## NPCs
 
@@ -155,6 +157,8 @@ To be able to use the save game feature, you need to implement the following Dun
 * `virtual void on_load_game_request_post(unsigned int rnd_seed)`
 
 Refer to the demo for an example on how to use these in a `GameEngine` application.
+
+The save game feature works very well together with the logging record/playback feature of `Termin8or` and you can even make a logging recording of you loading a saved game and then replay when you loaded that save game.
 
 ## Demo - Build and Run
 
