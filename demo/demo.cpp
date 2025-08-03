@@ -126,7 +126,7 @@ public:
 //#define SAVE_GAME
 #ifndef SAVE_GAME
       unsigned int rnd_seed = 0;
-      dungeon_engine->load_game_pre_build(savegame_filepath, &rnd_seed);
+      dungeon_engine->load_game_pre_build(savegame_filepath, &rnd_seed, 0.);
       GameEngine::set_curr_rnd_seed(rnd_seed);
 #endif
 
@@ -225,6 +225,7 @@ private:
       dungeon_engine = std::make_unique<dung::DungGine>(get_exe_folder(), true, texture_params);
     }
     dungeon_engine->load_dungeon(&bsp_tree);
+    dungeon_engine->configure_save_game(true, folder::split_file_path(savegame_filepath).first);
     //dungeon_engine->configure_sun(0.75f, 1e6f, dung::Season::Summer, 1e6f, dung::Latitude::NorthernHemisphere, dung::Longitude::F, false);
     dungeon_engine->configure_sun_rand(10.f, 3*60.f, dung::Latitude::Equator, dung::Longitude::F, true);
     dungeon_engine->style_dungeon();
