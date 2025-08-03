@@ -113,44 +113,44 @@ public:
     }
     else if (test_type == TestType::DungeonRuntime)
     {
-      std::cout << "curr rnd seed = " << GameEngine::get_curr_rnd_seed() << std::endl;
-      //rnd::srand(1626475275); // Terrain offset bug.
-      //rnd::srand(3074848586); // Torch fire-smoke test.
-      //rnd::srand(4133950669); // Drown animation test.
-      //rnd::srand(1905630639); // Dev days demo 1.
-      //rnd::srand(0x1337f00d + 5); // Use srand_time() after map generation.
+#if false
+//#define SAVE_GAME
+#ifndef SAVE_GAME
+      unsigned int rnd_seed = 0;
+      dungeon_engine->load_game_pre_build("savegame_0.dsg", &rnd_seed);
+      GameEngine::set_curr_rnd_seed(rnd_seed);
+#endif
+#endif
+
+      build_scene(true);
       
-      bsp_tree.generate(200, 400, dung::Orientation::Vertical);
-      bsp_tree.pad_rooms(4);
-      bsp_tree.create_corridors(1);
-      bsp_tree.create_doors(50, true);
-      
-      texture_params.dt_anim_s = 0.5;
-      auto f_tex_path = [](const auto& filename)
-      {
-        return folder::join_path({ "textures", filename });
-      };
-      texture_params.texture_file_names_surface_level_fill.emplace_back(f_tex_path("texture_sl_fill_0.tex"));
-      texture_params.texture_file_names_surface_level_fill.emplace_back(f_tex_path("texture_sl_fill_1.tex"));
-      texture_params.texture_file_names_surface_level_shadow.emplace_back(f_tex_path("texture_sl_shadow_0.tex"));
-      texture_params.texture_file_names_surface_level_shadow.emplace_back(f_tex_path("texture_sl_shadow_1.tex"));
-    
-      dungeon_engine = std::make_unique<dung::DungGine>(get_exe_folder(), true, texture_params);
-      dungeon_engine->load_dungeon(&bsp_tree);
-      //dungeon_engine->configure_sun(0.75f, 1e6f, dung::Season::Summer, 1e6f, dung::Latitude::NorthernHemisphere, dung::Longitude::F, false);
-      dungeon_engine->configure_sun_rand(10.f, 3*60.f, dung::Latitude::Equator, dung::Longitude::F, true);
-      dungeon_engine->style_dungeon();
-      if (!dungeon_engine->place_player(sh.size()))
-        std::cerr << "ERROR : Unable to place the playable character!" << std::endl;
-      dungeon_engine->place_keys(true);
-      dungeon_engine->place_lamps(30, 15, 5, true);
-      dungeon_engine->place_weapons(150, true);
-      dungeon_engine->place_potions(100, true);
-      dungeon_engine->place_armour(150, true);
-      dungeon_engine->place_npcs(100, true);
-      
-      dungeon_engine->add_listener(this);
+#if false
+#ifdef SAVE_GAME
+      dungeon_engine->save_game_post_build("savegame_0.dsg", GameEngine::get_curr_rnd_seed());
+#else
+      dungeon_engine->load_game_post_build("savegame_0.dsg");
+#endif
+#endif
     }
+  }
+  
+protected:
+  virtual void on_scene_rebuild_request() override
+  {
+    build_scene(false);
+  }
+  virtual void on_save_game_request(std::string& filepath, unsigned int& curr_rnd_seed) override
+  {
+    filepath = "savegame_0.dsg";
+    curr_rnd_seed = GameEngine::get_curr_rnd_seed();
+  }
+  virtual void on_load_game_request_pre(std::string& filepath) override
+  {
+    filepath = "savegame_0.dsg";
+  }
+  virtual void on_load_game_request_post(unsigned int rnd_seed) override
+  {
+    GameEngine::set_curr_rnd_seed(rnd_seed);
   }
   
 private:
@@ -182,6 +182,55 @@ private:
   
   virtual void draw_instructions() override
   {
+  }
+  
+  void build_scene(bool init)
+  {
+    std::cout << "curr rnd seed = " << GameEngine::get_curr_rnd_seed() << std::endl;
+    //rnd::srand(1626475275); // Terrain offset bug.
+    //rnd::srand(3074848586); // Torch fire-smoke test.
+    //rnd::srand(4133950669); // Drown animation test.
+    //rnd::srand(1905630639); // Dev days demo 1.
+    //rnd::srand(0x1337f00d + 5); // Use srand_time() after map generation.
+    
+    if (!init)
+      bsp_tree.reset();
+    bsp_tree.generate(200, 400, dung::Orientation::Vertical);
+    bsp_tree.pad_rooms(4);
+    bsp_tree.create_corridors(1);
+    bsp_tree.create_doors(50, true);
+    //if (!init)
+    //  bsp_tree.print_tree();
+    
+    if (init)
+    {
+      texture_params.dt_anim_s = 0.5;
+      auto f_tex_path = [](const auto& filename)
+      {
+        return folder::join_path({ "textures", filename });
+      };
+      texture_params.texture_file_names_surface_level_fill.emplace_back(f_tex_path("texture_sl_fill_0.tex"));
+      texture_params.texture_file_names_surface_level_fill.emplace_back(f_tex_path("texture_sl_fill_1.tex"));
+      texture_params.texture_file_names_surface_level_shadow.emplace_back(f_tex_path("texture_sl_shadow_0.tex"));
+      texture_params.texture_file_names_surface_level_shadow.emplace_back(f_tex_path("texture_sl_shadow_1.tex"));
+    
+      dungeon_engine = std::make_unique<dung::DungGine>(get_exe_folder(), true, texture_params);
+    }
+    dungeon_engine->load_dungeon(&bsp_tree);
+    //dungeon_engine->configure_sun(0.75f, 1e6f, dung::Season::Summer, 1e6f, dung::Latitude::NorthernHemisphere, dung::Longitude::F, false);
+    dungeon_engine->configure_sun_rand(10.f, 3*60.f, dung::Latitude::Equator, dung::Longitude::F, true);
+    dungeon_engine->style_dungeon();
+    if (!dungeon_engine->place_player(sh.size()))
+      std::cerr << "ERROR : Unable to place the playable character!" << std::endl;
+    dungeon_engine->place_keys(true);
+    dungeon_engine->place_lamps(30, 15, 5, true);
+    dungeon_engine->place_weapons(150, true);
+    dungeon_engine->place_potions(100, true);
+    dungeon_engine->place_armour(150, true);
+    dungeon_engine->place_npcs(100, true);
+    
+    if (init)
+      dungeon_engine->add_listener(this);
   }
   
   dung::BSPTree bsp_tree { 4 };
