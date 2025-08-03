@@ -51,7 +51,7 @@ There is no skill progression yet and underground rooms are currently mixed with
 * material based textures. So that when you design a texture in TextUR, DungGine treats different parts of the terrain differently, such as different viscosity and friction etc
 * different scrolling-modes for tracking the PC
 * save game feature
-* logging recording and replay (logging is a feature of `Termin8or` and works well together with the save game feature)
+* logging recording and replay (logging is a feature of [`Termin8or`](https://github.com/razterizer/Termin8or) and works well together with the save game feature)
 
 and stuff like that.
 The corridors are all straight (for now). Other than that, I think the BSP generation is pretty standard.
@@ -127,7 +127,7 @@ Some can swim, some can fly, and some can only walk.
   - `set_player_character(char ch)` : Sets the character of the playable character (pun intended).
   -  `set_player_style(const Style& style)` : Sets the style (fg/bg color) of the playable character.
   - `place_player(const RC& screen_size, std::optional<RC> world_pos = std::nullopt)` : Places the player near the middle of the realm in one of the corridors and centers the screen around the player.
-  -  configure_save_game(std::optional<std::string> dunggine_lib_repo_path) : Allows you to choose between version checking (using git commit hash on last commit of DungGine.git) and no version checking. If path is `nullopt` then version checking is disabled.
+  -  `configure_save_game(std::optional<std::string> dunggine_lib_repo_path)` : Allows you to choose between version checking (using git commit hash on last commit of DungGine.git) and no version checking. If path is `nullopt` then version checking is disabled.
   - `configure_sun(float sun_day_t_offs = 0.f, float minutes_per_day = 20.f, Season start_season = Season::Spring, float minutes_per_year = 120.f, Latitude latitude = Latitude::NorthernHemisphere, Longitude longitude = Longitude::F, bool use_per_room_lat_long_for_sun_dir = true)` : Configures the speed of the solar day, speed of the solar year, the starting direction of the sun and the starting season. Used for shadow movements for rooms over ground.
       When `use_per_room_lat_long_for_sun_dir` is `true` then use `latitude = Latitude::Equator` and `longitude = Longitude::F` to start with. Other values will shift the map over the globe so to speak, but with these starting settings the rooms at the top of the map will be the at the north pole and the rooms at the bottom of the map will be at the south pole. When `use_per_room_lat_long_for_sun_dir` is `false` then the specified latitude and longitude will be used globally across the whole map and the the function default args is a good starting point.
   - `configure_sun_rand(float minutes_per_day = 20.f, float minutes_per_year = 120.f, Latitude latitude = Latitude::NorthernHemisphere, Longitude longitude = Longitude::F, bool use_per_room_lat_long_for_sun_dir = true)` : Same as above but randomizes the initial direction of the sun.
@@ -158,7 +158,7 @@ To be able to use the save game feature, you need to implement the following Dun
 
 Refer to the demo for an example on how to use these in a `GameEngine` application.
 
-The save game feature works very well together with the logging record/playback feature of `Termin8or` and you can even make a logging recording of you loading a saved game and then replay when you loaded that save game.
+The save game feature works very well together with the logging record/playback feature of [`Termin8or`](https://github.com/razterizer/Termin8or) and you can even make a logging recording of you loading a saved game and then replay when you loaded that save game.
 
 ## Demo - Build and Run
 
