@@ -1353,6 +1353,38 @@ namespace dung
       
       if (do_fight)
         update_fighting(static_cast<float>(real_time_s));
+        
+      if (trigger_game_save)
+      {
+        std::string filepath = "savegame_0.dsg";
+        unsigned int curr_rnd_seed = 0;
+        // Expects just one listener.
+        broadcast([&filepath, &curr_rnd_seed](auto* l)
+          { l->on_save_game_request(filepath, curr_rnd_seed); });
+        
+        save_game_post_build(filepath, curr_rnd_seed);
+      
+        trigger_game_save = false;
+      }
+      else if (trigger_game_load)
+      {
+        std::string filepath = "savegame_0.dsg";
+        unsigned int curr_rnd_seed = 0;
+        // Expects just one listener.
+        broadcast([&filepath](auto* l)
+          { l->on_load_game_request_pre(filepath); });
+          
+        load_game_pre_build(filepath, &curr_rnd_seed);
+        
+        broadcast([curr_rnd_seed](auto* listener)
+                  { listener->on_load_game_request_post(curr_rnd_seed); });
+        
+        broadcast([](auto* l) { l->on_scene_rebuild_request(); });
+        
+        load_game_post_build(filepath);
+              
+        trigger_game_load = false;
+      }
       
       m_screen_helper->update_scrolling(curr_pos);
     }
