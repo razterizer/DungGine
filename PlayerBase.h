@@ -190,6 +190,7 @@ namespace dung
       lines.emplace_back("blood_splats");
       for (const auto& bs : blood_splats)
         bs.serialize(lines);
+      lines.emplace_back("-");
       
       sg::write_var(lines, SG_WRITE_VAR(cached_fight_offs));
       sg::write_var(lines, SG_WRITE_VAR(cached_fight_style));
@@ -242,8 +243,18 @@ namespace dung
         else if (sg::read_var(&it_line, SG_READ_VAR(can_swim))) {}
         else if (sg::read_var(&it_line, SG_READ_VAR(can_fly))) {}
         else if (*it_line == "blood_splats")
-          for (auto& bs : blood_splats)
-            it_line = bs.deserialize(it_line + 1, it_line_end, environment);
+        {
+          ++it_line;
+          if (*it_line != "-")
+          {
+            do
+            {
+              BloodSplat bs { environment, RC {}, 0, 0.f, RC {} };
+              it_line = bs.deserialize(it_line, it_line_end, environment) + 1;
+              blood_splats.emplace_back(bs);
+            } while (*it_line != "-");
+          }
+        }
         else if(sg::read_var(&it_line, SG_READ_VAR(cached_fight_offs))) {}
         else if (sg::read_var(&it_line, SG_READ_VAR(cached_fight_style))) {}
         else if (sg::read_var(&it_line, SG_READ_VAR(cached_fight_str)))
