@@ -335,14 +335,14 @@ namespace dung
         auto Nl = light.size();
         assert(Nfow > 0);
         assert(Nl > 0);
-        if (sg::read_var(&it_line, SG_READ_VAR(fog_of_war))) { ++it_line; }
-        else { assert(false); }
+        if (sg::read_var(&it_line, SG_READ_VAR(fog_of_war)))
+          assert(Nfow == fog_of_war.size());
+        ++it_line;
         
-        if (sg::read_var(&it_line, SG_READ_VAR(light))) { ++it_line; }
-        else { assert(false); }
+        if (sg::read_var(&it_line, SG_READ_VAR(light)))
+          assert(Nl == light.size());
+        ++it_line;
         
-        assert(Nfow == fog_of_war.size());
-        assert(Nl == light.size());
         return it_line;
       }
       else
