@@ -25,6 +25,7 @@
 #include <Core/FolderHelper.h>
 #include <Core/events/EventBroadcaster.h>
 #include <Core/Utils.h>
+#include <Core/System.h>
 
 using namespace utils::literals;
 
@@ -86,6 +87,8 @@ namespace dung
     
     bool trigger_game_save = false;
     bool trigger_game_load = false;
+    bool use_save_game_git_hash_check = false;
+    std::string path_to_dunggine_repo; // Path to where the DungGine repo is checked out.
     
     // /////////////////////
     
@@ -920,6 +923,13 @@ namespace dung
       return false;
     }
     
+    void configure_save_game(bool use_git_hash_check, std::optional<std::string> dunggine_lib_repo_path)
+    {
+      use_save_game_git_hash_check = use_git_hash_check;
+      if (dunggine_lib_repo_path.has_value())
+        path_to_dunggine_repo = dunggine_lib_repo_path.value();
+    }
+    
     // Randomizes the starting direction of the sun and the starting season.
     void configure_sun_rand(float minutes_per_day = 20.f, float minutes_per_year = 120.f,
                             Latitude latitude = Latitude::NorthernHemisphere,
@@ -1375,14 +1385,16 @@ namespace dung
         broadcast([&filepath](auto* l)
           { l->on_load_game_request_pre(filepath); });
           
-        load_game_pre_build(filepath, &curr_rnd_seed);
-        
-        broadcast([curr_rnd_seed](auto* listener)
-                  { listener->on_load_game_request_post(curr_rnd_seed); });
-        
-        broadcast([](auto* l) { l->on_scene_rebuild_request(); });
-        
-        load_game_post_build(filepath);
+        // Only proceed if we have the correct git hash.
+        if (load_game_pre_build(filepath, &curr_rnd_seed, real_time_s))
+        {
+          broadcast([curr_rnd_seed](auto* listener)
+                    { listener->on_load_game_request_post(curr_rnd_seed); });
+          
+          broadcast([](auto* l) { l->on_scene_rebuild_request(); });
+          
+          load_game_post_build(filepath);
+        }
               
         trigger_game_load = false;
       }
@@ -1638,9 +1650,22 @@ namespace dung
                                       debug);
     }
     
+    std::string get_latest_git_commit_hash() const
+    {
+      auto old_pwd = folder::get_pwd();
+      auto new_pwd = path_to_dunggine_repo;
+      if (!new_pwd.empty())
+        folder::set_pwd(new_pwd);
+      auto hash = sys::exec("git log -1 --pretty=format:\"%H\"");
+      folder::set_pwd(old_pwd);
+      return hash;
+    }
+    
     void save_game_post_build(const std::string& savegame_filename, unsigned int curr_rnd_seed) const
     {
       std::vector<std::string> lines;
+      
+      lines.emplace_back(use_save_game_git_hash_check ? get_latest_git_commit_hash() : "0");
       
       lines.emplace_back(std::to_string(curr_rnd_seed));
       
@@ -1696,14 +1721,26 @@ namespace dung
       TextIO::write_file(savegame_filename, lines);
     }
     
-    void load_game_pre_build(const std::string& savegame_filename, unsigned int* curr_rnd_seed)
+    bool load_game_pre_build(const std::string& savegame_filename, unsigned int* curr_rnd_seed, double real_time_s)
     {
+      std::string git_hash;
+    
       std::vector<std::string> lines;
       
       TextIO::read_file(savegame_filename, lines);
       
-      std::istringstream iss(lines[0]);
+      if (use_save_game_git_hash_check &&
+          lines[0] != get_latest_git_commit_hash())
+      {
+        message_handler->add_message(static_cast<float>(real_time_s),
+                                     "ERROR : Tried to load a saved game\nbut the git hash of the save game\ndoesn't match the git hash of the\nlast commit of DungGine!",
+                                      MessageHandler::Level::Fatal,
+                                      5.f);
+        return false;
+      }
+      std::istringstream iss(lines[1]);
       iss >> *curr_rnd_seed;
+      return true;
     }
     
     void load_game_post_build(const std::string& savegame_filename)
@@ -1712,7 +1749,7 @@ namespace dung
       
       TextIO::read_file(savegame_filename, lines);
       
-      for (auto it_line = lines.begin() + 1; it_line != lines.end(); ++it_line)
+      for (auto it_line = lines.begin() + 2; it_line != lines.end(); ++it_line)
       {
         if (*it_line == "m_environment")
         {
