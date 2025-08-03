@@ -1637,16 +1637,65 @@ namespace dung
                                       debug);
     }
     
-    void save_game(const std::string& savegame_filename, unsigned int curr_rnd_seed)
+    void save_game_post_build(const std::string& savegame_filename, unsigned int curr_rnd_seed) const
     {
       std::vector<std::string> lines;
       
       lines.emplace_back(std::to_string(curr_rnd_seed));
+      
+      lines.emplace_back("m_environment");
+      m_environment->serialize(lines);
+      sg::write_var_enum(lines, SG_WRITE_VAR(m_sun_dir));
+      sg::write_var_enum(lines, SG_WRITE_VAR(m_latitude));
+      sg::write_var_enum(lines, SG_WRITE_VAR(m_longitude));
+      sg::write_var_enum(lines, SG_WRITE_VAR(m_season));
+      sg::write_var(lines, SG_WRITE_VAR(m_sun_minutes_per_day));
+      sg::write_var(lines, SG_WRITE_VAR(m_sun_day_t_offs));
+      sg::write_var(lines, SG_WRITE_VAR(m_sun_minutes_per_year));
+      sg::write_var(lines, SG_WRITE_VAR(m_sun_year_t_offs));
+      sg::write_var(lines, SG_WRITE_VAR(m_t_solar_period));
+      sg::write_var(lines, SG_WRITE_VAR(debug));
+      
+      lines.emplace_back("m_player");
+      m_player.serialize(lines);
+      
+      lines.emplace_back("all_npcs");
+      for (const auto& npc : all_npcs)
+        npc.serialize(lines);
+      
+      lines.emplace_back("m_inventory");
+      m_inventory->serialize(lines);
+      
+      lines.emplace_back("all_keys");
+      for (const auto& key : all_keys)
+        key.serialize(lines);
+      
+      lines.emplace_back("all_lamps");
+      for (const auto& lamp : all_lamps)
+        lamp.serialize(lines);
         
+      lines.emplace_back("all_weapons");
+      for (const auto& weapon : all_weapons)
+        weapon->serialize(lines);
+        
+      lines.emplace_back("all_potions");
+      for (const auto& potion : all_potions)
+        potion.serialize(lines);
+        
+      lines.emplace_back("all_armour");
+      for (const auto& armour : all_armour)
+        armour->serialize(lines);
+        
+      sg::write_var(lines, "use_fog_of_war", use_fog_of_war);
+      
+#if false
+      //std::unique_ptr<ScreenHelper> m_screen_helper;
+#endif
+      
       TextIO::write_file(savegame_filename, lines);
     }
     
-    void load_game(const std::string& savegame_filename, unsigned int* curr_rnd_seed)
+    void load_game_pre_build(const std::string& savegame_filename, unsigned int* curr_rnd_seed)
     {
       std::vector<std::string> lines;
       
@@ -1654,6 +1703,72 @@ namespace dung
       
       std::istringstream iss(lines[0]);
       iss >> *curr_rnd_seed;
+    }
+    
+    void load_game_post_build(const std::string& savegame_filename)
+    {
+      std::vector<std::string> lines;
+      
+      TextIO::read_file(savegame_filename, lines);
+      
+      for (auto it_line = lines.begin() + 1; it_line != lines.end(); ++it_line)
+      {
+        if (*it_line == "m_environment")
+        {
+          it_line = m_environment->deserialize(it_line + 1, lines.end());
+        }
+        else if (sg::read_var_enum<SolarDirection>(&it_line, SG_READ_VAR(m_sun_dir))) {}
+        else if (sg::read_var_enum<Latitude>(&it_line, SG_READ_VAR(m_latitude))) {}
+        else if (sg::read_var_enum<Longitude>(&it_line, SG_READ_VAR(m_longitude))) {}
+        else if (sg::read_var_enum<Season>(&it_line, SG_READ_VAR(m_season))) {}
+        else if (sg::read_var(&it_line, SG_READ_VAR(m_sun_minutes_per_day))) {}
+        else if (sg::read_var(&it_line, SG_READ_VAR(m_sun_day_t_offs))) {}
+        else if (sg::read_var(&it_line, SG_READ_VAR(m_sun_minutes_per_year))) {}
+        else if (sg::read_var(&it_line, SG_READ_VAR(m_sun_year_t_offs))) {}
+        else if (sg::read_var(&it_line, SG_READ_VAR(m_t_solar_period))) {}
+        else if (sg::read_var(&it_line, SG_READ_VAR(debug))) {}
+        else if (*it_line == "m_player")
+        {
+          it_line = m_player.deserialize(it_line + 1, lines.end(), m_environment.get());
+        }
+        else if (*it_line == "all_npcs")
+        {
+          for (auto& npc : all_npcs)
+            it_line = npc.deserialize(it_line + 1, lines.end(), m_environment.get()); // code smell!!
+        }
+        
+        else if (*it_line == "m_inventory")
+          it_line = m_inventory->deserialize(it_line + 1, lines.end());
+        
+        else if (*it_line == "all_keys")
+          for (auto& key : all_keys)
+            it_line = key.deserialize(it_line + 1, lines.end(), m_environment.get());
+        
+        else if (*it_line == "all_lamps")
+          for (auto& lamp : all_lamps)
+            it_line = lamp.deserialize(it_line + 1, lines.end(), m_environment.get());
+        
+        else if (*it_line == "all_weapons")
+          for (auto& weapon : all_weapons)
+            it_line = weapon->deserialize(it_line + 1, lines.end(), m_environment.get());
+        
+        else if (*it_line == "all_potions")
+          for (auto& potion : all_potions)
+            it_line = potion.deserialize(it_line + 1, lines.end(), m_environment.get());
+        
+        else if (*it_line == "all_armour")
+          for (auto& armour : all_armour)
+            it_line = armour->deserialize(it_line + 1, lines.end(), m_environment.get());
+        
+        else if (sg::read_var(&it_line, SG_READ_VAR(use_fog_of_war)))
+        {
+          return;
+        }
+        else
+        {
+          std::cerr << "Error in save game parsing!\n";
+        }
+      }
     }
     
   };
