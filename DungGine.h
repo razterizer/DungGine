@@ -84,6 +84,9 @@ namespace dung
     
     bool stall_game = false;
     
+    bool trigger_game_save = false;
+    bool trigger_game_load = false;
+    
     // /////////////////////
     
     void update_sun(float real_time_s)
