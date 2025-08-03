@@ -1727,7 +1727,14 @@ namespace dung
     
       std::vector<std::string> lines;
       
-      TextIO::read_file(savegame_filename, lines);
+      if (!TextIO::read_file(savegame_filename, lines))
+      {
+        message_handler->add_message(static_cast<float>(real_time_s),
+                                     "ERROR : Unable to load save game file:\n\"" + savegame_filename + "\"!",
+                                     MessageHandler::Level::Fatal,
+                                     3.f);
+        return false;
+      }
       
       if (use_save_game_git_hash_check &&
           lines[0] != get_latest_git_commit_hash())
