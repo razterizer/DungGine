@@ -64,6 +64,8 @@ Items you can pick up are keys, torches, lanterns, magic lamps (isotropic light)
 * `D` to drop a hilited item when in the inventory.
 * `C` to consume a potion.
 * `I` to identify things the PC can see.
+* `g` to save game.
+* `G` to load saved game.
 
 ## NPCs
 
@@ -123,6 +125,7 @@ Some can swim, some can fly, and some can only walk.
   - `set_player_character(char ch)` : Sets the character of the playable character (pun intended).
   -  `set_player_style(const Style& style)` : Sets the style (fg/bg color) of the playable character.
   - `place_player(const RC& screen_size, std::optional<RC> world_pos = std::nullopt)` : Places the player near the middle of the realm in one of the corridors and centers the screen around the player.
+  -  configure_save_game(std::optional<std::string> dunggine_lib_repo_path) : Allows you to choose between version checking (using git commit hash on last commit of DungGine.git) and no version checking. If path is `nullopt` then version checking is disabled.
   - `configure_sun(float sun_day_t_offs = 0.f, float minutes_per_day = 20.f, Season start_season = Season::Spring, float minutes_per_year = 120.f, Latitude latitude = Latitude::NorthernHemisphere, Longitude longitude = Longitude::F, bool use_per_room_lat_long_for_sun_dir = true)` : Configures the speed of the solar day, speed of the solar year, the starting direction of the sun and the starting season. Used for shadow movements for rooms over ground.
       When `use_per_room_lat_long_for_sun_dir` is `true` then use `latitude = Latitude::Equator` and `longitude = Longitude::F` to start with. Other values will shift the map over the globe so to speak, but with these starting settings the rooms at the top of the map will be the at the north pole and the rooms at the bottom of the map will be at the south pole. When `use_per_room_lat_long_for_sun_dir` is `false` then the specified latitude and longitude will be used globally across the whole map and the the function default args is a good starting point.
   - `configure_sun_rand(float minutes_per_day = 20.f, float minutes_per_year = 120.f, Latitude latitude = Latitude::NorthernHemisphere, Longitude longitude = Longitude::F, bool use_per_room_lat_long_for_sun_dir = true)` : Same as above but randomizes the initial direction of the sun.
@@ -141,6 +144,17 @@ Some can swim, some can fly, and some can only walk.
 Texturing done using the editor [`TextUR`](https://github.com/razterizer/TextUR).
 Use the `TextUR` command line argument `-c` to convert a normal/fill texture to a shadow texture.
 `DungGine` supports texture animations.
+
+## Save Game
+
+To be able to use the save game feature, you need to implement the following DungGineListener events:
+
+* `virtual void on_scene_rebuild_request()`
+* `virtual void on_save_game_request(std::string& filepath, unsigned int& curr_rnd_seed)`
+* `virtual void on_load_game_request_pre(std::string& filepath)`
+* `virtual void on_load_game_request_post(unsigned int rnd_seed)`
+
+Refer to the demo for an example on how to use these in a `GameEngine` application.
 
 ## Demo - Build and Run
 
