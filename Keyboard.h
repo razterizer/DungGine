@@ -36,8 +36,10 @@ namespace dung
     
     std::vector<NPC>& m_all_npcs;
     
-    ui::TextBoxDebug& m_tbd;
+    bool& m_trigger_game_save;
+    bool& m_trigger_game_load;
     
+    ui::TextBoxDebug& m_tbd;
     bool& m_debug;
     
   public:
@@ -49,6 +51,8 @@ namespace dung
              std::vector<Potion>& all_potions,
              std::vector<std::unique_ptr<Armour>>& all_armour,
              std::vector<NPC>& all_npcs,
+             bool& trigger_game_save,
+             bool& trigger_game_load,
              ui::TextBoxDebug& tbd, bool& debug)
       : m_environment(environment)
       , m_inventory(inventory)
@@ -60,6 +64,8 @@ namespace dung
       , m_all_potions(all_potions)
       , m_all_armour(all_armour)
       , m_all_npcs(all_npcs)
+      , m_trigger_game_save(trigger_game_save)
+      , m_trigger_game_load(trigger_game_load)
       , m_tbd(tbd)
       , m_debug(debug)
     {}
@@ -563,6 +569,14 @@ namespace dung
       {
         for (auto& npc : m_all_npcs)
           npc.trigger_hostility(m_player.pos);
+      }
+      else if (curr_key == 'g')
+      {
+        m_trigger_game_save = true;
+      }
+      else if (curr_key == 'G')
+      {
+        m_trigger_game_load = true;
       }
     }
 
