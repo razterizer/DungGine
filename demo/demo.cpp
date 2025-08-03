@@ -26,6 +26,13 @@ public:
     GameEngine::set_sim_delay_us(10'000);
     GameEngine::set_anim_rate(0, 3); // swim animation
     GameEngine::set_anim_rate(1, 4); // fight animation
+    
+#ifndef _WIN32
+    const char* xcode_env = std::getenv("RUNNING_FROM_XCODE");
+    if (xcode_env != nullptr)
+      savegame_filepath = "../../../../../../../../Documents/xcode/lib/DungGine/demo/"; // #FIXME: Find a better solution!
+#endif
+    savegame_filepath = folder::join_path({ savegame_filepath, "savegame_0.dsg" });
   }
   
   virtual ~Game() override
@@ -117,7 +124,7 @@ public:
 //#define SAVE_GAME
 #ifndef SAVE_GAME
       unsigned int rnd_seed = 0;
-      dungeon_engine->load_game_pre_build("savegame_0.dsg", &rnd_seed);
+      dungeon_engine->load_game_pre_build(savegame_filepath, &rnd_seed);
       GameEngine::set_curr_rnd_seed(rnd_seed);
 #endif
 #endif
@@ -126,9 +133,9 @@ public:
       
 #if false
 #ifdef SAVE_GAME
-      dungeon_engine->save_game_post_build("savegame_0.dsg", GameEngine::get_curr_rnd_seed());
+      dungeon_engine->save_game_post_build(savegame_filepath, GameEngine::get_curr_rnd_seed());
 #else
-      dungeon_engine->load_game_post_build("savegame_0.dsg");
+      dungeon_engine->load_game_post_build(savegame_filepath);
 #endif
 #endif
     }
@@ -141,12 +148,12 @@ protected:
   }
   virtual void on_save_game_request(std::string& filepath, unsigned int& curr_rnd_seed) override
   {
-    filepath = "savegame_0.dsg";
+    filepath = savegame_filepath;
     curr_rnd_seed = GameEngine::get_curr_rnd_seed();
   }
   virtual void on_load_game_request_pre(std::string& filepath) override
   {
-    filepath = "savegame_0.dsg";
+    filepath = savegame_filepath;
   }
   virtual void on_load_game_request_post(unsigned int rnd_seed) override
   {
@@ -242,6 +249,8 @@ private:
   bool use_gore = true;
   
   float fire_smoke_dt_factor = 0.5f;
+  
+  std::string savegame_filepath;
 };
 
 int main(int argc, char** argv)
