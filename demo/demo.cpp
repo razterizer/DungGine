@@ -120,6 +120,8 @@ public:
     }
     else if (test_type == TestType::DungeonRuntime)
     {
+      build_scene(true);
+      
 #if false
 //#define SAVE_GAME
 #ifndef SAVE_GAME
@@ -127,11 +129,9 @@ public:
       dungeon_engine->load_game_pre_build(savegame_filepath, &rnd_seed);
       GameEngine::set_curr_rnd_seed(rnd_seed);
 #endif
-#endif
 
-      build_scene(true);
+      build_scene(false);
       
-#if false
 #ifdef SAVE_GAME
       dungeon_engine->save_game_post_build(savegame_filepath, GameEngine::get_curr_rnd_seed());
 #else
