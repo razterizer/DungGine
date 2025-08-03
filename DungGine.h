@@ -1393,7 +1393,7 @@ namespace dung
           
           broadcast([](auto* l) { l->on_scene_rebuild_request(); });
           
-          load_game_post_build(filepath);
+          load_game_post_build(filepath, real_time_s);
         }
               
         trigger_game_load = false;
@@ -1743,7 +1743,7 @@ namespace dung
       return true;
     }
     
-    void load_game_post_build(const std::string& savegame_filename)
+    void load_game_post_build(const std::string& savegame_filename, double real_time_s)
     {
       std::vector<std::string> lines;
       
@@ -1800,6 +1800,10 @@ namespace dung
         
         else if (sg::read_var(&it_line, SG_READ_VAR(use_fog_of_war)))
         {
+          message_handler->add_message(static_cast<float>(real_time_s),
+                                       "Successfully loaded save game:\n\"" + savegame_filename + "\"!",
+                                       MessageHandler::Level::Guide,
+                                       3.f);
           return;
         }
         else
