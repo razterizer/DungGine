@@ -193,7 +193,8 @@ private:
   
   void build_scene(bool init)
   {
-    std::cout << "curr rnd seed = " << GameEngine::get_curr_rnd_seed() << std::endl;
+    if (init) // Avoids extra screen-buffer row glitch that otherwise occurs when loading a saved game.
+      std::cout << "curr rnd seed = " << GameEngine::get_curr_rnd_seed() << std::endl;
     //rnd::srand(1626475275); // Terrain offset bug.
     //rnd::srand(3074848586); // Torch fire-smoke test.
     //rnd::srand(4133950669); // Drown animation test.
