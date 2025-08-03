@@ -923,9 +923,9 @@ namespace dung
       return false;
     }
     
-    void configure_save_game(bool use_git_hash_check, std::optional<std::string> dunggine_lib_repo_path)
+    void configure_save_game(std::optional<std::string> dunggine_lib_repo_path)
     {
-      use_save_game_git_hash_check = use_git_hash_check;
+      use_save_game_git_hash_check = dunggine_lib_repo_path.has_value();
       if (dunggine_lib_repo_path.has_value())
         path_to_dunggine_repo = dunggine_lib_repo_path.value();
     }
