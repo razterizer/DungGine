@@ -141,7 +141,7 @@ public:
       build_scene(false);
       
 #ifdef SAVE_GAME
-      dungeon_engine->save_game_post_build(savegame_filepath, GameEngine::get_curr_rnd_seed());
+      dungeon_engine->save_game_post_build(savegame_filepath, GameEngine::get_curr_rnd_seed(), 0.);
 #else
       dungeon_engine->load_game_post_build(savegame_filepath, 0.);
 #endif
