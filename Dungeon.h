@@ -79,9 +79,14 @@ namespace dung
     
     void reset()
     {
-      for (auto& bsp_tree : bsp_forest)
-        bsp_tree->reset();
+      global_bsp_tree_id = 0;
+      global_bsp_node_id = 0;
+      global_corridor_id = 0;
+      //for (auto& bsp_tree : bsp_forest)
+      //  bsp_tree->reset();
       bsp_forest.clear();
+      staircases.clear();
+      bsp_tree_rooms.clear();
     }
     
     const RC& get_world_size() const
