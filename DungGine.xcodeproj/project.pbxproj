@@ -45,6 +45,8 @@
 		075D41962E28B68E005DD356 /* demo */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = demo; sourceTree = BUILT_PRODUCTS_DIR; };
 		075D423C2E2CA41C005DD356 /* Comparison.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Comparison.h; sourceTree = "<group>"; };
 		075D42D92E364B4C005DD356 /* SaveGame.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SaveGame.h; sourceTree = "<group>"; };
+		075D436B2E4204A9005DD356 /* Staircase.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Staircase.h; sourceTree = "<group>"; };
+		075D436C2E420E7D005DD356 /* Dungeon.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Dungeon.h; sourceTree = "<group>"; };
 		07C2A7842C2616FC00869A56 /* RoomStyle.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RoomStyle.h; sourceTree = "<group>"; };
 		07C2A7852C2618A500869A56 /* Items.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Items.h; sourceTree = "<group>"; };
 		07C2A7862C261B3C00869A56 /* PC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PC.h; sourceTree = "<group>"; };
@@ -148,6 +150,7 @@
 				0709B9BA2C95825200A43834 /* workflows */,
 				07C2A7892C2A29CF00869A56 /* Orientation.h */,
 				07E6EACA2C14CFD3007BBC6B /* BSPTree.h */,
+				075D436C2E420E7D005DD356 /* Dungeon.h */,
 				075D423C2E2CA41C005DD356 /* Comparison.h */,
 				07D769B32C69EB9A00BCA669 /* Environment.h */,
 				07D769B42C6B422700BCA669 /* ScreenHelper.h */,
@@ -162,6 +165,7 @@
 				0719424A2C49D65F008BD519 /* NPC.h */,
 				07C2A7872C2A28C400869A56 /* Door.h */,
 				07C2A7882C2A297800869A56 /* Corridor.h */,
+				075D436B2E4204A9005DD356 /* Staircase.h */,
 				071942492C458746008BD519 /* SolarMotionPatterns.h */,
 				07D769A62C5FFF3B00BCA669 /* Globals.h */,
 				07D769B22C68D06D00BCA669 /* Terrain.h */,
@@ -245,6 +249,7 @@
 				TargetAttributes = {
 					075D41952E28B68E005DD356 = {
 						CreatedOnToolsVersion = 16.4;
+						LastSwiftMigration = 1640;
 					};
 					07E6EAC22C14CEA8007BBC6B = {
 						CreatedOnToolsVersion = 15.4;
@@ -299,6 +304,8 @@
 				HEADER_SEARCH_PATHS = ..;
 				MACOSX_DEPLOYMENT_TARGET = 15.5;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 6.0;
 			};
 			name = Debug;
 		};
@@ -312,6 +319,7 @@
 				HEADER_SEARCH_PATHS = ..;
 				MACOSX_DEPLOYMENT_TARGET = 15.5;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 6.0;
 			};
 			name = Release;
 		};
