@@ -109,11 +109,12 @@ namespace dung
       return bsp_forest[floor].get();
     }
     
-    const std::vector<BSPNode*>& get_rooms(BSPTree* bsp_tree) const
+    const std::vector<BSPNode*>* get_rooms(BSPTree* bsp_tree) const
     {
       auto it = bsp_tree_rooms.find(bsp_tree);
-      //if (it != bsp_tree_rooms.end())
-      return it->second; // Assume it exists. #FIXME: Check for existence.
+      if (it != bsp_tree_rooms.end())
+        return &(it->second);
+      return nullptr;
     }
     
     // prob_in_room : inverse probability. A value of 10 means probability 1/10 or about once every ten times.

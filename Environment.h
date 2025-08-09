@@ -95,26 +95,32 @@ namespace dung
           room_style.longitude = static_cast<Longitude>((long_offs + long_idx) % num_long);
         };
         
-        for (auto* leaf : m_dungeon->get_rooms(bsp_tree))
+        const auto* room_vec = m_dungeon->get_rooms(bsp_tree);
+        if (room_vec == nullptr)
+          std::cerr << "ERROR in Environment::style_dungeon() : Unable to find rooms for the BSP tree of floor " + std::to_string(f_idx) + "!\n";
+        else
         {
-          RoomStyle room_style;
-          room_style.init_rand(f_idx == 0, first_floor_is_surface_level);
-          
-          const auto& fill_textures = room_style.is_underground ? texture_ug_fill : texture_sl_fill;
-          if (!fill_textures.empty())
+          for (auto* leaf : *room_vec)
           {
-            // #NOTE: Here we assume all textures in the animation batch are of the same size.
-            const auto& tex = fill_textures.front();
-            if (tex.size.r >= leaf->bb_leaf_room.r_len - 1 && tex.size.c >= leaf->bb_leaf_room.c_len - 1)
+            RoomStyle room_style;
+            room_style.init_rand(f_idx == 0, first_floor_is_surface_level);
+          
+            const auto& fill_textures = room_style.is_underground ? texture_ug_fill : texture_sl_fill;
+            if (!fill_textures.empty())
             {
-              room_style.tex_pos.r = rnd::rand_int(0, tex.size.r - leaf->bb_leaf_room.r_len);
-              room_style.tex_pos.c = rnd::rand_int(0, tex.size.c - leaf->bb_leaf_room.c_len);
+              // #NOTE: Here we assume all textures in the animation batch are of the same size.
+              const auto& tex = fill_textures.front();
+              if (tex.size.r >= leaf->bb_leaf_room.r_len - 1 && tex.size.c >= leaf->bb_leaf_room.c_len - 1)
+              {
+                room_style.tex_pos.r = rnd::rand_int(0, tex.size.r - leaf->bb_leaf_room.r_len);
+                room_style.tex_pos.c = rnd::rand_int(0, tex.size.c - leaf->bb_leaf_room.c_len);
+              }
             }
+          
+            f_calc_lat_long(room_style, leaf->bb_leaf_room);
+          
+            stlutils::at_growing(m_room_styles, f_idx)[leaf] = room_style;
           }
-          
-          f_calc_lat_long(room_style, leaf->bb_leaf_room);
-          
-          stlutils::at_growing(m_room_styles, f_idx)[leaf] = room_style;
         }
         
         const auto& room_corridor_map = bsp_tree->get_room_corridor_map();
@@ -186,7 +192,10 @@ namespace dung
     // #NOTE: Only for unwalled area!
     bool is_inside_any_room(BSPTree* bsp_tree, const RC& pos, BSPNode** room_node = nullptr) const
     {
-      for (auto* leaf : m_dungeon->get_rooms(bsp_tree))
+      const auto* room_vec = m_dungeon->get_rooms(bsp_tree);
+      if (room_vec == nullptr)
+        return false;
+      for (auto* leaf : *room_vec)
         if (leaf->bb_leaf_room.is_inside_offs(pos, -1))
         {
           utils::try_set(room_node, leaf);
@@ -460,7 +469,10 @@ namespace dung
     BSPNode* find_room(int floor, int id) const
     {
       auto* bsp_tree = m_dungeon->get_tree(floor);
-      for (auto* leaf : m_dungeon->get_rooms(bsp_tree))
+      const auto* room_vec = m_dungeon->get_rooms(bsp_tree);
+      if (room_vec == nullptr)
+        return nullptr;
+      for (auto* leaf : *room_vec)
         if (leaf->id == id)
           return leaf;
       return nullptr;
