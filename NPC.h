@@ -169,8 +169,8 @@ namespace dung
         inside_room = curr_room->is_inside_room({r, c}, &location_corr);
       if (inside_room || inside_corr)
       {
-        bool ok_move_to = environment->allow_move_to(r, c);
-        bool wet = is_wet(environment->get_terrain(r, c));
+        bool ok_move_to = environment->allow_move_to(curr_floor, r, c);
+        bool wet = is_wet(environment->get_terrain(curr_floor, r, c));
         bool allow_walking = ok_move_to && !wet;
         bool allow_swimming = ok_move_to && can_swim && wet;
         bool allow_flying = can_fly;
@@ -739,13 +739,13 @@ namespace dung
       {
         fog_of_war = curr_room->is_in_fog_of_war(pos);
         light = curr_room->is_in_light(pos);
-        is_underground = environment->is_underground(curr_room);
+        is_underground = environment->is_underground(curr_floor, curr_room);
       }
       else if (inside_corr && curr_corridor != nullptr)
       {
         fog_of_war = curr_corridor->is_in_fog_of_war(pos);
         light = curr_corridor->is_in_light(pos);
-        is_underground = environment->is_underground(curr_corridor);
+        is_underground = environment->is_underground(curr_floor, curr_corridor);
       }
 
       if (debug)

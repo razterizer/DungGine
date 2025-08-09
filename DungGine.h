@@ -7,6 +7,7 @@
 
 #pragma once
 #include "BSPTree.h"
+#include "Dungeon.h"
 #include "Environment.h"
 #include "ScreenHelper.h"
 #include "DungGineStyles.h"
@@ -321,6 +322,10 @@ namespace dung
         
         for (auto* door : m_player.curr_room->doors)
           *get_field_ptr(door) = clear_val;
+          
+        auto* staircase = m_player.curr_room->staircase;
+        if (staircase != nullptr)
+          *get_field_ptr(staircase) = clear_val;
       }
 
     }
@@ -489,6 +494,11 @@ namespace dung
         for (auto* door : m_player.curr_room->doors)
           if (distance(door->pos, curr_pos) <= c_fow_dist)
             *get_field_ptr(door) = set_val;
+            
+        auto* staircase = m_player.curr_room->staircase;
+        if (staircase != nullptr)
+          if (distance(staircase->pos, curr_pos) <= c_fow_dist)
+            *get_field_ptr(staircase) = set_val;
       }
     }
     
@@ -507,12 +517,12 @@ namespace dung
               is_night = true;
           };
           
-          auto room_style = m_environment->find_room_style(obj.curr_room);
+          auto room_style = m_environment->find_room_style(obj.curr_floor, obj.curr_room);
           if (room_style.has_value())
             f_set_night(room_style.value());
           else
           {
-            auto corr_style = m_environment->find_corridor_style(obj.curr_corridor);
+            auto corr_style = m_environment->find_corridor_style(obj.curr_floor, obj.curr_corridor);
             if (corr_style.has_value())
               f_set_night(corr_style.value());
           }
@@ -820,18 +830,18 @@ namespace dung
             if (do_update_fight)
               m_player.cached_fight_offs = f_calc_fight_offs(dp);
             auto offs = m_player.cached_fight_offs;
-            if (m_environment->is_inside_any_room(m_player.pos + offs))
+            if (m_environment->is_inside_any_room(m_player.curr_floor, m_player.pos + offs))
             {
               f_render_fight(&m_player, npc_scr_pos, offs);
               if (do_update_fight && rnd::one_in(npc.visible ? 20 : 28))
               {
-                auto& bs = m_player.blood_splats.emplace_back(m_environment.get(), m_player.pos + offs, rnd::dice(4), sim_time_s, offs);
+                auto& bs = m_player.blood_splats.emplace_back(m_environment.get(), m_player.curr_floor, m_player.pos + offs, rnd::dice(4), sim_time_s, offs);
                 bs.curr_room = m_player.curr_room;
                 bs.curr_corridor = m_player.curr_corridor;
                 if (m_player.is_inside_curr_room())
-                  bs.is_underground = m_environment->is_underground(m_player.curr_room);
+                  bs.is_underground = m_environment->is_underground(m_player.curr_floor, m_player.curr_room);
                 else if (m_player.is_inside_curr_corridor())
-                  bs.is_underground = m_environment->is_underground(m_player.curr_corridor);
+                  bs.is_underground = m_environment->is_underground(m_player.curr_floor, m_player.curr_corridor);
               }
             }
             if (npc.visible)
@@ -839,12 +849,12 @@ namespace dung
               if (do_update_fight)
                 npc.cached_fight_offs = f_calc_fight_offs(-dp);
               auto offs = npc.cached_fight_offs;
-              if (m_environment->is_inside_any_room(npc.pos + offs))
+              if (m_environment->is_inside_any_room(npc.curr_floor, npc.pos + offs))
               {
                 f_render_fight(&npc, pc_scr_pos, offs);
                 if (do_update_fight && rnd::one_in(npc.visible ? 20 : 28))
                 {
-                  auto& bs = npc.blood_splats.emplace_back(m_environment.get(), npc.pos + offs, rnd::dice(4), sim_time_s, offs);
+                  auto& bs = npc.blood_splats.emplace_back(m_environment.get(), npc.curr_floor, npc.pos + offs, rnd::dice(4), sim_time_s, offs);
                   bs.curr_room = npc.curr_room;
                   bs.curr_corridor = npc.curr_corridor;
                   bs.is_underground = npc.is_underground;
@@ -873,9 +883,20 @@ namespace dung
                                               tbd, debug);
     }
     
-    void load_dungeon(BSPTree* bsp_tree)
+    //void load_dungeon(BSPTree* bsp_tree)
+    //{
+    //  m_environment->load_dungeon(bsp_tree);
+    //  all_npcs.clear();
+    //  all_keys.clear();
+    //  all_lamps.clear();
+    //  all_weapons.clear();
+    //  all_potions.clear();
+    //  all_armour.clear();
+    //}
+    
+    void load_dungeon(const Dungeon& dungeon)
     {
-      m_environment->load_dungeon(bsp_tree);
+      m_environment->load_dungeon(dungeon);
       all_npcs.clear();
       all_keys.clear();
       all_lamps.clear();
@@ -893,7 +914,8 @@ namespace dung
     void set_player_style(const Style& style) { m_player.style = style; }
     bool place_player(const RC& screen_size, std::optional<RC> world_pos = std::nullopt)
     {
-      const auto world_size = m_environment->get_world_size();
+      auto curr_floor = m_environment->get_init_floor(); // #NOTE: get_init_floor() should only be called here!
+      const auto world_size = m_environment->get_world_size(curr_floor);
       m_screen_helper->set_screen_size(screen_size);
     
       if (world_pos.has_value())
@@ -903,7 +925,8 @@ namespace dung
         
       m_player.last_pos = m_player.pos;
       
-      const auto& room_corridor_map = m_environment->get_room_corridor_map();
+      m_player.curr_floor = curr_floor;
+      const auto& room_corridor_map = m_environment->get_room_corridor_map(curr_floor);
       
       const int c_max_num_iters = 1e5_i;
       int num_iters = 0;
@@ -961,300 +984,336 @@ namespace dung
     
     bool place_keys(bool only_place_on_dry_land)
     {
-      const auto world_size = m_environment->get_world_size();
-      const auto& door_vec = m_environment->fetch_doors();
       const int c_max_num_iters = 1e5_i;
-      int num_iters = 0;
-      bool valid_pos = false;
-      for (auto* d : door_vec)
+      const auto* dungeon = m_environment->get_dungeon();
+      for (int f_idx = 0; f_idx < m_environment->num_floors(); ++f_idx)
       {
-        if (d->is_locked)
+        auto* bsp_tree = dungeon->get_tree(f_idx);
+        const auto world_size = bsp_tree->get_world_size();
+        const auto& door_vec = bsp_tree->fetch_doors();
+        for (auto* d : door_vec)
         {
-          Key key;
-          key.key_id = d->key_id;
+          if (d->is_locked)
+          {
+            Key key;
+            key.curr_floor = f_idx;
+            key.key_id = d->key_id;
+            bool valid_pos = false;
+            int num_iters = 0;
+            do
+            {
+              key.pos =
+              {
+                rnd::rand_int(0, world_size.r),
+                rnd::rand_int(0, world_size.c)
+              };
+              
+              BSPNode* room = nullptr;
+              valid_pos = m_environment->is_inside_any_room(bsp_tree, key.pos, &room);
+              if (only_place_on_dry_land &&
+                  room != nullptr &&
+                  !is_dry(m_environment->get_terrain(key.curr_floor, key.pos)))
+              {
+                valid_pos = false;
+              }
+            } while (num_iters++ < c_max_num_iters && !valid_pos);
+            
+            BSPNode* leaf = nullptr;
+            if (!m_environment->is_inside_any_room(bsp_tree, key.pos, &leaf))
+              return false;
+            
+            if (leaf != nullptr)
+            {
+              key.curr_room = leaf;
+              key.is_underground = m_environment->is_underground(key.curr_floor, leaf);
+            }
+            
+            all_keys.emplace_back(key);
+          }
+        }
+      }
+      return true;
+    }
+    
+    bool place_lamps(int num_torches_per_floor, int num_lanterns_per_floor, int num_magic_lamps_per_floor, bool only_place_on_dry_land)
+    {
+      const int c_max_num_iters = 1e5_i;
+      const int num_lamps_per_floor = num_torches_per_floor + num_lanterns_per_floor + num_magic_lamps_per_floor;
+      const auto* dungeon = m_environment->get_dungeon();
+      for (int f_idx = 0; f_idx < m_environment->num_floors(); ++f_idx)
+      {
+        auto* bsp_tree = dungeon->get_tree(f_idx);
+        const auto world_size = bsp_tree->get_world_size();
+        int ctr_torches = 0;
+        int ctr_lanterns = 0;
+        int ctr_magic_lamps = 0;
+        for (int lamp_idx = 0; lamp_idx < num_lamps_per_floor; ++lamp_idx)
+        {
+          Lamp lamp;
+          lamp.curr_floor = f_idx;
+          Lamp::LampType lamp_type = Lamp::LampType::Torch;
+          if (ctr_torches++ < num_torches_per_floor)
+            lamp_type = Lamp::LampType::Torch;
+          else if (ctr_lanterns++ < num_lanterns_per_floor)
+            lamp_type = Lamp::LampType::Lantern;
+          else if (ctr_magic_lamps++ < num_magic_lamps_per_floor)
+            lamp_type = Lamp::LampType::MagicLamp;
+          lamp.init_rand(lamp_type);
+          bool valid_pos = false;
+          int num_iters = 0;
           do
           {
-            key.pos =
+            if (lamp_idx == 0 && num_iters < 50)
             {
-              rnd::rand_int(0, world_size.r),
-              rnd::rand_int(0, world_size.c)
-            };
-            
+              lamp.pos =
+              {
+                rnd::rand_int(m_player.pos.r - 20, m_player.pos.r + 20),
+                rnd::rand_int(m_player.pos.c - 20, m_player.pos.c + 20)
+              };
+            }
+            else
+            {
+              lamp.pos =
+              {
+                rnd::rand_int(0, world_size.r),
+                rnd::rand_int(0, world_size.c)
+              };
+            }
             BSPNode* room = nullptr;
-            valid_pos = m_environment->is_inside_any_room(key.pos, &room);
+            valid_pos = m_environment->is_inside_any_room(bsp_tree, lamp.pos, &room);
             if (only_place_on_dry_land &&
                 room != nullptr &&
-                !is_dry(m_environment->get_terrain(key.pos)))
+                !is_dry(m_environment->get_terrain(lamp.curr_floor, lamp.pos)))
             {
               valid_pos = false;
             }
           } while (num_iters++ < c_max_num_iters && !valid_pos);
           
           BSPNode* leaf = nullptr;
-          if (!m_environment->is_inside_any_room(key.pos, &leaf))
+          if (!m_environment->is_inside_any_room(bsp_tree, lamp.pos, &leaf))
             return false;
-            
+          
           if (leaf != nullptr)
           {
-            key.curr_room = leaf;
-            key.is_underground = m_environment->is_underground(leaf);
+            lamp.curr_room = leaf;
+            lamp.is_underground = m_environment->is_underground(lamp.curr_floor, leaf);
           }
-            
-          all_keys.emplace_back(key);
+          
+          all_lamps.emplace_back(lamp);
         }
       }
       return true;
     }
     
-    bool place_lamps(int num_torches, int num_lanterns, int num_magic_lamps, bool only_place_on_dry_land)
+    bool place_weapons(int num_weapons_per_floor, bool only_place_on_dry_land)
     {
-      const auto world_size = m_environment->get_world_size();
       const int c_max_num_iters = 1e5_i;
-      int num_iters = 0;
-      bool valid_pos = false;
-      const int num_lamps = num_torches + num_lanterns + num_magic_lamps;
-      int ctr_torches = 0;
-      int ctr_lanterns = 0;
-      int ctr_magic_lamps = 0;
-      for (int lamp_idx = 0; lamp_idx < num_lamps; ++lamp_idx)
+      const auto* dungeon = m_environment->get_dungeon();
+      for (int f_idx = 0; f_idx < m_environment->num_floors(); ++f_idx)
       {
-        Lamp lamp;
-        Lamp::LampType lamp_type = Lamp::LampType::Torch;
-        if (ctr_torches++ < num_torches)
-          lamp_type = Lamp::LampType::Torch;
-        else if (ctr_lanterns++ < num_lanterns)
-          lamp_type = Lamp::LampType::Lantern;
-        else if (ctr_magic_lamps++ < num_magic_lamps)
-          lamp_type = Lamp::LampType::MagicLamp;
-        lamp.init_rand(lamp_type);
-        do
+        auto* bsp_tree = dungeon->get_tree(f_idx);
+        const auto world_size = bsp_tree->get_world_size();
+        for (int wpn_idx = 0; wpn_idx < num_weapons_per_floor; ++wpn_idx)
         {
-          if (lamp_idx == 0 && num_iters < 50)
+          std::unique_ptr<Weapon> weapon;
+          switch (rnd::rand_int(0, 2))
           {
-            lamp.pos =
-            {
-              rnd::rand_int(m_player.pos.r - 20, m_player.pos.r + 20),
-              rnd::rand_int(m_player.pos.c - 20, m_player.pos.c + 20)
-            };
+            case 0: weapon = std::make_unique<Sword>(); break;
+            case 1: weapon = std::make_unique<Dagger>(); break;
+            case 2: weapon = std::make_unique<Flail>(); break;
+              // Error:
+            default: return false;
           }
-          else
+          weapon->curr_floor = f_idx;
+          bool valid_pos = false;
+          int num_iters = 0;
+          do
           {
-            lamp.pos =
+            weapon->pos =
             {
               rnd::rand_int(0, world_size.r),
               rnd::rand_int(0, world_size.c)
             };
-          }
-          BSPNode* room = nullptr;
-          valid_pos = m_environment->is_inside_any_room(lamp.pos, &room);
-          if (only_place_on_dry_land &&
-              room != nullptr &&
-              !is_dry(m_environment->get_terrain(lamp.pos)))
-          {
-            valid_pos = false;
-          }
-        } while (num_iters++ < c_max_num_iters && !valid_pos);
-        
-        BSPNode* leaf = nullptr;
-        if (!m_environment->is_inside_any_room(lamp.pos, &leaf))
-          return false;
+            BSPNode* room = nullptr;
+            valid_pos = m_environment->is_inside_any_room(bsp_tree, weapon->pos, &room);
+            if (only_place_on_dry_land &&
+                room != nullptr &&
+                !is_dry(m_environment->get_terrain(weapon->curr_floor, weapon->pos)))
+            {
+              valid_pos = false;
+            }
+          } while (num_iters++ < c_max_num_iters && !valid_pos);
           
-        if (leaf != nullptr)
-        {
-          lamp.curr_room = leaf;
-          lamp.is_underground = m_environment->is_underground(leaf);
+          BSPNode* leaf = nullptr;
+          if (!m_environment->is_inside_any_room(bsp_tree, weapon->pos, &leaf))
+            return false;
+          
+          if (leaf != nullptr)
+          {
+            weapon->curr_room = leaf;
+            weapon->is_underground = m_environment->is_underground(weapon->curr_floor, leaf);
+          }
+          
+          all_weapons.emplace_back(weapon.release());
         }
-        
-        all_lamps.emplace_back(lamp);
       }
       return true;
     }
     
-    bool place_weapons(int num_weapons, bool only_place_on_dry_land)
+    bool place_potions(int num_potions_per_floor, bool only_place_on_dry_land)
     {
-      const auto world_size = m_environment->get_world_size();
       const int c_max_num_iters = 1e5_i;
-      int num_iters = 0;
-      bool valid_pos = false;
-      for (int wpn_idx = 0; wpn_idx < num_weapons; ++wpn_idx)
+      const auto* dungeon = m_environment->get_dungeon();
+      for (int f_idx = 0; f_idx < m_environment->num_floors(); ++f_idx)
       {
-        std::unique_ptr<Weapon> weapon;
-        switch (rnd::rand_int(0, 2))
+        auto* bsp_tree = dungeon->get_tree(f_idx);
+        const auto world_size = bsp_tree->get_world_size();
+        for (int pot_idx = 0; pot_idx < num_potions_per_floor; ++pot_idx)
         {
-          case 0: weapon = std::make_unique<Sword>(); break;
-          case 1: weapon = std::make_unique<Dagger>(); break;
-          case 2: weapon = std::make_unique<Flail>(); break;
-          // Error:
-          default: return false;
-        }
-        do
-        {
-          weapon->pos =
+          Potion potion;
+          potion.curr_floor = f_idx;
+          bool valid_pos = false;
+          int num_iters = 0;
+          do
           {
-            rnd::rand_int(0, world_size.r),
-            rnd::rand_int(0, world_size.c)
-          };
-          BSPNode* room = nullptr;
-          valid_pos = m_environment->is_inside_any_room(weapon->pos, &room);
-          if (only_place_on_dry_land &&
-              room != nullptr &&
-              !is_dry(m_environment->get_terrain(weapon->pos)))
-          {
-            valid_pos = false;
-          }
-        } while (num_iters++ < c_max_num_iters && !valid_pos);
-        
-        BSPNode* leaf = nullptr;
-        if (!m_environment->is_inside_any_room(weapon->pos, &leaf))
-          return false;
+            potion.pos =
+            {
+              rnd::rand_int(0, world_size.r),
+              rnd::rand_int(0, world_size.c)
+            };
+            BSPNode* room = nullptr;
+            valid_pos = m_environment->is_inside_any_room(bsp_tree, potion.pos, &room);
+            if (only_place_on_dry_land &&
+                room != nullptr &&
+                !is_dry(m_environment->get_terrain(potion.curr_floor, potion.pos)))
+            {
+              valid_pos = false;
+            }
+          } while (num_iters++ < c_max_num_iters && !valid_pos);
           
-        if (leaf != nullptr)
-        {
-          weapon->curr_room = leaf;
-          weapon->is_underground = m_environment->is_underground(leaf);
-        }
-        
-        all_weapons.emplace_back(weapon.release());
-      }
-      return true;
-    }
-    
-    bool place_potions(int num_potions, bool only_place_on_dry_land)
-    {
-      const auto world_size = m_environment->get_world_size();
-      const int c_max_num_iters = 1e5_i;
-      int num_iters = 0;
-      bool valid_pos = false;
-      for (int pot_idx = 0; pot_idx < num_potions; ++pot_idx)
-      {
-        Potion potion;
-        do
-        {
-          potion.pos =
-          {
-            rnd::rand_int(0, world_size.r),
-            rnd::rand_int(0, world_size.c)
-          };
-          BSPNode* room = nullptr;
-          valid_pos = m_environment->is_inside_any_room(potion.pos, &room);
-          if (only_place_on_dry_land &&
-              room != nullptr &&
-              !is_dry(m_environment->get_terrain(potion.pos)))
-          {
-            valid_pos = false;
-          }
-        } while (num_iters++ < c_max_num_iters && !valid_pos);
-        
-        BSPNode* leaf = nullptr;
-        if (!m_environment->is_inside_any_room(potion.pos, &leaf))
-          return false;
+          BSPNode* leaf = nullptr;
+          if (!m_environment->is_inside_any_room(bsp_tree, potion.pos, &leaf))
+            return false;
           
-        if (leaf != nullptr)
-        {
-          potion.curr_room = leaf;
-          potion.is_underground = m_environment->is_underground(leaf);
+          if (leaf != nullptr)
+          {
+            potion.curr_room = leaf;
+            potion.is_underground = m_environment->is_underground(potion.curr_floor, leaf);
+          }
+          
+          all_potions.emplace_back(potion);
         }
-        
-        all_potions.emplace_back(potion);
       }
       return true;
     }
     
     bool place_armour(int num_armour, bool only_place_on_dry_land)
     {
-      const auto world_size = m_environment->get_world_size();
       const int c_max_num_iters = 1e5_i;
-      int num_iters = 0;
-      bool valid_pos = false;
-      for (int a_idx = 0; a_idx < num_armour; ++a_idx)
+      const auto* dungeon = m_environment->get_dungeon();
+      for (int f_idx = 0; f_idx < m_environment->num_floors(); ++f_idx)
       {
-        std::unique_ptr<Armour> armour;
-        switch (rnd::rand_int(0, 6))
+        auto* bsp_tree = dungeon->get_tree(f_idx);
+        const auto world_size = bsp_tree->get_world_size();
+        for (int a_idx = 0; a_idx < num_armour; ++a_idx)
         {
-          case 0: armour = std::make_unique<Shield>(); break;
-          case 1: armour = std::make_unique<Gambeson>(); break;
-          case 2: armour = std::make_unique<ChainMailleHauberk>(); break;
-          case 3: armour = std::make_unique<PlatedBodyArmour>(); break;
-          case 4: armour = std::make_unique<PaddedCoif>(); break;
-          case 5: armour = std::make_unique<ChainMailleCoif>(); break;
-          case 6: armour = std::make_unique<Helmet>(); break;
-          // Error:
-          default: return false;
-        }
-        do
-        {
-          armour->pos =
+          std::unique_ptr<Armour> armour;
+          switch (rnd::rand_int(0, 6))
           {
-            rnd::rand_int(0, world_size.r),
-            rnd::rand_int(0, world_size.c)
-          };
-          BSPNode* room = nullptr;
-          valid_pos = m_environment->is_inside_any_room(armour->pos, &room);
-          if (only_place_on_dry_land &&
-              room != nullptr &&
-              !is_dry(m_environment->get_terrain(armour->pos)))
-          {
-            valid_pos = false;
+            case 0: armour = std::make_unique<Shield>(); break;
+            case 1: armour = std::make_unique<Gambeson>(); break;
+            case 2: armour = std::make_unique<ChainMailleHauberk>(); break;
+            case 3: armour = std::make_unique<PlatedBodyArmour>(); break;
+            case 4: armour = std::make_unique<PaddedCoif>(); break;
+            case 5: armour = std::make_unique<ChainMailleCoif>(); break;
+            case 6: armour = std::make_unique<Helmet>(); break;
+              // Error:
+            default: return false;
           }
-        } while (num_iters++ < c_max_num_iters && !valid_pos);
-        
-        BSPNode* leaf = nullptr;
-        if (!m_environment->is_inside_any_room(armour->pos, &leaf))
-          return false;
+          armour->curr_floor = f_idx;
+          bool valid_pos = false;
+          int num_iters = 0;
+          do
+          {
+            armour->pos =
+            {
+              rnd::rand_int(0, world_size.r),
+              rnd::rand_int(0, world_size.c)
+            };
+            BSPNode* room = nullptr;
+            valid_pos = m_environment->is_inside_any_room(bsp_tree, armour->pos, &room);
+            if (only_place_on_dry_land &&
+                room != nullptr &&
+                !is_dry(m_environment->get_terrain(armour->curr_floor, armour->pos)))
+            {
+              valid_pos = false;
+            }
+          } while (num_iters++ < c_max_num_iters && !valid_pos);
           
-        if (leaf != nullptr)
-        {
-          armour->curr_room = leaf;
-          armour->is_underground = m_environment->is_underground(leaf);
+          BSPNode* leaf = nullptr;
+          if (!m_environment->is_inside_any_room(bsp_tree, armour->pos, &leaf))
+            return false;
+          
+          if (leaf != nullptr)
+          {
+            armour->curr_room = leaf;
+            armour->is_underground = m_environment->is_underground(armour->curr_floor, leaf);
+          }
+          
+          all_armour.emplace_back(armour.release());
         }
-        
-        all_armour.emplace_back(armour.release());
       }
       return true;
     }
     
     bool place_npcs(int num_npcs, bool only_place_on_dry_land)
     {
-      const auto world_size = m_environment->get_world_size();
       const int c_max_num_iters = 1e5_i;
-      int num_iters = 0;
-      bool valid_pos = false;
-      for (int npc_idx = 0; npc_idx < num_npcs; ++npc_idx)
+      const auto* dungeon = m_environment->get_dungeon();
+      for (int f_idx = 0; f_idx < m_environment->num_floors(); ++f_idx)
       {
-        NPC npc;
-        npc.npc_class = rnd::rand_enum<Class>();
-        npc.npc_race = rnd::rand_enum<Race>();
-        do
+        auto* bsp_tree = dungeon->get_tree(f_idx);
+        const auto world_size = bsp_tree->get_world_size();
+        for (int npc_idx = 0; npc_idx < num_npcs; ++npc_idx)
         {
-          npc.pos =
+          NPC npc;
+          npc.curr_floor = f_idx;
+          npc.npc_class = rnd::rand_enum<Class>();
+          npc.npc_race = rnd::rand_enum<Race>();
+          bool valid_pos = false;
+          int num_iters = 0;
+          do
           {
-            rnd::rand_int(0, world_size.r),
-            rnd::rand_int(0, world_size.c)
-          };
-          BSPNode* room = nullptr;
-          valid_pos = m_environment->is_inside_any_room(npc.pos, &room);
-          if (only_place_on_dry_land &&
-              room != nullptr)
-          {
-            if (!is_dry(m_environment->get_terrain(npc.pos)))
-              valid_pos = false;
-            else if (!m_environment->allow_move_to(npc.pos.r, npc.pos.c))
-              valid_pos = false;
-          }
-        } while (num_iters++ < c_max_num_iters && !valid_pos);
-        
-        BSPNode* leaf = nullptr;
-        if (!m_environment->is_inside_any_room(npc.pos, &leaf))
-          return false;
+            npc.pos =
+            {
+              rnd::rand_int(0, world_size.r),
+              rnd::rand_int(0, world_size.c)
+            };
+            BSPNode* room = nullptr;
+            valid_pos = m_environment->is_inside_any_room(bsp_tree, npc.pos, &room);
+            if (only_place_on_dry_land &&
+                room != nullptr)
+            {
+              if (!is_dry(m_environment->get_terrain(npc.curr_floor, npc.pos)))
+                valid_pos = false;
+              else if (!m_environment->allow_move_to(npc.curr_floor, npc.pos.r, npc.pos.c))
+                valid_pos = false;
+            }
+          } while (num_iters++ < c_max_num_iters && !valid_pos);
           
-        if (leaf != nullptr)
-        {
-          npc.curr_room = leaf;
-          npc.is_underground = m_environment->is_underground(leaf);
-          npc.init(all_weapons);
+          BSPNode* leaf = nullptr;
+          if (!m_environment->is_inside_any_room(bsp_tree, npc.pos, &leaf))
+            return false;
+          
+          if (leaf != nullptr)
+          {
+            npc.curr_room = leaf;
+            npc.is_underground = m_environment->is_underground(npc.curr_floor, leaf);
+            npc.init(all_weapons);
+          }
+          
+          all_npcs.emplace_back(npc);
         }
-        
-        all_npcs.emplace_back(npc);
       }
       return true;
     }
@@ -1332,7 +1391,7 @@ namespace dung
       
       // PC LOS etc.
       bool was_alive = m_player.health > 0;
-      m_player.on_terrain = m_environment->get_terrain(m_player.pos);
+      m_player.on_terrain = m_environment->get_terrain(m_player.curr_floor, m_player.pos);
       m_player.update(m_screen_helper.get(), m_inventory.get(),
                       do_los_terrainos,
                       sim_time_s, sim_dt_s * fire_smoke_dt_factor);
@@ -1350,7 +1409,7 @@ namespace dung
         Corridor* pc_corr = m_player.is_inside_curr_corridor() ? m_player.curr_corridor : nullptr;
         for (auto& npc : all_npcs)
         {
-          npc.on_terrain = m_environment->get_terrain(npc.pos);
+          npc.on_terrain = m_environment->get_terrain(npc.curr_floor, npc.pos);
           npc.update(curr_pos, pc_room, pc_corr, m_environment.get(),
                      do_los_terrainos, do_npc_move,
                      sim_time_s, sim_dt_s);
@@ -1412,8 +1471,9 @@ namespace dung
               bool framed_mode = false,
               bool gore = false)
     {
-      const auto& room_corridor_map = m_environment->get_room_corridor_map();
-      const auto& door_vec = m_environment->fetch_doors();
+      const auto& room_corridor_map = m_environment->get_room_corridor_map(m_player.curr_floor);
+      const auto& door_vec = m_environment->fetch_doors(m_player.curr_floor);
+      const auto& staircase_vec = m_environment->fetch_staircases(m_player.curr_floor);
       
       MessageBoxDrawingArgs mb_args;
       mb_args.v_align = mb_v_align;
@@ -1445,6 +1505,7 @@ namespace dung
       if (debug)
       {
         sh.write_buffer(terrain2str(m_player.on_terrain), 5, 1, Color::Black, Color::White);
+        sh.write_buffer("Floor: " + std::to_string(m_player.curr_floor), 6, 1, Color::Black, Color::White);
         
         if (!tbd.empty())
         {
@@ -1457,14 +1518,14 @@ namespace dung
         }
       }
       
-      auto f_draw_swim_anim = [anim_ctr_swim, &sh, this](bool is_moving,
-                                                    const RC& pos, const RC& scr_pos,
-                                                    float los_r, float los_c)
+      auto f_draw_swim_anim = [anim_ctr_swim, &sh, this](bool is_moving, int curr_floor,
+                                                         const RC& pos, const RC& scr_pos,
+                                                         float los_r, float los_c)
       {
         if (anim_ctr_swim % 3 == 0 && is_moving)
         {
           RC swim_pos { math::roundI(pos.r - los_r), math::roundI(pos.c - los_c) };
-          if (m_environment->is_inside_any_room(swim_pos))
+          if (m_environment->is_inside_any_room(curr_floor, swim_pos))
           {
             RC swim_pos_scr { math::roundI(scr_pos.r - los_r), math::roundI(scr_pos.c - los_c) };
             sh.write_buffer("*", swim_pos_scr.r, swim_pos_scr.c, Color::White, Color::Transparent2);
@@ -1478,7 +1539,7 @@ namespace dung
         sh.write_buffer(std::string(1, m_player.character), pc_scr_pos.r, pc_scr_pos.c, m_player.style);
         
         if (is_wet(m_player.on_terrain))
-          f_draw_swim_anim(m_player.is_moving, m_player.pos, pc_scr_pos, m_player.los_r, m_player.los_c);
+          f_draw_swim_anim(m_player.is_moving, m_player.curr_floor, m_player.pos, pc_scr_pos, m_player.los_r, m_player.los_c);
             
         m_player.draw(sh, sim_time_s);
       }
@@ -1486,6 +1547,8 @@ namespace dung
       // Items and NPCs
       auto f_render_item = [&](const auto& obj)
       {
+        if (obj.curr_floor != m_player.curr_floor)
+          return;
         if (!obj.visible)
           return;
         auto scr_pos = m_screen_helper->get_screen_pos(obj.pos);
@@ -1494,6 +1557,8 @@ namespace dung
       
       for (const auto& npc : all_npcs)
       {
+        if (npc.curr_floor != m_player.curr_floor)
+          continue;
         //bool swimming = is_wet(npc.on_terrain) && npc.can_swim && !npc.can_fly;
         bool dead_on_liquid = npc.health <= 0 && is_wet(npc.on_terrain); //&& swimming;
         if (!dead_on_liquid || sim_time_s - npc.death_time_s < 1.5f + (npc.can_fly ? 0.5f : 0.f))
@@ -1503,7 +1568,7 @@ namespace dung
         {
           auto npc_scr_pos = m_screen_helper->get_screen_pos(npc.pos);
           if (npc.health > 0 && npc.can_swim && !npc.can_fly)
-            f_draw_swim_anim(npc.is_moving, npc.pos, npc_scr_pos, npc.los_r, npc.los_c);
+            f_draw_swim_anim(npc.is_moving, npc.curr_floor, npc.pos, npc_scr_pos, npc.los_r, npc.los_c);
           else if (npc.health <= 0)
           {
             float time_delay = 0.f;
@@ -1526,7 +1591,7 @@ namespace dung
                     RC offs_pos { r_offs, c_offs };
                     RC npc_scr_offs_pos = npc_scr_pos + offs_pos;
                     RC npc_world_offs_pos = npc.pos + offs_pos;
-                    if (m_environment->is_inside_any_room(npc_world_offs_pos))
+                    if (m_environment->is_inside_any_room(npc.curr_floor, npc_world_offs_pos))
                       sh.write_buffer("*", npc_scr_offs_pos.r, npc_scr_offs_pos.c, Color::White, Color::Transparent2);
                   }
               }
@@ -1541,7 +1606,7 @@ namespace dung
                   RC offs_pos { r_offs, c_offs };
                   RC npc_scr_offs_pos = npc_scr_pos + offs_pos;
                   RC npc_world_offs_pos = npc.pos + offs_pos;
-                  if (m_environment->is_inside_any_room(npc_world_offs_pos))
+                  if (m_environment->is_inside_any_room(npc.curr_floor, npc_world_offs_pos))
                     sh.write_buffer("*", npc_scr_offs_pos.r, npc_scr_offs_pos.c, Color::White, Color::Transparent2);
                 }
             }
@@ -1594,6 +1659,12 @@ namespace dung
         sh.write_buffer(door_ch, door_scr_pos.r, door_scr_pos.c, Color::Black, (use_fog_of_war && door->fog_of_war) ? Color::Black : (door->light ? Color::Yellow : Color::DarkYellow));
       }
       
+      for (const auto* staircase : staircase_vec)
+      {
+        auto staircase_scr_pos = m_screen_helper->get_screen_pos(staircase->pos);
+        sh.write_buffer("B", staircase_scr_pos.r, staircase_scr_pos.c, (use_fog_of_war && staircase->fog_of_war) ? Color::Black : (staircase->light ? Color::LightGray : Color::DarkGray), Color::Black);
+      }
+      
       for (const auto& key : all_keys)
         f_render_item(key);
       
@@ -1642,7 +1713,7 @@ namespace dung
       }
       
       m_environment->draw_environment(sh, real_time_s,
-                                      use_fog_of_war,
+                                      m_player.curr_floor, use_fog_of_war,
                                       m_sun_dir, m_solar_motion,
                                       m_t_solar_period, m_season,
                                       m_use_per_room_lat_long_for_sun_dir,

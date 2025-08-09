@@ -28,7 +28,7 @@ namespace dung
     Latitude latitude = Latitude::NorthernHemisphere;
     Longitude longitude = Longitude::F;
     
-    void init_rand()
+    void init_rand(bool first_floor, bool first_floor_is_surface_level)
     {
       wall_type = rnd::rand_enum<WallType>();
       WallBasicType wall_basic_type = WallBasicType::Other;
@@ -54,7 +54,10 @@ namespace dung
       {
         floor_type = rnd::rand_enum<FloorType>();
       } while (floor_type == FloorType::None);
-      is_underground = rnd::rand_bool();
+      if (first_floor_is_surface_level)
+        is_underground = !first_floor;
+      else
+        is_underground = rnd::rand_bool();
     }
     
     char get_fill_char() const

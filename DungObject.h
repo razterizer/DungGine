@@ -25,6 +25,8 @@ namespace dung
     bool light = false;
     bool visible = false;
     bool is_underground = false;
+    
+    int curr_floor = 0;
     BSPNode* curr_room = nullptr;
     Corridor* curr_corridor = nullptr;
     
@@ -35,6 +37,7 @@ namespace dung
       sg::write_var(lines, SG_WRITE_VAR(light));
       sg::write_var(lines, SG_WRITE_VAR(visible));
       sg::write_var(lines, SG_WRITE_VAR(is_underground));
+      sg::write_var(lines, SG_WRITE_VAR(curr_floor));
       lines.emplace_back("curr_room:id");
       lines.emplace_back(std::to_string(curr_room != nullptr ? curr_room->id : -1));
       lines.emplace_back("curr_corridor:id");
@@ -52,11 +55,12 @@ namespace dung
         else if (sg::read_var(&it_line, SG_READ_VAR(light))) {}
         else if (sg::read_var(&it_line, SG_READ_VAR(visible))) {}
         else if (sg::read_var(&it_line, SG_READ_VAR(is_underground))) {}
+        else if (sg::read_var(&it_line, SG_READ_VAR(curr_floor))) {}
         else if (*it_line == "curr_room:id")
         {
           ++it_line;
           auto room_id = std::atoi(it_line->c_str());
-          auto* room = environment->find_room(room_id);
+          auto* room = environment->find_room(curr_floor, room_id);
           if (room != nullptr)
             curr_room = room;
           if (room_id != -1 && room == nullptr)
@@ -66,7 +70,7 @@ namespace dung
         {
           ++it_line;
           auto corr_id = std::atoi(it_line->c_str());
-          auto* corr = environment->find_corridor(corr_id);
+          auto* corr = environment->find_corridor(curr_floor, corr_id);
           if (corr != nullptr)
             curr_corridor = corr;
           if (corr_id != -1 && corr == nullptr)

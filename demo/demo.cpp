@@ -65,6 +65,7 @@ public:
     // /////////
     if (test_type == TestType::DungeonSimple)
     {
+    #if 0
       std::cout << "curr rnd seed = " << GameEngine::get_curr_rnd_seed() << std::endl;
       //rnd::srand(0x1337f00d); // Use srand_time() after map generation.
       
@@ -116,6 +117,7 @@ public:
       dungeon_engine->draw(sh, get_real_time_s(), get_sim_time_s(),
                            get_anim_count(0), get_anim_count(1));
       sh.print_screen_buffer(Color::Black);
+#endif
 #endif
     }
     else if (test_type == TestType::DungeonRuntime)
@@ -202,16 +204,31 @@ private:
     //rnd::srand(0x1337f00d + 5); // Use srand_time() after map generation.
     
     if (!init)
-      bsp_tree.reset();
-    bsp_tree.generate(200, 400, dung::Orientation::Vertical);
-    bsp_tree.pad_rooms(4);
-    bsp_tree.create_corridors(1);
-    bsp_tree.create_doors(50, true);
+      dungeon.reset();
     //if (!init)
     //  bsp_tree.print_tree();
     
     if (init)
     {
+      auto& surface_level = dungeon_floor_params.emplace_back();
+      surface_level.min_room_length = 4;
+      surface_level.world_size = { 200, 400 };
+      surface_level.first_split_orientation = dung::Orientation::Vertical;
+      surface_level.room_padding_min = 4;
+      surface_level.room_padding_max = 4;
+      surface_level.min_corridor_half_width = 1;
+      surface_level.max_num_locked_doors = 50;
+      surface_level.allow_passageways = true;
+      auto& underground_level_1 = dungeon_floor_params.emplace_back();
+      underground_level_1.min_room_length = 4;
+      underground_level_1.world_size = { 200, 400 };
+      underground_level_1.first_split_orientation = dung::Orientation::Vertical;
+      underground_level_1.room_padding_min = 4;
+      underground_level_1.room_padding_max = 4;
+      underground_level_1.min_corridor_half_width = 1;
+      underground_level_1.max_num_locked_doors = 50;
+      underground_level_1.allow_passageways = true;
+    
       texture_params.dt_anim_s = 0.5;
       auto f_tex_path = [](const auto& filename)
       {
@@ -224,7 +241,8 @@ private:
     
       dungeon_engine = std::make_unique<dung::DungGine>(get_exe_folder(), true, texture_params);
     }
-    dungeon_engine->load_dungeon(&bsp_tree);
+    dungeon.generate(dungeon_floor_params);
+    dungeon_engine->load_dungeon(dungeon);
     dungeon_engine->configure_save_game(folder::split_file_path(savegame_filepath).first);
     //dungeon_engine->configure_sun(0.75f, 1e6f, dung::Season::Summer, 1e6f, dung::Latitude::NorthernHemisphere, dung::Longitude::F, false);
     dungeon_engine->configure_sun_rand(10.f, 3*60.f, dung::Latitude::Equator, dung::Longitude::F, true);
@@ -237,12 +255,14 @@ private:
     dungeon_engine->place_potions(100, true);
     dungeon_engine->place_armour(150, true);
     dungeon_engine->place_npcs(100, true);
+    dungeon.create_staircases(4);
     
     if (init)
       dungeon_engine->add_listener(this);
   }
   
-  dung::BSPTree bsp_tree { 4 };
+  dung::Dungeon dungeon { true, -1 };
+  std::vector<dung::DungeonFloorParams> dungeon_floor_params;
   
   dung::DungGineTextureParams texture_params;
   std::unique_ptr<dung::DungGine> dungeon_engine;

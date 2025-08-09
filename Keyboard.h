@@ -12,6 +12,8 @@
 #include "Items.h"
 #include <Termin8or/MessageHandler.h>
 
+using namespace std::string_literals;
+
 
 namespace dung
 {
@@ -95,7 +97,7 @@ namespace dung
         }
         else if (is_inside_curr_bb(curr_pos.r, curr_pos.c - 1) &&
                  m_player.allow_move() &&
-                 m_environment->allow_move_to(curr_pos.r, curr_pos.c - 1))
+                 m_environment->allow_move_to(m_player.curr_floor, curr_pos.r, curr_pos.c - 1))
           curr_pos.c--;
       }
       else if (str::to_lower(curr_key) == 'd' || curr_special_key == keyboard::SpecialKey::Right)
@@ -106,15 +108,16 @@ namespace dung
           {
             obj->picked_up = false;
             obj->pos = curr_pos;
+            obj->curr_floor = m_player.curr_floor;
             if (m_player.is_inside_curr_room())
             {
-              obj->is_underground = m_environment->is_underground(m_player.curr_room);
+              obj->is_underground = m_environment->is_underground(m_player.curr_floor, m_player.curr_room);
               obj->curr_room = m_player.curr_room;
               obj->curr_corridor = nullptr;
             }
             else if (m_player.is_inside_curr_corridor())
             {
-              obj->is_underground = m_environment->is_underground(m_player.curr_corridor);
+              obj->is_underground = m_environment->is_underground(m_player.curr_floor, m_player.curr_corridor);
               obj->curr_room = nullptr;
               obj->curr_corridor = m_player.curr_corridor;
             }
@@ -271,7 +274,7 @@ namespace dung
         }
         else if (is_inside_curr_bb(curr_pos.r, curr_pos.c + 1) &&
                  m_player.allow_move() &&
-                 m_environment->allow_move_to(curr_pos.r, curr_pos.c + 1))
+                 m_environment->allow_move_to(m_player.curr_floor, curr_pos.r, curr_pos.c + 1))
           curr_pos.c++;
       }
       else if (str::to_lower(curr_key) == 's' || curr_special_key == keyboard::SpecialKey::Down)
@@ -280,7 +283,7 @@ namespace dung
           m_inventory->inc_hilite();
         else if (is_inside_curr_bb(curr_pos.r + 1, curr_pos.c) &&
                  m_player.allow_move() &&
-                 m_environment->allow_move_to(curr_pos.r + 1, curr_pos.c))
+                 m_environment->allow_move_to(m_player.curr_floor, curr_pos.r + 1, curr_pos.c))
           curr_pos.r++;
       }
       else if (str::to_lower(curr_key) == 'w' || curr_special_key == keyboard::SpecialKey::Up)
@@ -289,7 +292,7 @@ namespace dung
           m_inventory->dec_hilite();
         else if (is_inside_curr_bb(curr_pos.r - 1, curr_pos.c) &&
                  m_player.allow_move() &&
-                 m_environment->allow_move_to(curr_pos.r - 1, curr_pos.c))
+                 m_environment->allow_move_to(m_player.curr_floor, curr_pos.r - 1, curr_pos.c))
           curr_pos.r--;
       }
       else if (curr_key == ' ')
@@ -371,6 +374,36 @@ namespace dung
             for (auto* door : m_player.curr_room->doors)
               if (f_alter_door_states(door))
                 break;
+                
+            auto* staircase = m_player.curr_room->staircase;
+            if (staircase != nullptr && curr_pos == staircase->pos)
+            {
+              int floor_dir = 0;
+              if (m_player.curr_floor == staircase->floor_A)
+              {
+                m_player.curr_floor = staircase->floor_B;
+                m_player.curr_room = staircase->room_floor_B;
+                floor_dir = staircase->floor_B - staircase->floor_A;
+              }
+              else if (m_player.curr_floor == staircase->floor_B)
+              {
+                m_player.curr_floor = staircase->floor_A;
+                m_player.curr_room = staircase->room_floor_A;
+                floor_dir = staircase->floor_A - staircase->floor_B;
+              }
+              if (floor_dir != 0)
+              {
+                message_handler->add_message(static_cast<float>(real_time_s),
+                                             "You walked "s + (floor_dir == -1 ? "up" : "down") + " one floor",
+                                             MessageHandler::Level::Guide);
+                if (m_player.curr_floor == 0)
+                {
+                  message_handler->add_message(static_cast<float>(real_time_s),
+                                               "You are now at surface level!",
+                                               MessageHandler::Level::Guide);
+                }
+              }
+            }
           }
           
           std::string too_heavy_msg_template = " is too heavy to carry.\nYou need to drop items from your inventory!";

@@ -29,12 +29,13 @@ namespace dung
     Terrain terrain = Terrain::Void;
     Environment* environment;
     
-    BloodSplat(Environment* env, const RC& p, int s, float ts, const RC& d)
+    BloodSplat(Environment* env, int floor, const RC& p, int s, float ts, const RC& d)
       : shape(s)
       , dir(d)
       , time_stamp(ts)
       , environment(env)
     {
+      curr_floor = floor;
       pos = p;
       pos_r = static_cast<float>(p.r);
       pos_c = static_cast<float>(p.c);
@@ -48,7 +49,7 @@ namespace dung
     
     void update(float curr_time)
     {
-      terrain = environment->get_terrain(pos);
+      terrain = environment->get_terrain(curr_floor, pos);
       
       alive = curr_time < time_stamp + life_time;
     
@@ -58,14 +59,14 @@ namespace dung
         pos_c += speed * (dir.c + rnd::rand_float(-1.5f, +1.5f) + 1.5f*std::cos(math::c_2pi*2.5f*curr_time));
         auto pos_ri = static_cast<int>(math::roundI(pos_r));
         auto pos_ci = static_cast<int>(math::roundI(pos_c));
-        if (environment->is_inside_any_room({ pos_ri, pos_ci }))
+        if (environment->is_inside_any_room(curr_floor, { pos_ri, pos_ci }))
         {
           pos.r = pos_ri;
           pos.c = pos_ci;
         }
       }
       
-      terrain = environment->get_terrain(pos);
+      terrain = environment->get_terrain(curr_floor, pos);
     }
     
     virtual void serialize(std::vector<std::string>& lines) const override
@@ -120,6 +121,7 @@ namespace dung
     float last_los_c = 0.f;
     bool is_moving = false;
     
+    int curr_floor = 0;
     BSPNode* curr_room = nullptr;
     Corridor* curr_corridor = nullptr;
     
@@ -172,6 +174,7 @@ namespace dung
       sg::write_var(lines, SG_WRITE_VAR(last_los_r));
       sg::write_var(lines, SG_WRITE_VAR(last_los_c));
       sg::write_var(lines, SG_WRITE_VAR(is_moving));
+      sg::write_var(lines, SG_WRITE_VAR(curr_floor));
       lines.emplace_back("curr_room:id");
       lines.emplace_back(std::to_string(curr_room != nullptr ? curr_room->id : -1)); // PC:279
       lines.emplace_back("curr_corridor:id");
@@ -212,11 +215,12 @@ namespace dung
         else if (sg::read_var(&it_line, SG_READ_VAR(last_los_r))) {}
         else if (sg::read_var(&it_line, SG_READ_VAR(last_los_c))) {}
         else if (sg::read_var(&it_line, SG_READ_VAR(is_moving))) {}
+        else if (sg::read_var(&it_line, SG_READ_VAR(curr_floor))) {}
         else if (*it_line == "curr_room:id")
         {
           ++it_line;
           auto room_id = std::atoi(it_line->c_str());
-          auto* room = environment->find_room(room_id);
+          auto* room = environment->find_room(curr_floor, room_id);
           if (room != nullptr)
             curr_room = room;
           if (room_id != -1 && room == nullptr)
@@ -226,7 +230,7 @@ namespace dung
         {
           ++it_line;
           auto corr_id = std::atoi(it_line->c_str());
-          auto* corr = environment->find_corridor(corr_id);
+          auto* corr = environment->find_corridor(curr_floor, corr_id);
           if (corr != nullptr)
             curr_corridor = corr;
           if (corr_id != -1 && corr == nullptr)
@@ -249,7 +253,7 @@ namespace dung
           {
             do
             {
-              BloodSplat bs { environment, RC {}, 0, 0.f, RC {} };
+              BloodSplat bs { environment, -1, RC {}, 0, 0.f, RC {} };
               it_line = bs.deserialize(it_line, it_line_end, environment) + 1;
               blood_splats.emplace_back(bs);
             } while (*it_line != "-");
