@@ -298,12 +298,12 @@ namespace dung
       //for (auto& npc : all_npcs)
       //  *get_field_ptr(&npc) = clear_val;
       
-      ttl::Rectangle bb;
+      //ttl::Rectangle bb;
       bool_vector* field = nullptr;
       
       if (m_player.curr_corridor != nullptr)
       {
-        bb = m_player.curr_corridor->bb;
+        //bb = m_player.curr_corridor->bb;
         field = get_field_ptr(m_player.curr_corridor);
         
         auto* door_0 = m_player.curr_corridor->doors[0];
@@ -315,7 +315,7 @@ namespace dung
       }
       if (m_player.curr_room != nullptr)
       {
-        bb = m_player.curr_room->bb_leaf_room;
+        //bb = m_player.curr_room->bb_leaf_room;
         field = get_field_ptr(m_player.curr_room);
         stlutils::memset(*field, clear_val);
         
