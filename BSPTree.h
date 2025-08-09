@@ -362,6 +362,8 @@ namespace dung
   };
       
   // //////////////////////////////////////////////////////////////
+  
+  int global_bsp_tree_id = 0;
 
   class BSPTree final
   {
@@ -375,6 +377,8 @@ namespace dung
     ttl::Rectangle bb;
     
   public:
+    int id = global_bsp_tree_id++;
+  
     BSPTree() = default;
     BSPTree(int min_room_length)
       : m_min_room_length(min_room_length)
