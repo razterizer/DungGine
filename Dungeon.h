@@ -8,6 +8,7 @@
 #pragma once
 #include "BSPTree.h"
 #include "Staircase.h"
+#include "Comparison.h"
 #include <Termin8or/AABB.h>
 
 namespace dung
@@ -31,7 +32,7 @@ namespace dung
     
     std::vector<std::unique_ptr<Staircase>> staircases; // staircases between levels (bsp-trees).
     
-    std::map<const BSPTree*, std::vector<BSPNode*>> bsp_tree_rooms;
+    std::map<const BSPTree*, std::vector<BSPNode*>, PtrLess<BSPTree>> bsp_tree_rooms;
     
     RC world_size { 0, 0 };
     
