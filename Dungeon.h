@@ -186,6 +186,25 @@ namespace dung
           staircases_raw.emplace_back(s.get());
       return staircases_raw;
     }
+    
+    void serialize(std::vector<std::string>& lines) const
+    {
+      for (auto* bsp_tree : get_trees())
+      {
+        lines.emplace_back("bsp_tree");
+        bsp_tree->serialize(lines);
+      }
+    }
+    
+    std::vector<std::string>::iterator deserialize(std::vector<std::string>::iterator it_line_begin,
+                                                   std::vector<std::string>::iterator it_line_end)
+    {
+      auto it_line = it_line_begin;
+      for (auto* t : get_trees())
+        if (*it_line == "bsp_tree")
+          it_line = t->deserialize(it_line + 1, it_line_end) + 1;
+      return it_line - 1;
+    }
   };
 
 }

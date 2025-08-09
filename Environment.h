@@ -490,16 +490,13 @@ namespace dung
     
     void serialize(std::vector<std::string>& lines) const
     {
-      for (auto* bsp_tree : m_dungeon->get_trees())
-        bsp_tree->serialize(lines);
+      m_dungeon->serialize(lines);
     }
     
     std::vector<std::string>::iterator deserialize(std::vector<std::string>::iterator it_line_begin,
                                                    std::vector<std::string>::iterator it_line_end)
     {
-      // #FIXME: Reimplement.
-      return it_line_begin;
-      //return m_bsp_tree->deserialize(it_line_begin, it_line_end);
+      return m_dungeon->deserialize(it_line_begin, it_line_end);
     }
   };
 
