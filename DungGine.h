@@ -1421,7 +1421,7 @@ namespace dung
         broadcast([&filepath, &curr_rnd_seed](auto* l)
           { l->on_save_game_request(filepath, curr_rnd_seed); });
         
-        save_game_post_build(filepath, curr_rnd_seed);
+        save_game_post_build(filepath, curr_rnd_seed, real_time_s);
       
         trigger_game_save = false;
       }
@@ -1721,7 +1721,7 @@ namespace dung
       return hash;
     }
     
-    void save_game_post_build(const std::string& savegame_filename, unsigned int curr_rnd_seed) const
+    void save_game_post_build(const std::string& savegame_filename, unsigned int curr_rnd_seed, double real_time_s) const
     {
       std::vector<std::string> lines;
       
@@ -1778,7 +1778,20 @@ namespace dung
       //std::unique_ptr<ScreenHelper> m_screen_helper;
 #endif
       
-      TextIO::write_file(savegame_filename, lines);
+      if (TextIO::write_file(savegame_filename, lines))
+      {
+        message_handler->add_message(static_cast<float>(real_time_s),
+                                     "Successfully saved save-game:\n\"" + savegame_filename + "\"!",
+                                     MessageHandler::Level::Guide,
+                                     3.f);
+      }
+      else
+      {
+        message_handler->add_message(static_cast<float>(real_time_s),
+                                     "ERROR : Unable to save save-game file:\n\"" + savegame_filename + "\"!",
+                                     MessageHandler::Level::Fatal,
+                                     3.f);
+      }
     }
     
     bool load_game_pre_build(const std::string& savegame_filename, unsigned int* curr_rnd_seed, double real_time_s)
@@ -1790,7 +1803,7 @@ namespace dung
       if (!TextIO::read_file(savegame_filename, lines))
       {
         message_handler->add_message(static_cast<float>(real_time_s),
-                                     "ERROR : Unable to load save game file:\n\"" + savegame_filename + "\"!",
+                                     "ERROR : Unable to load save-game file:\n\"" + savegame_filename + "\"!",
                                      MessageHandler::Level::Fatal,
                                      3.f);
         return false;
@@ -1800,7 +1813,7 @@ namespace dung
           lines[0] != get_latest_git_commit_hash())
       {
         message_handler->add_message(static_cast<float>(real_time_s),
-                                     "ERROR : Tried to load a saved game\nbut the git hash of the save game\ndoesn't match the git hash of the\nlast commit of DungGine!",
+                                     "ERROR : Tried to load a saved game\nbut the git hash of the save-game\ndoesn't match the git hash of the\nlast commit of DungGine!",
                                       MessageHandler::Level::Fatal,
                                       5.f);
         return false;
@@ -1868,7 +1881,7 @@ namespace dung
         else if (sg::read_var(&it_line, SG_READ_VAR(use_fog_of_war)))
         {
           message_handler->add_message(static_cast<float>(real_time_s),
-                                       "Successfully loaded save game:\n\"" + savegame_filename + "\"!",
+                                       "Successfully loaded save-game:\n\"" + savegame_filename + "\"!",
                                        MessageHandler::Level::Guide,
                                        3.f);
           return;
