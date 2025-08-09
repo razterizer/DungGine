@@ -368,6 +368,8 @@ namespace dung
     std::vector<std::unique_ptr<Door>> doors;
     std::map<std::pair<BSPNode*, BSPNode*>, Corridor*, PtrPairLess<BSPNode>> room_corridor_map;
     
+    ttl::Rectangle bb;
+    
   public:
     BSPTree() = default;
     BSPTree(int min_room_length)
@@ -382,6 +384,7 @@ namespace dung
       corridors.clear();
       doors.clear();
       room_corridor_map.clear();
+      bb.clear();
     }
     
     void generate(int world_size_rows, int world_size_cols,
@@ -390,8 +393,13 @@ namespace dung
       m_root.orientation = first_split_orientation;
       m_root.size_rows = world_size_rows;
       m_root.size_cols = world_size_cols;
-      ttl::Rectangle bb { 0, 0, m_root.size_rows, m_root.size_cols };
+      bb = { 0, 0, m_root.size_rows, m_root.size_cols };
       m_root.generate(bb, 0, m_min_room_length);
+    }
+    
+    const ttl::Rectangle& get_bounding_box() const
+    {
+      return bb;
     }
     
     std::vector<BSPNode*> fetch_leaves()
