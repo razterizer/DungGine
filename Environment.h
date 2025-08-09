@@ -30,7 +30,7 @@ namespace dung
 
   class Environment final
   {
-    const Dungeon* m_dungeon = nullptr;
+    Dungeon* m_dungeon = nullptr;
     //std::vector<BSPNode*> m_leaves;
     
     // One map per floor.
@@ -65,7 +65,7 @@ namespace dung
       dt_texture_anim_s = texture_params.dt_anim_s;
     }
     
-    void load_dungeon(const Dungeon& dungeon)
+    void load_dungeon(Dungeon& dungeon)
     {
       m_dungeon = &dungeon;
       m_room_styles.clear();
