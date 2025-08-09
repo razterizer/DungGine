@@ -65,23 +65,30 @@ public:
     // /////////
     if (test_type == TestType::DungeonSimple)
     {
-    #if 0
       std::cout << "curr rnd seed = " << GameEngine::get_curr_rnd_seed() << std::endl;
       //rnd::srand(0x1337f00d); // Use srand_time() after map generation.
       
-      bsp_tree.generate(29, 79, dung::Orientation::Vertical);
-      bsp_tree.pad_rooms(4);
-      bsp_tree.create_corridors(1);
-      bsp_tree.create_doors(0, true);
+      auto& surface_level = dungeon_floor_params.emplace_back();
+      surface_level.min_room_length = 4;
+      surface_level.world_size = { 29, 79 };
+      surface_level.first_split_orientation = dung::Orientation::Vertical;
+      surface_level.room_padding_min = 4;
+      surface_level.room_padding_max = 4;
+      surface_level.min_corridor_half_width = 1;
+      surface_level.max_num_locked_doors = 0;
+      surface_level.allow_passageways = true;
       
-      bsp_tree.print_tree();
+      dungeon.generate(dungeon_floor_params);
+      auto* bsp_tree = dungeon.get_tree(0);
+      
+      bsp_tree->print_tree();
       
       clear_screen();
       return_cursor();
       
       sh.clear();
-      bsp_tree.draw_rooms(sh);
-      bsp_tree.draw_corridors(sh);
+      bsp_tree->draw_rooms(sh);
+      bsp_tree->draw_corridors(sh);
       sh.print_screen_buffer(bg_color);
       
       //sh.clear();
@@ -90,9 +97,9 @@ public:
       //sh.print_screen_buffer(t, bg_color);
       
       sh.clear();
-      bsp_tree.draw_corridors(sh);
-      bsp_tree.draw_regions(sh, 0, 0);
-      bsp_tree.draw_rooms(sh);
+      bsp_tree->draw_corridors(sh);
+      bsp_tree->draw_regions(sh, 0, 0);
+      bsp_tree->draw_rooms(sh);
       sh.print_screen_buffer(bg_color);
       
       //sh.clear();
@@ -101,7 +108,7 @@ public:
 
 #if 1
       dungeon_engine = std::make_unique<dung::DungGine>(get_exe_folder(), false);
-      dungeon_engine->load_dungeon(&bsp_tree);
+      dungeon_engine->load_dungeon(dungeon);
       dungeon_engine->style_dungeon();
       if (!dungeon_engine->place_player(sh.size()))
         std::cerr << "ERROR : Unable to place the playable character!" << std::endl;
@@ -117,7 +124,6 @@ public:
       dungeon_engine->draw(sh, get_real_time_s(), get_sim_time_s(),
                            get_anim_count(0), get_anim_count(1));
       sh.print_screen_buffer(Color::Black);
-#endif
 #endif
     }
     else if (test_type == TestType::DungeonRuntime)
@@ -261,7 +267,7 @@ private:
       dungeon_engine->add_listener(this);
   }
   
-  dung::Dungeon dungeon { true, -1 };
+  dung::Dungeon dungeon { test_type == TestType::DungeonRuntime, -1 };
   std::vector<dung::DungeonFloorParams> dungeon_floor_params;
   
   dung::DungGineTextureParams texture_params;
