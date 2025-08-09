@@ -23,6 +23,8 @@
 
 namespace dung
 {
+
+  struct Staircase;
   
   // Example:
   // ####################################################
@@ -103,6 +105,8 @@ namespace dung
     
     bool_vector fog_of_war;
     bool_vector light;
+    
+    Staircase* staircase = nullptr;
     
     // ///////////
     
