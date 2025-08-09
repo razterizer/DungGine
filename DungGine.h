@@ -1671,8 +1671,10 @@ namespace dung
         
       if (gore)
       {
-        auto f_draw_blood_splat = [&sh](const RC& scr_pos, const BloodSplat& bs)
+        auto f_draw_blood_splat = [&sh](int curr_floor, const RC& scr_pos, const BloodSplat& bs)
         {
+          if (bs.curr_floor != curr_floor)
+            return;
           if (is_wet(bs.terrain) && !bs.alive)
             return;
           std::string str = "";
@@ -1689,14 +1691,14 @@ namespace dung
         for (const auto& bs : m_player.blood_splats)
         {
           auto bs_scr_pos = m_screen_helper->get_screen_pos(bs.pos);
-          f_draw_blood_splat(bs_scr_pos, bs);
+          f_draw_blood_splat(m_player.curr_floor, bs_scr_pos, bs);
         }
         for (const auto& npc : all_npcs)
         {
           for (const auto& bs : npc.blood_splats)
           {
             auto bs_scr_pos = m_screen_helper->get_screen_pos(bs.pos);
-            f_draw_blood_splat(bs_scr_pos, bs);
+            f_draw_blood_splat(m_player.curr_floor, bs_scr_pos, bs);
           }
         }
       }
