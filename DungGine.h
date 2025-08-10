@@ -904,35 +904,76 @@ namespace dung
     bool place_player(const RC& screen_size, std::optional<RC> world_pos = std::nullopt)
     {
       auto curr_floor = m_environment->get_init_floor(); // #NOTE: get_init_floor() should only be called here!
+      const auto& room_corridor_map = m_environment->get_room_corridor_map(curr_floor);
       const auto world_size = m_environment->get_world_size(curr_floor);
       m_screen_helper->set_screen_size(screen_size);
-    
-      if (world_pos.has_value())
-        m_player.pos = world_pos.value();
-      else
-        m_player.pos = world_size / 2;
-        
-      m_player.last_pos = m_player.pos;
       
       m_player.curr_floor = curr_floor;
-      const auto& room_corridor_map = m_environment->get_room_corridor_map(curr_floor);
       
-      const int c_max_num_iters = 1e5_i;
-      int num_iters = 0;
-      do
+      if (!world_pos.has_value())
       {
-        for (const auto& cp : room_corridor_map)
-          if (cp.second->is_inside_corridor(m_player.pos))
+        const int c_max_num_iters = 1e2_i;
+        int num_iters = 0;
+        int rnd_sel = 0;
+        auto f_find_rnd_corr = [&room_corridor_map](int rnd_sel) -> Corridor*
+        {
+          int ctr = 0;
+          for (auto it = room_corridor_map.begin(); it != room_corridor_map.end(); ++it)
+            if (rnd_sel == ctr++)
+              return it->second;
+          return nullptr;
+        };
+        do
+        {
+          rnd_sel = rnd::rand_idx(room_corridor_map.size());
+          auto* rnd_corr = f_find_rnd_corr(rnd_sel);
+          if (rnd_corr != nullptr)
           {
-            m_player.is_spawned = true;
-            m_player.curr_corridor = cp.second;
-            m_screen_helper->focus_on_world_pos_mid_screen(m_player.pos);
-            return true;
+            if (rnd_corr->orientation == Orientation::Vertical && rnd_corr->bb.r_len > 2)
+              break;
+            if (rnd_corr->orientation == Orientation::Horizontal && rnd_corr->bb.c_len > 2)
+              break;
           }
-        m_player.pos += { rnd::rand_int(-2, +2), rnd::rand_int(-2, +2) };
-        m_player.pos = m_player.pos.clamp(0, world_size.r, 0, world_size.c);
-      } while (++num_iters < c_max_num_iters);
-      return false;
+        } while (++num_iters < c_max_num_iters);
+        auto* rnd_corr = f_find_rnd_corr(rnd_sel);
+        if (rnd_corr != nullptr)
+        {
+          m_player.is_spawned = true;
+          m_player.curr_corridor = rnd_corr;
+          const auto& bb = rnd_corr->bb;
+          m_player.pos = {
+            rnd_corr->orientation == Orientation::Vertical ? rnd::rand_int(bb.top() + 1, bb.bottom() - 1) : bb.r_mid(),
+            rnd_corr->orientation == Orientation::Horizontal ? rnd::rand_int(bb.left() + 1, bb.right() - 1) : bb.c_mid()
+          };
+          m_player.last_pos = m_player.pos;
+          m_screen_helper->focus_on_world_pos_mid_screen(m_player.pos);
+          return true;
+        }
+        return false;
+      }
+      else // Try to find a valid corridor position near the requested position i.e. argument "world_pos".
+      {
+        m_player.pos = world_pos.value();
+        
+        m_player.last_pos = m_player.pos;
+        
+        const int c_max_num_iters = 1e5_i;
+        int num_iters = 0;
+        do
+        {
+          for (const auto& cp : room_corridor_map)
+            if (cp.second->is_inside_corridor(m_player.pos))
+            {
+              m_player.is_spawned = true;
+              m_player.curr_corridor = cp.second;
+              m_screen_helper->focus_on_world_pos_mid_screen(m_player.pos);
+              return true;
+            }
+          m_player.pos += { rnd::rand_int(-2, +2), rnd::rand_int(-2, +2) };
+          m_player.pos = m_player.pos.clamp(0, world_size.r, 0, world_size.c);
+        } while (++num_iters < c_max_num_iters);
+        return false;
+      }
     }
     
     void configure_save_game(std::optional<std::string> dunggine_lib_repo_path)
