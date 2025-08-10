@@ -62,10 +62,10 @@ Items you can pick up are keys, torches, lanterns, magic lamps (isotropic light)
 * `WASD keys` or `arrow keys` to control the direction of the PC or browse inventory objects.
 * `Space` to pick up items, open doors or equip items in the inventory UI.
 * `-` to open and close the inventory.
-* `F` to fight friendlies (hostile NPCs will always start the fight). When running away from them, they will quickly forget and forgive.
-* `D` to drop a hilited item when in the inventory.
-* `C` to consume a potion.
-* `I` to identify things the PC can see.
+* `f` or `F` to fight friendlies (hostile NPCs will always start the fight). When running away from them, they will quickly forget and forgive.
+* `d` or `D` to drop a hilited item when in the inventory.
+* `c` or `C` to consume a potion.
+* `i` or `I` to identify things the PC can see.
 * `g` to save game (need to setup the save game feature properly. See below).
 * `G` to load saved game (need to setup the save game feature properly. See below).
 
