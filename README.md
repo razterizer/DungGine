@@ -33,8 +33,8 @@
 This is a header only library.
 The engine works very well together with the `GameEngine` class of lib [`Termin8or`](https://github.com/razterizer/Termin8or).
 
-There are two main classes for this dungeon generator: `BSPTree` that is responsible for creating the rooms, corridors and doors in the "dungeon", and then there is the class `DungGine` that is the dungeon game engine itself.
-See the next section for a summary over these two classes.
+There are three main classes for this dungeon generator: `BSPTree` that is responsible for creating the rooms, corridors and doors for each floor in the "dungeon", `Dungeon` which holds the BSP trees (one for each floor) and thus the whole map, and then there is the class `DungGine` that is the dungeon game engine itself.
+See the next section for a summary over these three classes.
 
 ## Features
 
@@ -107,8 +107,10 @@ Some can swim, some can fly, and some can only walk.
 
 * `BSPTree.h`
   - `BSPTree(int min_room_length)` : The constructor.
+  - `reset()` : Resets the whole tree with all of its nodes and auxiliary data structures. Need to call this before regenerating with `generate()`.
   - `generate(int world_size_rows, int world_size_cols,
                   Orientation first_split_orientation)` : Generates the BSP regions recursively.
+  - `get_bounding_box()` gets the bounding box of the whole tree that was set by `generate()`.
   - `pad_rooms(int min_rnd_wall_padding = 1, int max_rnd_wall_padding = 4)` : Pads the regions into rooms.
   - `create_corridors(int min_corridor_half_width = 1)` : Non-recursive method of creating corridors on leaf-level.
   - `create_doors(int max_num_locked_doors, bool allow_passageways)` : Creates doors between rooms and corridors. You need to first have called `generate()`, `pad_rooms()` and `create_corridors()` before calling this function.
@@ -120,9 +122,27 @@ Some can swim, some can fly, and some can only walk.
   - `get_room_corridor_map()` : Function that retrieves the room and corridor relationship data structure.
   - `get_world_size()` : Gets the world size.
   - `fetch_doors()` : Gets a vector of pointers to all doors.
+  - `serialize(std::vector<std::string>& lines)` : Used by the save-game feature to store info about the current state.
+  - `deserialize(std::vector<std::string>::iterator it_line_begin, std::vector<std::string>::iterator it_line_end)` : Used by the save-game feature to restore info about the current state.
+* `Dungeon.h`
+  - `DungeonFloorParams` : A param struct that contain parameters describing how a certain floor (`BSPTree`) should be generated.
+  - `Dungeon(bool first_level_is_over_ground, int starting_floor = -1)` : If argument `starting_floor = -1` means that the PC starts from the bottom-most floor. If argument `first_level_is_over_ground = true` then the first floor/bps-tree will be styled such that all of its rooms are marked as surface-level and all subsequent floors will be styled such that all of their rooms are marked as underground, if `false`, then all rooms of all levels will be randomly marked as underground / surface-level (old/legacy behaviour).
+  - `generate(const std::vector<DungeonFloorParams>& floor_params)` : Generates the BSP trees (floors) for the whole dungeon map given the `floor_params` where each element in the vector corresponds to one floor.
+  - `reset()` : Resets the datastructures. Call this prior to `generate()` in order to regenerate all the data.
+  - `get_world_size()` : Returns the total world size of all of the floors stored in this object.
+  - `get_trees()` : Retrieves the BSP trees AKA floors in this `Dungeon` object.
+  - `get_init_floor()` : Gets the starting floor index.
+  - `get_tree(int floor)` : Gets the BSP tree corresponding to the supplied floor index.
+  - `get_rooms(BSPTree* bsp_tree)` : Retrieves the cached rooms of the supplied BSP tree.
+  - `create_staircases(int prob_in_room = 10)` : Creates staircases between adjacent pairs of floors. `prob_in_room` means the inverse probability of creating a staircase in a pair of rooms that overlap. A value of 10 means probability 1/10 or about once every ten times.
+  - `num_floors()` : Returns the number of floors in this object.
+  - `is_first_floor_is_surface_level()` : Retrieves the first argument of the constructor. Just worded a bit differently.
+  - `fetch_staircases(int floor)` : Fetches the staircases of a certain floor as a vector of raw-ptrs instead of a vector of unique-ptrs.
+  - `serialize(std::vector<std::string>& lines)` : Used by the save-game feature to store info about the current state.
+  - `deserialize(std::vector<std::string>::iterator it_line_begin, std::vector<std::string>::iterator it_line_end)` : Used by the save-game feature to restore info about the current state.
 * `DungGine.h`
   - `DungGine(const std::string& exe_folder, bool use_fow, DungGineTextureParams texture_params = {})` : The constructor.
-  - `load_dungeon(BSPTree* bsp_tree)` : Loads a generated BSP tree.
+  - `load_dungeon(Dungeon& dungeon)` : Loads a dungeon consisting of generated BSP trees, one BSP tree corresponds to a floor.
   - `style_dungeon()` : Performs automated styling of rooms in the dungeon / realm.
   - `set_player_character(char ch)` : Sets the character of the playable character (pun intended).
   -  `set_player_style(const Style& style)` : Sets the style (fg/bg color) of the playable character.
@@ -132,11 +152,11 @@ Some can swim, some can fly, and some can only walk.
       When `use_per_room_lat_long_for_sun_dir` is `true` then use `latitude = Latitude::Equator` and `longitude = Longitude::F` to start with. Other values will shift the map over the globe so to speak, but with these starting settings the rooms at the top of the map will be the at the north pole and the rooms at the bottom of the map will be at the south pole. When `use_per_room_lat_long_for_sun_dir` is `false` then the specified latitude and longitude will be used globally across the whole map and the the function default args is a good starting point.
   - `configure_sun_rand(float minutes_per_day = 20.f, float minutes_per_year = 120.f, Latitude latitude = Latitude::NorthernHemisphere, Longitude longitude = Longitude::F, bool use_per_room_lat_long_for_sun_dir = true)` : Same as above but randomizes the initial direction of the sun.
   - `place_keys(bool only_place_on_dry_land)` : Places the keys in rooms, randomly all over the world.
-  - `place_lamps(int num_torches, int num_lanterns, int num_magic_lamps, bool only_place_on_dry_land)` : Places `num_torches` torches, `num_lanterns` lanterns and `num_magic_lamps` magic lamps in rooms, randomly all over the world.
-  - `place_weapons(int num_weapons, bool only_place_on_dry_land)` : Places `num_weapons` weapons in rooms, randomly all over the world.
-  - `place_potions(int num_potions, bool only_place_on_dry_land)` : Places `num_potions` potions in rooms, randomly all over the world.
-  - `place_armour(int num_armour, bool only_place_on_dry_land)` : Places `num_armour` armour parts in rooms, randomly all over the world.
-  - `place_npcs(int num_npcs, bool only_place_on_dry_land)` : Places `num_npcs` NPCs in rooms, randomly all over the world.
+  - `place_lamps(int num_torches_per_floor, int num_lanterns_per_floor, int num_magic_lamps_per_floor, bool only_place_on_dry_land)` : Places `num_torches` torches, `num_lanterns` lanterns and `num_magic_lamps` magic lamps in rooms, randomly all over the world.
+  - `place_weapons(int num_weapons_per_floor, bool only_place_on_dry_land)` : Places `num_weapons` weapons in rooms, randomly all over the world.
+  - `place_potions(int num_potions_per_floor, bool only_place_on_dry_land)` : Places `num_potions` potions in rooms, randomly all over the world.
+  - `place_armour(int num_armour_per_floor, bool only_place_on_dry_land)` : Places `num_armour` armour parts in rooms, randomly all over the world.
+  - `place_npcs(int num_npcs_per_floor, bool only_place_on_dry_land)` : Places `num_npcs` NPCs in rooms, randomly all over the world.
   - `set_screen_scrolling_mode(ScreenScrollingMode mode, float t_page = 0.2f)` : Sets the screen scrolling mode to either `AlwaysInCentre`, `PageWise` or `WhenOutsideScreen`. `t_page` is used with `PageWise` mode.
   - `update(int frame_ctr, float fps, double real_time_s, float sim_time_s, float sim_dt_s, float fire_smoke_dt_factor, const keyboard::KeyPressDataPair& kpdp, bool* game_over)` : Updating the state of the dungeon engine. Manages things such as the change of direction of the sun for the shadows of rooms that are not under the ground and key-presses for control of the playable character.
   - `draw(ScreenHandler<NR, NC>& sh, double real_time_s, float sim_time_s, int anim_ctr_swim, int anim_ctr_fight, ui::VerticalAlignment mb_v_align = ui::VerticalAlignment::CENTER, ui::HorizontalAlignment mb_h_align = ui::HorizontalAlignment::CENTER, int mb_v_align_offs = 0, int mb_h_align_offs = 0, bool framed_mode = false, bool gore = false)` : Draws the whole dungeon world with NPCs and the PC along with items strewn all over the place. Use mb_v_align and mb_h_align to place the messagebox along with mb_v_align_offs, mb_h_align_offs and framed_mode. If `gore = true` then PC and NPCs will leave tracks of blood during fights.
@@ -250,17 +270,24 @@ dung::BSPTree::draw_corridors()
 ***
 
 ```cpp
-dung::BSPTree bsp_tree { 4 }; // argument: `min_room_length = 4`.
-bsp_tree.generate(29, 79, dung::Orientation::Vertical); // arguments: world_size_rows, world_size_cols,
-                  first_split_orientation.
-bsp_tree.pad_rooms(4); // arguments: min_rnd_wall_padding = 4, [max_rnd_wall_padding = 4].
-bsp_tree.create_corridors(1); // argument: min_corridor_half_width = 1, (1 means it will be three chars wide).
+std::vector<dung::DungeonFloorParams> dungeon_floor_params
+auto& floor = dungeon_floor_params.emplace_back();
+floor.min_room_length = 4;
+floor.world_size = { 29, 79 };
+floor.first_split_orientation = dung::Orientation::Vertical;
+floor.room_padding_min = 4;
+floor.room_padding_max = 4;
+floor.min_corridor_half_width = 1; // min_corridor_half_width = 1, (1 means it will be three chars wide).
+floor.max_num_locked_doors = 0;
+floor.allow_passageways = true;
+dung::Dungeon dungeon { false, -1 };
+dungeon.generate(dungeon_floor_params);
 
 ScreenHandler<NR, NC> sh;
 Color bg_color = Color::Default;
 
-dung::DungGine dungeon_engine;
-dungeon_engine.load_dungeon(&bsp_tree);
+dung::DungGine dungeon_engine { "bin/", false };
+dungeon_engine.load_dungeon(dungeon);
 dungeon_engine.style_dungeon();
 dungeon_engine.draw(sh, get_real_time_s(), get_sim_time_s(), 0, 0);
 sh.print_screen_buffer(bg_color);
@@ -272,7 +299,8 @@ sh.print_screen_buffer(bg_color);
 
 ```cpp
 // Declarations
-dung::BSPTree bsp_tree { 4 }; // argument: `min_room_length = 4`.
+std::vector<dung::DungeonFloorParams> dungeon_floor_params;
+dung::Dungeon dungeon { false, -1 };
 dung::DungGineTextureParams texture_params;
 std::unique_ptr<dung::DungGine> dungeon_engine;
 ScreenHandler<NR, NC> sh;
@@ -281,14 +309,19 @@ int anim_ctr = 0;
 const float fire_smoke_dt_factor = 0.5f;
 
 // Initializations
-bsp_tree.generate(200, 400, dung::Orientation::Vertical); // arguments: world_size_rows, world_size_cols,
-                  first_split_orientation.
-bsp_tree.pad_rooms(4); // arguments: min_rnd_wall_padding = 4, [max_rnd_wall_padding = 4].
-bsp_tree.create_corridors(1); // argument: min_corridor_half_width = 1, (1 means it will be three chars wide).
-bsp_tree.create_doors(100, true); // We also create doors here. Arguments: max_num_locked_doors, allow_passageways.
+auto& floor = dungeon_floor_params.emplace_back();
+floor.min_room_length = 4;
+floor.world_size = { 200, 400 };
+floor.first_split_orientation = dung::Orientation::Vertical;
+floor.room_padding_min = 4;
+floor.room_padding_max = 4;
+floor.min_corridor_half_width = 1; // min_corridor_half_width = 1, (1 means it will be three chars wide).
+floor.max_num_locked_doors = 100;
+floor.allow_passageways = true;
+dungeon.generate(dungeon_floor_params);
 
 dungeon_engine = std::make_unique<dung::DungGine>(get_exe_folder(), true); // arguments: exe_folder, use_fow, texture_params.
-dungeon_engine.load_dungeon(&bsp_tree);
+dungeon_engine.load_dungeon(dungeon);
 dungeon_engine.configure_sun_rand(20.f, 120.f, dung::Latitude::NorthernHemisphere, dung::Longitude::FW, false); // 20 minutes per day and 120 minutes per year. Global shadow.
 dungeon_engine.style_dungeon();
 if (!dungeon_engine.place_player(sh.size()))
@@ -323,7 +356,8 @@ To move the character in a game loop, use function `update()` to allow keystroke
 
 ```cpp
 // Declarations
-dung::BSPTree bsp_tree { 4 }; // argument: `min_room_length = 4`.
+std::vector<dung::DungeonFloorParams> dungeon_floor_params;
+dung::Dungeon dungeon { true, -1 }; // First floor is surface level, PC placed at the lowest underground floor.
 dung::DungGineTextureParams texture_params;
 std::unique_ptr<dung::DungGine> dungeon_engine;
 ScreenHandler<NR, NC> sh;
@@ -332,11 +366,25 @@ int anim_ctr = 0;
 const float fire_smoke_dt_factor = 0.5f;
 
 // Initializations
-bsp_tree.generate(200, 400, dung::Orientation::Vertical); // arguments: world_size_rows, world_size_cols,
-                  first_split_orientation.
-bsp_tree.pad_rooms(4); // arguments: min_rnd_wall_padding = 4, [max_rnd_wall_padding = 4].
-bsp_tree.create_corridors(1); // argument: min_corridor_half_width = 1, (1 means it will be three chars wide).
-bsp_tree.create_doors(100, true); // We also create doors here. Arguments: max_num_locked_doors, allow_passageways.
+auto& floor_surface_level = dungeon_floor_params.emplace_back();
+floor_surface_level.min_room_length = 4;
+floor_surface_level.world_size = { 200, 400 };
+floor_surface_level.first_split_orientation = dung::Orientation::Vertical;
+floor_surface_level.room_padding_min = 4;
+floor_surface_level.room_padding_max = 4;
+floor_surface_level.min_corridor_half_width = 1; // min_corridor_half_width = 1, (1 means it will be three chars wide).
+floor_surface_level.max_num_locked_doors = 100;
+floor_surface_level.allow_passageways = true;
+auto& floor_underground = dungeon_floor_params.emplace_back();
+floor_underground.min_room_length = 4;
+floor_underground.world_size = { 200, 400 };
+floor_underground.first_split_orientation = dung::Orientation::Vertical;
+floor_underground.room_padding_min = 4;
+floor_underground.room_padding_max = 4;
+floor_underground.min_corridor_half_width = 1; // min_corridor_half_width = 1, (1 means it will be three chars wide).
+floor_underground.max_num_locked_doors = 100;
+floor_underground.allow_passageways = true;
+dungeon.generate(dungeon_floor_params);
 
 texture_params.dt_anim_s = 0.5;
 auto f_tex_path = [](const auto& filename)
@@ -349,7 +397,7 @@ texture_params.texture_file_names_surface_level_shadow.emplace_back(f_tex_path("
 texture_params.texture_file_names_surface_level_shadow.emplace_back(f_tex_path("texture_sl_shadow_1.tex"));
 
 dungeon_engine = std::make_unique<dung::DungGine>(get_exe_folder(), true, texture_params); // arguments: exe_folder, use_fow, texture_params.
-dungeon_engine.load_dungeon(&bsp_tree);
+dungeon_engine.load_dungeon(dungeon);
 dungeon_engine.configure_sun_rand(20.f, 120.f, dung::Latitude::Equator, dung::Longitude::F, true); // 20 minutes per day and 120 minutes per year. Localized shadows across the map starting at Equator & Front.
 dungeon_engine.style_dungeon();
 if (!dungeon_engine.place_player(sh.size()))
