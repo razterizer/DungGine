@@ -103,6 +103,26 @@ There are a bunch of different NPCs and that have different behaviours. The foll
 They all look different visually and have different walking styles etc.
 Some can swim, some can fly, and some can only walk.
 
+## Gateways
+
+There are two kinds of gateways if you will: Doors and Staircases.
+
+### Doors
+
+Doors can be either a passageway or a door that you can open and close. A door door can be locked.
+The following characters are used for different door states:
+
+* `^` : Passageway. You can always pass through these from a corridor to a room or vice versa.
+* `L` : An open door. Just pass through.
+* `D` : A closed door. You need to open with the space key when next to the door while the PC is directed at it.
+* `G` : A locked door. You need to find the key first, then select the key and then press space when next to the door while the PC is directed at it. A used key will automatically vanish by the PC performing a vanishing spell for you.
+
+### Staircases
+
+Staircases go either one level up or down. They look like a gray `B` on a black background. To walk up/down the stairs, you first need to stand on the staircase symbol and then press space. The messaging system will inform you where you walked and if you are on the top floor.
+
+There is currently no visual distiction between upwards or downwards going staircases. Perhaps a future feature.
+
 ## Headers
 
 * `BSPTree.h`
