@@ -102,7 +102,7 @@ namespace dung
       }
       else if (str::to_lower(curr_key) == 'd' || curr_special_key == keyboard::SpecialKey::Right)
       {
-        if (m_player.show_inventory)
+        if (m_player.show_inventory && str::to_lower(curr_key) == 'd')
         {
           auto f_drop_item = [&](auto* obj)
           {
