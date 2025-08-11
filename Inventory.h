@@ -350,10 +350,14 @@ namespace dung
     
     void apply_deserialization_changes()
     {
-      for (auto idx : sg_hilited_idcs)
-        toggle_state(idx, InvItemState::SET_HILITE);
+      for (auto idx : sg_hilited_idcs) // #NOTE: Should be just one index.
+      {
+        toggle_state(hilite_idx, InvItemState::RESET_HILITE);
+        hilite_idx = idx;
+        toggle_state(hilite_idx, InvItemState::SET_HILITE);
+      }
         
-      for (auto idx : sg_selected_idcs)
+      for (auto idx : sg_selected_idcs) // #NOTE: Should be just one index.
         toggle_state(idx, InvItemState::SWITCH_SELECTION);
         
       sg_hilited_idcs.clear();
