@@ -25,14 +25,16 @@ namespace dung
     bool selected = false;
     bool hilited = false;
     Item* item = nullptr;
+    int item_index = -1;
     
     InvItem() = default;
     InvItem(const std::string& t)
       : text(t)
     {}
-    InvItem(const std::string& t, Item* i)
+    InvItem(const std::string& t, Item* i, int i_idx)
       : text(t)
       , item(i)
+      , item_index(i_idx)
     {}
     InvItem(const std::string& t, int lvl)
       : text(t)
@@ -47,11 +49,49 @@ namespace dung
     std::vector<InvItem> m_items;
     int selection_idx = 0;
     int hilite_idx = 0;
+    bool sort_items = false;
+    bool invalidated = false;
     
   public:
-    void add_item(const std::string& text, Item* item = nullptr)
+    void set_sort_mode(bool enable_sort_items)
     {
-      m_items.emplace_back(text, item);
+      sort_items = enable_sort_items;
+    }
+    
+    bool is_invalidated() const { return invalidated; }
+    void reset_invalidation() { invalidated = false; }
+  
+    void add_item(const std::string& text, Item* item = nullptr, int idx = -1)
+    {
+      m_items.emplace_back(text, item, idx);
+      
+      if (sort_items)
+      {
+        int item_idx_at_selection = m_items[selection_idx].item_index;
+        bool was_selected = m_items[selection_idx].selected;
+        m_items[selection_idx].selected = false;
+        int item_idx_at_hilite = m_items[hilite_idx].item_index;
+        bool was_hilited = m_items[hilite_idx].hilited;
+        m_items[hilite_idx].hilited = false;
+        
+        stlutils::sort(m_items, [](const auto& iA, const auto& iB)
+          {
+            return iA.item_index < iB.item_index;
+          });
+          
+        selection_idx = stlutils::find_if_idx(m_items,
+          [item_idx_at_selection](const auto& i) { return i.item_index == item_idx_at_selection; });
+        m_items[selection_idx].selected = was_selected;
+        hilite_idx = stlutils::find_if_idx(m_items,
+          [item_idx_at_hilite](const auto& i) { return i.item_index == item_idx_at_hilite; });
+        m_items[hilite_idx].hilited = was_hilited;
+        invalidated = true;
+      }
+    }
+    
+    int get_hilite_idx() const
+    {
+      return use_title + hilite_idx;
     }
     
     void remove_item(Item* item)
@@ -176,6 +216,36 @@ namespace dung
       : title(title_text, 0)
     {}
     
+    void set_sort_mode(bool enable_sort_items)
+    {
+      for (auto& sg : m_subgroups)
+        sg.set_sort_mode(enable_sort_items);
+    }
+    
+    bool is_invalidated() const
+    {
+      for (const auto& sg : m_subgroups)
+        if (sg.is_invalidated())
+          return true;
+      return false;
+    }
+    
+    int calc_new_hilite_idx()
+    {
+      int cum_idx = 1; // Cumulative index. Excludes the title.
+      for (auto& sg : m_subgroups)
+      {
+        if (sg.is_invalidated())
+        {
+          int hilite_idx = cum_idx + sg.get_hilite_idx();
+          sg.reset_invalidation();
+          return hilite_idx;
+        }
+        cum_idx += sg.size();
+      }
+      return -1;
+    }
+    
     const std::string& get_title() const
     {
       return title.text;
@@ -286,6 +356,12 @@ namespace dung
   public:
     void set_bounding_box(const ttl::Rectangle& bb) { m_bb = bb; }
     
+    void set_sort_mode(bool enable_sort_items)
+    {
+      for (auto& g : m_groups)
+        g.set_sort_mode(enable_sort_items);
+    }
+    
     void add_group(const InvGroup& group)
     {
       m_groups.emplace_back(group);
@@ -346,6 +422,28 @@ namespace dung
           g.toggle_state(rel_idx, state);
         cum_idx += g.size();
       }
+    }
+    
+    void apply_invalidated()
+    {
+      int cum_idx = 0; // Cumulative index.
+      for (auto& g : m_groups)
+      {
+        auto rel_idx = g.calc_new_hilite_idx();
+        if (rel_idx != -1)
+        {
+          toggle_state(hilite_idx, InvItemState::RESET_HILITE);
+          hilite_idx = cum_idx + rel_idx;
+          toggle_state(hilite_idx, InvItemState::SET_HILITE);
+          break;
+        }
+        cum_idx += g.size();
+      }
+      
+      // #NOTE: Can occur after deserialization. So commenting out for now.
+      //for (auto& g : m_groups)
+      //  if (g.is_invalidated())
+      //    std::cerr << "ERROR in Inventory::apply_invalidated() : Not suppose to have multiply invalidated groups!\n";
     }
     
     void apply_deserialization_changes()
