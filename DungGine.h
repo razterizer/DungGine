@@ -59,6 +59,7 @@ namespace dung
     std::unique_ptr<ScreenHelper> m_screen_helper;
     
     std::unique_ptr<Inventory> m_inventory;
+    OneShot sort_inventory { false };
     
     std::unique_ptr<Keyboard> m_keyboard;
     
@@ -267,6 +268,8 @@ namespace dung
         m_player.curr_tot_inv_weight += armour->weight;
       }
       
+      if (sort_inventory.once())
+        m_inventory->set_sort_mode(true);
       m_inventory->apply_invalidated();
       m_inventory->apply_deserialization_changes();
     }
@@ -868,7 +871,7 @@ namespace dung
     }
     
   public:
-    DungGine(const std::string& exe_folder, bool use_fow, DungGineTextureParams texture_params = {})
+    DungGine(const std::string& exe_folder, bool use_fow, bool sorted_inventory_items, DungGineTextureParams texture_params = {})
       : message_handler(std::make_unique<MessageHandler>())
       , use_fog_of_war(use_fow)
     {
@@ -882,6 +885,8 @@ namespace dung
                                               all_npcs,
                                               trigger_game_save, trigger_game_load,
                                               tbd, debug);
+      if (sorted_inventory_items)
+        sort_inventory.reset();
     }
     
     void load_dungeon(Dungeon& dungeon)

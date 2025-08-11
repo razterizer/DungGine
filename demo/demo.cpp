@@ -107,7 +107,7 @@ public:
       //sh.print_screen_buffer(t, bg_color);
 
 #if 1
-      dungeon_engine = std::make_unique<dung::DungGine>(get_exe_folder(), false);
+      dungeon_engine = std::make_unique<dung::DungGine>(get_exe_folder(), false, false);
       dungeon_engine->load_dungeon(dungeon);
       dungeon_engine->style_dungeon();
       if (!dungeon_engine->place_player(sh.size()))
@@ -245,7 +245,7 @@ private:
       texture_params.texture_file_names_surface_level_shadow.emplace_back(f_tex_path("texture_sl_shadow_0.tex"));
       texture_params.texture_file_names_surface_level_shadow.emplace_back(f_tex_path("texture_sl_shadow_1.tex"));
     
-      dungeon_engine = std::make_unique<dung::DungGine>(get_exe_folder(), true, texture_params);
+      dungeon_engine = std::make_unique<dung::DungGine>(get_exe_folder(), true, true, texture_params);
     }
     dungeon.generate(dungeon_floor_params);
     dungeon_engine->load_dungeon(dungeon);
