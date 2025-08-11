@@ -144,7 +144,7 @@ namespace dung
         std::string item_str = "  Key:" + std::to_string(key.key_id);
         f_format_item_str(item_str, key.weight, key.price, 0);
         if (keys_subgroup->find_item(&key) == nullptr)
-          keys_subgroup->add_item(item_str, &key);
+          keys_subgroup->add_item(item_str, &key, key_idx);
         m_player.curr_tot_inv_weight += key.weight;
       }
       
@@ -159,7 +159,7 @@ namespace dung
         std::string item_str = "  "s + lamp_type + ":" + std::to_string(lamp_idx);
         f_format_item_str(item_str, lamp.weight, lamp.price, 0);
         if (lamps_subgroup->find_item(&lamp) == nullptr)
-          lamps_subgroup->add_item(item_str, &lamp);
+          lamps_subgroup->add_item(item_str, &lamp, lamp_idx);
         m_player.curr_tot_inv_weight += lamp.weight;
       }
       
@@ -183,7 +183,7 @@ namespace dung
         item_str += std::to_string(wpn_idx);
         f_format_item_str(item_str, weapon->weight, weapon->price, weapon->damage);
         if (weapons_subgroup_melee->find_item(weapon.get()) == nullptr)
-          weapons_subgroup_melee->add_item(item_str, weapon.get());
+          weapons_subgroup_melee->add_item(item_str, weapon.get(), wpn_idx);
         m_player.curr_tot_inv_weight += weapon->weight;
       }
       
@@ -196,7 +196,7 @@ namespace dung
         std::string item_str = "  Potion:" + std::to_string(pot_idx);
         f_format_item_str(item_str, potion.weight, potion.price, 0);
         if (potions_subgroup->find_item(&potion) == nullptr)
-          potions_subgroup->add_item(item_str, &potion);
+          potions_subgroup->add_item(item_str, &potion, pot_idx);
         m_player.curr_tot_inv_weight += potion.weight;
       }
       
@@ -263,10 +263,11 @@ namespace dung
         f_format_item_str(item_str, armour->weight, armour->price, armour->protection);
         if (armour_subgroup != nullptr)
           if (armour_subgroup->find_item(armour.get()) == nullptr)
-            armour_subgroup->add_item(item_str, armour.get());
+            armour_subgroup->add_item(item_str, armour.get(), a_idx);
         m_player.curr_tot_inv_weight += armour->weight;
       }
       
+      m_inventory->apply_invalidated();
       m_inventory->apply_deserialization_changes();
     }
     
