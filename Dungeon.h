@@ -137,21 +137,21 @@ namespace dung
         
         for (auto* rA : rooms_A)
         {
-          aabb_A = rA->bb_leaf_room;
+          aabb_A = rA->bb_leaf_room.extrude(-1); // We only want to intersect the interior of the rooms.
           for (auto* rB : rooms_B)
           {
             if (rB->staircase == nullptr && rnd::one_in(prob_in_room))
             {
-              aabb_B = rB->bb_leaf_room;
+              aabb_B = rB->bb_leaf_room.extrude(-1); // We only want to intersect the interior of the rooms.
               if (aabb_A.overlaps(aabb_B))
               {
                 auto bb_isect = aabb_A.set_intersect(aabb_B).to_rectangle();
-                if (bb_isect.r_len == 1 || bb_isect.c_len == 1)
+                if (bb_isect.is_empty())
                   continue;
                 auto* stairs = staircases.emplace_back(std::make_unique<Staircase>()).get();
                 stairs->pos = {
-                  rnd::rand_int(bb_isect.top() + 1, bb_isect.bottom() - 1),
-                  rnd::rand_int(bb_isect.left() + 1, bb_isect.right() - 1)
+                  rnd::rand_int(bb_isect.top(), bb_isect.bottom()),
+                  rnd::rand_int(bb_isect.left(), bb_isect.right())
                 };
                 stairs->room_floor_A = rA;
                 stairs->room_floor_B = rB;
