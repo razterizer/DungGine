@@ -934,9 +934,9 @@ namespace dung
           auto* rnd_corr = f_find_rnd_corr(rnd_sel);
           if (rnd_corr != nullptr)
           {
-            if (rnd_corr->orientation == Orientation::Vertical && rnd_corr->bb.r_len > 3)
+            if (rnd_corr->orientation == Orientation::Vertical && rnd_corr->bb.r_len > 4)
               break;
-            if (rnd_corr->orientation == Orientation::Horizontal && rnd_corr->bb.c_len > 3)
+            if (rnd_corr->orientation == Orientation::Horizontal && rnd_corr->bb.c_len > 4)
               break;
           }
         } while (++num_iters < c_max_num_iters);
