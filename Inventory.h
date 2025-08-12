@@ -15,6 +15,10 @@
 namespace dung
 {
 
+  // Hilite is global and selection is local per sub-group.
+  // Thus there are only one hilite index but several selection indices,
+  //   max one per sub-group.
+
   struct InvItem
   {
     std::string text;
@@ -259,19 +263,6 @@ namespace dung
       return -1;
     }
     
-    int find_selected_index() const
-    {
-      int cum_idx = 1;
-      for (const auto& sg : m_subgroups)
-      {
-        auto rel_idx = sg.find_selected_index();
-        if (rel_idx != -1)
-          return cum_idx + rel_idx;
-        cum_idx += sg.size();
-      }
-      return -1;
-    }
-    
     bool set_hilited_state(int idx, bool enable_hilite)
     {
       if (idx == -1)
@@ -505,19 +496,6 @@ namespace dung
       return -1;
     }
     
-    int find_selected_index() const
-    {
-      int cum_idx = 0;
-      for (const auto& g : m_groups)
-      {
-        auto rel_idx = g.find_selected_index();
-        if (rel_idx != -1)
-          return cum_idx + rel_idx;
-        cum_idx += g.size();
-      }
-      return -1;
-    }
-    
     bool set_hilited_state(int idx, bool enable_hilite)
     {
       if (idx == -1)
@@ -587,11 +565,15 @@ namespace dung
         set_hilited_state(find_hilited_index(), false);
         set_hilited_state(idx, true);
       }
-        
-      for (auto idx : sg_selected_idcs) // #NOTE: Should be just one index.
+      
+      if (!sg_selected_idcs.empty())
       {
-        set_selected_state(find_selected_index(), false);
-        set_selected_state(idx, true);
+        for (auto& g : *this)
+          for (auto& sg : g)
+            sg.set_selected_state(sg.find_selected_index(), false);
+        
+        for (auto idx : sg_selected_idcs)
+          set_selected_state(idx, true);
       }
         
       sg_hilited_idcs.clear();
