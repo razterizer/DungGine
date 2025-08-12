@@ -15,8 +15,6 @@
 namespace dung
 {
 
-  enum class InvItemState { NONE, SWITCH_SELECTION, SET_HILITE, RESET_HILITE };
-
   struct InvItem
   {
     std::string text;
@@ -47,8 +45,6 @@ namespace dung
     InvItem title { "", 1 };
     bool use_title = false;
     std::vector<InvItem> m_items;
-    int selection_idx = 0;
-    int hilite_idx = 0;
     bool sort_items = false;
     bool invalidated = false;
     
@@ -66,32 +62,95 @@ namespace dung
       m_items.emplace_back(text, item, idx);
       
       if (sort_items)
-      {
-        int item_idx_at_selection = m_items[selection_idx].item_index;
-        bool was_selected = m_items[selection_idx].selected;
-        m_items[selection_idx].selected = false;
-        int item_idx_at_hilite = m_items[hilite_idx].item_index;
-        bool was_hilited = m_items[hilite_idx].hilited;
-        m_items[hilite_idx].hilited = false;
-        
         stlutils::sort(m_items, [](const auto& iA, const auto& iB)
           {
             return iA.item_index < iB.item_index;
           });
-          
-        selection_idx = stlutils::find_if_idx(m_items,
-          [item_idx_at_selection](const auto& i) { return i.item_index == item_idx_at_selection; });
-        m_items[selection_idx].selected = was_selected;
-        hilite_idx = stlutils::find_if_idx(m_items,
-          [item_idx_at_hilite](const auto& i) { return i.item_index == item_idx_at_hilite; });
-        m_items[hilite_idx].hilited = was_hilited;
-        invalidated = true;
-      }
     }
     
-    int get_hilite_idx() const
+    int find_hilited_index() const
     {
-      return use_title + hilite_idx;
+      int num_items = stlutils::sizeI(m_items);
+      for (int i_idx = 0; i_idx < num_items; ++i_idx)
+      {
+        if (m_items[i_idx].hilited)
+          return use_title + i_idx;
+      }
+      return -1;
+    }
+    
+    int find_selected_index() const
+    {
+      int num_items = stlutils::sizeI(m_items);
+      for (int i_idx = 0; i_idx < num_items; ++i_idx)
+      {
+        if (m_items[i_idx].selected)
+          return use_title + i_idx;
+      }
+      return -1;
+    }
+    
+    bool set_hilited_state(int idx, bool enable_hilite)
+    {
+      if (idx == -1)
+        return false;
+      int rel_idx = idx - use_title;
+      if (math::in_range<int>(rel_idx, 0, stlutils::sizeI(m_items), Range::ClosedOpen))
+      {
+        m_items[rel_idx].hilited = enable_hilite;
+        return true;
+      }
+      return false;
+    }
+    
+    bool set_selected_state(int idx, bool enable_select)
+    {
+      if (idx == -1)
+        return false;
+      int rel_idx = idx - use_title;
+      if (math::in_range<int>(rel_idx, 0, stlutils::sizeI(m_items), Range::ClosedOpen))
+      {
+        m_items[rel_idx].selected = enable_select;
+        return true;
+      }
+      return false;
+    }
+    
+    bool get_hilited_state(int idx) const
+    {
+      if (idx == -1)
+        return false;
+      int rel_idx = idx - use_title;
+      if (math::in_range<int>(rel_idx, 0, stlutils::sizeI(m_items), Range::ClosedOpen))
+        return m_items[rel_idx].hilited;
+      return false;
+    }
+    
+    bool get_selected_state(int idx) const
+    {
+      if (idx == -1)
+        return false;
+      int rel_idx = idx - use_title;
+      if (math::in_range<int>(rel_idx, 0, stlutils::sizeI(m_items), Range::ClosedOpen))
+        return m_items[rel_idx].selected;
+      return false;
+    }
+    
+    bool toggle_hilited_selection()
+    {
+      int hilite_idx = find_hilited_index();
+      if (hilite_idx != -1)
+      {
+        int selection_idx = find_selected_index();
+        // if same index then toggle selection state, otherwise transfer.
+        if (selection_idx != hilite_idx)
+          set_selected_state(selection_idx, false);
+
+        bool selected = get_selected_state(hilite_idx);
+        set_selected_state(hilite_idx, !selected);
+        return true;
+      }
+      return false;
     }
     
     void remove_item(Item* item)
@@ -136,49 +195,6 @@ namespace dung
       if (it != m_items.end())
         return &(*it);
       return nullptr;
-    }
-    
-    void toggle_state(int idx, InvItemState state)
-    {
-      int rel_idx = idx - use_title;
-      
-      bool same_selection = selection_idx == rel_idx;
-    
-      if (state == InvItemState::SWITCH_SELECTION)
-      {
-        if (math::in_range<int>(selection_idx, 0, stlutils::sizeI(m_items), Range::ClosedOpen))
-        {
-          auto& item = m_items[selection_idx];
-          if (!same_selection)
-            item.selected = false;
-        }
-      }
-    
-      if (state == InvItemState::SWITCH_SELECTION)
-        selection_idx = rel_idx;
-      else if (state == InvItemState::SET_HILITE)
-        hilite_idx = rel_idx;
-        
-      if (math::in_range<int>(rel_idx, 0, stlutils::sizeI(m_items), Range::ClosedOpen))
-      {
-        auto& item = m_items[rel_idx];
-        switch (state)
-        {
-          case InvItemState::NONE: break;
-          case InvItemState::SWITCH_SELECTION:
-              math::toggle(item.selected);
-            break;
-          case InvItemState::SET_HILITE:
-            item.hilited = true;
-            break;
-          case InvItemState::RESET_HILITE:
-            item.hilited = false;
-            break;
-        }
-      }
-      
-      if (state == InvItemState::RESET_HILITE)
-        hilite_idx = -1;
     }
     
     int size() const { return use_title + stlutils::sizeI(m_items); }
@@ -230,20 +246,100 @@ namespace dung
       return false;
     }
     
-    int calc_new_hilite_idx()
+    int find_hilited_index() const
     {
-      int cum_idx = 1; // Cumulative index. Excludes the title.
-      for (auto& sg : m_subgroups)
+      int cum_idx = 1;
+      for (const auto& sg : m_subgroups)
       {
-        if (sg.is_invalidated())
-        {
-          int hilite_idx = cum_idx + sg.get_hilite_idx();
-          sg.reset_invalidation();
-          return hilite_idx;
-        }
+        auto rel_idx = sg.find_hilited_index();
+        if (rel_idx != -1)
+          return cum_idx + rel_idx;
         cum_idx += sg.size();
       }
       return -1;
+    }
+    
+    int find_selected_index() const
+    {
+      int cum_idx = 1;
+      for (const auto& sg : m_subgroups)
+      {
+        auto rel_idx = sg.find_selected_index();
+        if (rel_idx != -1)
+          return cum_idx + rel_idx;
+        cum_idx += sg.size();
+      }
+      return -1;
+    }
+    
+    bool set_hilited_state(int idx, bool enable_hilite)
+    {
+      if (idx == -1)
+        return false;
+      int cum_idx = 1; // Cumulative index.
+      for (auto& sg : m_subgroups)
+      {
+        int rel_idx = idx - cum_idx;
+        if (math::in_range<int>(rel_idx, 0, sg.size(), Range::ClosedOpen))
+          if (sg.set_hilited_state(rel_idx, enable_hilite))
+            return true;
+        cum_idx += sg.size();
+      }
+      return false;
+    }
+    
+    bool set_selected_state(int idx, bool enable_select)
+    {
+      if (idx == -1)
+        return false;
+      int cum_idx = 1; // Cumulative index.
+      for (auto& sg : m_subgroups)
+      {
+        int rel_idx = idx - cum_idx;
+        if (math::in_range<int>(rel_idx, 0, sg.size(), Range::ClosedOpen))
+          if (sg.set_selected_state(rel_idx, enable_select))
+            return true;
+        cum_idx += sg.size();
+      }
+      return false;
+    }
+    
+    bool get_hilited_state(int idx) const
+    {
+      if (idx == -1)
+        return false;
+      int cum_idx = 1; // Cumulative index.
+      for (auto& sg : m_subgroups)
+      {
+        int rel_idx = idx - cum_idx;
+        if (math::in_range<int>(rel_idx, 0, sg.size(), Range::ClosedOpen))
+          return sg.get_hilited_state(rel_idx);
+        cum_idx += sg.size();
+      }
+      return false;
+    }
+    
+    bool get_selected_state(int idx) const
+    {
+      if (idx == -1)
+        return false;
+      int cum_idx = 1; // Cumulative index.
+      for (auto& sg : m_subgroups)
+      {
+        int rel_idx = idx - cum_idx;
+        if (math::in_range<int>(rel_idx, 0, sg.size(), Range::ClosedOpen))
+          return sg.get_selected_state(rel_idx);
+        cum_idx += sg.size();
+      }
+      return false;
+    }
+    
+    bool toggle_hilited_selection()
+    {
+      for (auto& sg : m_subgroups)
+        if (sg.toggle_hilited_selection())
+          return true;
+      return false;
     }
     
     const std::string& get_title() const
@@ -302,21 +398,6 @@ namespace dung
       return {};
     };
     
-    void toggle_state(int idx, InvItemState state)
-    {
-      if (idx == 0)
-        return; // Can't select the title for now.
-        
-      int cum_idx = 1; // Cumulative index.
-      for (auto& sg : m_subgroups)
-      {
-        int rel_idx = idx - cum_idx;
-        if (math::in_range<int>(rel_idx, 0, sg.size(), Range::ClosedOpen))
-          sg.toggle_state(rel_idx, state);
-        cum_idx += sg.size();
-      }
-    }
-    
     std::vector<InvSubGroup>::iterator begin()
     {
       return m_subgroups.begin();
@@ -348,7 +429,6 @@ namespace dung
     int rb0_title = 2;
     int rb0_items = 4; // row box-relative-pos start items.
     int cb0_items = 2; // col box-relative-pos start items.
-    int hilite_idx = 0;
     
     // Save-game temporaries for delayed application.
     std::vector<int> sg_hilited_idcs, sg_selected_idcs;
@@ -412,51 +492,107 @@ namespace dung
       return {};
     };
     
-    void toggle_state(int idx, InvItemState state)
+    int find_hilited_index() const
     {
+      int cum_idx = 0;
+      for (const auto& g : m_groups)
+      {
+        auto rel_idx = g.find_hilited_index();
+        if (rel_idx != -1)
+          return cum_idx + rel_idx;
+        cum_idx += g.size();
+      }
+      return -1;
+    }
+    
+    int find_selected_index() const
+    {
+      int cum_idx = 0;
+      for (const auto& g : m_groups)
+      {
+        auto rel_idx = g.find_selected_index();
+        if (rel_idx != -1)
+          return cum_idx + rel_idx;
+        cum_idx += g.size();
+      }
+      return -1;
+    }
+    
+    bool set_hilited_state(int idx, bool enable_hilite)
+    {
+      if (idx == -1)
+        return false;
       int cum_idx = 0; // Cumulative index.
       for (auto& g : m_groups)
       {
         int rel_idx = idx - cum_idx;
         if (math::in_range<int>(rel_idx, 0, g.size(), Range::ClosedOpen))
-          g.toggle_state(rel_idx, state);
+          if (g.set_hilited_state(rel_idx, enable_hilite))
+            return true;
         cum_idx += g.size();
       }
+      return false;
     }
     
-    void apply_invalidated()
+    bool set_selected_state(int idx, bool enable_select)
     {
+      if (idx == -1)
+        return false;
       int cum_idx = 0; // Cumulative index.
       for (auto& g : m_groups)
       {
-        auto rel_idx = g.calc_new_hilite_idx();
-        if (rel_idx != -1)
-        {
-          toggle_state(hilite_idx, InvItemState::RESET_HILITE);
-          hilite_idx = cum_idx + rel_idx;
-          toggle_state(hilite_idx, InvItemState::SET_HILITE);
-          break;
-        }
+        int rel_idx = idx - cum_idx;
+        if (math::in_range<int>(rel_idx, 0, g.size(), Range::ClosedOpen))
+          if (g.set_selected_state(rel_idx, enable_select))
+            return true;
         cum_idx += g.size();
       }
-      
-      // #NOTE: Can occur after deserialization. So commenting out for now.
-      //for (auto& g : m_groups)
-      //  if (g.is_invalidated())
-      //    std::cerr << "ERROR in Inventory::apply_invalidated() : Not suppose to have multiply invalidated groups!\n";
+      return false;
+    }
+    
+    bool get_hilited_state(int idx) const
+    {
+      if (idx == -1)
+        return false;
+      int cum_idx = 0; // Cumulative index.
+      for (auto& g : m_groups)
+      {
+        int rel_idx = idx - cum_idx;
+        if (math::in_range<int>(rel_idx, 0, g.size(), Range::ClosedOpen))
+          return g.get_hilited_state(rel_idx);
+        cum_idx += g.size();
+      }
+      return false;
+    }
+    
+    bool get_selected_state(int idx) const
+    {
+      if (idx == -1)
+        return false;
+      int cum_idx = 0; // Cumulative index.
+      for (auto& g : m_groups)
+      {
+        int rel_idx = idx - cum_idx;
+        if (math::in_range<int>(rel_idx, 0, g.size(), Range::ClosedOpen))
+          return g.get_selected_state(rel_idx);
+        cum_idx += g.size();
+      }
+      return false;
     }
     
     void apply_deserialization_changes()
     {
       for (auto idx : sg_hilited_idcs) // #NOTE: Should be just one index.
       {
-        toggle_state(hilite_idx, InvItemState::RESET_HILITE);
-        hilite_idx = idx;
-        toggle_state(hilite_idx, InvItemState::SET_HILITE);
+        set_hilited_state(find_hilited_index(), false);
+        set_hilited_state(idx, true);
       }
         
       for (auto idx : sg_selected_idcs) // #NOTE: Should be just one index.
-        toggle_state(idx, InvItemState::SWITCH_SELECTION);
+      {
+        set_selected_state(find_selected_index(), false);
+        set_selected_state(idx, true);
+      }
         
       sg_hilited_idcs.clear();
       sg_selected_idcs.clear();
@@ -464,7 +600,8 @@ namespace dung
     
     void inc_hilite()
     {
-      toggle_state(hilite_idx, InvItemState::RESET_HILITE);
+      int hilite_idx = find_hilited_index();
+      set_hilited_state(hilite_idx, false);
       int num_wraps = 0;
       do
       {
@@ -475,12 +612,13 @@ namespace dung
           num_wraps++;
         }
       } while (get_item(hilite_idx).level < 2 && num_wraps < 3);
-      toggle_state(hilite_idx, InvItemState::SET_HILITE);
+      set_hilited_state(hilite_idx, true);
     }
     
     void dec_hilite()
     {
-      toggle_state(hilite_idx, InvItemState::RESET_HILITE);
+      int hilite_idx = find_hilited_index();
+      set_hilited_state(hilite_idx, false);
       int num_wraps = 0;
       do
       {
@@ -491,17 +629,20 @@ namespace dung
           num_wraps++;
         }
       } while (get_item(hilite_idx).level < 2 && num_wraps < 3);
-      toggle_state(hilite_idx, InvItemState::SET_HILITE);
+      set_hilited_state(hilite_idx, true);
     }
     
-    void toggle_hilited_selection()
+    bool toggle_hilited_selection()
     {
-      toggle_state(hilite_idx, InvItemState::SWITCH_SELECTION);
+      for (auto& g : m_groups)
+        if (g.toggle_hilited_selection())
+          return true;
+      return false;
     }
     
     void reset_hilite()
     {
-      toggle_state(hilite_idx, InvItemState::RESET_HILITE);
+      set_hilited_state(find_hilited_index(), false);
     }
       
     template<int NR, int NC>
@@ -510,6 +651,8 @@ namespace dung
       sh.write_buffer(str::adjust_str("Inventory", str::Adjustment::Center, m_bb.c_len), m_bb.top() + rb0_title, m_bb.left(), Color::White, Color::Transparent2);
       
       int num_lines = size();
+      
+      int hilite_idx = std::max(0, find_hilited_index());
       
       int r_offs = std::max(0, hilite_idx - (m_bb.r_len - rb0_items - 2));
         
@@ -572,8 +715,6 @@ namespace dung
     
     void serialize(std::vector<std::string>& lines) const
     {
-      sg::write_var(lines, SG_WRITE_VAR(hilite_idx));
-      
       lines.emplace_back("items");
       int num_lines = size();
       for (int r = 0; r < num_lines; ++r)
@@ -590,8 +731,7 @@ namespace dung
     {
       for (auto it_line = it_line_begin; it_line != it_line_end; ++it_line)
       {
-        if (sg::read_var(&it_line, SG_READ_VAR(hilite_idx))) {}
-        else if (*it_line == "items")
+        if (*it_line == "items")
         {
           for (auto it_line2 = it_line + 1; it_line2 != it_line_end; ++it_line2)
           {

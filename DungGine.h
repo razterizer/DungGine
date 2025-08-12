@@ -270,7 +270,6 @@ namespace dung
       
       if (sort_inventory.once())
         m_inventory->set_sort_mode(true);
-      m_inventory->apply_invalidated();
       m_inventory->apply_deserialization_changes();
     }
     
