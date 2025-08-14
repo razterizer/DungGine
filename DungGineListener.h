@@ -29,6 +29,7 @@ namespace dung
     virtual void on_save_game_request(std::string& filepath, unsigned int& curr_rnd_seed) {}
     virtual void on_load_game_request_pre(std::string& filepath) {}
     virtual void on_load_game_request_post(unsigned int rnd_seed) {}
+    virtual void on_screenshot_request(std::string& filepath) {}
   };
 
 }
