@@ -358,6 +358,11 @@ namespace dung
                                                            std::vector<std::string>::iterator it_line_end,
                                                            Environment* environment) override
     {
+      key_idcs.clear();
+      lamp_idcs.clear();
+      weapon_idcs.clear();
+      potion_idcs.clear();
+      armour_idcs.clear();
       it_line_begin = PlayerBase::deserialize(it_line_begin, it_line_end, environment);
       for (auto it_line = it_line_begin + 1; it_line != it_line_end; ++it_line)
       {
