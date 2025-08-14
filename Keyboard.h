@@ -386,12 +386,14 @@ namespace dung
               {
                 m_player.curr_floor = staircase->floor_B;
                 m_player.curr_room = staircase->room_floor_B;
+                m_player.curr_corridor = nullptr;
                 floor_dir = staircase->floor_B - staircase->floor_A;
               }
               else if (m_player.curr_floor == staircase->floor_B)
               {
                 m_player.curr_floor = staircase->floor_A;
                 m_player.curr_room = staircase->room_floor_A;
+                m_player.curr_corridor = nullptr;
                 floor_dir = staircase->floor_A - staircase->floor_B;
               }
               if (floor_dir != 0)
