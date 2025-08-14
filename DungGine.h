@@ -1518,6 +1518,19 @@ namespace dung
       mb_args.h_align_offs = mb_h_align_offs;
       mb_args.framed_mode = framed_mode;
       message_handler->update(sh, static_cast<float>(real_time_s), mb_args);
+      
+      if (debug)
+      {
+        if (!tbd.empty())
+        {
+          ui::TextBoxDrawingArgsAlign tbd_args;
+          tbd_args.v_align = ui::VerticalAlignment::TOP;
+          tbd_args.base.box_style = { Color::Blue, Color::Yellow };
+          tbd_args.framed_mode = framed_mode;
+          tbd.calc_pre_draw(str::Adjustment::Left);
+          tbd.draw(sh, tbd_args);
+        }
+      }
         
       if (m_player.show_inventory)
       {
@@ -1542,16 +1555,6 @@ namespace dung
       {
         sh.write_buffer(terrain2str(m_player.on_terrain), 5, 1, Color::Black, Color::White);
         sh.write_buffer("Floor: " + std::to_string(m_player.curr_floor), 6, 1, Color::Black, Color::White);
-        
-        if (!tbd.empty())
-        {
-          ui::TextBoxDrawingArgsAlign tbd_args;
-          tbd_args.v_align = ui::VerticalAlignment::TOP;
-          tbd_args.base.box_style = { Color::Blue, Color::Yellow };
-          tbd_args.framed_mode = framed_mode;
-          tbd.calc_pre_draw(str::Adjustment::Left);
-          tbd.draw(sh, tbd_args);
-        }
       }
       
       auto f_draw_swim_anim = [anim_ctr_swim, &sh, this](bool is_moving, int curr_floor,
