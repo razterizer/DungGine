@@ -51,16 +51,16 @@ namespace dung
     Environment() = default;
     ~Environment() = default;
     
-    void load_textures(const std::string& exe_folder, DungGineTextureParams texture_params)
+    void load_textures(DungGineTextureParams texture_params)
     {
       for (const auto& fn : texture_params.texture_file_names_surface_level_fill)
-        texture_sl_fill.emplace_back().load(folder::join_path({ exe_folder, fn }));
+        texture_sl_fill.emplace_back().load(fn);
       for (const auto& fn : texture_params.texture_file_names_surface_level_shadow)
-        texture_sl_shadow.emplace_back().load(folder::join_path({ exe_folder, fn }));
+        texture_sl_shadow.emplace_back().load(fn);
       for (const auto& fn : texture_params.texture_file_names_underground_fill)
-        texture_ug_fill.emplace_back().load(folder::join_path({ exe_folder, fn }));
+        texture_ug_fill.emplace_back().load(fn);
       for (const auto& fn : texture_params.texture_file_names_underground_shadow)
-        texture_ug_shadow.emplace_back().load(folder::join_path({ exe_folder, fn }));
+        texture_ug_shadow.emplace_back().load(fn);
         
       dt_texture_anim_s = texture_params.dt_anim_s;
     }

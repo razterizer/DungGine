@@ -870,13 +870,13 @@ namespace dung
     }
     
   public:
-    DungGine(const std::string& exe_folder, bool use_fow, bool sorted_inventory_items, DungGineTextureParams texture_params = {})
+    DungGine(bool use_fow, bool sorted_inventory_items, DungGineTextureParams texture_params = {})
       : message_handler(std::make_unique<MessageHandler>())
       , use_fog_of_war(use_fow)
     {
       m_screen_helper = std::make_unique<ScreenHelper>();
       m_environment = std::make_unique<Environment>();
-      m_environment->load_textures(exe_folder, texture_params);
+      m_environment->load_textures(texture_params);
       m_inventory = std::make_unique<Inventory>();
       m_keyboard = std::make_unique<Keyboard>(m_environment.get(), m_inventory.get(), message_handler.get(),
                                               m_player,

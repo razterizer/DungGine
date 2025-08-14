@@ -164,7 +164,7 @@ There is currently no visual distiction between upwards or downwards going stair
   - `serialize(std::vector<std::string>& lines)` : Used by the save-game feature to store info about the current state.
   - `deserialize(std::vector<std::string>::iterator it_line_begin, std::vector<std::string>::iterator it_line_end)` : Used by the save-game feature to restore info about the current state.
 * `DungGine.h`
-  - `DungGine(const std::string& exe_folder, bool use_fow, bool sorted_inventory_items, DungGineTextureParams texture_params = {})` : The constructor. If `use_fow = true` then the whole dungeon map will be covered in black until you gradually uncover area by area. If `sorted_inventory_items = true` then an inventory subgroup will be automatically sorted every time an item is added to it. It adjusts any states and indices related to this subgroup in order to retain the correct hilite and selection status after sorting.
+  - `DungGine(bool use_fow, bool sorted_inventory_items, DungGineTextureParams texture_params = {})` : The constructor. If `use_fow = true` then the whole dungeon map will be covered in black until you gradually uncover area by area. If `sorted_inventory_items = true` then an inventory subgroup will be automatically sorted every time an item is added to it. It adjusts any states and indices related to this subgroup in order to retain the correct hilite and selection status after sorting.
   - `load_dungeon(Dungeon& dungeon)` : Loads a dungeon consisting of generated BSP trees, one BSP tree corresponds to a floor.
   - `style_dungeon()` : Performs automated styling of rooms in the dungeon / realm.
   - `set_player_character(char ch)` : Sets the character of the playable character (pun intended).
@@ -346,7 +346,7 @@ floor.max_num_locked_doors = 100;
 floor.allow_passageways = true;
 dungeon.generate(dungeon_floor_params);
 
-dungeon_engine = std::make_unique<dung::DungGine>(get_exe_folder(), true, false); // arguments: exe_folder, use_fow, sorted_inventory_items, texture_params.
+dungeon_engine = std::make_unique<dung::DungGine>(true, false); // arguments: exe_folder, use_fow, sorted_inventory_items, texture_params.
 dungeon_engine.load_dungeon(dungeon);
 dungeon_engine.configure_sun_rand(20.f, 120.f, dung::Latitude::NorthernHemisphere, dung::Longitude::FW, false); // 20 minutes per day and 120 minutes per year. Global shadow.
 dungeon_engine.style_dungeon();
@@ -422,7 +422,7 @@ texture_params.texture_file_names_surface_level_fill.emplace_back(f_tex_path("te
 texture_params.texture_file_names_surface_level_shadow.emplace_back(f_tex_path("texture_sl_shadow_0.tex"));
 texture_params.texture_file_names_surface_level_shadow.emplace_back(f_tex_path("texture_sl_shadow_1.tex"));
 
-dungeon_engine = std::make_unique<dung::DungGine>(get_exe_folder(), true, true, texture_params); // arguments: exe_folder, use_fow, sorted_inventory_items, texture_params.
+dungeon_engine = std::make_unique<dung::DungGine>(true, true, texture_params); // arguments: exe_folder, use_fow, sorted_inventory_items, texture_params.
 dungeon_engine.load_dungeon(dungeon);
 dungeon_engine.configure_sun_rand(20.f, 120.f, dung::Latitude::Equator, dung::Longitude::F, true); // 20 minutes per day and 120 minutes per year. Localized shadows across the map starting at Equator & Front.
 dungeon_engine.style_dungeon();

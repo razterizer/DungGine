@@ -27,12 +27,15 @@ public:
     GameEngine::set_anim_rate(0, 3); // swim animation
     GameEngine::set_anim_rate(1, 4); // fight animation
     
+    // #NOTE: Makes sure we run from the right folder independent of the current pwd the exe is run from.
+    //   E.g. "demo> bin/demo" or "bin> demo" should both work.
+    project_root_filepath = folder::join_path({ get_exe_folder(), ".." });
 #ifndef _WIN32
     const char* xcode_env = std::getenv("RUNNING_FROM_XCODE");
     if (xcode_env != nullptr)
-      savegame_filepath = "../../../../../../../../Documents/xcode/lib/DungGine/demo/"; // #FIXME: Find a better solution!
+      project_root_filepath = folder::join_path({ project_root_filepath, "../../../../../../../Documents/xcode/lib/DungGine/demo/" }); // #FIXME: Find a better solution!
 #endif
-    savegame_filepath = folder::join_path({ savegame_filepath, "savegame_0.dsg" });
+    savegame_filepath = folder::join_path({ project_root_filepath, "savegame_0.dsg" });
   }
   
   virtual ~Game() override
@@ -107,7 +110,7 @@ public:
       //sh.print_screen_buffer(t, bg_color);
 
 #if 1
-      dungeon_engine = std::make_unique<dung::DungGine>(get_exe_folder(), false, false);
+      dungeon_engine = std::make_unique<dung::DungGine>(false, false);
       dungeon_engine->load_dungeon(dungeon);
       dungeon_engine->style_dungeon();
       if (!dungeon_engine->place_player(sh.size()))
@@ -236,16 +239,16 @@ private:
       underground_level_1.allow_passageways = true;
     
       texture_params.dt_anim_s = 0.5;
-      auto f_tex_path = [](const auto& filename)
+      auto f_tex_path = [this](const auto& filename)
       {
-        return folder::join_path({ "textures", filename });
+        return folder::join_path({ project_root_filepath, "textures", filename });
       };
       texture_params.texture_file_names_surface_level_fill.emplace_back(f_tex_path("texture_sl_fill_0.tex"));
       texture_params.texture_file_names_surface_level_fill.emplace_back(f_tex_path("texture_sl_fill_1.tex"));
       texture_params.texture_file_names_surface_level_shadow.emplace_back(f_tex_path("texture_sl_shadow_0.tex"));
       texture_params.texture_file_names_surface_level_shadow.emplace_back(f_tex_path("texture_sl_shadow_1.tex"));
     
-      dungeon_engine = std::make_unique<dung::DungGine>(get_exe_folder(), true, true, texture_params);
+      dungeon_engine = std::make_unique<dung::DungGine>(true, true, texture_params);
     }
     dungeon.generate(dungeon_floor_params);
     dungeon_engine->load_dungeon(dungeon);
@@ -278,6 +281,7 @@ private:
   
   float fire_smoke_dt_factor = 0.5f;
   
+  std::string project_root_filepath;
   std::string savegame_filepath;
 };
 
