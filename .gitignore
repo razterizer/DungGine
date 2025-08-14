@@ -39,3 +39,6 @@ rec*.txt
 
 # Dungeon SaveGame data
 *.dsg
+
+# DungGine screenshots
+screenshot*.txt
