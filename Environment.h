@@ -276,6 +276,8 @@ namespace dung
       const auto& bb = room->bb_leaf_room;
       if (bb.is_inside_offs(pos, -1))
       {
+        if (!stlutils::in_range(m_room_styles, floor))
+          return Terrain::Default;
         auto its = m_room_styles[floor].find(room);
         if (its == m_room_styles[floor].end())
           return Terrain::Default;
@@ -360,109 +362,115 @@ namespace dung
                           bool debug)
     {
       auto shadow_type = sun_dir;
-      for (const auto& room_pair : m_room_styles[curr_floor])
+      if (stlutils::in_range(m_room_styles, curr_floor))
       {
-        auto* room = room_pair.first;
-        const auto& bb = room->bb_leaf_room;
-        const auto& room_style = room_pair.second;
-        auto bb_scr_pos = screen_helper->get_screen_pos(bb.pos());
-        if (use_per_room_lat_long_for_sun_dir)
-          shadow_type = solar_motion.get_solar_direction(room_style.latitude, room_style.longitude, season, t_solar_period);
-        
-        if (debug)
+        for (const auto& room_pair : m_room_styles[curr_floor])
         {
-          sh.write_buffer(std::to_string(room_style.is_underground), bb_scr_pos.r + 1, bb_scr_pos.c + 1, Color::White, Color::Black);
-        }
-        
-        // Fog of war
-        if (use_fog_of_war)
-        {
-          for (int r = 0; r < bb.r_len; ++r)
+          auto* room = room_pair.first;
+          const auto& bb = room->bb_leaf_room;
+          const auto& room_style = room_pair.second;
+          auto bb_scr_pos = screen_helper->get_screen_pos(bb.pos());
+          if (use_per_room_lat_long_for_sun_dir)
+            shadow_type = solar_motion.get_solar_direction(room_style.latitude, room_style.longitude, season, t_solar_period);
+          
+          if (debug)
           {
-            for (int c = 0; c < bb.c_len; ++c)
-            {
-              if (room->fog_of_war[r * bb.c_len + c])
-                sh.write_buffer(".", bb_scr_pos.r + r, bb_scr_pos.c + c, Color::Black, Color::Black);
-            }
-          }
-        }
-        
-        drawing::draw_box_outline(sh,
-                                  bb_scr_pos.r, bb_scr_pos.c, bb.r_len, bb.c_len,
-                                  room_style.wall_type,
-                                  room_style.wall_style,
-                                  room->light);
-                                  
-        if (room_style.is_underground ? texture_ug_fill.empty() : texture_sl_fill.empty())
-        {
-          drawing::draw_box(sh,
-                            bb_scr_pos.r, bb_scr_pos.c, bb.r_len, bb.c_len,
-                            room_style.get_fill_style(),
-                            room_style.get_fill_char(),
-                            room_style.is_underground ? SolarDirection::Nadir : shadow_type,
-                            styles::shade_style(room_style.get_fill_style(), color::ShadeType::Dark),
-                            room_style.get_fill_char(),
-                            room->light);
-        }
-        else
-        {
-          if (real_time_s - texture_anim_time_stamp > dt_texture_anim_s)
-          {
-            texture_anim_ctr++;
-            texture_anim_time_stamp = real_time_s;
+            sh.write_buffer(std::to_string(room_style.is_underground), bb_scr_pos.r + 1, bb_scr_pos.c + 1, Color::White, Color::Black);
           }
           
-          const auto& texture_fill = *(fetch_curr_fill_texture(room_style).value_or(&texture_empty));
-          const auto& texture_shadow = *(fetch_curr_shadow_texture(room_style).value_or(&texture_empty));
-        
-          drawing::draw_box_textured(sh,
-                                     bb_scr_pos.r, bb_scr_pos.c, bb.r_len, bb.c_len,
-                                     room_style.is_underground ? SolarDirection::Nadir : shadow_type,
-                                     texture_fill,
-                                     texture_shadow,
-                                     room->light,
-                                     room_style.is_underground,
-                                     room_style.tex_pos);
+          // Fog of war
+          if (use_fog_of_war)
+          {
+            for (int r = 0; r < bb.r_len; ++r)
+            {
+              for (int c = 0; c < bb.c_len; ++c)
+              {
+                if (room->fog_of_war[r * bb.c_len + c])
+                  sh.write_buffer(".", bb_scr_pos.r + r, bb_scr_pos.c + c, Color::Black, Color::Black);
+              }
+            }
+          }
+          
+          drawing::draw_box_outline(sh,
+                                    bb_scr_pos.r, bb_scr_pos.c, bb.r_len, bb.c_len,
+                                    room_style.wall_type,
+                                    room_style.wall_style,
+                                    room->light);
+          
+          if (room_style.is_underground ? texture_ug_fill.empty() : texture_sl_fill.empty())
+          {
+            drawing::draw_box(sh,
+                              bb_scr_pos.r, bb_scr_pos.c, bb.r_len, bb.c_len,
+                              room_style.get_fill_style(),
+                              room_style.get_fill_char(),
+                              room_style.is_underground ? SolarDirection::Nadir : shadow_type,
+                              styles::shade_style(room_style.get_fill_style(), color::ShadeType::Dark),
+                              room_style.get_fill_char(),
+                              room->light);
+          }
+          else
+          {
+            if (real_time_s - texture_anim_time_stamp > dt_texture_anim_s)
+            {
+              texture_anim_ctr++;
+              texture_anim_time_stamp = real_time_s;
+            }
+            
+            const auto& texture_fill = *(fetch_curr_fill_texture(room_style).value_or(&texture_empty));
+            const auto& texture_shadow = *(fetch_curr_shadow_texture(room_style).value_or(&texture_empty));
+            
+            drawing::draw_box_textured(sh,
+                                       bb_scr_pos.r, bb_scr_pos.c, bb.r_len, bb.c_len,
+                                       room_style.is_underground ? SolarDirection::Nadir : shadow_type,
+                                       texture_fill,
+                                       texture_shadow,
+                                       room->light,
+                                       room_style.is_underground,
+                                       room_style.tex_pos);
+          }
         }
       }
       
       shadow_type = sun_dir;
-      for (const auto& corr_pair : m_corridor_styles[curr_floor])
+      if (stlutils::in_range(m_corridor_styles, curr_floor))
       {
-        auto* corr = corr_pair.first;
-        const auto& bb = corr->bb;
-        const auto& corr_style = corr_pair.second;
-        auto bb_scr_pos = screen_helper->get_screen_pos(bb.pos());
-        if (use_per_room_lat_long_for_sun_dir)
-          shadow_type = solar_motion.get_solar_direction(corr_style.latitude, corr_style.longitude, season, t_solar_period);
-        
-        // Fog of war
-        if (use_fog_of_war)
+        for (const auto& corr_pair : m_corridor_styles[curr_floor])
         {
-          for (int r = 0; r < bb.r_len; ++r)
+          auto* corr = corr_pair.first;
+          const auto& bb = corr->bb;
+          const auto& corr_style = corr_pair.second;
+          auto bb_scr_pos = screen_helper->get_screen_pos(bb.pos());
+          if (use_per_room_lat_long_for_sun_dir)
+            shadow_type = solar_motion.get_solar_direction(corr_style.latitude, corr_style.longitude, season, t_solar_period);
+          
+          // Fog of war
+          if (use_fog_of_war)
           {
-            for (int c = 0; c < bb.c_len; ++c)
+            for (int r = 0; r < bb.r_len; ++r)
             {
-              if (corr->fog_of_war[r * bb.c_len + c])
-                sh.write_buffer(".", bb_scr_pos.r + r, bb_scr_pos.c + c, Color::Black, Color::Black);
+              for (int c = 0; c < bb.c_len; ++c)
+              {
+                if (corr->fog_of_war[r * bb.c_len + c])
+                  sh.write_buffer(".", bb_scr_pos.r + r, bb_scr_pos.c + c, Color::Black, Color::Black);
+              }
             }
           }
+          
+          
+          drawing::draw_box_outline(sh,
+                                    bb_scr_pos.r, bb_scr_pos.c, bb.r_len, bb.c_len,
+                                    corr_style.wall_type,
+                                    corr_style.wall_style,
+                                    corr->light);
+          drawing::draw_box(sh,
+                            bb_scr_pos.r, bb_scr_pos.c, bb.r_len, bb.c_len,
+                            corr_style.get_fill_style(),
+                            corr_style.get_fill_char(),
+                            corr_style.is_underground ? SolarDirection::Nadir : shadow_type,
+                            styles::shade_style(corr_style.get_fill_style(), color::ShadeType::Dark, true),
+                            corr_style.get_fill_char(),
+                            corr->light);
         }
-        
-        
-        drawing::draw_box_outline(sh,
-                                  bb_scr_pos.r, bb_scr_pos.c, bb.r_len, bb.c_len,
-                                  corr_style.wall_type,
-                                  corr_style.wall_style,
-                                  corr->light);
-        drawing::draw_box(sh,
-                          bb_scr_pos.r, bb_scr_pos.c, bb.r_len, bb.c_len,
-                          corr_style.get_fill_style(),
-                          corr_style.get_fill_char(),
-                          corr_style.is_underground ? SolarDirection::Nadir : shadow_type,
-                          styles::shade_style(corr_style.get_fill_style(), color::ShadeType::Dark, true),
-                          corr_style.get_fill_char(),
-                          corr->light);
       }
     }
     
