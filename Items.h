@@ -17,6 +17,12 @@ namespace dung
   {
     virtual ~Item() = default;
   
+    // exists is set to false when dropping an item in the water
+    //   or disposing it using a vanishing spell.
+    //   This helps to preserve index-based item idcs
+    //   without having to erase items from item vectors.
+    bool exists = true;
+    
     bool picked_up = false;
     Style style = { Color::White, Color::Transparent2 };
     char character = '?';
@@ -27,10 +33,12 @@ namespace dung
     
     virtual void set_visibility(bool use_fog_of_war, bool fow_near, bool is_night)
     {
-      visible = !(picked_up ||
+      visible = !(!exists ||
+                  picked_up ||
                   (use_fog_of_war && this->fog_of_war) ||
                   ((this->is_underground || is_night) && !this->light));
-      visible_near = !(picked_up ||
+      visible_near = !(!exists ||
+                       picked_up ||
                        (use_fog_of_war && (this->fog_of_war || !fow_near)) ||
                        ((this->is_underground || is_night) && !this->light));
     }
@@ -39,6 +47,7 @@ namespace dung
     {
       DungObject::serialize(lines);
       
+      sg::write_var(lines, SG_WRITE_VAR(exists));
       sg::write_var(lines, SG_WRITE_VAR(picked_up));
       sg::write_var(lines, SG_WRITE_VAR(style));
       sg::write_var(lines, SG_WRITE_VAR(character));
@@ -54,7 +63,8 @@ namespace dung
       it_line_begin = DungObject::deserialize(it_line_begin, it_line_end, environment);
       for (auto it_line = it_line_begin + 1; it_line != it_line_end; ++it_line)
       {
-        if (sg::read_var(&it_line, SG_READ_VAR(picked_up))) {}
+        if (sg::read_var(&it_line, SG_READ_VAR(exists))) {}
+        else if (sg::read_var(&it_line, SG_READ_VAR(picked_up))) {}
         else if (sg::read_var(&it_line, SG_READ_VAR(style))) {}
         else if (sg::read_var(&it_line, SG_READ_VAR(character))) {}
         else if (sg::read_var(&it_line, SG_READ_VAR(visible_near))) {}
@@ -151,10 +161,12 @@ namespace dung
     
     virtual void set_visibility(bool use_fog_of_war, bool fow_near, bool is_night) override
     {
-      visible = !(picked_up ||
+      visible = !(!exists ||
+                  picked_up ||
                   (use_fog_of_war && this->fog_of_war));
                   
-      visible_near = !(picked_up ||
+      visible_near = !(!exists ||
+                       picked_up ||
                        (use_fog_of_war && (this->fog_of_war || !fow_near)));
     }
     

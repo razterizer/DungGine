@@ -133,10 +133,10 @@ namespace dung
           {
             auto* keys_group = m_inventory->fetch_group("Keys:");
             auto* keys_subgroup = keys_group->fetch_subgroup(0);
-            auto* selected_inv_item = keys_subgroup->get_hilited_item();
-            if (selected_inv_item != nullptr && selected_inv_item->item != nullptr && selected_inv_item->hilited)
+            auto* hilited_inv_item = keys_subgroup->get_hilited_item();
+            if (hilited_inv_item != nullptr && hilited_inv_item->item != nullptr)
             {
-              auto* key = dynamic_cast<Key*>(selected_inv_item->item);
+              auto* key = dynamic_cast<Key*>(hilited_inv_item->item);
               if (key != nullptr)
               {
                 auto idx = stlutils::find_if_idx(m_all_keys, [key](const auto& o) { return &o == key; });
@@ -146,7 +146,7 @@ namespace dung
                 keys_subgroup->remove_item(key);
                 to_drop_found = true;
                 if (dropped_over_liquid)
-                  stlutils::erase_if(m_all_keys, [key](const auto& o) { return &o == key; });
+                  key->exists = false;
               }
             }
           }
@@ -154,10 +154,10 @@ namespace dung
           {
             auto* lamps_group = m_inventory->fetch_group("Lamps:");
             auto* lamps_subgroup = lamps_group->fetch_subgroup(0);
-            auto* selected_inv_item = lamps_subgroup->get_hilited_item();
-            if (selected_inv_item != nullptr && selected_inv_item->item != nullptr)
+            auto* hilited_inv_item = lamps_subgroup->get_hilited_item();
+            if (hilited_inv_item != nullptr && hilited_inv_item->item != nullptr)
             {
-              auto* lamp = dynamic_cast<Lamp*>(selected_inv_item->item);
+              auto* lamp = dynamic_cast<Lamp*>(hilited_inv_item->item);
               if (lamp != nullptr)
               {
                 auto idx = stlutils::find_if_idx(m_all_lamps, [lamp](const auto& o) { return &o == lamp; });
@@ -167,7 +167,7 @@ namespace dung
                 lamps_subgroup->remove_item(lamp);
                 to_drop_found = true;
                 if (dropped_over_liquid)
-                  stlutils::erase_if(m_all_lamps, [lamp](const auto& o) { return &o == lamp; });
+                  lamp->exists = false;
               }
             }
           }
@@ -175,21 +175,21 @@ namespace dung
           {
             auto* weapons_group = m_inventory->fetch_group("Weapons:");
             auto* weapons_subgroup_melee = weapons_group->fetch_subgroup(0);
-            auto* selected_inv_item = weapons_subgroup_melee->get_hilited_item();
-            if (selected_inv_item != nullptr && selected_inv_item->item != nullptr)
+            auto* hilited_inv_item = weapons_subgroup_melee->get_hilited_item();
+            if (hilited_inv_item != nullptr && hilited_inv_item->item != nullptr)
             {
-              auto* weapon = dynamic_cast<Weapon*>(selected_inv_item->item);
+              auto* weapon = dynamic_cast<Weapon*>(hilited_inv_item->item);
               if (weapon != nullptr)
               {
                 auto idx = stlutils::find_if_idx(m_all_weapons,
                   [weapon](const auto& o) { return o.get() == weapon; });
-                msg += weapon->type +":" + std::to_string(idx) + "!";
+                msg += weapon->type + ":" + std::to_string(idx) + "!";
                 f_drop_item(weapon);
                 stlutils::erase(m_player.weapon_idcs, idx);
                 weapons_subgroup_melee->remove_item(weapon);
                 to_drop_found = true;
                 if (dropped_over_liquid)
-                  stlutils::erase_if(m_all_weapons, [weapon](const auto& o) { return o.get() == weapon; });
+                  weapon->exists = false;
               }
             }
           }
@@ -197,10 +197,10 @@ namespace dung
           {
             auto* potions_group = m_inventory->fetch_group("Potions:");
             auto* potions_subgroup = potions_group->fetch_subgroup(0);
-            auto* selected_inv_item = potions_subgroup->get_hilited_item();
-            if (selected_inv_item != nullptr && selected_inv_item->item != nullptr)
+            auto* hilited_inv_item = potions_subgroup->get_hilited_item();
+            if (hilited_inv_item != nullptr && hilited_inv_item->item != nullptr)
             {
-              auto* potion = dynamic_cast<Potion*>(selected_inv_item->item);
+              auto* potion = dynamic_cast<Potion*>(hilited_inv_item->item);
               if (potion != nullptr)
               {
                 auto idx = stlutils::find_if_idx(m_all_potions,
@@ -211,7 +211,7 @@ namespace dung
                 potions_subgroup->remove_item(potion);
                 to_drop_found = true;
                 if (dropped_over_liquid)
-                  stlutils::erase_if(m_all_potions, [potion](const auto& o) { return &o == potion; });
+                  potion->exists = false;
               }
             }
           }
@@ -222,20 +222,20 @@ namespace dung
             {
               if (to_drop_found)
                 return false;
-              auto* selected_inv_item = subgroup->get_hilited_item();
-              if (selected_inv_item != nullptr && selected_inv_item->item != nullptr)
+              auto* hilited_inv_item = subgroup->get_hilited_item();
+              if (hilited_inv_item != nullptr && hilited_inv_item->item != nullptr)
               {
-                auto* armour = dynamic_cast<Armour*>(selected_inv_item->item);
+                auto* armour = dynamic_cast<Armour*>(hilited_inv_item->item);
                 if (armour != nullptr)
                 {
                   auto idx = stlutils::find_if_idx(all_armour, [armour](const auto& o) { return o.get() == armour; });
-                  msg += armour->type +":" + std::to_string(idx) + "!";
+                  msg += armour->type + ":" + std::to_string(idx) + "!";
                   f_drop_item(armour);
                   stlutils::erase(pc_armour_idcs, idx);
                   subgroup->remove_item(armour);
                   to_drop_found = true;
                   if (dropped_over_liquid)
-                    stlutils::erase_if(all_armour, [armour](const auto& o) { return o.get() == armour; });
+                    armour->exists = false;
                   return true;
                 }
               }
@@ -416,7 +416,7 @@ namespace dung
           for (size_t key_idx = 0; key_idx < m_all_keys.size(); ++key_idx)
           {
             auto& key = m_all_keys[key_idx];
-            if (key.pos == curr_pos && !key.picked_up)
+            if (key.exists && key.pos == curr_pos && !key.picked_up)
             {
               if (m_player.has_weight_capacity(key.weight))
               {
@@ -434,7 +434,7 @@ namespace dung
           for (size_t lamp_idx = 0; lamp_idx < m_all_lamps.size(); ++lamp_idx)
           {
             auto& lamp = m_all_lamps[lamp_idx];
-            if (lamp.pos == curr_pos && !lamp.picked_up)
+            if (lamp.exists && lamp.pos == curr_pos && !lamp.picked_up)
             {
               auto lamp_type = lamp.get_type_str();
               if (m_player.has_weight_capacity(lamp.weight))
@@ -454,7 +454,7 @@ namespace dung
           for (size_t wpn_idx = 0; wpn_idx < m_all_weapons.size(); ++wpn_idx)
           {
             auto& weapon = m_all_weapons[wpn_idx];
-            if (weapon->pos == curr_pos && !weapon->picked_up)
+            if (weapon->exists && weapon->pos == curr_pos && !weapon->picked_up)
             {
               if (m_player.has_weight_capacity(weapon->weight))
               {
@@ -472,7 +472,7 @@ namespace dung
           for (size_t pot_idx = 0; pot_idx < m_all_potions.size(); ++pot_idx)
           {
             auto& potion = m_all_potions[pot_idx];
-            if (potion.pos == curr_pos && !potion.picked_up)
+            if (potion.exists && potion.pos == curr_pos && !potion.picked_up)
             {
               if (m_player.has_weight_capacity(potion.weight))
               {
@@ -490,7 +490,7 @@ namespace dung
           for (size_t a_idx = 0; a_idx < m_all_armour.size(); ++a_idx)
           {
             auto& armour = m_all_armour[a_idx];
-            if (armour->pos == curr_pos && !armour->picked_up)
+            if (armour->exists && armour->pos == curr_pos && !armour->picked_up)
             {
               if (m_player.has_weight_capacity(armour->weight))
               {

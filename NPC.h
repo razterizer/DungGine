@@ -281,10 +281,11 @@ namespace dung
         do
         {
           int idx = rnd::rand_idx(num_weapons);
-          if (!all_weapons[idx]->picked_up)
+          auto* weapon = all_weapons[idx].get();
+          if (weapon->exists && !weapon->picked_up)
           {
             weapon_idx = idx;
-            all_weapons[idx]->picked_up = true;
+            weapon->picked_up = true;
             break;
           }
         } while (ctr++ < 10);

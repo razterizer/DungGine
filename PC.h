@@ -232,7 +232,7 @@ namespace dung
       if (it != all_keys.end())
         inventory->remove_item(&(*it));
       stlutils::erase_if(key_idcs, [&](int key_idx) { return all_keys[key_idx].key_id == key_id; });
-      stlutils::erase_if(all_keys, [&](const auto& key) { return key.key_id == key_id; });
+      it->exists = false;
     }
     
     void remove_selected_potion(Inventory* inventory, std::vector<Potion>& all_potions)
@@ -248,7 +248,7 @@ namespace dung
           auto idx = stlutils::find_if_idx(all_potions, [potion](const auto& p) { return &p == potion; });
           subgroup->remove_item(potion);
           stlutils::erase(potion_idcs, idx);
-          stlutils::erase_if(all_potions, [potion](const auto& p) { return &p == potion; });
+          potion->exists = false;
         }
       }
     }
