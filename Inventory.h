@@ -424,6 +424,8 @@ namespace dung
     // Save-game temporaries for delayed application.
     std::vector<int> sg_hilited_idcs, sg_selected_idcs;
     
+    int cached_hilited_index = 0; // Not source of truth.
+    
   public:
     void set_bounding_box(const ttl::Rectangle& bb) { m_bb = bb; }
     
@@ -622,9 +624,24 @@ namespace dung
       return false;
     }
     
+    void cache_hilited_index()
+    {
+      cached_hilited_index = find_hilited_index();
+    }
+    
     void reset_hilite()
     {
-      set_hilited_state(find_hilited_index(), false);
+      int num_wraps = 0;
+      int hilite_idx = cached_hilited_index;
+      while (!set_hilited_state(hilite_idx, true) && num_wraps < 3)
+      {
+        hilite_idx++;
+        if (hilite_idx >= size())
+        {
+          hilite_idx = 0;
+          num_wraps++;
+        }
+      };
     }
       
     template<int NR, int NC>

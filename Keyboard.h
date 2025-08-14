@@ -126,6 +126,8 @@ namespace dung
             }
           };
           
+          m_inventory->cache_hilited_index();
+          
           std::string msg = "You dropped an item: ";
           bool to_drop_found = false;
           bool dropped_over_liquid = !is_dry(m_player.on_terrain);
