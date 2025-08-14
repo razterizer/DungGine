@@ -36,6 +36,7 @@ public:
       project_root_filepath = folder::join_path({ project_root_filepath, "../../../../../../../Documents/xcode/lib/DungGine/demo/" }); // #FIXME: Find a better solution!
 #endif
     savegame_filepath = folder::join_path({ project_root_filepath, "savegame_0.dsg" });
+    screenshot_filepath = folder::join_path({ project_root_filepath, "screenshot_0.txt" });
   }
   
   virtual ~Game() override
@@ -171,6 +172,11 @@ protected:
     GameEngine::set_curr_rnd_seed(rnd_seed);
   }
   
+  virtual void on_screenshot_request(std::string& filepath) override
+  {
+    filepath = screenshot_filepath;
+  }
+  
 private:
   virtual void update() override
   {
@@ -283,6 +289,7 @@ private:
   
   std::string project_root_filepath;
   std::string savegame_filepath;
+  std::string screenshot_filepath;
 };
 
 int main(int argc, char** argv)

@@ -40,6 +40,7 @@ namespace dung
     
     bool& m_trigger_game_save;
     bool& m_trigger_game_load;
+    bool& m_trigger_screenshot;
     
     ui::TextBoxDebug& m_tbd;
     bool& m_debug;
@@ -55,6 +56,7 @@ namespace dung
              std::vector<NPC>& all_npcs,
              bool& trigger_game_save,
              bool& trigger_game_load,
+             bool& trigger_screenshot,
              ui::TextBoxDebug& tbd, bool& debug)
       : m_environment(environment)
       , m_inventory(inventory)
@@ -68,6 +70,7 @@ namespace dung
       , m_all_npcs(all_npcs)
       , m_trigger_game_save(trigger_game_save)
       , m_trigger_game_load(trigger_game_load)
+      , m_trigger_screenshot(trigger_screenshot)
       , m_tbd(tbd)
       , m_debug(debug)
     {}
@@ -610,6 +613,10 @@ namespace dung
       else if (curr_key == 'G')
       {
         m_trigger_game_load = true;
+      }
+      else if (curr_key == 'z')
+      {
+        m_trigger_screenshot = true;
       }
     }
 

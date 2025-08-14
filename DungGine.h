@@ -89,6 +89,7 @@ namespace dung
     
     bool trigger_game_save = false;
     bool trigger_game_load = false;
+    bool trigger_screenshot = false;
     bool use_save_game_git_hash_check = false;
     std::string path_to_dunggine_repo; // Path to where the DungGine repo is checked out.
     
@@ -882,7 +883,7 @@ namespace dung
                                               m_player,
                                               all_keys, all_lamps, all_weapons, all_potions, all_armour,
                                               all_npcs,
-                                              trigger_game_save, trigger_game_load,
+                                              trigger_game_save, trigger_game_load, trigger_screenshot,
                                               tbd, debug);
       if (sorted_inventory_items)
         sort_inventory.reset();
@@ -1756,6 +1757,33 @@ namespace dung
                                       m_use_per_room_lat_long_for_sun_dir,
                                       m_screen_helper.get(),
                                       debug);
+                                      
+      if (trigger_screenshot)
+      {
+        auto screenshot = sh.get_screen_buffer_chars();
+        
+        std::string filepath = "screenshot_0.txt";
+        // Expects just one listener.
+        broadcast([&filepath](auto* l)
+          { l->on_screenshot_request(filepath); });
+        
+        if (TextIO::write_file(filepath, screenshot))
+        {
+          message_handler->add_message(static_cast<float>(real_time_s),
+                                       "Successfully saved screenshot:\n\"" + filepath + "\"!",
+                                       MessageHandler::Level::Guide,
+                                       3.f);
+        }
+        else
+        {
+          message_handler->add_message(static_cast<float>(real_time_s),
+                                       "ERROR : Unable to save screenshot to file:\n\"" + filepath + "\"!",
+                                       MessageHandler::Level::Fatal,
+                                       3.f);
+        }
+        
+        trigger_screenshot = false;
+      }
     }
     
     std::string get_latest_git_commit_hash() const

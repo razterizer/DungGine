@@ -67,10 +67,11 @@ Items you can pick up are keys, torches, lanterns, magic lamps (isotropic light)
 * `d` or `D` to drop a hilited item when in the inventory.
 * `c` or `C` to consume a potion.
 * `i` or `I` to identify things the PC can see.
-* `g` to save game (need to setup the save game feature properly. See below).
-* `G` to load saved game (need to setup the save game feature properly. See below).
+* `g` to save game (need to setup the save game feature properly. See below). File extension: `*.dsg`.
+* `G` to load saved game (need to setup the save game feature properly. See below). File extension: `*.dsg`.
+* `z` to save a screenshot. File extension: `*.txt`.
 * `+` NPC debug view. It shows NPC states and displays arrows to them to make them easier to find.
-* `?` Misc debug view. It shows what terrain you're standing on, what floor you're on, and in the corner of every room you'll see a `0` (surface-level) or `1` (underground).
+* `?` Misc debug view. It shows what terrain you're standing on, what floor you're on, and in the corner of every room you'll see a `0` (surface-level) or `1` (underground). Also when in debug view, you will be able to see the `TextBoxDebug` debug variable window if there are any variables registered to it.
 
 ## NPCs
 
