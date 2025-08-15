@@ -189,7 +189,7 @@ namespace dung
     {
       Item::serialize(lines);
     
-      sg::write_var_enum(lines, SG_WRITE_VAR(life_time_s));
+      sg::write_var(lines, SG_WRITE_VAR(life_time_s));
     }
     
     virtual std::vector<std::string>::iterator deserialize(std::vector<std::string>::iterator it_line_begin,
@@ -199,7 +199,7 @@ namespace dung
       it_line_begin = Item::deserialize(it_line_begin, it_line_end, environment);
       for (auto it_line = it_line_begin + 1; it_line != it_line_end; ++it_line)
       {
-        if (sg::read_var_enum(&it_line, SG_READ_VAR(life_time_s)))
+        if (sg::read_var(&it_line, SG_READ_VAR(life_time_s)))
         {
           return it_line;
         }
