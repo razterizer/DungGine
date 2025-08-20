@@ -313,7 +313,8 @@ namespace dung
         
         auto* door_0 = m_player.curr_corridor->doors[0];
         auto* door_1 = m_player.curr_corridor->doors[1];
-        stlutils::memset(*field, clear_val);
+        //stlutils::memset(*field, clear_val);
+        stlutils::fill(*field, clear_val);
         
         *get_field_ptr(door_0) = clear_val;
         *get_field_ptr(door_1) = clear_val;
@@ -322,7 +323,8 @@ namespace dung
       {
         //bb = m_player.curr_room->bb_leaf_room;
         field = get_field_ptr(m_player.curr_room);
-        stlutils::memset(*field, clear_val);
+        //stlutils::memset(*field, clear_val);
+        stlutils::fill(*field, clear_val);
         
         for (auto* door : m_player.curr_room->doors)
           *get_field_ptr(door) = clear_val;
