@@ -608,8 +608,8 @@ namespace dung
       for (const auto& npc : all_npcs)
       {
         auto dist_pc_npc = distance(m_player.pos, npc.pos);
-        bool pc_melee_attack = (npc.enemy || npc.is_hostile) && (dist_pc_npc < npc.c_dist_fight_melee);
-        bool pc_ranged_attack = !pc_melee_attack && (npc.enemy || npc.is_hostile) && (dist_pc_npc < npc.c_dist_fight_ranged) && get_selected_ranged_weapon(&m_player) != nullptr;
+        bool pc_melee_attack = npc.wants_to_attack() && (dist_pc_npc < npc.c_dist_fight_melee);
+        bool pc_ranged_attack = !pc_melee_attack && npc.wants_to_attack() && (dist_pc_npc < npc.c_dist_fight_ranged) && get_selected_ranged_weapon(&m_player) != nullptr;
         if (npc.health > 0 && (npc.state == State::FightMelee || npc.state == State::FightRanged || pc_melee_attack || pc_ranged_attack))
         {
           std::string npc_hb = str::rep_char(' ', 10);
@@ -715,8 +715,8 @@ namespace dung
         
         // /////// PC
         
-        bool pc_melee_attack = (npc.enemy || npc.is_hostile) && (dist_pc_npc < npc.c_dist_fight_melee);
-        bool pc_ranged_attack = !pc_melee_attack && (npc.enemy || npc.is_hostile) && (dist_pc_npc < npc.c_dist_fight_ranged);
+        bool pc_melee_attack = npc.wants_to_attack() && (dist_pc_npc < npc.c_dist_fight_melee);
+        bool pc_ranged_attack = !pc_melee_attack && npc.wants_to_attack() && (dist_pc_npc < npc.c_dist_fight_ranged);
         
         // Fire shots.
         if (pc_ranged_attack)

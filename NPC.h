@@ -115,6 +115,7 @@ namespace dung
     bool is_hostile = false;
     bool was_hostile = false;
     OneShot trg_info_hostile_npc;
+    bool can_see_pc = false;
     
     float death_time_s = 0.f;
     OneShot trg_death;
@@ -793,7 +794,7 @@ namespace dung
       if (dist_to_pc > c_dist_hostile_hyst_off)
         is_hostile = false;
       
-      bool can_see_pc = false;
+      can_see_pc = false;
       if (inside_room)
       {
         if (pc_corr != nullptr)
@@ -825,11 +826,11 @@ namespace dung
           can_see_pc = true;
       }
       
-      if ((enemy || is_hostile) && can_see_pc && dist_to_pc < c_dist_fight_melee)
+      if (wants_to_attack() && dist_to_pc < c_dist_fight_melee)
         state = State::FightMelee;
-      else if ((enemy || is_hostile) && can_see_pc && dist_to_pc < c_dist_fight_ranged && ranged_weapon_idx != -1)
+      else if (wants_to_attack() && dist_to_pc < c_dist_fight_ranged && ranged_weapon_idx != -1)
         state = State::FightRanged;
-      else if ((enemy || is_hostile) && can_see_pc && dist_to_pc < c_dist_pursue)
+      else if (wants_to_attack() && dist_to_pc < c_dist_pursue)
         state = State::Pursue;
       else if (!can_see_pc || dist_to_pc > c_dist_patroll)
         state = State::Patroll;
@@ -906,6 +907,11 @@ namespace dung
             break;
           }
       }
+    }
+    
+    bool wants_to_attack() const
+    {
+      return (enemy || is_hostile) && can_see_pc;
     }
     
     int calc_armour_class(const std::vector<std::unique_ptr<Armour>>& all_armour) const
