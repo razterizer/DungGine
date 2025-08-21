@@ -1169,11 +1169,15 @@ namespace dung
         for (int wpn_idx = 0; wpn_idx < num_weapons_per_floor; ++wpn_idx)
         {
           std::unique_ptr<Weapon> weapon;
-          switch (rnd::rand_int(0, 2))
+          switch (rnd::rand_int(0, 6))
           {
-            case 0: weapon = std::make_unique<Sword>(); break;
-            case 1: weapon = std::make_unique<Dagger>(); break;
+            case 0: weapon = std::make_unique<Dagger>(); break;
+            case 1: weapon = std::make_unique<Sword>(); break;
             case 2: weapon = std::make_unique<Flail>(); break;
+            case 3: weapon = std::make_unique<MorningStar>(); break;
+            case 4: weapon = std::make_unique<Sling>(); break;
+            case 5: weapon = std::make_unique<Bow>(); break;
+            case 6: weapon = std::make_unique<Crossbow>(); break;
               // Error:
             default: return false;
           }
