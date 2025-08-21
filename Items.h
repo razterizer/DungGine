@@ -213,9 +213,9 @@ namespace dung
   struct Weapon : Item
   {
     int damage = 1;
-    bool rusty = false;
-    bool sharpened = false;
-    bool poisonous = false;
+    //bool rusty = false;
+    //bool sharpened = false;
+    //bool poisonous = false;
     std::string type;
     int speed = 0; // max 20.
     
