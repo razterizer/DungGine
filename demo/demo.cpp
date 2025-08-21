@@ -286,7 +286,7 @@ private:
   bool use_gore = true;
   
   float fire_smoke_dt_factor = 0.5f;
-  float projectile_speed_factor = 10.f;
+  float projectile_speed_factor = 15.f;
   
   std::string project_root_filepath;
   std::string savegame_filepath;
