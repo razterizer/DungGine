@@ -1083,6 +1083,13 @@ namespace dung
           light = p.curr_room->light[idx];
           fog_of_war = p.curr_room->fog_of_war[idx];
         }
+        else if (p.curr_corridor != nullptr)
+        {
+          const auto& bb = p.curr_corridor->bb;
+          int idx = (wpn_pos.r - bb.r)*bb.c_len + (wpn_pos.c - bb.c);
+          light = p.curr_corridor->light[idx];
+          fog_of_war = p.curr_corridor->fog_of_war[idx];
+        }
         bool visible = !((use_fog_of_war && fog_of_war) ||
                       ((m_environment->is_underground(p.curr_floor, p.curr_room) || calc_night(p)) && !light)); // #FIXME: add fow term.
         if (visible)
