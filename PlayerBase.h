@@ -132,6 +132,7 @@ namespace dung
     int weakness = 0;
     int thac0 = 1;
     float weight_strain = 0.f;
+    bool ranged_weapon_hit = false;
     
     Terrain on_terrain = Terrain::Default;
     bool can_swim = true;
