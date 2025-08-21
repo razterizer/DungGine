@@ -17,6 +17,7 @@ namespace dung
   using Style = styles::Style;
   using HiliteSelectFGStyle = styles::HiliteSelectFGStyle;
   enum class FloorType { None, Sand, Grass, Stone, Stone2, Water, Wood, NUM_ITEMS };
+  enum class WallShadingType { BG_Light, BG_Dark, BG_Rand };
   
   struct RoomStyle
   {
@@ -28,36 +29,90 @@ namespace dung
     Latitude latitude = Latitude::NorthernHemisphere;
     Longitude longitude = Longitude::F;
     
-    void init_rand(bool first_floor, bool first_floor_is_surface_level)
+    void init_rand(bool first_floor, bool first_floor_is_surface_level,
+                   WallShadingType wall_shading_surface_level,
+                   WallShadingType wall_shading_underground)
     {
+      do
+      {
+        floor_type = rnd::rand_enum<FloorType>();
+      } while (floor_type == FloorType::None);
+      
+      if (first_floor_is_surface_level)
+        is_underground = !first_floor;
+      else
+        is_underground = rnd::rand_bool();
+    
       wall_type = rnd::rand_enum<WallType>();
-      WallBasicType wall_basic_type = WallBasicType::Other;
+      WallBasicType wall_basic_type = WallBasicType::OtherLight;
+      
+      auto f_masonry_wall = [](WallShadingType wall_shading)
+      {
+        switch (wall_shading)
+        {
+          case WallShadingType::BG_Light:
+            return WallBasicType::MasonryLight;
+          case WallShadingType::BG_Dark:
+            return WallBasicType::MasonryDark;
+          case WallShadingType::BG_Rand:
+          default:
+            return rnd::rand_bool() ? WallBasicType::MasonryLight : WallBasicType::MasonryDark;
+        }
+      };
+      
+      auto f_temple_wall = [](WallShadingType wall_shading)
+      {
+        switch (wall_shading)
+        {
+          case WallShadingType::BG_Light:
+            return WallBasicType::TempleLight;
+          case WallShadingType::BG_Dark:
+            return WallBasicType::TempleDark;
+          case WallShadingType::BG_Rand:
+          default:
+            return rnd::rand_bool() ? WallBasicType::TempleLight : WallBasicType::TempleDark;
+        }
+      };
+      
+      auto f_other_wall = [](WallShadingType wall_shading)
+      {
+        switch (wall_shading)
+        {
+          case WallShadingType::BG_Light:
+            return WallBasicType::OtherLight;
+          case WallShadingType::BG_Dark:
+            return WallBasicType::OtherDark;
+          case WallShadingType::BG_Rand:
+          default:
+            return rnd::rand_bool() ? WallBasicType::OtherLight : WallBasicType::OtherDark;
+        }
+      };
+      
       switch (wall_type)
       {
         case WallType::Masonry:
         case WallType::Masonry2:
         case WallType::Masonry3:
         case WallType::Masonry4:
-          wall_basic_type = WallBasicType::Masonry;
+          wall_basic_type = is_underground ?
+                              f_masonry_wall(wall_shading_underground) :
+                              f_masonry_wall(wall_shading_surface_level);
           break;
         case WallType::Temple:
-          wall_basic_type = WallBasicType::Temple;
+          wall_basic_type = is_underground ?
+                              f_temple_wall(wall_shading_underground) :
+                              f_temple_wall(wall_shading_surface_level);
           break;
         case WallType::Line:
         case WallType::Hash:
         default:
-          wall_basic_type = WallBasicType::Other;
+          wall_basic_type = is_underground ?
+                              f_other_wall(wall_shading_underground) :
+                              f_other_wall(wall_shading_surface_level);
           break;
       }
+        
       wall_style = styles::get_random_style(wall_palette[wall_basic_type]);
-      do
-      {
-        floor_type = rnd::rand_enum<FloorType>();
-      } while (floor_type == FloorType::None);
-      if (first_floor_is_surface_level)
-        is_underground = !first_floor;
-      else
-        is_underground = rnd::rand_bool();
     }
     
     char get_fill_char() const

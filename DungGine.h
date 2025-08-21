@@ -1133,9 +1133,12 @@ namespace dung
       all_armour.clear();
     }
     
-    void style_dungeon()
+    void style_dungeon(WallShadingType wall_shading_surface_level,
+                       WallShadingType wall_shading_underground)
     {
-      m_environment->style_dungeon(m_latitude, m_longitude);
+      m_environment->style_dungeon(m_latitude, m_longitude,
+                                   wall_shading_surface_level,
+                                   wall_shading_underground);
     }
     
     void set_player_character(char ch) { m_player.character = ch; }

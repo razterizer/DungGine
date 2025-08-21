@@ -166,7 +166,7 @@ There is currently no visual distiction between upwards or downwards going stair
 * `DungGine.h`
   - `DungGine(bool use_fow, bool sorted_inventory_items, DungGineTextureParams texture_params = {})` : The constructor. If `use_fow = true` then the whole dungeon map will be covered in black until you gradually uncover area by area. If `sorted_inventory_items = true` then an inventory subgroup will be automatically sorted every time an item is added to it. It adjusts any states and indices related to this subgroup in order to retain the correct hilite and selection status after sorting.
   - `load_dungeon(Dungeon& dungeon)` : Loads a dungeon consisting of generated BSP trees, one BSP tree corresponds to a floor.
-  - `style_dungeon()` : Performs automated styling of rooms in the dungeon / realm.
+  - `style_dungeon(WallShadingType wall_shading_surface_level, WallShadingType wall_shading_underground)` : Performs automated styling of rooms in the dungeon / realm.
   - `set_player_character(char ch)` : Sets the character of the playable character (pun intended).
   - `set_player_style(const Style& style)` : Sets the style (fg/bg color) of the playable character.
   - `place_player(const RC& screen_size, std::optional<RC> world_pos = std::nullopt)` : Places the player near the middle of the realm in one of the corridors and centers the screen around the player.
@@ -314,7 +314,7 @@ Color bg_color = Color::Default;
 
 dung::DungGine dungeon_engine { "bin/", false, false };
 dungeon_engine.load_dungeon(dungeon);
-dungeon_engine.style_dungeon();
+dungeon_engine.style_dungeon(dung::WallShadingType::BG_Rand, dung::WallShadingType::BG_Rand);
 dungeon_engine.draw(sh, get_real_time_s(), get_sim_time_s(), 0, 0);
 sh.print_screen_buffer(bg_color);
 ```
@@ -349,7 +349,7 @@ dungeon.generate(dungeon_floor_params);
 dungeon_engine = std::make_unique<dung::DungGine>(true, false); // arguments: exe_folder, use_fow, sorted_inventory_items, texture_params.
 dungeon_engine.load_dungeon(dungeon);
 dungeon_engine.configure_sun_rand(20.f, 120.f, dung::Latitude::NorthernHemisphere, dung::Longitude::FW, false); // 20 minutes per day and 120 minutes per year. Global shadow.
-dungeon_engine.style_dungeon();
+dungeon_engine.style_dungeon(dung::WallShadingType::BG_Rand, dung::WallShadingType::BG_Rand);
 if (!dungeon_engine.place_player(sh.size()))
   std::cerr << "ERROR : Unable to place the playable character!" << std::endl;
 dungeon_engine->place_keys(true, true);
@@ -425,7 +425,7 @@ texture_params.texture_file_names_surface_level_shadow.emplace_back(f_tex_path("
 dungeon_engine = std::make_unique<dung::DungGine>(true, true, texture_params); // arguments: exe_folder, use_fow, sorted_inventory_items, texture_params.
 dungeon_engine.load_dungeon(dungeon);
 dungeon_engine.configure_sun_rand(20.f, 120.f, dung::Latitude::Equator, dung::Longitude::F, true); // 20 minutes per day and 120 minutes per year. Localized shadows across the map starting at Equator & Front.
-dungeon_engine.style_dungeon();
+dungeon_engine.style_dungeon(dung::WallShadingType::BG_Light, dung::WallShadingType::BG_Dark);
 if (!dungeon_engine.place_player(sh.size()))
   std::cerr << "ERROR : Unable to place the playable character!" << std::endl;
 dungeon_engine->place_keys(true, false);

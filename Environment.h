@@ -72,7 +72,9 @@ namespace dung
       m_corridor_styles.clear();
     }
     
-    void style_dungeon(Latitude latitude_0, Longitude longitude_0)
+    void style_dungeon(Latitude latitude_0, Longitude longitude_0,
+                       WallShadingType wall_shading_surface_level,
+                       WallShadingType wall_shading_underground)
     {
       bool first_floor_is_surface_level = m_dungeon->is_first_floor_is_surface_level();
       for (int f_idx = 0; f_idx < m_dungeon->num_floors(); ++f_idx)
@@ -103,7 +105,8 @@ namespace dung
           for (auto* leaf : *room_vec)
           {
             RoomStyle room_style;
-            room_style.init_rand(f_idx == 0, first_floor_is_surface_level);
+            room_style.init_rand(f_idx == 0, first_floor_is_surface_level,
+                                 wall_shading_surface_level, wall_shading_underground);
           
             const auto& fill_textures = room_style.is_underground ? texture_ug_fill : texture_sl_fill;
             if (!fill_textures.empty())

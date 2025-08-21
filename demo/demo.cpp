@@ -113,7 +113,7 @@ public:
 #if 1
       dungeon_engine = std::make_unique<dung::DungGine>(false, false);
       dungeon_engine->load_dungeon(dungeon);
-      dungeon_engine->style_dungeon();
+      dungeon_engine->style_dungeon(dung::WallShadingType::BG_Rand, dung::WallShadingType::BG_Rand);
       if (!dungeon_engine->place_player(sh.size()))
         std::cerr << "ERROR : Unable to place the playable character!" << std::endl;
       dungeon_engine->configure_sun(20.f);
@@ -261,7 +261,7 @@ private:
     dungeon_engine->configure_save_game(folder::split_file_path(savegame_filepath).first);
     //dungeon_engine->configure_sun(0.75f, 1e6f, dung::Season::Summer, 1e6f, dung::Latitude::NorthernHemisphere, dung::Longitude::F, false);
     dungeon_engine->configure_sun_rand(10.f, 3*60.f, dung::Latitude::Equator, dung::Longitude::F, true);
-    dungeon_engine->style_dungeon();
+    dungeon_engine->style_dungeon(dung::WallShadingType::BG_Rand, dung::WallShadingType::BG_Dark);
     if (!dungeon_engine->place_player(sh.size()))
       std::cerr << "ERROR : Unable to place the playable character!" << std::endl;
     dungeon_engine->place_keys(true, false);
