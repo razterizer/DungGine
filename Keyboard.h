@@ -11,6 +11,8 @@
 #include "PC.h"
 #include "Items.h"
 #include <Termin8or/MessageHandler.h>
+#include <Core/Utils.h>
+#include <functional>
 
 using namespace std::string_literals;
 
@@ -44,6 +46,64 @@ namespace dung
     
     ui::TextBoxDebug& m_tbd;
     bool& m_debug;
+    
+    void drop_item(Item* obj, const RC& curr_pos)
+    {
+      obj->picked_up = false;
+      obj->pos = curr_pos;
+      obj->curr_floor = m_player.curr_floor;
+      if (m_player.is_inside_curr_room())
+      {
+        obj->is_underground = m_environment->is_underground(m_player.curr_floor, m_player.curr_room);
+        obj->curr_room = m_player.curr_room;
+        obj->curr_corridor = nullptr;
+      }
+      else if (m_player.is_inside_curr_corridor())
+      {
+        obj->is_underground = m_environment->is_underground(m_player.curr_floor, m_player.curr_corridor);
+        obj->curr_room = nullptr;
+        obj->curr_corridor = m_player.curr_corridor;
+      }
+    }
+    
+    template<typename Elem,
+             typename LambdaItemType,
+             typename LambdaID,
+             typename ItemType = std::remove_pointer_t<decltype(utils::get_raw_ptr(std::declval<Elem&>()))>>
+    void find_and_drop_item(bool& to_drop_found,
+                            std::string& msg,
+                            const std::string& group_title,
+                            int subgroup_idx,
+                            LambdaItemType&& pred_item_type,
+                            const RC& curr_pos,
+                            bool dropped_over_liquid,
+                            LambdaID&& pred_get_id,
+                            const std::vector<Elem>& all_type_items,
+                            std::vector<int>& held_type_item_idcs)
+    {
+      if (to_drop_found)
+        return;
+      auto* inv_group = m_inventory->fetch_group(group_title);
+      auto* inv_subgroup = inv_group->fetch_subgroup(subgroup_idx);
+      auto* hilited_inv_item = inv_subgroup->get_hilited_item();
+      if (hilited_inv_item != nullptr && hilited_inv_item->item != nullptr)
+      {
+        auto* item = dynamic_cast<ItemType*>(hilited_inv_item->item);
+        if (item != nullptr)
+        {
+          auto idx = stlutils::find_if_idx(all_type_items,
+                                           [item](const auto& o) { return utils::get_raw_ptr(o) == item; });
+          msg += pred_item_type(item) + ":" + std::to_string(pred_get_id(item, idx)) + "!";
+          drop_item(item, curr_pos);
+          stlutils::erase(held_type_item_idcs, idx);
+          inv_subgroup->remove_item(item);
+          if (dropped_over_liquid)
+            item->exists = false;
+          to_drop_found = true;
+        }
+      }
+    }
+
     
   public:
     Keyboard(Environment* environment, Inventory* inventory, MessageHandler* msg_handler,
@@ -107,164 +167,44 @@ namespace dung
       {
         if (m_player.show_inventory && str::to_lower(curr_key) == 'd')
         {
-          auto f_drop_item = [&](auto* obj)
-          {
-            obj->picked_up = false;
-            obj->pos = curr_pos;
-            obj->curr_floor = m_player.curr_floor;
-            if (m_player.is_inside_curr_room())
-            {
-              obj->is_underground = m_environment->is_underground(m_player.curr_floor, m_player.curr_room);
-              obj->curr_room = m_player.curr_room;
-              obj->curr_corridor = nullptr;
-            }
-            else if (m_player.is_inside_curr_corridor())
-            {
-              obj->is_underground = m_environment->is_underground(m_player.curr_floor, m_player.curr_corridor);
-              obj->curr_room = nullptr;
-              obj->curr_corridor = m_player.curr_corridor;
-            }
-          };
-          
           m_inventory->cache_hilited_index();
           
           std::string msg = "You dropped an item: ";
-          bool to_drop_found = false;
           bool dropped_over_liquid = !is_dry(m_player.on_terrain);
+          bool to_drop_found = false;
           
-          {
-            auto* keys_group = m_inventory->fetch_group("Keys:");
-            auto* keys_subgroup = keys_group->fetch_subgroup(0);
-            auto* hilited_inv_item = keys_subgroup->get_hilited_item();
-            if (hilited_inv_item != nullptr && hilited_inv_item->item != nullptr)
-            {
-              auto* key = dynamic_cast<Key*>(hilited_inv_item->item);
-              if (key != nullptr)
-              {
-                auto idx = stlutils::find_if_idx(m_all_keys, [key](const auto& o) { return &o == key; });
-                msg += "key:" + std::to_string(key->key_id) + "!";
-                f_drop_item(key);
-                stlutils::erase(m_player.key_idcs, idx);
-                keys_subgroup->remove_item(key);
-                to_drop_found = true;
-                if (dropped_over_liquid)
-                  key->exists = false;
-              }
-            }
-          }
-          if (!to_drop_found)
-          {
-            auto* lamps_group = m_inventory->fetch_group("Lamps:");
-            auto* lamps_subgroup = lamps_group->fetch_subgroup(0);
-            auto* hilited_inv_item = lamps_subgroup->get_hilited_item();
-            if (hilited_inv_item != nullptr && hilited_inv_item->item != nullptr)
-            {
-              auto* lamp = dynamic_cast<Lamp*>(hilited_inv_item->item);
-              if (lamp != nullptr)
-              {
-                auto idx = stlutils::find_if_idx(m_all_lamps, [lamp](const auto& o) { return &o == lamp; });
-                msg += "lamp:" + std::to_string(idx) + "!";
-                f_drop_item(lamp);
-                stlutils::erase(m_player.lamp_idcs, idx);
-                lamps_subgroup->remove_item(lamp);
-                to_drop_found = true;
-                if (dropped_over_liquid)
-                  lamp->exists = false;
-              }
-            }
-          }
-          if (!to_drop_found)
-          {
-            auto* weapons_group = m_inventory->fetch_group("Weapons:");
-            auto* weapons_subgroup_melee = weapons_group->fetch_subgroup(0);
-            auto* hilited_inv_item = weapons_subgroup_melee->get_hilited_item();
-            if (hilited_inv_item != nullptr && hilited_inv_item->item != nullptr)
-            {
-              auto* weapon = dynamic_cast<Weapon*>(hilited_inv_item->item);
-              if (weapon != nullptr)
-              {
-                auto idx = stlutils::find_if_idx(m_all_weapons,
-                  [weapon](const auto& o) { return o.get() == weapon; });
-                msg += weapon->type + ":" + std::to_string(idx) + "!";
-                f_drop_item(weapon);
-                stlutils::erase(m_player.weapon_idcs, idx);
-                weapons_subgroup_melee->remove_item(weapon);
-                to_drop_found = true;
-                if (dropped_over_liquid)
-                  weapon->exists = false;
-              }
-            }
-          }
-          if (!to_drop_found)
-          {
-            auto* potions_group = m_inventory->fetch_group("Potions:");
-            auto* potions_subgroup = potions_group->fetch_subgroup(0);
-            auto* hilited_inv_item = potions_subgroup->get_hilited_item();
-            if (hilited_inv_item != nullptr && hilited_inv_item->item != nullptr)
-            {
-              auto* potion = dynamic_cast<Potion*>(hilited_inv_item->item);
-              if (potion != nullptr)
-              {
-                auto idx = stlutils::find_if_idx(m_all_potions,
-                  [potion](const auto& o) { return &o == potion; });
-                msg += "potion:" + std::to_string(idx) + "!";
-                f_drop_item(potion);
-                stlutils::erase(m_player.potion_idcs, idx);
-                potions_subgroup->remove_item(potion);
-                to_drop_found = true;
-                if (dropped_over_liquid)
-                  potion->exists = false;
-              }
-            }
-          }
-          if (!to_drop_found)
-          {
-            auto f_try_drop_armour = [&msg, &f_drop_item, &to_drop_found, dropped_over_liquid]
-                                    (auto* subgroup, auto& all_armour, auto& pc_armour_idcs)
-            {
-              if (to_drop_found)
-                return false;
-              auto* hilited_inv_item = subgroup->get_hilited_item();
-              if (hilited_inv_item != nullptr && hilited_inv_item->item != nullptr)
-              {
-                auto* armour = dynamic_cast<Armour*>(hilited_inv_item->item);
-                if (armour != nullptr)
-                {
-                  auto idx = stlutils::find_if_idx(all_armour, [armour](const auto& o) { return o.get() == armour; });
-                  msg += armour->type + ":" + std::to_string(idx) + "!";
-                  f_drop_item(armour);
-                  stlutils::erase(pc_armour_idcs, idx);
-                  subgroup->remove_item(armour);
-                  to_drop_found = true;
-                  if (dropped_over_liquid)
-                    armour->exists = false;
-                  return true;
-                }
-              }
-              return false;
-            };
-            
-            auto* armour_group = m_inventory->fetch_group("Armour:");
-            if (!f_try_drop_armour(armour_group->fetch_subgroup(ARMOUR_Shield),
-                                   m_all_armour, m_player.armour_idcs))
-              if (!f_try_drop_armour(armour_group->fetch_subgroup(ARMOUR_Gambeson),
-                                     m_all_armour, m_player.armour_idcs))
-                if (!f_try_drop_armour(armour_group->fetch_subgroup(ARMOUR_ChainMailleHauberk),
-                                       m_all_armour, m_player.armour_idcs))
-                  if (!f_try_drop_armour(armour_group->fetch_subgroup(ARMOUR_PlatedBodyArmour),
-                                         m_all_armour, m_player.armour_idcs))
-                    if (!f_try_drop_armour(armour_group->fetch_subgroup(ARMOUR_PaddedCoif),
-                                           m_all_armour, m_player.armour_idcs))
-                      if (!f_try_drop_armour(armour_group->fetch_subgroup(ARMOUR_ChainMailleCoif),
-                                             m_all_armour, m_player.armour_idcs))
-                        f_try_drop_armour(armour_group->fetch_subgroup(ARMOUR_Helmet),
-                                          m_all_armour, m_player.armour_idcs);
-          }
-          if (!to_drop_found)
-          {
-            msg += "Invalid Item!";
-            std::cerr << "ERROR: Attempted to drop invalid item!" << std::endl;
-          }
+          find_and_drop_item(to_drop_found, msg, "Keys:", 0,
+                             [](Key* /*key*/) -> std::string { return "key"; },
+                             curr_pos, dropped_over_liquid,
+                             [](Key* key, int /*idx*/) -> int { return key->key_id; },
+                             m_all_keys, m_player.key_idcs);
+          find_and_drop_item(to_drop_found, msg, "Lamps:", 0,
+                             [](Lamp* /*lamp*/) -> std::string { return "lamp"; },
+                             curr_pos, dropped_over_liquid,
+                             [](Lamp* /*lamp*/, int idx) -> int { return idx; },
+                             m_all_lamps, m_player.lamp_idcs);
+          find_and_drop_item(to_drop_found, msg, "Weapons:", 0, // Melee
+                             [](Weapon* weapon) -> std::string { return weapon->type; },
+                             curr_pos, dropped_over_liquid,
+                             [](Weapon* /*weapon*/, int idx) -> int { return idx; },
+                             m_all_weapons, m_player.weapon_idcs);
+          find_and_drop_item(to_drop_found, msg, "Weapons:", 1, // Ranged
+                             [](Weapon* weapon) -> std::string { return weapon->type; },
+                             curr_pos, dropped_over_liquid,
+                             [](Weapon* /*weapon*/, int idx) -> int { return idx; },
+                             m_all_weapons, m_player.weapon_idcs);
+          find_and_drop_item(to_drop_found, msg, "Potions:", 0,
+                             [](Potion* /*potion*/) -> std::string { return "potion"; },
+                             curr_pos, dropped_over_liquid,
+                             [](Potion* /*potion*/, int idx) -> int { return idx; },
+                             m_all_potions, m_player.potion_idcs);
+          for (int a_idx = 0; a_idx < ARMOUR_NUM_ITEMS; ++a_idx)
+            find_and_drop_item(to_drop_found, msg, "Armour:", a_idx,
+                               [](Armour* armour) -> std::string { return armour->type; },
+                               curr_pos, dropped_over_liquid,
+                               [](Armour* /*armour*/, int idx) -> int { return idx; },
+                               m_all_armour, m_player.armour_idcs);
+
           if (to_drop_found)
           {
             m_inventory->reset_hilite();
@@ -275,6 +215,11 @@ namespace dung
               message_handler->add_message(static_cast<float>(real_time_s),
                                            "Item was dropped over the " + terrain2str(m_player.on_terrain) + " and is now forever lost.",
                                            MessageHandler::Level::Warning);
+          }
+          else
+          {
+            msg += "Invalid Item!";
+            std::cerr << "ERROR: Attempted to drop invalid item!" << std::endl;
           }
         }
         else if (is_inside_curr_bb(curr_pos.r, curr_pos.c + 1) &&
