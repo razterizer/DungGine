@@ -92,6 +92,7 @@ namespace dung
       Timer travel_time { 3.f };
       PlayerBase* shooter = nullptr;
       const Weapon* weapon = nullptr;       // for damage calculation and projectile rendering.
+      BSPNode* curr_room = nullptr;
       bool hit = false;
     };
     std::vector<Projectile> active_projectiles;
@@ -666,6 +667,7 @@ namespace dung
       auto target_pos = to_Vec2(target->pos);
       p.dir = math::normalize(target_pos - to_Vec2(shooter->pos));
       p.shooter = shooter;
+      p.curr_room = shooter->curr_room;
       p.weapon = ranged_weapon;
       p.speed = projectile_speed_factor * ranged_weapon->projectile_speed;
       
@@ -1069,7 +1071,12 @@ namespace dung
         
         sh.write_buffer(std::string(1, p_char), wpn_scr_pos, p.weapon->projectile_fg_color, Color::Transparent2);
       }
-      stlutils::erase_if(active_projectiles, [sim_time_s](const auto& p) { return p.hit || p.travel_time.finished(sim_time_s); });
+      stlutils::erase_if(active_projectiles, [sim_time_s](const auto& p)
+      {
+        return p.hit
+            || p.travel_time.finished(sim_time_s)
+            || (p.curr_room != nullptr && p.curr_room->bb_leaf_room.find_location(to_RC_round(p.pos)) != ttl::BBLocation::Inside);
+      });
     }
     
   public:
