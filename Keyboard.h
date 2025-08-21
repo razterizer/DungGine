@@ -292,7 +292,9 @@ namespace dung
                                                "The door is unlocked!",
                                                MessageHandler::Level::Guide);
                   
+                  m_inventory->cache_hilited_index();
                   m_player.remove_key_by_key_id(m_inventory, m_all_keys, door->key_id);
+                  m_inventory->reset_hilite();
                   message_handler->add_message(static_cast<float>(real_time_s),
                                                "You cast a vanishing spell on the key!",
                                                MessageHandler::Level::Guide);
@@ -518,8 +520,6 @@ namespace dung
         auto* potion = m_player.get_selected_potion(m_inventory);
         if (potion != nullptr)
         {
-          m_inventory->cache_hilited_index();
-        
           auto hp = potion->get_hp();
           if (m_player.health + hp > globals::max_health)
             hp = globals::max_health - m_player.health;
@@ -546,11 +546,12 @@ namespace dung
                                              MessageHandler::Level::Guide);
               break;
           }
+          m_inventory->cache_hilited_index();
           m_player.remove_selected_potion(m_inventory, m_all_potions);
+          m_inventory->reset_hilite();
           message_handler->add_message(static_cast<float>(real_time_s),
                                        "You throw away the empty vial.",
                                        MessageHandler::Level::Guide);
-          m_inventory->reset_hilite();
         }
       }
       else if (str::to_lower(curr_key) == 'f')
