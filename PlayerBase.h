@@ -9,6 +9,7 @@
 #include "DungObject.h"
 #include "SaveGame.h"
 #include <Termin8or/StringConversion.h>
+#include <Core/Timer.h>
 
 
 namespace dung
@@ -143,6 +144,7 @@ namespace dung
     RC cached_fight_offs { 0, 0 };
     styles::Style cached_fight_style;
     std::string cached_fight_str;
+    Timer attack_timer { 1 };
     
     bool allow_move()
     {
