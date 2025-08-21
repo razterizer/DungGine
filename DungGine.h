@@ -82,6 +82,19 @@ namespace dung
     const std::vector<int> fight_r_offs = { 1, 0, -1, -1, -1, 0, 1, 1 };
     const std::vector<int> fight_c_offs = { 1, 1, 1, 0, -1, -1, -1, 0 };
     
+    struct Projectile
+    {
+      Vec2 pos;
+      Vec2 dir { 0.f, 0.f };
+      float speed = 0.f;
+      int ang_idx = 0;
+      Timer travel_time { 3.f };
+      PlayerBase* shooter = nullptr;
+      const Weapon* weapon = nullptr;       // for damage calculation and projectile rendering.
+      bool hit = false;
+    };
+    std::vector<Projectile> active_projectiles;
+    
     ui::TextBox tb_health, tb_strength;
     ui::TextBoxDebug tbd;
     
