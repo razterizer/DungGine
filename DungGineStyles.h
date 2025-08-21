@@ -838,4 +838,14 @@ namespace dung
     Color::Cyan,
     Color::White,
   };
+  
+  inline std::vector<Color> crossbow_fg_palette
+  {
+    Color::DarkBlue,
+    Color::DarkCyan,
+    Color::LightGray,
+    Color::DarkGray,
+    Color::Blue,
+    Color::Cyan,
+  };
 }
