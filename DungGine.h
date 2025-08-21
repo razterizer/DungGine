@@ -1251,21 +1251,24 @@ namespace dung
       m_use_per_room_lat_long_for_sun_dir = use_per_room_lat_long_for_sun_dir;
     }
     
-    bool place_keys(bool only_place_on_dry_land)
+    bool place_keys(bool only_place_on_dry_land, bool only_place_on_same_floor)
     {
       const int c_max_num_iters = 1e5_i;
       const auto* dungeon = m_environment->get_dungeon();
       for (int f_idx = 0; f_idx < m_environment->num_floors(); ++f_idx)
       {
-        auto* bsp_tree = dungeon->get_tree(f_idx);
-        const auto world_size = bsp_tree->get_world_size();
-        const auto& door_vec = bsp_tree->fetch_doors();
+        auto* bsp_tree_doors = dungeon->get_tree(f_idx);
+        const auto& door_vec = bsp_tree_doors->fetch_doors();
         for (auto* d : door_vec)
         {
           if (d->is_locked)
           {
+            auto fk_idx = only_place_on_same_floor ? f_idx : rnd::dice(m_environment->num_floors()) - 1;
+            auto* bsp_tree_key = only_place_on_same_floor ? bsp_tree_doors : dungeon->get_tree(fk_idx);
+            const auto world_size = bsp_tree_key->get_world_size();
+          
             Key key;
-            key.curr_floor = f_idx;
+            key.curr_floor = fk_idx;
             key.key_id = d->key_id;
             bool valid_pos = false;
             int num_iters = 0;
@@ -1278,7 +1281,7 @@ namespace dung
               };
               
               BSPNode* room = nullptr;
-              valid_pos = m_environment->is_inside_any_room(bsp_tree, key.pos, &room);
+              valid_pos = m_environment->is_inside_any_room(bsp_tree_key, key.pos, &room);
               if (only_place_on_dry_land &&
                   room != nullptr &&
                   !is_dry(m_environment->get_terrain(key.curr_floor, key.pos)))
@@ -1288,7 +1291,7 @@ namespace dung
             } while (num_iters++ < c_max_num_iters && !valid_pos);
             
             BSPNode* leaf = nullptr;
-            if (!m_environment->is_inside_any_room(bsp_tree, key.pos, &leaf))
+            if (!m_environment->is_inside_any_room(bsp_tree_key, key.pos, &leaf))
               return false;
             
             if (leaf != nullptr)

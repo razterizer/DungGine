@@ -174,7 +174,7 @@ There is currently no visual distiction between upwards or downwards going stair
   - `configure_sun(float sun_day_t_offs = 0.f, float minutes_per_day = 20.f, Season start_season = Season::Spring, float minutes_per_year = 120.f, Latitude latitude = Latitude::NorthernHemisphere, Longitude longitude = Longitude::F, bool use_per_room_lat_long_for_sun_dir = true)` : Configures the speed of the solar day, speed of the solar year, the starting direction of the sun and the starting season. Used for shadow movements for rooms over ground.
       When `use_per_room_lat_long_for_sun_dir` is `true` then use `latitude = Latitude::Equator` and `longitude = Longitude::F` to start with. Other values will shift the map over the globe so to speak, but with these starting settings the rooms at the top of the map will be the at the north pole and the rooms at the bottom of the map will be at the south pole. When `use_per_room_lat_long_for_sun_dir` is `false` then the specified latitude and longitude will be used globally across the whole map and the the function default args is a good starting point.
   - `configure_sun_rand(float minutes_per_day = 20.f, float minutes_per_year = 120.f, Latitude latitude = Latitude::NorthernHemisphere, Longitude longitude = Longitude::F, bool use_per_room_lat_long_for_sun_dir = true)` : Same as above but randomizes the initial direction of the sun.
-  - `place_keys(bool only_place_on_dry_land)` : Places the keys in rooms, randomly all over the world.
+  - `place_keys(bool only_place_on_dry_land, bool only_place_on_same_floor)` : Places the keys in rooms, randomly all over the world.
   - `place_lamps(int num_torches_per_floor, int num_lanterns_per_floor, int num_magic_lamps_per_floor, bool only_place_on_dry_land)` : Places `num_torches` torches, `num_lanterns` lanterns and `num_magic_lamps` magic lamps in rooms, randomly all over the world.
   - `place_weapons(int num_weapons_per_floor, bool only_place_on_dry_land)` : Places `num_weapons` weapons in rooms, randomly all over the world.
   - `place_potions(int num_potions_per_floor, bool only_place_on_dry_land)` : Places `num_potions` potions in rooms, randomly all over the world.
@@ -352,7 +352,7 @@ dungeon_engine.configure_sun_rand(20.f, 120.f, dung::Latitude::NorthernHemispher
 dungeon_engine.style_dungeon();
 if (!dungeon_engine.place_player(sh.size()))
   std::cerr << "ERROR : Unable to place the playable character!" << std::endl;
-dungeon_engine->place_keys(true);
+dungeon_engine->place_keys(true, true);
 dungeon_engine->place_lamps(20, 5, 3, true);
 dungeon_engine->place_weapons(100, true);
 dungeon_engine->place_potions(100, true);
@@ -428,7 +428,7 @@ dungeon_engine.configure_sun_rand(20.f, 120.f, dung::Latitude::Equator, dung::Lo
 dungeon_engine.style_dungeon();
 if (!dungeon_engine.place_player(sh.size()))
   std::cerr << "ERROR : Unable to place the playable character!" << std::endl;
-dungeon_engine->place_keys(true);
+dungeon_engine->place_keys(true, false);
 dungeon_engine->place_lamps(20, 15, 5, true);
 dungeon_engine->place_weapons(150, true);
 dungeon_engine->place_potions(100, true);
