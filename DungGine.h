@@ -593,6 +593,14 @@ namespace dung
       return ranged_weapon;
     }
     
+    std::pair<bool, bool> get_pc_attack_modes(const NPC& npc)
+    {
+      auto dist_pc_npc = npc.distance_to_pc();
+      bool pc_melee_attack = npc.wants_to_attack() && (dist_pc_npc < npc.c_dist_fight_melee);
+      bool pc_ranged_attack = !pc_melee_attack && npc.wants_to_attack() && (dist_pc_npc < npc.c_dist_fight_ranged) && get_selected_ranged_weapon(&m_player) != nullptr;
+      return { pc_melee_attack, pc_ranged_attack };
+    }
+    
     template<int NR, int NC>
     void draw_health_bars(ScreenHandler<NR, NC>& sh, bool framed_mode)
     {
@@ -607,9 +615,7 @@ namespace dung
       
       for (const auto& npc : all_npcs)
       {
-        auto dist_pc_npc = npc.distance_to_pc();
-        bool pc_melee_attack = npc.wants_to_attack() && (dist_pc_npc < npc.c_dist_fight_melee);
-        bool pc_ranged_attack = !pc_melee_attack && npc.wants_to_attack() && (dist_pc_npc < npc.c_dist_fight_ranged) && get_selected_ranged_weapon(&m_player) != nullptr;
+        auto [pc_melee_attack, pc_ranged_attack] = get_pc_attack_modes(npc);
         if (npc.health > 0 && (npc.state == State::FightMelee || npc.state == State::FightRanged || pc_melee_attack || pc_ranged_attack))
         {
           std::string npc_hb = str::rep_char(' ', 10);
@@ -711,29 +717,23 @@ namespace dung
         
         int blind_attack_penalty = (npc.visible ? 0 : (npc.state == State::FightMelee ? 12 : 15)) + rnd::rand_int(0, 8);
         
-        auto dist_pc_npc = npc.distance_to_pc();
-        
         // /////// PC
         
-        bool pc_melee_attack = npc.wants_to_attack() && (dist_pc_npc < npc.c_dist_fight_melee);
-        bool pc_ranged_attack = !pc_melee_attack && npc.wants_to_attack() && (dist_pc_npc < npc.c_dist_fight_ranged);
+        auto [pc_melee_attack, pc_ranged_attack] = get_pc_attack_modes(npc);
         
         // Fire shots.
         if (pc_ranged_attack)
         {
-          if (pc_ranged_weapon != nullptr)
+          if (m_player.attack_timer.start_if_stopped(sim_time_s))
+            m_player.attack_timer.set_delay(1.f / pc_ranged_weapon->attack_speed);
+          else
           {
-            if (m_player.attack_timer.start_if_stopped(sim_time_s))
-              m_player.attack_timer.set_delay(1.f / pc_ranged_weapon->attack_speed);
-            else
-            {
-              int pc_attack_roll = rnd::dice(20)
-                                   + m_player.thac0
-                                   + m_player.get_ranged_attack_bonus()
-                                   - blind_attack_penalty;
-              if (pc_attack_roll >= npc_ac && m_player.attack_timer.wait_then_reset(sim_time_s))
-                fire_projectile(&m_player, &npc, pc_ranged_weapon, sim_time_s, projectile_speed_factor);
-            }
+            int pc_attack_roll = rnd::dice(20)
+                                 + m_player.thac0
+                                 + m_player.get_ranged_attack_bonus()
+                                 - blind_attack_penalty;
+            if (pc_attack_roll >= npc_ac && m_player.attack_timer.wait_then_reset(sim_time_s))
+              fire_projectile(&m_player, &npc, pc_ranged_weapon, sim_time_s, projectile_speed_factor);
           }
         }
         
@@ -788,19 +788,16 @@ namespace dung
         // Fire shots.
         if (npc.state == State::FightRanged)
         {
-          if (npc_ranged_weapon != nullptr)
+          if (npc.attack_timer.start_if_stopped(sim_time_s))
+            npc.attack_timer.set_delay(1.f / npc_ranged_weapon->attack_speed);
+          else
           {
-            if (npc.attack_timer.start_if_stopped(sim_time_s))
-              npc.attack_timer.set_delay(1.f / npc_ranged_weapon->attack_speed);
-            else
-            {
-              int npc_attack_roll = rnd::dice(20)
-                                    + npc.thac0
-                                    + npc.get_ranged_attack_bonus()
-                                    - blind_attack_penalty;
-              if (npc_attack_roll >= pc_ac && npc.attack_timer.wait_then_reset(sim_time_s))
-                fire_projectile(&npc, &m_player, npc_ranged_weapon, sim_time_s, projectile_speed_factor);
-            }
+            int npc_attack_roll = rnd::dice(20)
+                                  + npc.thac0
+                                  + npc.get_ranged_attack_bonus()
+                                  - blind_attack_penalty;
+            if (npc_attack_roll >= pc_ac && npc.attack_timer.wait_then_reset(sim_time_s))
+              fire_projectile(&npc, &m_player, npc_ranged_weapon, sim_time_s, projectile_speed_factor);
           }
         }
         
