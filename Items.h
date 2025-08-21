@@ -219,6 +219,10 @@ namespace dung
     //bool poisonous = false;
     std::string type;
     float attack_speed = 15.f; // max 15 aps (demo fps).
+    float projectile_speed = 15.f; // max 15 aps (demo fps).
+    float spread_sigma_rad = 0.f;
+    std::array<char, 8> projectile_characters; // { 0, 45, 90, 135, 180, 225, 270, 315 } degrees.
+    Color projectile_fg_color = Color::Transparent2;
   };
   
   struct Dagger : Weapon
