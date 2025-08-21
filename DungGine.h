@@ -607,7 +607,7 @@ namespace dung
       
       for (const auto& npc : all_npcs)
       {
-        auto dist_pc_npc = distance(m_player.pos, npc.pos);
+        auto dist_pc_npc = npc.distance_to_pc();
         bool pc_melee_attack = npc.wants_to_attack() && (dist_pc_npc < npc.c_dist_fight_melee);
         bool pc_ranged_attack = !pc_melee_attack && npc.wants_to_attack() && (dist_pc_npc < npc.c_dist_fight_ranged) && get_selected_ranged_weapon(&m_player) != nullptr;
         if (npc.health > 0 && (npc.state == State::FightMelee || npc.state == State::FightRanged || pc_melee_attack || pc_ranged_attack))
@@ -711,7 +711,7 @@ namespace dung
         
         int blind_attack_penalty = (npc.visible ? 0 : (npc.state == State::FightMelee ? 12 : 15)) + rnd::rand_int(0, 8);
         
-        auto dist_pc_npc = distance(m_player.pos, npc.pos);
+        auto dist_pc_npc = npc.distance_to_pc();
         
         // /////// PC
         
@@ -819,7 +819,7 @@ namespace dung
         if (npc.state == State::FightMelee)
         {
           // #TODO: Fix distance penalty for ranged weapons. The closer you get to the target, the less damage you inflict.
-          //auto dist = distance(m_player.pos, npc.pos);
+          //auto dist = npc.distance_to_pc();
           //auto* lamp = m_player.get_selected_lamp(m_inventory.get());
           //auto ranged_max_attack_dist = lamp == nullptr ? globals::max_fow_radius : lamp->radius;
           

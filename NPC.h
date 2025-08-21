@@ -115,6 +115,7 @@ namespace dung
     bool is_hostile = false;
     bool was_hostile = false;
     OneShot trg_info_hostile_npc;
+    float dist_to_pc = math::get_max<float>();
     bool can_see_pc = false;
     
     float death_time_s = 0.f;
@@ -743,7 +744,6 @@ namespace dung
     
     void trigger_hostility(const RC& pc_pos)
     {
-      auto dist_to_pc = distance(pos, pc_pos);
       if (dist_to_pc < c_dist_hostile_hyst_on)
           is_hostile = true;
     }
@@ -783,7 +783,7 @@ namespace dung
         }
       }
       
-      auto dist_to_pc = distance(pos, pc_pos);
+      dist_to_pc = distance(pos, pc_pos);
       
       was_hostile = is_hostile;
       if (enemy)
@@ -907,6 +907,11 @@ namespace dung
             break;
           }
       }
+    }
+    
+    float distance_to_pc() const
+    {
+      return dist_to_pc;
     }
     
     bool wants_to_attack() const
