@@ -316,7 +316,8 @@ namespace dung
     ARMOUR_PlatedBodyArmour,
     ARMOUR_PaddedCoif,
     ARMOUR_ChainMailleCoif,
-    ARMOUR_Helmet
+    ARMOUR_Helmet,
+    ARMOUR_NUM_ITEMS
   };
   
   struct Armour : Item
