@@ -728,7 +728,7 @@ namespace dung
             m_player.attack_timer.set_delay(1.f / pc_ranged_weapon->attack_speed);
           else
           {
-            int pc_attack_roll = rnd::dice(20)
+            int pc_attack_roll = rnd::dice(26)
                                  + m_player.thac0
                                  + m_player.get_ranged_attack_bonus()
                                  - blind_attack_penalty;
@@ -792,7 +792,7 @@ namespace dung
             npc.attack_timer.set_delay(1.f / npc_ranged_weapon->attack_speed);
           else
           {
-            int npc_attack_roll = rnd::dice(20)
+            int npc_attack_roll = rnd::dice(26)
                                   + npc.thac0
                                   + npc.get_ranged_attack_bonus()
                                   - blind_attack_penalty;
