@@ -208,6 +208,8 @@ namespace dung
     }
   };
   
+  enum WeaponDistType { WeaponDistType_Melee, WeaponDistType_Ranged };
+  
   struct Weapon : Item
   {
     int damage = 1;
