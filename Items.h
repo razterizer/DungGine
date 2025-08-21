@@ -266,7 +266,20 @@ namespace dung
     }
   };
   
-  // MorningStar
+  struct MorningStar : Weapon
+  {
+    MorningStar()
+    {
+      character = 'i';
+      style.fg_color = Color::DarkGray;
+      weight = rnd::randn_range_clamp(1.5f, 2.8f);
+      price = math::roundI(20*rnd::randn_clamp(1e3f, 500.f, 0.f, 5e5f))/20.f;
+      type = "morning star";
+      damage = rnd::randn_clamp_int(9.f, 5.f, 5, 35);
+      attack_speed = rnd::randn_range_clamp(0.7f, 1.3f);
+      dist_type = WeaponDistType_Melee;
+    }
+  };
   
   struct Potion : Item
   {
