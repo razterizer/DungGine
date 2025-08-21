@@ -342,14 +342,6 @@ namespace dung
     {
       const auto c_fow_dist = radius; //2.3f;
       
-      auto f_normalize_angle = [](float& ang)
-      {
-        while (ang < 0.f)
-          ang += math::c_2pi;
-        while (ang >= math::c_2pi)
-          ang -= math::c_2pi;
-      };
-      
       auto f_set_item_field = [&](auto& obj)
       {
         if (m_player.curr_room == obj.curr_room || m_player.curr_corridor == obj.curr_corridor)
@@ -372,15 +364,12 @@ namespace dung
               float dir_hi_r = (dir_r*Chi - dir_c*Shi);
               float dir_hi_c = dir_r*Shi + dir_c*Chi;
     
-              float lo_angle_rad = std::atan2(-dir_lo_r, dir_lo_c);
-              float hi_angle_rad = std::atan2(-dir_hi_r, dir_hi_c);
-              f_normalize_angle(lo_angle_rad);
-              f_normalize_angle(hi_angle_rad);
+              float lo_angle_rad = math::atan2n(-dir_lo_r, dir_lo_c);
+              float hi_angle_rad = math::atan2n(-dir_hi_r, dir_hi_c);
               if (lo_angle_rad > hi_angle_rad)
                 hi_angle_rad += math::c_2pi;
                 
-              float curr_angle_rad = static_cast<float>(std::atan2(-(obj.pos.r - curr_pos.r), obj.pos.c - curr_pos.c));
-              f_normalize_angle(curr_angle_rad);
+              float curr_angle_rad = static_cast<float>(math::atan2n<float>(-(obj.pos.r - curr_pos.r), obj.pos.c - curr_pos.c));
               if (curr_angle_rad < lo_angle_rad)
                 curr_angle_rad += math::c_2pi;
               if (math::in_range<float>(curr_angle_rad, lo_angle_rad, hi_angle_rad, Range::Closed))
