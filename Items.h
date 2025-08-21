@@ -212,6 +212,7 @@ namespace dung
   
   struct Weapon : Item
   {
+    WeaponDistType dist_type = WeaponDistType_Melee;
     int damage = 1;
     //bool rusty = false;
     //bool sharpened = false;
@@ -229,6 +230,7 @@ namespace dung
       price = math::roundI(20*rnd::randn_clamp(5e2f, 500.f, 0.f, 1e4f))/20.f;
       type = "dagger";
       damage = rnd::randn_clamp_int(3.f, 1.f, 1, 7);
+      dist_type = WeaponDistType_Melee;
     }
   };
   
@@ -242,6 +244,7 @@ namespace dung
       price = math::roundI(20*rnd::randn_clamp(4e3f, 500.f, 0.f, 5e6f))/20.f;
       type = "sword";
       damage = rnd::randn_clamp_int(7.f, 4., 4, 50);
+      dist_type = WeaponDistType_Melee;
     }
   };
   
@@ -255,6 +258,7 @@ namespace dung
       price = math::roundI(20*rnd::randn_clamp(1e3f, 500.f, 0.f, 5e5f))/20.f;
       type = "flail";
       damage = rnd::randn_clamp_int(7.5f, 5.f, 3, 30);
+      dist_type = WeaponDistType_Melee;
     }
   };
   
