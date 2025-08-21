@@ -873,6 +873,11 @@ namespace dung
       return strength / 2; // Example: Strength bonus to damage
     }
     
+    int get_ranged_attack_bonus() const
+    {
+      return dexterity / 2 + strength / 4;
+    }
+    
     virtual void serialize(std::vector<std::string>& lines) const override
     {
       PlayerBase::serialize(lines);

@@ -212,6 +212,11 @@ namespace dung
       return strength / 2; // Example: Strength bonus to damage
     }
     
+    int get_ranged_attack_bonus() const
+    {
+      return dexterity / 2 + strength / 4;
+    }
+    
     bool using_key_id(Inventory* inventory, int key_id) const
     {
       auto* group = inventory->fetch_group("Keys:");
