@@ -217,33 +217,6 @@ namespace dung
     //bool sharpened = false;
     //bool poisonous = false;
     std::string type;
-    int speed = 0; // max 20.
-    
-    virtual void serialize(std::vector<std::string>& lines) const override
-    {
-      Item::serialize(lines);
-    
-      sg::write_var(lines, SG_WRITE_VAR(damage));
-      sg::write_var(lines, SG_WRITE_VAR(type));
-      sg::write_var(lines, SG_WRITE_VAR(speed));
-    }
-    
-    virtual std::vector<std::string>::iterator deserialize(std::vector<std::string>::iterator it_line_begin,
-                                                           std::vector<std::string>::iterator it_line_end,
-                                                           Environment* environment) override
-    {
-      it_line_begin = Item::deserialize(it_line_begin, it_line_end, environment);
-      for (auto it_line = it_line_begin + 1; it_line != it_line_end; ++it_line)
-      {
-        if (sg::read_var(&it_line, SG_READ_VAR(damage))) {}
-        else if (sg::read_var(&it_line, SG_READ_VAR(type))) {}
-        else if (sg::read_var(&it_line, SG_READ_VAR(speed)))
-        {
-          return it_line;
-        }
-      }
-      return it_line_end;
-    }
   };
   
   struct Sword : Weapon
