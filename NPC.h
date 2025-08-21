@@ -906,7 +906,6 @@ namespace dung
       sg::write_var(lines, SG_WRITE_VAR(armor_class));
       sg::write_var_enum(lines, SG_WRITE_VAR(npc_race));
       sg::write_var_enum(lines, SG_WRITE_VAR(npc_class));
-      sg::write_var(lines, SG_WRITE_VAR(weapon_idx));
       sg::write_var(lines, SG_WRITE_VAR(is_hostile));
       sg::write_var(lines, SG_WRITE_VAR(was_hostile));
       // OneShot trg_info_hostile_npc;
@@ -950,7 +949,6 @@ namespace dung
         else if (sg::read_var(&it_line, SG_READ_VAR(armor_class))) {}
         else if (sg::read_var_enum(&it_line, SG_READ_VAR(npc_race))) {}
         else if (sg::read_var_enum(&it_line, SG_READ_VAR(npc_class))) {}
-        else if (sg::read_var(&it_line, SG_READ_VAR(weapon_idx))) {}
         else if (sg::read_var(&it_line, SG_READ_VAR(is_hostile))) {}
         else if (sg::read_var(&it_line, SG_READ_VAR(was_hostile))) {}
         // OneShot trg_info_hostile_npc;
