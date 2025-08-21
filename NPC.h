@@ -97,12 +97,14 @@ namespace dung
     Class npc_class = Class::Warrior_Barbarian;
     int weapon_idx = -1;
     
-    const float c_dist_fight = 2.f + 1e-2f;
-    const float c_dist_pursue = 7.f + 1e-2f;
-    const float c_dist_patroll = 12.f + 1e-2f;
-    const float c_dist_hostile_hyst_on = 2.f + 1e-2f;
-    const float c_dist_hostile_hyst_off = 3.f + 1e-2f;
-    const int c_fight_min_dist = 1;
+    static constexpr float c_dist_fight_melee = 2.f + 1e-2f;
+    static constexpr float c_dist_fight_ranged = 6.5f + 1e-2f;
+    static constexpr float c_dist_pursue = 7.f + 1e-2f;
+    static constexpr float c_dist_patroll = 12.f + 1e-2f;
+    static constexpr float c_dist_hostile_hyst_on = 2.f + 1e-2f;
+    static constexpr float c_dist_hostile_hyst_off = 3.f + 1e-2f;
+    static constexpr int c_fight_min_dist_melee = 1;
+    static constexpr int c_fight_min_dist_ranged = 3;
     bool is_hostile = false;
     bool was_hostile = false;
     OneShot trg_info_hostile_npc;
