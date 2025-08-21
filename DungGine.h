@@ -182,24 +182,25 @@ namespace dung
       auto* weapons_group = m_inventory->fetch_group("Weapons:");
       auto* weapons_subgroup_melee = weapons_group->fetch_subgroup(0);
       weapons_subgroup_melee->set_title("Melee:");
+      auto* weapons_subgroup_ranged = weapons_group->fetch_subgroup(1);
+      weapons_subgroup_ranged->set_title("Ranged:");
       for (int inv_wpn_idx = 0; inv_wpn_idx < num_inv_wpns; ++inv_wpn_idx)
       {
         auto wpn_idx = m_player.weapon_idcs[inv_wpn_idx];
         auto& weapon = all_weapons[wpn_idx];
         std::string item_str = "  ";
-        if (dynamic_cast<Sword*>(weapon.get()) != nullptr)
-          item_str += "Sword";
-        else if (dynamic_cast<Dagger*>(weapon.get()) != nullptr)
-          item_str += "Dagger";
-        else if (dynamic_cast<Flail*>(weapon.get()) != nullptr)
-          item_str += "Flail";
-        else
-          item_str += "<Weapon>";
+        bool melee = dynamic_cast<Sword*>(weapon.get()) != nullptr
+          || dynamic_cast<Dagger*>(weapon.get()) != nullptr
+          || dynamic_cast<Flail*>(weapon.get()) != nullptr
+          || dynamic_cast<MorningStar*>(weapon.get()) != nullptr;
+        item_str += str::anfangify(weapon->type);
         item_str += ":";
         item_str += std::to_string(wpn_idx);
         f_format_item_str(item_str, weapon->weight, weapon->price, weapon->damage);
-        if (weapons_subgroup_melee->find_item(weapon.get()) == nullptr)
+        if (melee && weapons_subgroup_melee->find_item(weapon.get()) == nullptr)
           weapons_subgroup_melee->add_item(item_str, weapon.get(), wpn_idx);
+        else if (!melee && weapons_subgroup_ranged->find_item(weapon.get()) == nullptr)
+          weapons_subgroup_ranged->add_item(item_str, weapon.get(), wpn_idx);
         m_player.curr_tot_inv_weight += weapon->weight;
       }
       
