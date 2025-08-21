@@ -285,6 +285,63 @@ namespace dung
     }
   };
   
+  struct Sling : Weapon
+  {
+    Sling()
+    {
+      character = 's';
+      style.fg_color = Color::DarkRed;
+      weight = rnd::randn_range_clamp(0.02f, 0.5f);
+      price = math::roundI(20*rnd::randn_clamp(200.f, 150.f, 0.f, 5e2f))/20.f;
+      type = "sling";
+      damage = rnd::randn_clamp_int(5.f, 2.f, 2, 15);
+      attack_speed = rnd::randn_range_clamp(1.8f, 2.2f);
+      projectile_speed = rnd::randn_clamp(8.5f, 0.6f, 8.f, 9.f);
+      spread_sigma_rad = 0.4f;
+      dist_type = WeaponDistType_Ranged;
+      stlutils::fill(projectile_characters, '*');
+      projectile_fg_color = Color::DarkGray;
+    }
+  };
+  
+  struct Bow : Weapon
+  {
+    Bow()
+    {
+      character = rnd::rand_select<char>({ '(', ')', '{', '}' });;
+      style.fg_color = Color::DarkRed;
+      weight = rnd::randn_range_clamp(0.4f, 4.f);
+      price = math::roundI(20*rnd::randn_clamp(3e3f, 1500.f, 0.f, 5e5f))/20.f;
+      type = "bow";
+      damage = rnd::randn_clamp_int(8.f, 5.f, 3, 40);
+      attack_speed = rnd::randn_range_clamp(1.f, 2.f);
+      projectile_speed = rnd::randn_clamp(9.5f, 0.6f, 9.f, 10.f);
+      spread_sigma_rad = 0.1f;
+      dist_type = WeaponDistType_Ranged;
+      projectile_characters = { '-', '/', '|', '\\', '-', '/', '|', '\\' };
+      projectile_fg_color = Color::Yellow;
+    }
+  };
+  
+  struct Crossbow : Weapon
+  {
+    Crossbow()
+    {
+      character = rnd::rand_select<char>({ '[', ']' });
+      style.fg_color = color::get_random_color(crossbow_fg_palette);
+      weight = rnd::randn_range_clamp(1.f, 20.f);
+      price = math::roundI(20*rnd::randn_clamp(1e4f, 1500.f, 0.f, 5e5f))/20.f;
+      type = "crossbow";
+      damage = rnd::randn_clamp_int(12.f, 5.f, 3, 55);
+      attack_speed = rnd::randn_range_clamp(0.6f, 0.8f);
+      projectile_speed = rnd::randn_clamp(8.5f, 0.6f, 8.f, 10.f);
+      spread_sigma_rad = 0.02f;
+      dist_type = WeaponDistType_Ranged;
+      projectile_characters = { '-', '/', '|', '\\', '-', '/', '|', '\\' };
+      projectile_fg_color = Color::LightGray;
+    }
+  };
+  
   struct Potion : Item
   {
     int health = 1;
