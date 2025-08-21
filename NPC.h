@@ -53,10 +53,12 @@ namespace dung
     }
   }
   
-  enum class State { Patroll, Pursue, Fight, NUM_ITEMS };
+  enum class State { Patroll, Pursue, FightMelee, FightRanged, NUM_ITEMS };
   
   struct NPC final : PlayerBase
   {
+    Style orig_style;
+  
     float pos_r = 0.f;
     float pos_c = 0.f;
     float vel_r = 0.f;
@@ -77,6 +79,7 @@ namespace dung
     State state = State::Patroll;
     
     bool debug = false;
+    bool was_debug = false;
     
     bool wall_coll_resolve = false;
     int wall_coll_resolve_ctr = 0;
@@ -95,7 +98,9 @@ namespace dung
     
     Race npc_race = Race::Ogre;
     Class npc_class = Class::Warrior_Barbarian;
-    int weapon_idx = -1;
+    int melee_weapon_idx = -1;
+    int ranged_weapon_idx = -1;
+    int armour_idx = -1;
     int fierceness = 0; // Body as weapon.
     bool animal = false; // Animals cannot have weapons nor armour.
     
@@ -140,7 +145,10 @@ namespace dung
           vel_c += acc_c*dt;
           break;
         case State::Pursue:
-        case State::Fight:
+        case State::FightMelee:
+        {
+          const float c_fight_min_dist = state == State::FightRanged ? c_fight_min_dist_ranged : c_fight_min_dist_melee;
+        
           //vel_r = 0.5f * (pc_pos.r - pos.r);
           //vel_c = 0.5f * (pc_pos.c - pos.c);
           
@@ -154,6 +162,8 @@ namespace dung
           else if (pc_pos.c - c_fight_min_dist > pos.c)
             vel_c = 0.5f * ((pc_pos.c - c_fight_min_dist) - pos.c);
           break;
+        }
+        case State::FightRanged:
         case State::NUM_ITEMS:
           break;
       }
@@ -270,30 +280,14 @@ namespace dung
       style = { Color::Green, Color::DarkYellow };
     }
   
-    void init(const std::vector<std::unique_ptr<Weapon>>& all_weapons)
+    void init(const std::vector<std::unique_ptr<Weapon>>& all_weapons,
+              const std::vector<std::unique_ptr<Armour>>& all_armour)
     {
       pos_r = static_cast<float>(pos.r);
       pos_c = static_cast<float>(pos.c);
       
       npc_race = rnd::rand_enum<Race>();
       npc_class = rnd::rand_enum<Class>();
-      
-      int ctr = 0;
-      const int num_weapons = stlutils::sizeI(all_weapons);
-      if (!all_weapons.empty() && !rnd::one_in(4))
-      {
-        do
-        {
-          int idx = rnd::rand_idx(num_weapons);
-          auto* weapon = all_weapons[idx].get();
-          if (weapon->exists && !weapon->picked_up)
-          {
-            weapon_idx = idx;
-            weapon->picked_up = true;
-            break;
-          }
-        } while (ctr++ < 10);
-      }
       
       const float c_min_acc_step = 0.3f;
       const float c_min_acc_lim = 0.6f;
@@ -687,6 +681,55 @@ namespace dung
           std::cerr << "Unknown race (" + std::to_string(static_cast<int>(npc_race)) + ")!";
           break;
       }
+      
+      orig_style = style;
+      
+      if (!animal)
+      {
+        if (!all_weapons.empty())
+        {
+          auto f_pick_weapon = [&](WeaponDistType dist_type)
+          {
+            const int num_weapons = stlutils::sizeI(all_weapons);
+            int ctr = 0;
+            do
+            {
+              int idx = rnd::rand_idx(num_weapons);
+              auto* weapon = all_weapons[idx].get();
+              if (weapon->exists && weapon->dist_type == dist_type && !weapon->picked_up)
+              {
+                weapon->picked_up = true;
+                return idx;
+              }
+            } while (ctr++ < 10);
+            return -1;
+          };
+          
+          auto f_pick_armour = [&]()
+          {
+            const int num_armour = stlutils::sizeI(all_armour);
+            int ctr = 0;
+            do
+            {
+              int idx = rnd::rand_idx(num_armour);
+              auto* armour = all_armour[idx].get();
+              if (armour->exists && !armour->picked_up)
+              {
+                armour->picked_up = true;
+                return idx;
+              }
+            } while (ctr++ < 10);
+            return -1;
+          };
+          
+          if (!rnd::one_in(4)) // 3 of 4 have a melee weapon.
+            melee_weapon_idx = f_pick_weapon(WeaponDistType_Melee);
+          if (rnd::one_in(4)) // 1 of 4 have a ranged weapon.
+            ranged_weapon_idx = f_pick_weapon(WeaponDistType_Ranged);
+          if (!rnd::one_in(3)) // 2 of 3 have armour.
+            armour_idx = f_pick_armour();
+        }
+      }
     }
     
     void set_visibility(bool use_fog_of_war, bool fow_near, bool is_night)
@@ -782,8 +825,10 @@ namespace dung
           can_see_pc = true;
       }
       
-      if ((enemy || is_hostile) && can_see_pc && dist_to_pc < c_dist_fight)
-        state = State::Fight;
+      if ((enemy || is_hostile) && can_see_pc && dist_to_pc < c_dist_fight_melee)
+        state = State::FightMelee;
+      else if ((enemy || is_hostile) && can_see_pc && dist_to_pc < c_dist_fight_ranged && ranged_weapon_idx != -1)
+        state = State::FightRanged;
       else if ((enemy || is_hostile) && can_see_pc && dist_to_pc < c_dist_pursue)
         state = State::Pursue;
       else if (!can_see_pc || dist_to_pc > c_dist_patroll)
@@ -820,13 +865,20 @@ namespace dung
           case State::Pursue:
             style.bg_color = Color::DarkYellow;
             break;
-          case State::Fight:
+          case State::FightMelee:
             style.bg_color = Color::DarkRed;
+            break;
+          case State::FightRanged:
+            style.bg_color = Color::DarkCyan;
             break;
           case State::NUM_ITEMS:
             break;
         }
       }
+      else if (was_debug && health > 0)
+        style = orig_style;
+        
+      was_debug = debug;
       
       // Update current room and current corridor.
       if (curr_corridor != nullptr)
@@ -856,9 +908,9 @@ namespace dung
       }
     }
     
-    int calc_armour_class() const
+    int calc_armour_class(const std::vector<std::unique_ptr<Armour>>& all_armour) const
     {
-      return armor_class + (dexterity / 2);
+      return armor_class + (armour_idx == -1 ? 0 : all_armour[armour_idx]->protection) + (dexterity / 2);
     }
     
     // Function to calculate melee attack bonus

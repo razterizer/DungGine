@@ -574,6 +574,25 @@ namespace dung
           bs.set_visibility(use_fog_of_war, f_calc_night(bs));
     }
     
+    Weapon* get_selected_melee_weapon(PlayerBase* player) const
+    {
+      Weapon* melee_weapon = nullptr;
+      if (auto* pc = dynamic_cast<PC*>(player); pc != nullptr)
+        melee_weapon = pc->get_selected_weapon(m_inventory.get(), WeaponDistType_Melee);
+      else if (auto* npc = dynamic_cast<NPC*>(player); npc != nullptr)
+        melee_weapon = npc->melee_weapon_idx == -1 ? nullptr : all_weapons[npc->melee_weapon_idx].get();
+      return melee_weapon;
+    }
+    Weapon* get_selected_ranged_weapon(PlayerBase* player) const
+    {
+      Weapon* ranged_weapon = nullptr;
+      if (auto* pc = dynamic_cast<PC*>(player); pc != nullptr)
+        ranged_weapon = pc->get_selected_weapon(m_inventory.get(), WeaponDistType_Ranged);
+      else if (auto* npc = dynamic_cast<NPC*>(player); npc != nullptr)
+        ranged_weapon = npc->ranged_weapon_idx == -1 ? nullptr : all_weapons[npc->ranged_weapon_idx].get();
+      return ranged_weapon;
+    }
+    
     template<int NR, int NC>
     void draw_health_bars(ScreenHandler<NR, NC>& sh, bool framed_mode)
     {
@@ -588,7 +607,10 @@ namespace dung
       
       for (const auto& npc : all_npcs)
       {
-        if (npc.health > 0 && npc.state == State::Fight)
+        auto dist_pc_npc = distance(m_player.pos, npc.pos);
+        bool pc_melee_attack = (npc.enemy || npc.is_hostile) && (dist_pc_npc < npc.c_dist_fight_melee);
+        bool pc_ranged_attack = !pc_melee_attack && (npc.enemy || npc.is_hostile) && (dist_pc_npc < npc.c_dist_fight_ranged) && get_selected_ranged_weapon(&m_player) != nullptr;
+        if (npc.health > 0 && (npc.state == State::FightMelee || npc.state == State::FightRanged || pc_melee_attack || pc_ranged_attack))
         {
           std::string npc_hb = str::rep_char(' ', 10);
           float npc_ratio = globals::max_health / 10;
@@ -628,90 +650,261 @@ namespace dung
       tb_strength.draw(sh, tb_args);
     }
     
-    void update_fighting(float real_time_s)
+    void fire_projectile(PlayerBase* shooter, PlayerBase* target, const Weapon* ranged_weapon, float sim_time_s, float projectile_speed_factor)
     {
-      if (m_player.health > 0)
+      if (ranged_weapon == nullptr)
+        return;
+    
+      Projectile p;
+      p.pos = to_Vec2(shooter->pos);
+      auto target_pos = to_Vec2(target->pos);
+      p.dir = math::normalize(target_pos - to_Vec2(shooter->pos));
+      p.shooter = shooter;
+      p.weapon = ranged_weapon;
+      p.speed = projectile_speed_factor * ranged_weapon->projectile_speed;
+      
+      // convert to angle
+      float base_angle = std::atan2(-p.dir.r, p.dir.c);
+      
+      // add Gaussian noise based on weapon accuracy
+      float sigma = ranged_weapon->spread_sigma_rad;
+      float noisy_angle = rnd::randn(base_angle, sigma);
+      
+      // convert back to vector
+      p.dir = { -std::sin(noisy_angle), std::cos(noisy_angle) };
+      
+      // set travel time based on distance / projectile speed
+      float dist = math::distance(target_pos, p.pos)*4.f*projectile_speed_factor; // Magic factor?
+      p.travel_time.set_delay(dist / p.speed);
+      p.travel_time.force_start(sim_time_s);
+      
+      // optional: pick angle index if your rendering uses direction sprites
+      p.ang_idx = math::roundI(8.f * math::normalize_angle(noisy_angle) / math::c_2pi) % 8;
+      
+      active_projectiles.emplace_back(p);
+    }
+    
+    void update_fighting(float real_time_s, float sim_time_s, float sim_dt_s, float projectile_speed_factor)
+    {
+      auto f_calc_melee_damage = [](const Weapon* weapon, int bonus)
       {
-        for (auto& npc : all_npcs)
+        if (weapon == nullptr)
+          return 1 + bonus; // Fists with strength bonus
+        return weapon->damage + bonus;
+      };
+      
+      if (m_player.health <= 0)
+        return;
+      
+      const auto* pc_melee_weapon = get_selected_melee_weapon(&m_player);
+      const auto* pc_ranged_weapon = get_selected_ranged_weapon(&m_player);
+      
+      // Calculate the player's total armor class.
+      int pc_ac = m_player.calc_armour_class(m_inventory.get());
+      
+      for (auto& npc : all_npcs)
+      {
+        if (npc.health <= 0)
+          continue;
+        
+        int npc_ac = npc.calc_armour_class(all_armour);
+        
+        int blind_attack_penalty = (npc.visible ? 0 : (npc.state == State::FightMelee ? 12 : 15)) + rnd::rand_int(0, 8);
+        
+        auto dist_pc_npc = distance(m_player.pos, npc.pos);
+        
+        // /////// PC
+        
+        bool pc_melee_attack = (npc.enemy || npc.is_hostile) && (dist_pc_npc < npc.c_dist_fight_melee);
+        bool pc_ranged_attack = !pc_melee_attack && (npc.enemy || npc.is_hostile) && (dist_pc_npc < npc.c_dist_fight_ranged);
+        
+        // Fire shots.
+        if (pc_ranged_attack)
         {
-          if (npc.health > 0 && npc.state == State::Fight)
+          if (pc_ranged_weapon != nullptr)
           {
-            auto f_calc_damage = [](const Weapon* weapon, int bonus)
+            if (m_player.attack_timer.start_if_stopped(sim_time_s))
+              m_player.attack_timer.set_delay(1.f / pc_ranged_weapon->attack_speed);
+            else
             {
-              if (weapon == nullptr)
-                return 1 + bonus; // Fists with strength bonus
-              return weapon->damage + bonus;
-            };
-        
-            int blind_attack_penalty = (npc.visible ? 0 : 12) + rnd::rand_int(0, 8);
-        
-            // NPC attack roll.
-            int npc_attack_roll = rnd::dice(20) + npc.thac0 + npc.get_melee_attack_bonus() - blind_attack_penalty;
-        
-            // Calculate the player's total armor class.
-            int player_ac = m_player.calc_armour_class(m_inventory.get());
-        
-            // Determine if NPC hits the player.
-            // e.g. d12 + 1 + (2 + 10/2) >= (10 + 10/2).
-            // d12 + 8 >= 15.
-            if (npc_attack_roll >= player_ac)
-            {
-              // NPC hits the player
-              int damage = 1; // Default damage for fists
-              if (npc.weapon_idx != -1)
-                damage = f_calc_damage(all_weapons[npc.weapon_idx].get(), npc.get_melee_damage_bonus());
-        
-              // Apply damage to the player
-              bool was_alive = m_player.health > 0;
-              m_player.health -= damage;
-              if (was_alive && m_player.health <= 0)
-              {
-                message_handler->add_message(real_time_s,
-                                             "You were killed!",
-                                             MessageHandler::Level::Fatal);
-                broadcast([](auto* listener) { listener->on_pc_death(); });
-              }
-            }
-            
-            // Roll a d20 for the player's attack roll (if the NPC is visible).
-            // If invisible, then roll a d32 instead.
-            const auto* weapon = m_player.get_selected_melee_weapon(m_inventory.get());
-            int player_attack_roll = rnd::dice(20) + m_player.thac0 + m_player.get_melee_attack_bonus() - blind_attack_penalty;
-            int npc_ac = npc.calc_armour_class();
-            
-            // Determine if player hits the NPC.
-            if (player_attack_roll >= npc_ac)
-            {
-              // PC hits the NPC.
-              int damage = f_calc_damage(weapon, m_player.get_melee_damage_bonus());
-              
-              // Apply damage to the NPC.
-              bool was_alive = npc.health > 0;
-              npc.health -= damage;
-              if (was_alive && npc.health <= 0)
-              {
-                message_handler->add_message(real_time_s,
-                                             "You killed the " + race2str(npc.npc_race) + "!",
-                                             MessageHandler::Level::Guide);
-                broadcast([](auto* listener) { listener->on_npc_death(); });
-              }
+              int pc_attack_roll = rnd::dice(20)
+                                   + m_player.thac0
+                                   + m_player.get_ranged_attack_bonus()
+                                   - blind_attack_penalty;
+              if (pc_attack_roll >= npc_ac && m_player.attack_timer.wait_then_reset(sim_time_s))
+                fire_projectile(&m_player, &npc, pc_ranged_weapon, sim_time_s, projectile_speed_factor);
             }
           }
         }
+        
+        int npc_damage = 0;
+        for (auto& p : active_projectiles)
+        {
+          // Check if projectile reached its target.
+          if (!p.hit && p.shooter != &npc && to_RC_round(p.pos) == npc.pos)
+          {
+            p.hit = true; // mark it as impacted
+            npc.ranged_weapon_hit = true;
+            npc_damage += p.weapon->damage;
+          }
+        }
+        
+        if (pc_melee_attack)
+        {
+          // Roll a d20 for the player's attack roll (if the NPC is visible).
+          // If invisible, then roll a d32 instead.
+          int pc_attack_roll = rnd::dice(20)
+                               + m_player.thac0
+                               + m_player.get_melee_attack_bonus()
+                               - blind_attack_penalty;
+          
+          // Determine if PC hits the NPC.
+          if (pc_attack_roll >= npc_ac)
+          {
+            // PC hits the NPC.
+            npc_damage += f_calc_melee_damage(pc_melee_weapon, m_player.get_melee_damage_bonus());
+          }
+        }
+        
+        if (npc_damage > 0)
+        {
+          // Apply damage to the NPC.
+          bool was_alive = npc.health > 0;
+          npc.health -= npc_damage;
+          if (was_alive && npc.health <= 0)
+          {
+            message_handler->add_message(real_time_s,
+                                         "You killed the " + race2str(npc.npc_race) + "!",
+                                         MessageHandler::Level::Guide);
+            broadcast([](auto* listener) { listener->on_npc_death(); });
+          }
+        }
+        
+        // /////// NPC
+        
+        const auto* npc_melee_weapon = get_selected_melee_weapon(&npc);
+        const auto* npc_ranged_weapon = get_selected_ranged_weapon(&npc);
+        
+        // Fire shots.
+        if (npc.state == State::FightRanged)
+        {
+          if (npc_ranged_weapon != nullptr)
+          {
+            if (npc.attack_timer.start_if_stopped(sim_time_s))
+              npc.attack_timer.set_delay(1.f / npc_ranged_weapon->attack_speed);
+            else
+            {
+              int npc_attack_roll = rnd::dice(20)
+                                    + npc.thac0
+                                    + npc.get_ranged_attack_bonus()
+                                    - blind_attack_penalty;
+              if (npc_attack_roll >= pc_ac && npc.attack_timer.wait_then_reset(sim_time_s))
+                fire_projectile(&npc, &m_player, npc_ranged_weapon, sim_time_s, projectile_speed_factor);
+            }
+          }
+        }
+        
+        int pc_damage = 0;
+        for (auto& p : active_projectiles)
+        {
+          // Check if projectile reached its target.
+          if (!p.hit && p.shooter != &m_player && to_RC_round(p.pos) == m_player.pos)
+          {
+            p.hit = true; // mark it as impacted
+            m_player.ranged_weapon_hit = true;
+            pc_damage += p.weapon->damage;
+          }
+        }
+        
+        if (npc.state == State::FightMelee)
+        {
+          // #TODO: Fix distance penalty for ranged weapons. The closer you get to the target, the less damage you inflict.
+          //auto dist = distance(m_player.pos, npc.pos);
+          //auto* lamp = m_player.get_selected_lamp(m_inventory.get());
+          //auto ranged_max_attack_dist = lamp == nullptr ? globals::max_fow_radius : lamp->radius;
+          
+          int npc_melee_attack_bonus = npc.state == State::FightMelee ? npc.get_melee_attack_bonus() : 0;
+          
+          // NPC attack roll.
+          int npc_attack_roll = rnd::dice(20)
+                                + npc.thac0
+                                + npc_melee_attack_bonus
+                                + (rnd::dice(4) ? npc.fierceness / 2 : 0)
+                                - blind_attack_penalty;
+          
+          // Determine if NPC hits the PC.
+          // e.g. d12 + 1 + (2 + 10/2) >= (10 + 10/2).
+          // d12 + 8 >= 15.
+          if (npc_attack_roll >= pc_ac)
+          {
+            // NPC hits the PC.
+            pc_damage += f_calc_melee_damage(npc_melee_weapon, npc.get_melee_damage_bonus()) + (rnd::dice(6) ? npc.fierceness : 0);
+          }
+        }
+          
+        if (pc_damage > 0)
+        {
+          // Apply damage to the player
+          bool was_alive = m_player.health > 0;
+          m_player.health -= pc_damage;
+          if (was_alive && m_player.health <= 0)
+          {
+            message_handler->add_message(real_time_s,
+                                         "You were killed!",
+                                         MessageHandler::Level::Fatal);
+            broadcast([](auto* listener) { listener->on_pc_death(); });
+          }
+        }
+      }
+      
+      for (auto& p : active_projectiles)
+      {
+        // Move projectile toward target using sim_dt_s.
+        float dist_to_move = p.speed * sim_dt_s;
+        // Update p.pos here (simple linear interpolation or grid stepping).
+        p.pos += p.dir * dist_to_move;
       }
     }
     
     template<int NR, int NC>
     void draw_fighting(ScreenHandler<NR, NC>& sh, const RC& pc_scr_pos, bool do_update_fight, float real_time_s, float sim_time_s)
     {
+      auto f_render_pc_blood_splats = [&](const RC& offs)
+      {
+        auto& bs = m_player.blood_splats.emplace_back(m_environment.get(), m_player.curr_floor, m_player.pos + offs, rnd::dice(4), sim_time_s, offs);
+        bs.curr_room = m_player.curr_room;
+        bs.curr_corridor = m_player.curr_corridor;
+        if (m_player.is_inside_curr_room())
+          bs.is_underground = m_environment->is_underground(m_player.curr_floor, m_player.curr_room);
+        else if (m_player.is_inside_curr_corridor())
+          bs.is_underground = m_environment->is_underground(m_player.curr_floor, m_player.curr_corridor);
+      };
+      
+      auto f_render_npc_blood_splats = [&](NPC& npc, const RC& offs)
+      {
+        auto& bs = npc.blood_splats.emplace_back(m_environment.get(), npc.curr_floor, npc.pos + offs, rnd::dice(4), sim_time_s, offs);
+        bs.curr_room = npc.curr_room;
+        bs.curr_corridor = npc.curr_corridor;
+        bs.is_underground = npc.is_underground;
+      };
+      
       if (m_player.health > 0)
       {
+        if (m_player.ranged_weapon_hit)
+        {
+          RC offs = { rnd::rand_int(-1, +1), rnd::rand_int(-1, +1) };
+          if (m_environment->is_inside_any_room(m_player.curr_floor, m_player.pos + offs))
+            f_render_pc_blood_splats(offs);
+          
+          m_player.ranged_weapon_hit = false;
+        }
+      
         for (auto& npc : all_npcs)
         {
           if (npc.health <= 0)
             continue;
           
-          if (npc.state == State::Fight)
+          if (npc.state == State::FightMelee || npc.state == State::FightRanged)
           {
             if (npc.trg_info_hostile_npc.once())
             {
@@ -727,7 +920,7 @@ namespace dung
           else
             npc.trg_info_hostile_npc.reset();
           
-          if (npc.state == State::Fight)
+          if (npc.state == State::FightMelee)
           {
             auto npc_scr_pos = m_screen_helper->get_screen_pos(npc.pos);
             
@@ -844,15 +1037,7 @@ namespace dung
             {
               f_render_fight(&m_player, npc_scr_pos, offs);
               if (do_update_fight && rnd::one_in(npc.visible ? 20 : 28))
-              {
-                auto& bs = m_player.blood_splats.emplace_back(m_environment.get(), m_player.curr_floor, m_player.pos + offs, rnd::dice(4), sim_time_s, offs);
-                bs.curr_room = m_player.curr_room;
-                bs.curr_corridor = m_player.curr_corridor;
-                if (m_player.is_inside_curr_room())
-                  bs.is_underground = m_environment->is_underground(m_player.curr_floor, m_player.curr_room);
-                else if (m_player.is_inside_curr_corridor())
-                  bs.is_underground = m_environment->is_underground(m_player.curr_floor, m_player.curr_corridor);
-              }
+                f_render_pc_blood_splats(offs);
             }
             if (npc.visible)
             {
@@ -863,14 +1048,17 @@ namespace dung
               {
                 f_render_fight(&npc, pc_scr_pos, offs);
                 if (do_update_fight && rnd::one_in(npc.visible ? 20 : 28))
-                {
-                  auto& bs = npc.blood_splats.emplace_back(m_environment.get(), npc.curr_floor, npc.pos + offs, rnd::dice(4), sim_time_s, offs);
-                  bs.curr_room = npc.curr_room;
-                  bs.curr_corridor = npc.curr_corridor;
-                  bs.is_underground = npc.is_underground;
-                }
+                  f_render_npc_blood_splats(npc, offs);
               }
             }
+          }
+          else if (npc.ranged_weapon_hit)
+          {
+            RC offs = { rnd::rand_int(-1, +1), rnd::rand_int(-1, +1) };
+            if (m_environment->is_inside_any_room(npc.curr_floor, npc.pos + offs))
+              f_render_npc_blood_splats(npc, offs);
+          
+            npc.ranged_weapon_hit = false;
           }
         }
       }
@@ -1366,7 +1554,7 @@ namespace dung
           {
             npc.curr_room = leaf;
             npc.is_underground = m_environment->is_underground(npc.curr_floor, leaf);
-            npc.init(all_weapons);
+            npc.init(all_weapons, all_armour);
           }
           
           all_npcs.emplace_back(npc);
@@ -1377,7 +1565,7 @@ namespace dung
     
     void update(int frame_ctr, float fps,
                 double real_time_s, float sim_time_s, float sim_dt_s,
-                float fire_smoke_dt_factor, 
+                float fire_smoke_dt_factor, float projectile_speed_factor,
                 const keyboard::KeyPressDataPair& kpdp, bool* game_over)
     {
       utils::try_set(game_over, m_player.health <= 0);
@@ -1479,7 +1667,7 @@ namespace dung
       }
       
       if (do_fight)
-        update_fighting(static_cast<float>(real_time_s));
+        update_fighting(static_cast<float>(real_time_s), sim_time_s, sim_dt_s, projectile_speed_factor);
         
       if (trigger_game_save)
       {

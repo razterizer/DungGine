@@ -286,10 +286,10 @@ namespace dung
       return nullptr;
     }
     
-    Weapon* get_selected_melee_weapon(Inventory* inventory)
+    Weapon* get_selected_weapon(Inventory* inventory, WeaponDistType dist_type)
     {
      auto* group = inventory->fetch_group("Weapons:");
-      auto* subgroup = group->fetch_subgroup(0);
+      auto* subgroup = group->fetch_subgroup(dist_type);
       auto* selected_inv_item = subgroup->get_selected_item();
       if (selected_inv_item != nullptr && selected_inv_item->item != nullptr)
       {
