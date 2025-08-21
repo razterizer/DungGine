@@ -874,6 +874,17 @@ namespace dung
           }
         }
       }
+      for (const auto& p : active_projectiles)
+      {
+        char p_char = p.weapon->projectile_characters[p.ang_idx];
+        
+        const RC& wpn_pos = to_RC_round(p.pos);
+        
+        const RC& wpn_scr_pos = m_screen_helper->get_screen_pos(wpn_pos);
+        
+        sh.write_buffer(std::string(1, p_char), wpn_scr_pos, p.weapon->projectile_fg_color);
+      }
+      stlutils::erase_if(active_projectiles, [sim_time_s](const auto& p) { return p.hit || p.travel_time.finished(sim_time_s); });
     }
     
   public:
