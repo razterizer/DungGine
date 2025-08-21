@@ -27,6 +27,7 @@
 #include <Core/events/EventBroadcaster.h>
 #include <Core/Utils.h>
 #include <Core/System.h>
+#include <Core/Timer.h>
 
 using namespace utils::literals;
 
