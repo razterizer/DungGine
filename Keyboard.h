@@ -518,6 +518,8 @@ namespace dung
         auto* potion = m_player.get_selected_potion(m_inventory);
         if (potion != nullptr)
         {
+          m_inventory->cache_hilited_index();
+        
           auto hp = potion->get_hp();
           if (m_player.health + hp > globals::max_health)
             hp = globals::max_health - m_player.health;
@@ -548,6 +550,7 @@ namespace dung
           message_handler->add_message(static_cast<float>(real_time_s),
                                        "You throw away the empty vial.",
                                        MessageHandler::Level::Guide);
+          m_inventory->reset_hilite();
         }
       }
       else if (str::to_lower(curr_key) == 'f')
