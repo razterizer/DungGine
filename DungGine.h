@@ -92,7 +92,9 @@ namespace dung
       Timer travel_time { 3.f };
       PlayerBase* shooter = nullptr;
       const Weapon* weapon = nullptr;       // for damage calculation and projectile rendering.
+      int curr_floor = 0;
       BSPNode* curr_room = nullptr;
+      Corridor* curr_corridor = nullptr;
       bool hit = false;
     };
     std::vector<Projectile> active_projectiles;
@@ -513,36 +515,37 @@ namespace dung
       }
     }
     
+    template<typename T>
+    bool calc_night(const T& obj)
+    {
+      bool is_night = false;
+      if (m_use_per_room_lat_long_for_sun_dir)
+      {
+        auto f_set_night = [&](const RoomStyle& rs)
+        {
+          if (m_solar_motion.get_solar_direction(rs.latitude, rs.longitude, m_season, m_t_solar_period) == SolarDirection::Nadir)
+            is_night = true;
+        };
+        
+        auto room_style = m_environment->find_room_style(obj.curr_floor, obj.curr_room);
+        if (room_style.has_value())
+          f_set_night(room_style.value());
+        else
+        {
+          auto corr_style = m_environment->find_corridor_style(obj.curr_floor, obj.curr_corridor);
+          if (corr_style.has_value())
+            f_set_night(corr_style.value());
+        }
+      }
+      else
+        is_night = m_sun_dir == SolarDirection::Nadir;
+      
+      return is_night;
+    };
+    
     void set_visibilities(float fow_radius, const RC& pc_pos)
     {
       const auto c_fow_radius_sq = math::sq(fow_radius);
-    
-      auto f_calc_night = [&](const auto& obj) -> bool
-      {
-        bool is_night = false;
-        if (m_use_per_room_lat_long_for_sun_dir)
-        {
-          auto f_set_night = [&](const RoomStyle& rs)
-          {
-            if (m_solar_motion.get_solar_direction(rs.latitude, rs.longitude, m_season, m_t_solar_period) == SolarDirection::Nadir)
-              is_night = true;
-          };
-          
-          auto room_style = m_environment->find_room_style(obj.curr_floor, obj.curr_room);
-          if (room_style.has_value())
-            f_set_night(room_style.value());
-          else
-          {
-            auto corr_style = m_environment->find_corridor_style(obj.curr_floor, obj.curr_corridor);
-            if (corr_style.has_value())
-              f_set_night(corr_style.value());
-          }
-        }
-        else
-          is_night = m_sun_dir == SolarDirection::Nadir;
-        
-        return is_night;
-      };
       
       auto f_fow_near = [&pc_pos, c_fow_radius_sq](const auto& obj) -> bool
       {
@@ -550,29 +553,29 @@ namespace dung
       };
             
       for (auto& key : all_keys)
-        key.set_visibility(use_fog_of_war, f_fow_near(key), f_calc_night(key));
+        key.set_visibility(use_fog_of_war, f_fow_near(key), calc_night(key));
       
       for (auto& lamp : all_lamps)
-        lamp.set_visibility(use_fog_of_war, f_fow_near(lamp), f_calc_night(lamp));
+        lamp.set_visibility(use_fog_of_war, f_fow_near(lamp), calc_night(lamp));
       
       for (auto& weapon : all_weapons)
-        weapon->set_visibility(use_fog_of_war, f_fow_near(*weapon), f_calc_night(*weapon));
+        weapon->set_visibility(use_fog_of_war, f_fow_near(*weapon), calc_night(*weapon));
       
       for (auto& potion : all_potions)
-        potion.set_visibility(use_fog_of_war, f_fow_near(potion), f_calc_night(potion));
+        potion.set_visibility(use_fog_of_war, f_fow_near(potion), calc_night(potion));
         
       for (auto& armour : all_armour)
-        armour->set_visibility(use_fog_of_war, f_fow_near(*armour), f_calc_night(*armour));
+        armour->set_visibility(use_fog_of_war, f_fow_near(*armour), calc_night(*armour));
         
       for (auto& npc : all_npcs)
-        npc.set_visibility(use_fog_of_war, f_fow_near(npc), f_calc_night(npc));
+        npc.set_visibility(use_fog_of_war, f_fow_near(npc), calc_night(npc));
         
       for (auto& bs : m_player.blood_splats)
-        bs.set_visibility(use_fog_of_war, f_calc_night(bs));
+        bs.set_visibility(use_fog_of_war, calc_night(bs));
       
       for (auto& npc : all_npcs)
         for (auto& bs : npc.blood_splats)
-          bs.set_visibility(use_fog_of_war, f_calc_night(bs));
+          bs.set_visibility(use_fog_of_war, calc_night(bs));
     }
     
     Weapon* get_selected_melee_weapon(PlayerBase* player) const
@@ -667,7 +670,9 @@ namespace dung
       auto target_pos = to_Vec2(target->pos);
       p.dir = math::normalize(target_pos - to_Vec2(shooter->pos));
       p.shooter = shooter;
+      p.curr_floor = shooter->curr_floor;
       p.curr_room = shooter->curr_room;
+      p.curr_corridor = shooter->curr_corridor;
       p.weapon = ranged_weapon;
       p.speed = projectile_speed_factor * ranged_weapon->projectile_speed;
       
@@ -1070,12 +1075,17 @@ namespace dung
         const RC& wpn_scr_pos = m_screen_helper->get_screen_pos(wpn_pos);
         
         bool light = false;
+        bool fog_of_war = true;
         if (p.curr_room != nullptr)
         {
           const auto& bb = p.curr_room->bb_leaf_room;
-          light = p.curr_room->light[(wpn_pos.r - bb.r)*bb.c_len + (wpn_pos.c - bb.c)];
+          int idx = (wpn_pos.r - bb.r)*bb.c_len + (wpn_pos.c - bb.c);
+          light = p.curr_room->light[idx];
+          fog_of_war = p.curr_room->fog_of_war[idx];
         }
-        if (light)
+        bool visible = !((use_fog_of_war && fog_of_war) ||
+                      ((m_environment->is_underground(p.curr_floor, p.curr_room) || calc_night(p)) && !light)); // #FIXME: add fow term.
+        if (visible)
           sh.write_buffer(std::string(1, p_char), wpn_scr_pos, p.weapon->projectile_fg_color, Color::Transparent2);
       }
       stlutils::erase_if(active_projectiles, [sim_time_s](const auto& p)
