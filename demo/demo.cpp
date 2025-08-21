@@ -41,7 +41,8 @@ public:
   
   virtual ~Game() override
   {
-    dungeon_engine->remove_listener(this);
+    if (dungeon_engine != nullptr)
+      dungeon_engine->remove_listener(this);
   }
   
   virtual void on_pc_death() override
