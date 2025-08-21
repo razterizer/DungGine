@@ -1069,7 +1069,14 @@ namespace dung
         
         const RC& wpn_scr_pos = m_screen_helper->get_screen_pos(wpn_pos);
         
-        sh.write_buffer(std::string(1, p_char), wpn_scr_pos, p.weapon->projectile_fg_color, Color::Transparent2);
+        bool light = false;
+        if (p.curr_room != nullptr)
+        {
+          const auto& bb = p.curr_room->bb_leaf_room;
+          light = p.curr_room->light[(wpn_pos.r - bb.r)*bb.c_len + (wpn_pos.c - bb.c)];
+        }
+        if (light)
+          sh.write_buffer(std::string(1, p_char), wpn_scr_pos, p.weapon->projectile_fg_color, Color::Transparent2);
       }
       stlutils::erase_if(active_projectiles, [sim_time_s](const auto& p)
       {
