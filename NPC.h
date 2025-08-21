@@ -96,6 +96,8 @@ namespace dung
     Race npc_race = Race::Ogre;
     Class npc_class = Class::Warrior_Barbarian;
     int weapon_idx = -1;
+    int fierceness = 0; // Body as weapon.
+    bool animal = false; // Animals cannot have weapons nor armour.
     
     static constexpr float c_dist_fight_melee = 2.f + 1e-2f;
     static constexpr float c_dist_fight_ranged = 6.5f + 1e-2f;
@@ -325,6 +327,8 @@ namespace dung
           enemy = rnd::one_in(5);
           can_swim = true;
           can_fly = false;
+          fierceness = 2;
+          animal = false;
           break;
         case Race::Elf:
           character = '@';
@@ -337,6 +341,8 @@ namespace dung
           enemy = rnd::one_in(20);
           can_swim = true;
           can_fly = false;
+          fierceness = 1;
+          animal = false;
           break;
         case Race::Half_Elf:
           character = '@';
@@ -349,6 +355,8 @@ namespace dung
           enemy = rnd::one_in(15);
           can_swim = true;
           can_fly = false;
+          fierceness = 1;
+          animal = false;
           break;
         case Race::Gnome:
           character = 'b';
@@ -361,6 +369,8 @@ namespace dung
           enemy = rnd::one_in(20);
           can_swim = true;
           can_fly = false;
+          fierceness = 0;
+          animal = false;
           break;
         case Race::Halfling:
           character = 'b';
@@ -373,6 +383,8 @@ namespace dung
           enemy = rnd::one_in(20);
           can_swim = true;
           can_fly = false;
+          fierceness = 0;
+          animal = false;
           break;
         case Race::Dwarf:
           character = '0';
@@ -385,6 +397,8 @@ namespace dung
           enemy = rnd::one_in(18);
           can_swim = rnd::rand_bool();
           can_fly = false;
+          fierceness = 2;
+          animal = false;
           break;
         case Race::Half_Orc:
           character = '3';
@@ -397,6 +411,8 @@ namespace dung
           enemy = !rnd::one_in(10);
           can_swim = rnd::rand_bool();
           can_fly = false;
+          fierceness = 4;
+          animal = false;
           break;
         case Race::Ogre:
           character = 'O';
@@ -409,6 +425,8 @@ namespace dung
           enemy = !rnd::one_in(5);
           can_swim = true;
           can_fly = false;
+          fierceness = 5;
+          animal = false;
           break;
         case Race::Hobgoblin:
           character = 'a';
@@ -421,6 +439,8 @@ namespace dung
           enemy = !rnd::one_in(15);
           can_swim = false;
           can_fly = false;
+          fierceness = 4;
+          animal = false;
           break;
         case Race::Goblin:
           character = 'G';
@@ -433,6 +453,8 @@ namespace dung
           enemy = !rnd::one_in(15);
           can_swim = rnd::rand_bool();
           can_fly = false;
+          fierceness = 4;
+          animal = false;
           break;
         case Race::Orc:
           character = '2';
@@ -445,6 +467,8 @@ namespace dung
           enemy = !rnd::one_in(15);
           can_swim = rnd::rand_bool();
           can_fly = false;
+          fierceness = 5;
+          animal = false;
           break;
         case Race::Troll:
           character = 'R';
@@ -457,6 +481,8 @@ namespace dung
           enemy = !rnd::one_in(14);
           can_swim = false;
           can_fly = false;
+          fierceness = 7;
+          animal = false;
           break;
         case Race::Monster:
           character = 'M';
@@ -469,6 +495,8 @@ namespace dung
           enemy = !rnd::one_in(15);
           can_swim = rnd::rand_bool();
           can_fly = false;
+          fierceness = 7;
+          animal = rnd::rand_bool();
           break;
         case Race::Lich:
           character = 'z';
@@ -481,6 +509,8 @@ namespace dung
           enemy = !rnd::one_in(15);
           can_swim = false;
           can_fly = false;
+          fierceness = 6;
+          animal = false;
           break;
         case Race::Lich_King:
           character = 'Z';
@@ -493,6 +523,8 @@ namespace dung
           enemy = !rnd::one_in(15);
           can_swim = false;
           can_fly = false;
+          fierceness = 7;
+          animal = false;
           break;
         case Race::Basilisk:
           character = 'S';
@@ -505,6 +537,8 @@ namespace dung
           enemy = !rnd::one_in(15);
           can_swim = true;
           can_fly = false;
+          fierceness = 5;
+          animal = true;
           break;
         case Race::Bear:
           character = 'B';
@@ -517,6 +551,8 @@ namespace dung
           enemy = !rnd::one_in(10);
           can_swim = true;
           can_fly = false;
+          fierceness = 6;
+          animal = true;
           break;
         case Race::Kobold:
           character = 'x';
@@ -529,6 +565,8 @@ namespace dung
           enemy = !rnd::one_in(15);
           can_swim = false;
           can_fly = false;
+          fierceness = 3;
+          animal = false;
           break;
         case Race::Skeleton:
           character = '%';
@@ -541,6 +579,8 @@ namespace dung
           enemy = !rnd::one_in(10);
           can_swim = false;
           can_fly = false;
+          fierceness = 1;
+          animal = false;
           break;
         case Race::Giant:
           character = 'O';
@@ -553,6 +593,8 @@ namespace dung
           enemy = !rnd::one_in(5);
           can_swim = rnd::rand_bool();
           can_fly = false;
+          fierceness = 7;
+          animal = false;
           break;
         case Race::Huge_Spider:
           character = 'W';
@@ -565,6 +607,8 @@ namespace dung
           enemy = !rnd::one_in(13);
           can_swim = false;
           can_fly = false;
+          fierceness = 4;
+          animal = true;
           break;
         case Race::Wolf:
           character = 'm';
@@ -577,6 +621,8 @@ namespace dung
           enemy = !rnd::one_in(8);
           can_swim = rnd::rand_bool();
           can_fly = false;
+          fierceness = 4;
+          animal = true;
           break;
         case Race::Wyvern:
           character = 'w';
@@ -589,6 +635,8 @@ namespace dung
           enemy = !rnd::one_in(12);
           can_swim = false;
           can_fly = true;
+          fierceness = 5;
+          animal = true;
           break;
         case Race::Griffin:
           character = 'g';
@@ -601,6 +649,8 @@ namespace dung
           enemy = !rnd::one_in(13);
           can_swim = false;
           can_fly = true;
+          fierceness = 4;
+          animal = true;
           break;
         case Race::Ghoul:
           character = 'h';
@@ -613,6 +663,8 @@ namespace dung
           enemy = !rnd::one_in(20);
           can_swim = false;
           can_fly = false;
+          fierceness = 2;
+          animal = false;
           break;
         case Race::Dragon:
           character = 'R';
@@ -625,6 +677,8 @@ namespace dung
           enemy = !rnd::one_in(7);
           can_swim = false;
           can_fly = true;
+          fierceness = 8;
+          animal = true;
           break;
         case Race::NUM_ITEMS:
           std::cerr << "Illegal race: NUM_ITEMS!" << std::endl;
