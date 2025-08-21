@@ -218,6 +218,7 @@ namespace dung
     //bool sharpened = false;
     //bool poisonous = false;
     std::string type;
+    float attack_speed = 15.f; // max 15 aps (demo fps).
   };
   
   struct Dagger : Weapon
@@ -230,6 +231,7 @@ namespace dung
       price = math::roundI(20*rnd::randn_clamp(5e2f, 500.f, 0.f, 1e4f))/20.f;
       type = "dagger";
       damage = rnd::randn_clamp_int(3.f, 1.f, 1, 7);
+      attack_speed = rnd::randn_range_clamp(2.f, 3.f);
       dist_type = WeaponDistType_Melee;
     }
   };
@@ -244,6 +246,7 @@ namespace dung
       price = math::roundI(20*rnd::randn_clamp(4e3f, 500.f, 0.f, 5e6f))/20.f;
       type = "sword";
       damage = rnd::randn_clamp_int(7.f, 4., 4, 50);
+      attack_speed = rnd::randn_range_clamp(1.25f, 1.75f);
       dist_type = WeaponDistType_Melee;
     }
   };
@@ -258,6 +261,7 @@ namespace dung
       price = math::roundI(20*rnd::randn_clamp(1e3f, 500.f, 0.f, 5e5f))/20.f;
       type = "flail";
       damage = rnd::randn_clamp_int(7.5f, 5.f, 3, 30);
+      attack_speed = rnd::randn_range_clamp(0.8f, 1.2f);
       dist_type = WeaponDistType_Melee;
     }
   };
