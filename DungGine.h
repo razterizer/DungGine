@@ -630,8 +630,8 @@ namespace dung
           float npc_ratio = globals::max_health / 10;
           for (int i = 0; i < 10; ++i)
             npc_hb[i] = npc.health > static_cast<int>(i*npc_ratio) ? 'O' : ' ';
-          npc_hb = std::string(1, npc.character) + ' ' + npc_hb;
-          per_textel_styles.emplace_back(RC { line++, 0 }, npc.style);
+          npc_hb = std::string(1, npc.visible ? npc.character : '?') + ' ' + npc_hb;
+          per_textel_styles.emplace_back(RC { line++, 0 }, npc.visible ? npc.style : Style { Color::White, Color::Transparent2 });
           health_bars.emplace_back(npc_hb);
           styles.emplace_back(Style { Color::Red, Color::Transparent2 });
         }
