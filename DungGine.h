@@ -1380,29 +1380,52 @@ namespace dung
       return true;
     }
     
-    bool place_weapons(int num_weapons_per_floor, bool only_place_on_dry_land)
+    bool place_weapons(int num_daggers_per_floor,
+                       int num_swords_per_floor,
+                       int num_flails_per_floor,
+                       int num_morningstars_per_floor,
+                       int num_slings_per_floor,
+                       int num_bows_per_floor,
+                       int num_crossbows_per_floor,
+                       bool only_place_on_dry_land)
     {
       const int c_max_num_iters = 1e5_i;
       const auto* dungeon = m_environment->get_dungeon();
+      const int num_weapons_per_floor = num_daggers_per_floor
+                                        + num_swords_per_floor
+                                        + num_flails_per_floor
+                                        + num_morningstars_per_floor
+                                        + num_slings_per_floor
+                                        + num_bows_per_floor
+                                        + num_crossbows_per_floor;
       for (int f_idx = 0; f_idx < m_environment->num_floors(); ++f_idx)
       {
         auto* bsp_tree = dungeon->get_tree(f_idx);
         const auto world_size = bsp_tree->get_world_size();
+        int ctr_daggers = 0;
+        int ctr_swords = 0;
+        int ctr_flails = 0;
+        int ctr_morningstars = 0;
+        int ctr_slings = 0;
+        int ctr_bows = 0;
+        int ctr_crossbows = 0;
         for (int wpn_idx = 0; wpn_idx < num_weapons_per_floor; ++wpn_idx)
         {
           std::unique_ptr<Weapon> weapon;
-          switch (rnd::rand_int(0, 6))
-          {
-            case 0: weapon = std::make_unique<Dagger>(); break;
-            case 1: weapon = std::make_unique<Sword>(); break;
-            case 2: weapon = std::make_unique<Flail>(); break;
-            case 3: weapon = std::make_unique<MorningStar>(); break;
-            case 4: weapon = std::make_unique<Sling>(); break;
-            case 5: weapon = std::make_unique<Bow>(); break;
-            case 6: weapon = std::make_unique<Crossbow>(); break;
-              // Error:
-            default: return false;
-          }
+          if (ctr_daggers++ < num_daggers_per_floor)
+            weapon = std::make_unique<Dagger>();
+          else if (ctr_swords++ < num_swords_per_floor)
+            weapon = std::make_unique<Sword>();
+          else if (ctr_flails++ < num_flails_per_floor)
+            weapon = std::make_unique<Flail>();
+          else if (ctr_morningstars++ < num_morningstars_per_floor)
+            weapon = std::make_unique<MorningStar>();
+          else if (ctr_slings++ < num_slings_per_floor)
+            weapon = std::make_unique<Sling>();
+          else if (ctr_bows++ < num_bows_per_floor)
+            weapon = std::make_unique<Bow>();
+          else if (ctr_crossbows++ < num_crossbows_per_floor)
+            weapon = std::make_unique<Crossbow>();
           weapon->curr_floor = f_idx;
           bool valid_pos = false;
           int num_iters = 0;
