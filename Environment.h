@@ -211,6 +211,8 @@ namespace dung
     {
       if (!stlutils::in_range(m_room_styles, floor))
         return false;
+      if (room == nullptr)
+        return false;
       auto it = m_room_styles[floor].find(room);
       if (it != m_room_styles[floor].end())
         return it->second.is_underground;
@@ -220,6 +222,8 @@ namespace dung
     bool is_underground(int floor, Corridor* corr) const
     {
       if (!stlutils::in_range(m_corridor_styles, floor))
+        return false;
+      if (corr == nullptr)
         return false;
       auto it = m_corridor_styles[floor].find(corr);
       if (it != m_corridor_styles[floor].end())
@@ -231,6 +235,8 @@ namespace dung
     {
       if (!stlutils::in_range(m_room_styles, floor))
         return std::nullopt;
+      if (room == nullptr)
+        return std::nullopt;
       auto itr = m_room_styles[floor].find(room);
       if (itr != m_room_styles[floor].end())
         return itr->second;
@@ -240,6 +246,8 @@ namespace dung
     std::optional<RoomStyle> find_corridor_style(int floor, Corridor* corridor) const
     {
       if (!stlutils::in_range(m_corridor_styles, floor))
+        return std::nullopt;
+      if (corridor == nullptr)
         return std::nullopt;
       auto itc = m_corridor_styles[floor].find(corridor);
       if (itc != m_corridor_styles[floor].end())
