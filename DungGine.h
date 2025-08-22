@@ -1462,17 +1462,23 @@ namespace dung
       return true;
     }
     
-    bool place_potions(int num_potions_per_floor, bool only_place_on_dry_land)
+    bool place_potions(int num_health_potions_per_floor, int num_poison_potions_per_floor,
+                       bool only_place_on_dry_land)
     {
       const int c_max_num_iters = 1e5_i;
       const auto* dungeon = m_environment->get_dungeon();
+      const int num_potions_per_floor = num_health_potions_per_floor + num_poison_potions_per_floor;
       for (int f_idx = 0; f_idx < m_environment->num_floors(); ++f_idx)
       {
         auto* bsp_tree = dungeon->get_tree(f_idx);
         const auto world_size = bsp_tree->get_world_size();
+        //int ctr_health_potions = 0;
+        int ctr_poison_potions = 0;
         for (int pot_idx = 0; pot_idx < num_potions_per_floor; ++pot_idx)
         {
           Potion potion;
+          if (ctr_poison_potions++ < num_poison_potions_per_floor)
+            potion.poison = true;
           potion.curr_floor = f_idx;
           bool valid_pos = false;
           int num_iters = 0;

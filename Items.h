@@ -354,7 +354,6 @@ namespace dung
       weight = rnd::randn_range_clamp(0.02f, 0.4f);
       price = math::roundI(20*rnd::randn_clamp(1e3f, 500.f, 0.f, 5e5f))/20.f;
       health = math::roundI(rnd::randn_clamp(.05f, 0.1f, 0, 1.f)*globals::max_health);
-      poison = rnd::one_in(50);
     }
     
     int get_hp() const
