@@ -1517,29 +1517,49 @@ namespace dung
       return true;
     }
     
-    bool place_armour(int num_armour, bool only_place_on_dry_land)
+    bool place_armour(int num_shields_per_floor, int num_gambesons_per_floor,
+                      int num_cmhs_per_floor, int num_pbas_per_floor,
+                      int num_padded_coifs_per_floor, int num_cmcs_per_floor,
+                      int num_helmets_per_floor,
+                      bool only_place_on_dry_land)
     {
       const int c_max_num_iters = 1e5_i;
       const auto* dungeon = m_environment->get_dungeon();
+      const int num_armour_per_floor = num_shields_per_floor
+                                       + num_gambesons_per_floor
+                                       + num_cmhs_per_floor
+                                       + num_pbas_per_floor
+                                       + num_padded_coifs_per_floor
+                                       + num_cmcs_per_floor
+                                       + num_helmets_per_floor;
       for (int f_idx = 0; f_idx < m_environment->num_floors(); ++f_idx)
       {
         auto* bsp_tree = dungeon->get_tree(f_idx);
         const auto world_size = bsp_tree->get_world_size();
-        for (int a_idx = 0; a_idx < num_armour; ++a_idx)
+        int ctr_shields = 0;
+        int ctr_gambesons = 0;
+        int ctr_cmhs = 0;
+        int ctr_pbas = 0;
+        int ctr_padded_coifs = 0;
+        int ctr_cmcs = 0;
+        int ctr_helmets = 0;
+        for (int a_idx = 0; a_idx < num_armour_per_floor; ++a_idx)
         {
           std::unique_ptr<Armour> armour;
-          switch (rnd::rand_int(0, 6))
-          {
-            case 0: armour = std::make_unique<Shield>(); break;
-            case 1: armour = std::make_unique<Gambeson>(); break;
-            case 2: armour = std::make_unique<ChainMailleHauberk>(); break;
-            case 3: armour = std::make_unique<PlatedBodyArmour>(); break;
-            case 4: armour = std::make_unique<PaddedCoif>(); break;
-            case 5: armour = std::make_unique<ChainMailleCoif>(); break;
-            case 6: armour = std::make_unique<Helmet>(); break;
-              // Error:
-            default: return false;
-          }
+          if (ctr_shields++ < num_shields_per_floor)
+            armour = std::make_unique<Shield>();
+          else if (ctr_gambesons++ < num_gambesons_per_floor)
+            armour = std::make_unique<Gambeson>();
+          else if (ctr_cmhs++ < num_cmhs_per_floor)
+            armour = std::make_unique<ChainMailleHauberk>();
+          else if (ctr_pbas++ < num_pbas_per_floor)
+            armour = std::make_unique<PlatedBodyArmour>();
+          else if (ctr_padded_coifs++ < num_padded_coifs_per_floor)
+            armour = std::make_unique<PaddedCoif>();
+          else if (ctr_cmcs++ < num_cmcs_per_floor)
+            armour = std::make_unique<ChainMailleCoif>();
+          else if (ctr_helmets++ < num_helmets_per_floor)
+            armour = std::make_unique<Helmet>();
           armour->curr_floor = f_idx;
           bool valid_pos = false;
           int num_iters = 0;

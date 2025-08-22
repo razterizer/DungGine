@@ -271,7 +271,7 @@ private:
     dungeon_engine->place_lamps(30, 15, 5, true);
     dungeon_engine->place_weapons(30, 25, 17, 13, 30, 20, 15, true);
     dungeon_engine->place_potions(20, 80, true);
-    dungeon_engine->place_armour(150, true);
+    dungeon_engine->place_armour(25, 30, 20, 10, 40, 15, 10, true);
     dungeon_engine->place_npcs(100, true);
     dungeon.create_staircases(4);
     

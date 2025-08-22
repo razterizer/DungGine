@@ -178,7 +178,7 @@ There is currently no visual distiction between upwards or downwards going stair
   - `place_lamps(int num_torches_per_floor, int num_lanterns_per_floor, int num_magic_lamps_per_floor, bool only_place_on_dry_land)` : Places lamps in rooms, randomly all over the world.
   - `place_weapons(int num_daggers_per_floor, int num_swords_per_floor, int num_flails_per_floor, int num_morningstars_per_floor, int num_slings_per_floor, int num_bows_per_floor, int num_crossbows_per_floor, bool only_place_on_dry_land)` : Places weapons in rooms, randomly all over the world.
   - `place_potions(int num_health_potions_per_floor, int num_poison_potions_per_floor, bool only_place_on_dry_land)` : Places potions in rooms, randomly all over the world.
-  - `place_armour(int num_armour_per_floor, bool only_place_on_dry_land)` : Places `num_armour` armour parts in rooms, randomly all over the world.
+  - `place_armour(int num_shields_per_floor, int num_gambesons_per_floor, int num_cmhs_per_floor, int num_pbas_per_floor, int num_padded_coifs_per_floor, int num_cmcs_per_floor, int num_helmets_per_floor, bool only_place_on_dry_land)` : Places armour parts in rooms, randomly all over the world. Explanation: `cmh` = chain-maille hauberk, `pba` = plated body armour, `cmc` = chain-maille coif.
   - `place_npcs(int num_npcs_per_floor, bool only_place_on_dry_land)` : Places `num_npcs` NPCs in rooms, randomly all over the world.
   - `set_screen_scrolling_mode(ScreenScrollingMode mode, float t_page = 0.2f)` : Sets the screen scrolling mode to either `AlwaysInCentre`, `PageWise` or `WhenOutsideScreen`. `t_page` is used with `PageWise` mode.
   - `update(int frame_ctr, float fps, double real_time_s, float sim_time_s, float sim_dt_s, float fire_smoke_dt_factor, float projectile_speed_factor, int melee_attack_dice, int ranged_attack_dice, const keyboard::KeyPressDataPair& kpdp, bool* game_over)` : Updating the state of the dungeon engine. Manages things such as the change of direction of the sun for the shadows of rooms that are not under the ground and key-presses for control of the playable character.
@@ -433,7 +433,7 @@ dungeon_engine->place_keys(true, false);
 dungeon_engine->place_lamps(20, 15, 5, true);
 dungeon_engine->place_weapons(30, 25, 17, 13, 30, 20, 15, true);
 dungeon_engine->place_potions(20 80, true);
-dungeon_engine->place_armour(150, true);
+dungeon_engine->place_armour(25, 30, 20, 10, 40, 15, 10, true);
 dungeon_engine->place_npcs(100, false);
 dungeon_engine.set_screen_scrolling_mode(ScreenScrollingMode::WhenOutsideScreen);
 
