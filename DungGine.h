@@ -697,7 +697,9 @@ namespace dung
       active_projectiles.emplace_back(p);
     }
     
-    void update_fighting(float real_time_s, float sim_time_s, float sim_dt_s, float projectile_speed_factor)
+    void update_fighting(float real_time_s, float sim_time_s, float sim_dt_s,
+                         float projectile_speed_factor,
+                         int melee_attack_dice, int ranged_attack_dice)
     {
       auto f_calc_melee_damage = [](const Weapon* weapon, int bonus)
       {
@@ -735,7 +737,7 @@ namespace dung
             m_player.attack_timer.set_delay(1.f / pc_ranged_weapon->attack_speed);
           else
           {
-            int pc_attack_roll = rnd::dice(26)
+            int pc_attack_roll = rnd::dice(ranged_attack_dice)
                                  + m_player.thac0
                                  + m_player.get_ranged_attack_bonus()
                                  - blind_attack_penalty;
@@ -760,7 +762,7 @@ namespace dung
         {
           // Roll a d20 for the player's attack roll (if the NPC is visible).
           // If invisible, then roll a d32 instead.
-          int pc_attack_roll = rnd::dice(20)
+          int pc_attack_roll = rnd::dice(melee_attack_dice)
                                + m_player.thac0
                                + m_player.get_melee_attack_bonus()
                                - blind_attack_penalty;
@@ -799,7 +801,7 @@ namespace dung
             npc.attack_timer.set_delay(1.f / npc_ranged_weapon->attack_speed);
           else
           {
-            int npc_attack_roll = rnd::dice(26)
+            int npc_attack_roll = rnd::dice(ranged_attack_dice)
                                   + npc.thac0
                                   + npc.get_ranged_attack_bonus()
                                   - blind_attack_penalty;
@@ -830,7 +832,7 @@ namespace dung
           int npc_melee_attack_bonus = npc.state == State::FightMelee ? npc.get_melee_attack_bonus() : 0;
           
           // NPC attack roll.
-          int npc_attack_roll = rnd::dice(20)
+          int npc_attack_roll = rnd::dice(melee_attack_dice)
                                 + npc.thac0
                                 + npc_melee_attack_bonus
                                 + (rnd::dice(4) ? npc.fierceness / 2 : 0)
@@ -1629,6 +1631,7 @@ namespace dung
     void update(int frame_ctr, float fps,
                 double real_time_s, float sim_time_s, float sim_dt_s,
                 float fire_smoke_dt_factor, float projectile_speed_factor,
+                int melee_attack_dice, int ranged_attack_dice,
                 const keyboard::KeyPressDataPair& kpdp, bool* game_over)
     {
       utils::try_set(game_over, m_player.health <= 0);
@@ -1730,7 +1733,9 @@ namespace dung
       }
       
       if (do_fight)
-        update_fighting(static_cast<float>(real_time_s), sim_time_s, sim_dt_s, projectile_speed_factor);
+        update_fighting(static_cast<float>(real_time_s), sim_time_s, sim_dt_s,
+                        projectile_speed_factor,
+                        melee_attack_dice, ranged_attack_dice);
         
       if (trigger_game_save)
       {

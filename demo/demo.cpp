@@ -125,6 +125,7 @@ public:
       dungeon_engine->update(get_frame_count(), get_real_fps(),
                              get_real_time_s(), get_sim_time_s(), get_sim_dt_s(),
                              fire_smoke_dt_factor, projectile_speed_factor,
+                             20, 40,
                              kpdp, &game_over);
       dungeon_engine->draw(sh, get_real_time_s(), get_sim_time_s(),
                            get_anim_count(0), get_anim_count(1));
@@ -187,6 +188,7 @@ private:
       dungeon_engine->update(get_frame_count(), get_real_fps(),
                              get_real_time_s(), get_sim_time_s(), get_sim_dt_s(),
                              fire_smoke_dt_factor, projectile_speed_factor,
+                             20, 40,
                              kpdp, &game_over);
       if (game_over)
         set_state_game_over();
