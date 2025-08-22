@@ -210,25 +210,25 @@ namespace dung
     bool is_underground(int floor, BSPNode* room) const
     {
       if (!stlutils::in_range(m_room_styles, floor))
-        return false;
+        return true; // better be invisible.
       if (room == nullptr)
-        return false;
+        return true; // better be invisible.
       auto it = m_room_styles[floor].find(room);
       if (it != m_room_styles[floor].end())
         return it->second.is_underground;
-      return false;
+      return true;
     }
     
     bool is_underground(int floor, Corridor* corr) const
     {
       if (!stlutils::in_range(m_corridor_styles, floor))
-        return false;
+        return true; // better be invisible.
       if (corr == nullptr)
-        return false;
+        return true; // better be invisible.
       auto it = m_corridor_styles[floor].find(corr);
       if (it != m_corridor_styles[floor].end())
         return it->second.is_underground;
-      return false;
+      return true;
     }
     
     std::optional<RoomStyle> find_room_style(int floor, BSPNode* room) const
