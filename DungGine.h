@@ -610,13 +610,17 @@ namespace dung
     {
       std::vector<std::string> health_bars;
       std::vector<Style> styles;
+      std::vector<std::pair<RC, Style>> per_textel_styles;
       std::string pc_hb = str::rep_char(' ', 10);
       float pc_ratio = globals::max_health / 10;
       for (int i = 0; i < 10; ++i)
         pc_hb[i] = m_player.health > static_cast<int>(i*pc_ratio) ? '#' : ' ';
+      pc_hb = std::string(1, m_player.character) + ' ' + pc_hb;
+      per_textel_styles.emplace_back(RC { 0, 0 }, m_player.style);
       health_bars.emplace_back(pc_hb);
       styles.emplace_back(Style { Color::Magenta, Color::Transparent2 });
       
+      int line = 1;
       for (const auto& npc : all_npcs)
       {
         auto [pc_melee_attack, pc_ranged_attack] = get_pc_attack_modes(npc);
@@ -626,6 +630,8 @@ namespace dung
           float npc_ratio = globals::max_health / 10;
           for (int i = 0; i < 10; ++i)
             npc_hb[i] = npc.health > static_cast<int>(i*npc_ratio) ? 'O' : ' ';
+          npc_hb = std::string(1, npc.character) + ' ' + npc_hb;
+          per_textel_styles.emplace_back(RC { line++, 0 }, npc.style);
           health_bars.emplace_back(npc_hb);
           styles.emplace_back(Style { Color::Red, Color::Transparent2 });
         }
@@ -636,7 +642,7 @@ namespace dung
       tb_args.h_align = ui::HorizontalAlignment::LEFT;
       tb_args.base.box_style = { Color::White, Color::DarkBlue };
       tb_args.framed_mode = framed_mode;
-      tb_health.set_text(health_bars, styles);
+      tb_health.set_text(health_bars, styles, per_textel_styles);
       tb_health.calc_pre_draw(str::Adjustment::Left);
       tb_health.draw(sh, tb_args);
     }
