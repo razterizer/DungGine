@@ -879,7 +879,8 @@ namespace dung
     }
     
     template<int NR, int NC>
-    void draw_fighting(ScreenHandler<NR, NC>& sh, const RC& pc_scr_pos, bool do_update_fight, float real_time_s, float sim_time_s)
+    void draw_fighting(ScreenHandler<NR, NC>& sh, const RC& pc_scr_pos, bool do_update_fight, float real_time_s, float sim_time_s,
+                       int melee_blood_dice_visible, int melee_blood_dice_invisible)
     {
       auto f_render_pc_blood_splats = [&](const RC& offs)
       {
@@ -1048,7 +1049,7 @@ namespace dung
             if (m_environment->is_inside_any_room(m_player.curr_floor, m_player.pos + offs))
             {
               f_render_fight(&m_player, npc_scr_pos, offs);
-              if (do_update_fight && rnd::one_in(npc.visible ? 20 : 28))
+              if (do_update_fight && rnd::one_in(npc.visible ? melee_blood_dice_visible : melee_blood_dice_invisible))
                 f_render_pc_blood_splats(offs);
             }
             if (npc.visible)
@@ -1059,7 +1060,7 @@ namespace dung
               if (m_environment->is_inside_any_room(npc.curr_floor, npc.pos + offs))
               {
                 f_render_fight(&npc, pc_scr_pos, offs);
-                if (do_update_fight && rnd::one_in(npc.visible ? 20 : 28))
+                if (do_update_fight && rnd::one_in(npc.visible ? melee_blood_dice_visible : melee_blood_dice_invisible))
                   f_render_npc_blood_splats(npc, offs);
               }
             }
@@ -1804,6 +1805,7 @@ namespace dung
     template<int NR, int NC>
     void draw(ScreenHandler<NR, NC>& sh, double real_time_s, float sim_time_s,
               int anim_ctr_swim, int anim_ctr_fight,
+              int melee_blood_dice_visible, int melee_blood_dice_invisible,
               ui::VerticalAlignment mb_v_align = ui::VerticalAlignment::CENTER,
               ui::HorizontalAlignment mb_h_align = ui::HorizontalAlignment::CENTER,
               int mb_v_align_offs = 0, int mb_h_align_offs = 0,
@@ -1846,7 +1848,8 @@ namespace dung
       
       auto pc_scr_pos = m_screen_helper->get_screen_pos(m_player.pos);
       
-      draw_fighting(sh, pc_scr_pos, anim_ctr_fight % 2 == 0, static_cast<float>(real_time_s), sim_time_s);
+      draw_fighting(sh, pc_scr_pos, anim_ctr_fight % 2 == 0, static_cast<float>(real_time_s), sim_time_s,
+                    melee_blood_dice_visible, melee_blood_dice_invisible);
       
       for (auto& bs : m_player.blood_splats)
         bs.update(sim_time_s);

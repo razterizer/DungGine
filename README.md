@@ -182,7 +182,7 @@ There is currently no visual distiction between upwards or downwards going stair
   - `place_npcs(int num_npcs_per_floor, bool only_place_on_dry_land)` : Places `num_npcs` NPCs in rooms, randomly all over the world.
   - `set_screen_scrolling_mode(ScreenScrollingMode mode, float t_page = 0.2f)` : Sets the screen scrolling mode to either `AlwaysInCentre`, `PageWise` or `WhenOutsideScreen`. `t_page` is used with `PageWise` mode.
   - `update(int frame_ctr, float fps, double real_time_s, float sim_time_s, float sim_dt_s, float fire_smoke_dt_factor, float projectile_speed_factor, int melee_attack_dice, int ranged_attack_dice, const keyboard::KeyPressDataPair& kpdp, bool* game_over)` : Updating the state of the dungeon engine. Manages things such as the change of direction of the sun for the shadows of rooms that are not under the ground and key-presses for control of the playable character.
-  - `draw(ScreenHandler<NR, NC>& sh, double real_time_s, float sim_time_s, int anim_ctr_swim, int anim_ctr_fight, ui::VerticalAlignment mb_v_align = ui::VerticalAlignment::CENTER, ui::HorizontalAlignment mb_h_align = ui::HorizontalAlignment::CENTER, int mb_v_align_offs = 0, int mb_h_align_offs = 0, bool framed_mode = false, bool gore = false)` : Draws the whole dungeon world with NPCs and the PC along with items strewn all over the place. Use mb_v_align and mb_h_align to place the messagebox along with mb_v_align_offs, mb_h_align_offs and framed_mode. If `gore = true` then PC and NPCs will leave tracks of blood during fights.
+  - `draw(ScreenHandler<NR, NC>& sh, double real_time_s, float sim_time_s, int anim_ctr_swim, int anim_ctr_fight, int melee_blood_dice_visible, int melee_blood_dice_invisible, ui::VerticalAlignment mb_v_align = ui::VerticalAlignment::CENTER, ui::HorizontalAlignment mb_h_align = ui::HorizontalAlignment::CENTER, int mb_v_align_offs = 0, int mb_h_align_offs = 0, bool framed_mode = false, bool gore = false)` : Draws the whole dungeon world with NPCs and the PC along with items strewn all over the place. Use mb_v_align and mb_h_align to place the messagebox along with mb_v_align_offs, mb_h_align_offs and framed_mode. If `gore = true` then PC and NPCs will leave tracks of blood during fights.
   - `save_game_post_build(const std::string& savegame_filename, unsigned int curr_rnd_seed, double real_time_s)` : Called when pressing the `g` key.
   - `load_game_pre_build(const std::string& savegame_filename, unsigned int* curr_rnd_seed, double real_time_s)` : Called when pressing the `G` key. Called internally before rebuilding the scene via the `on_scene_rebuild_request()` event to funnel the random seed from the save-game file to `GameEngine` or whatever system you are using to run the `DungGine` in. The random seed from the save-file needs to be set before regenerating the scene.
   - `load_game_post_build(const std::string& savegame_filename, double real_time_s)` : Called when pressing the `G` key. Called internally after the scene has been rebuilt via the `on_scene_rebuild_request()` event. This function deserializes all the states from the save-file on top of the rebuilt scene and its data structures.
@@ -315,7 +315,7 @@ Color bg_color = Color::Default;
 dung::DungGine dungeon_engine { "bin/", false, false };
 dungeon_engine.load_dungeon(dungeon);
 dungeon_engine.style_dungeon(dung::WallShadingType::BG_Rand, dung::WallShadingType::BG_Rand);
-dungeon_engine.draw(sh, get_real_time_s(), get_sim_time_s(), 0, 0);
+dungeon_engine.draw(sh, get_real_time_s(), get_sim_time_s(), 0, 0, 30, 40);
 sh.print_screen_buffer(bg_color);
 ```
 
@@ -369,7 +369,8 @@ dungeon_engine->update(get_frame_count(), get_real_fps(),
 if (game_over)
   set_state_game_over();
 dungeon_engine->draw(sh, get_real_time_s(), get_sim_time_s(),
-  get_anim_count(0), get_anim_count(1));
+  get_anim_count(0), get_anim_count(1),
+  30, 40);
 sh.print_screen_buffer(bg_color);
 anim_ctr++;
 ```
@@ -449,6 +450,7 @@ if (game_over)
   set_state_game_over();
 dungeon_engine->draw(sh, get_real_time_s(), get_sim_time_s(),
   get_anim_count(0), get_anim_count(1),
+  30, 40,
   ui::VerticalAlignment::BOTTOM, ui::HorizontalAlignment::CENTER,
   -5, 0, false, true);
 sh.print_screen_buffer(bg_color);
