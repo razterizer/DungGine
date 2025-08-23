@@ -30,6 +30,7 @@ namespace dung
     float weight = 0.f; // kg-ish.
     float price = 0.f;  // SEK-ish.
     
+    virtual void change_fg_color() = 0;
     
     virtual void set_visibility(bool use_fog_of_war, bool fow_near, bool is_night)
     {
@@ -89,6 +90,11 @@ namespace dung
       price = math::roundI(20*rnd::randn_clamp(20.f, 30.f, 0.f, 1e4f))/20.f;
     }
     
+    virtual void change_fg_color() override
+    {
+      style.fg_color = color::get_random_color(key_fg_palette);
+    }
+    
     int key_id = 0;
   };
   
@@ -103,6 +109,25 @@ namespace dung
       weight = 0.4f;
       price = math::roundI(20*rnd::randn_clamp(200.f, 100.f, 0.f, 1e4f))/20.f;
     }
+    
+    virtual void change_fg_color() override
+    {
+      switch (lamp_type)
+      {
+        case LampType::MagicLamp:
+          style.fg_color = Color::DarkMagenta;
+          break;
+        case LampType::Lantern:
+          style.fg_color = color::get_random_color({ Color::Red, Color::Green });
+          break;
+        case LampType::Torch:
+          style.fg_color = Color::DarkYellow;
+          break;
+        default:
+          break;
+      }
+    }
+    
     void init_rand()
     {
       init_rand(rnd::rand_enum<Lamp::LampType>());
@@ -142,6 +167,7 @@ namespace dung
           break;
       }
     }
+    
     enum class LightType { Isotropic, Directional, NUM_ITEMS };
     LightType light_type = LightType::Isotropic;
     LampType lamp_type = LampType::MagicLamp;
@@ -238,6 +264,11 @@ namespace dung
       attack_speed = rnd::randn_range_clamp(2.f, 3.f);
       dist_type = WeaponDistType_Melee;
     }
+    
+    virtual void change_fg_color() override
+    {
+      style.fg_color = Color::DarkGray;
+    }
   };
   
   struct Sword : Weapon
@@ -252,6 +283,11 @@ namespace dung
       damage = rnd::randn_clamp_int(7.f, 4., 4, 50);
       attack_speed = rnd::randn_range_clamp(1.25f, 1.75f);
       dist_type = WeaponDistType_Melee;
+    }
+    
+    virtual void change_fg_color() override
+    {
+      style.fg_color = Color::DarkGray;
     }
   };
   
@@ -268,6 +304,11 @@ namespace dung
       attack_speed = rnd::randn_range_clamp(0.8f, 1.2f);
       dist_type = WeaponDistType_Melee;
     }
+    
+    virtual void change_fg_color() override
+    {
+      style.fg_color = Color::LightGray;
+    }
   };
   
   struct MorningStar : Weapon
@@ -282,6 +323,11 @@ namespace dung
       damage = rnd::randn_clamp_int(9.f, 5.f, 5, 35);
       attack_speed = rnd::randn_range_clamp(0.7f, 1.3f);
       dist_type = WeaponDistType_Melee;
+    }
+    
+    virtual void change_fg_color() override
+    {
+      style.fg_color = Color::LightGray;
     }
   };
   
@@ -302,6 +348,11 @@ namespace dung
       stlutils::fill(projectile_characters, '*');
       projectile_fg_color = Color::DarkGray;
     }
+    
+    virtual void change_fg_color() override
+    {
+      style.fg_color = Color::DarkGray;
+    }
   };
   
   struct Bow : Weapon
@@ -320,6 +371,11 @@ namespace dung
       dist_type = WeaponDistType_Ranged;
       projectile_characters = { '-', '/', '|', '\\', '-', '/', '|', '\\' };
       projectile_fg_color = Color::Yellow;
+    }
+    
+    virtual void change_fg_color() override
+    {
+      style.fg_color = Color::DarkYellow;
     }
   };
   
@@ -340,6 +396,11 @@ namespace dung
       projectile_characters = { '-', '/', '|', '\\', '-', '/', '|', '\\' };
       projectile_fg_color = Color::LightGray;
     }
+    
+    virtual void change_fg_color() override
+    {
+      style.fg_color = color::get_random_color(crossbow_fg_palette);
+    }
   };
   
   struct Potion : Item
@@ -354,6 +415,11 @@ namespace dung
       weight = rnd::randn_range_clamp(0.02f, 0.4f);
       price = math::roundI(20*rnd::randn_clamp(1e3f, 500.f, 0.f, 5e5f))/20.f;
       health = math::roundI(rnd::randn_clamp(.05f, 0.1f, 0, 1.f)*globals::max_health);
+    }
+    
+    virtual void change_fg_color() override
+    {
+      style.fg_color = color::get_random_color(potion_fg_palette);
     }
     
     int get_hp() const
@@ -391,6 +457,11 @@ namespace dung
       protection = rnd::randn_clamp_int(2.f, 15.f, 0, 50);
       weight = protection * 0.5f * (1.f + 0.6f*(rnd::rand() - 0.6f));
     }
+    
+    virtual void change_fg_color() override
+    {
+      style.fg_color = Color::Blue;
+    }
   };
   
   struct Gambeson : Armour
@@ -404,6 +475,11 @@ namespace dung
       protection = rnd::randn_clamp_int(0.5f, 12.f, 0, 10);
       weight = protection * 0.25f * (1.f + 0.3f*(rnd::rand() - 0.6f));
     }
+    
+    virtual void change_fg_color() override
+    {
+      style.fg_color = Color::LightGray;
+    }
   };
   
   struct ChainMailleHauberk : Armour
@@ -415,6 +491,11 @@ namespace dung
       type = "chain maille hauberk";
       protection = rnd::randn_clamp_int(5.f, 18.f, 0, 40);
       weight = protection * 0.62f * (1.f + 0.5f*(rnd::rand() - 0.6f));
+    }
+    
+    virtual void change_fg_color() override
+    {
+      style.fg_color = Color::Cyan;
     }
   };
   
@@ -429,6 +510,11 @@ namespace dung
       protection = rnd::randn_clamp_int(10.f, 20.f, 0, 100);
       weight = protection * 0.67f * (1.f + 0.6f*(rnd::rand() - 0.6f));
     }
+    
+    virtual void change_fg_color() override
+    {
+      style.fg_color = Color::Cyan;
+    }
   };
   
   struct PaddedCoif : Armour
@@ -440,6 +526,11 @@ namespace dung
       type = "padded coif";
       protection = rnd::randn_clamp_int(0.5f, 12.f, 0, 10);
       weight = protection * 0.016f * (1.f + 0.4f*(rnd::rand() - 0.6f));
+    }
+    
+    virtual void change_fg_color() override
+    {
+      style.fg_color = Color::LightGray;
     }
   };
   
@@ -453,6 +544,11 @@ namespace dung
       protection = rnd::randn_clamp_int(5.f, 18.f, 0, 40);
       weight = protection * 0.061f * (1.f + 0.3f*(rnd::rand() - 0.6f));
     }
+    
+    virtual void change_fg_color() override
+    {
+      style.fg_color = Color::Cyan;
+    }
   };
   
   struct Helmet : Armour
@@ -464,6 +560,11 @@ namespace dung
       type = "helmet";
       protection = rnd::randn_clamp_int(10.f, 20.f, 0, 100);
       weight = protection * 0.087f * (1.f + 0.4f*(rnd::rand() - 0.6f));
+    }
+    
+    virtual void change_fg_color() override
+    {
+      style.fg_color = Color::Cyan;
     }
   };
 }

@@ -1112,6 +1112,15 @@ namespace dung
       });
     }
     
+    void assign_room_properties(Item& item, const std::optional<RoomStyle>& rs, bool assure_contrasting_fg_colors)
+    {
+      const auto& room_style = rs.value();
+      item.is_underground = room_style.is_underground;
+      if (assure_contrasting_fg_colors)
+        while (item.style.fg_color == room_style.get_fill_style().bg_color)
+          item.change_fg_color();
+    }
+    
   public:
     DungGine(bool use_fow, bool sorted_inventory_items, DungGineTextureParams texture_params = {})
       : message_handler(std::make_unique<MessageHandler>())
@@ -1263,7 +1272,7 @@ namespace dung
       m_use_per_room_lat_long_for_sun_dir = use_per_room_lat_long_for_sun_dir;
     }
     
-    bool place_keys(bool only_place_on_dry_land, bool only_place_on_same_floor)
+    bool place_keys(bool only_place_on_dry_land, bool assure_contrasting_fg_colors, bool only_place_on_same_floor)
     {
       const int c_max_num_iters = 1e5_i;
       const auto* dungeon = m_environment->get_dungeon();
@@ -1292,24 +1301,30 @@ namespace dung
                 rnd::rand_int(0, world_size.c)
               };
               
-              BSPNode* room = nullptr;
-              valid_pos = m_environment->is_inside_any_room(bsp_tree_key, key.pos, &room);
+              valid_pos = m_environment->is_inside_any_room(bsp_tree_key, key.pos, &key.curr_room);
               if (only_place_on_dry_land &&
-                  room != nullptr &&
+                  key.curr_room != nullptr &&
                   !is_dry(m_environment->get_terrain(key.curr_floor, key.pos)))
               {
                 valid_pos = false;
               }
             } while (num_iters++ < c_max_num_iters && !valid_pos);
             
-            BSPNode* leaf = nullptr;
-            if (!m_environment->is_inside_any_room(bsp_tree_key, key.pos, &leaf))
-              return false;
-            
-            if (leaf != nullptr)
+            if (key.curr_room != nullptr)
             {
-              key.curr_room = leaf;
-              key.is_underground = m_environment->is_underground(key.curr_floor, leaf);
+              auto rs = m_environment->find_room_style(key.curr_floor, key.curr_room);
+              if (rs.has_value())
+                assign_room_properties(key, rs, assure_contrasting_fg_colors);
+              else
+              {
+                std::cerr << "ERROR in place_keys() : Unable to find room style for placed key!\n";
+                return false;
+              }
+            }
+            else
+            {
+              std::cerr << "ERROR in place_keys() : Unable to find room for key!\n";
+              return false;
             }
             
             all_keys.emplace_back(key);
@@ -1319,7 +1334,8 @@ namespace dung
       return true;
     }
     
-    bool place_lamps(int num_torches_per_floor, int num_lanterns_per_floor, int num_magic_lamps_per_floor, bool only_place_on_dry_land)
+    bool place_lamps(int num_torches_per_floor, int num_lanterns_per_floor, int num_magic_lamps_per_floor,
+                     bool only_place_on_dry_land, bool assure_contrasting_fg_colors)
     {
       const int c_max_num_iters = 1e5_i;
       const int num_lamps_per_floor = num_torches_per_floor + num_lanterns_per_floor + num_magic_lamps_per_floor;
@@ -1363,24 +1379,31 @@ namespace dung
                 rnd::rand_int(0, world_size.c)
               };
             }
-            BSPNode* room = nullptr;
-            valid_pos = m_environment->is_inside_any_room(bsp_tree, lamp.pos, &room);
+
+            valid_pos = m_environment->is_inside_any_room(bsp_tree, lamp.pos, &lamp.curr_room);
             if (only_place_on_dry_land &&
-                room != nullptr &&
+                lamp.curr_room != nullptr &&
                 !is_dry(m_environment->get_terrain(lamp.curr_floor, lamp.pos)))
             {
               valid_pos = false;
             }
           } while (num_iters++ < c_max_num_iters && !valid_pos);
           
-          BSPNode* leaf = nullptr;
-          if (!m_environment->is_inside_any_room(bsp_tree, lamp.pos, &leaf))
-            return false;
-          
-          if (leaf != nullptr)
+          if (lamp.curr_room != nullptr)
           {
-            lamp.curr_room = leaf;
-            lamp.is_underground = m_environment->is_underground(lamp.curr_floor, leaf);
+            auto rs = m_environment->find_room_style(lamp.curr_floor, lamp.curr_room);
+            if (rs.has_value())
+              assign_room_properties(lamp, rs, assure_contrasting_fg_colors);
+            else
+            {
+              std::cerr << "ERROR in place_lamps() : Unable to find room style for placed lamp!\n";
+              return false;
+            }
+          }
+          else
+          {
+            std::cerr << "ERROR in place_lamps() : Unable to find room for lamp!\n";
+            return false;
           }
           
           all_lamps.emplace_back(lamp);
@@ -1396,7 +1419,7 @@ namespace dung
                        int num_slings_per_floor,
                        int num_bows_per_floor,
                        int num_crossbows_per_floor,
-                       bool only_place_on_dry_land)
+                       bool only_place_on_dry_land, bool assure_contrasting_fg_colors)
     {
       const int c_max_num_iters = 1e5_i;
       const auto* dungeon = m_environment->get_dungeon();
@@ -1445,24 +1468,31 @@ namespace dung
               rnd::rand_int(0, world_size.r),
               rnd::rand_int(0, world_size.c)
             };
-            BSPNode* room = nullptr;
-            valid_pos = m_environment->is_inside_any_room(bsp_tree, weapon->pos, &room);
+
+            valid_pos = m_environment->is_inside_any_room(bsp_tree, weapon->pos, &weapon->curr_room);
             if (only_place_on_dry_land &&
-                room != nullptr &&
+                weapon->curr_room != nullptr &&
                 !is_dry(m_environment->get_terrain(weapon->curr_floor, weapon->pos)))
             {
               valid_pos = false;
             }
           } while (num_iters++ < c_max_num_iters && !valid_pos);
           
-          BSPNode* leaf = nullptr;
-          if (!m_environment->is_inside_any_room(bsp_tree, weapon->pos, &leaf))
-            return false;
-          
-          if (leaf != nullptr)
+          if (weapon->curr_room != nullptr)
           {
-            weapon->curr_room = leaf;
-            weapon->is_underground = m_environment->is_underground(weapon->curr_floor, leaf);
+            auto rs = m_environment->find_room_style(weapon->curr_floor, weapon->curr_room);
+            if (rs.has_value())
+              assign_room_properties(*weapon.get(), rs, assure_contrasting_fg_colors);
+            else
+            {
+              std::cerr << "ERROR in place_weapons() : Unable to find room style for placed weapon!\n";
+              return false;
+            }
+          }
+          else
+          {
+            std::cerr << "ERROR in place_weapons() : Unable to find room for weapon!\n";
+            return false;
           }
           
           all_weapons.emplace_back(weapon.release());
@@ -1472,7 +1502,7 @@ namespace dung
     }
     
     bool place_potions(int num_health_potions_per_floor, int num_poison_potions_per_floor,
-                       bool only_place_on_dry_land)
+                       bool only_place_on_dry_land, bool assure_contrasting_fg_colors)
     {
       const int c_max_num_iters = 1e5_i;
       const auto* dungeon = m_environment->get_dungeon();
@@ -1498,24 +1528,31 @@ namespace dung
               rnd::rand_int(0, world_size.r),
               rnd::rand_int(0, world_size.c)
             };
-            BSPNode* room = nullptr;
-            valid_pos = m_environment->is_inside_any_room(bsp_tree, potion.pos, &room);
+
+            valid_pos = m_environment->is_inside_any_room(bsp_tree, potion.pos, &potion.curr_room);
             if (only_place_on_dry_land &&
-                room != nullptr &&
+                potion.curr_room != nullptr &&
                 !is_dry(m_environment->get_terrain(potion.curr_floor, potion.pos)))
             {
               valid_pos = false;
             }
           } while (num_iters++ < c_max_num_iters && !valid_pos);
           
-          BSPNode* leaf = nullptr;
-          if (!m_environment->is_inside_any_room(bsp_tree, potion.pos, &leaf))
-            return false;
-          
-          if (leaf != nullptr)
+          if (potion.curr_room != nullptr)
           {
-            potion.curr_room = leaf;
-            potion.is_underground = m_environment->is_underground(potion.curr_floor, leaf);
+            auto rs = m_environment->find_room_style(potion.curr_floor, potion.curr_room);
+            if (rs.has_value())
+              assign_room_properties(potion, rs, assure_contrasting_fg_colors);
+            else
+            {
+              std::cerr << "ERROR in place_potions() : Unable to find room style for placed potion!\n";
+              return false;
+            }
+          }
+          else
+          {
+            std::cerr << "ERROR in place_potions() : Unable to find room for potion!\n";
+            return false;
           }
           
           all_potions.emplace_back(potion);
@@ -1528,7 +1565,7 @@ namespace dung
                       int num_cmhs_per_floor, int num_pbas_per_floor,
                       int num_padded_coifs_per_floor, int num_cmcs_per_floor,
                       int num_helmets_per_floor,
-                      bool only_place_on_dry_land)
+                      bool only_place_on_dry_land, bool assure_contrasting_fg_colors)
     {
       const int c_max_num_iters = 1e5_i;
       const auto* dungeon = m_environment->get_dungeon();
@@ -1577,24 +1614,31 @@ namespace dung
               rnd::rand_int(0, world_size.r),
               rnd::rand_int(0, world_size.c)
             };
-            BSPNode* room = nullptr;
-            valid_pos = m_environment->is_inside_any_room(bsp_tree, armour->pos, &room);
+
+            valid_pos = m_environment->is_inside_any_room(bsp_tree, armour->pos, &armour->curr_room);
             if (only_place_on_dry_land &&
-                room != nullptr &&
+                armour->curr_room != nullptr &&
                 !is_dry(m_environment->get_terrain(armour->curr_floor, armour->pos)))
             {
               valid_pos = false;
             }
           } while (num_iters++ < c_max_num_iters && !valid_pos);
           
-          BSPNode* leaf = nullptr;
-          if (!m_environment->is_inside_any_room(bsp_tree, armour->pos, &leaf))
-            return false;
-          
-          if (leaf != nullptr)
+          if (armour->curr_room != nullptr)
           {
-            armour->curr_room = leaf;
-            armour->is_underground = m_environment->is_underground(armour->curr_floor, leaf);
+            auto rs = m_environment->find_room_style(armour->curr_floor, armour->curr_room);
+            if (rs.has_value())
+              assign_room_properties(*armour.get(), rs, assure_contrasting_fg_colors);
+            else
+            {
+              std::cerr << "ERROR in place_armour() : Unable to find room style for placed armour!\n";
+              return false;
+            }
+          }
+          else
+          {
+            std::cerr << "ERROR in place_armour() : Unable to find room for armour!\n";
+            return false;
           }
           
           all_armour.emplace_back(armour.release());
@@ -1626,10 +1670,10 @@ namespace dung
               rnd::rand_int(0, world_size.r),
               rnd::rand_int(0, world_size.c)
             };
-            BSPNode* room = nullptr;
-            valid_pos = m_environment->is_inside_any_room(bsp_tree, npc.pos, &room);
+
+            valid_pos = m_environment->is_inside_any_room(bsp_tree, npc.pos, &npc.curr_room);
             if (only_place_on_dry_land &&
-                room != nullptr)
+                npc.curr_room != nullptr)
             {
               if (!is_dry(m_environment->get_terrain(npc.curr_floor, npc.pos)))
                 valid_pos = false;
@@ -1637,16 +1681,16 @@ namespace dung
                 valid_pos = false;
             }
           } while (num_iters++ < c_max_num_iters && !valid_pos);
-          
-          BSPNode* leaf = nullptr;
-          if (!m_environment->is_inside_any_room(bsp_tree, npc.pos, &leaf))
-            return false;
-          
-          if (leaf != nullptr)
+                    
+          if (npc.curr_room != nullptr)
           {
-            npc.curr_room = leaf;
-            npc.is_underground = m_environment->is_underground(npc.curr_floor, leaf);
+            npc.is_underground = m_environment->is_underground(npc.curr_floor, npc.curr_room);
             npc.init(all_weapons, all_armour);
+          }
+          else
+          {
+            std::cerr << "ERROR in place_npcs() : Unable to find room for npc!\n";
+            return false;
           }
           
           all_npcs.emplace_back(npc);

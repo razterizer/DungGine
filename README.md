@@ -174,11 +174,11 @@ There is currently no visual distiction between upwards or downwards going stair
   - `configure_sun(float sun_day_t_offs = 0.f, float minutes_per_day = 20.f, Season start_season = Season::Spring, float minutes_per_year = 120.f, Latitude latitude = Latitude::NorthernHemisphere, Longitude longitude = Longitude::F, bool use_per_room_lat_long_for_sun_dir = true)` : Configures the speed of the solar day, speed of the solar year, the starting direction of the sun and the starting season. Used for shadow movements for rooms over ground.
       When `use_per_room_lat_long_for_sun_dir` is `true` then use `latitude = Latitude::Equator` and `longitude = Longitude::F` to start with. Other values will shift the map over the globe so to speak, but with these starting settings the rooms at the top of the map will be the at the north pole and the rooms at the bottom of the map will be at the south pole. When `use_per_room_lat_long_for_sun_dir` is `false` then the specified latitude and longitude will be used globally across the whole map and the the function default args is a good starting point.
   - `configure_sun_rand(float minutes_per_day = 20.f, float minutes_per_year = 120.f, Latitude latitude = Latitude::NorthernHemisphere, Longitude longitude = Longitude::F, bool use_per_room_lat_long_for_sun_dir = true)` : Same as above but randomizes the initial direction of the sun.
-  - `place_keys(bool only_place_on_dry_land, bool only_place_on_same_floor)` : Places the keys in rooms, randomly all over the world.
-  - `place_lamps(int num_torches_per_floor, int num_lanterns_per_floor, int num_magic_lamps_per_floor, bool only_place_on_dry_land)` : Places lamps in rooms, randomly all over the world.
-  - `place_weapons(int num_daggers_per_floor, int num_swords_per_floor, int num_flails_per_floor, int num_morningstars_per_floor, int num_slings_per_floor, int num_bows_per_floor, int num_crossbows_per_floor, bool only_place_on_dry_land)` : Places weapons in rooms, randomly all over the world.
-  - `place_potions(int num_health_potions_per_floor, int num_poison_potions_per_floor, bool only_place_on_dry_land)` : Places potions in rooms, randomly all over the world.
-  - `place_armour(int num_shields_per_floor, int num_gambesons_per_floor, int num_cmhs_per_floor, int num_pbas_per_floor, int num_padded_coifs_per_floor, int num_cmcs_per_floor, int num_helmets_per_floor, bool only_place_on_dry_land)` : Places armour parts in rooms, randomly all over the world. Explanation: `cmh` = chain-maille hauberk, `pba` = plated body armour, `cmc` = chain-maille coif.
+  - `place_keys(bool only_place_on_dry_land, bool assure_contrasting_fg_colors, bool only_place_on_same_floor)` : Places the keys in rooms, randomly all over the world.
+  - `place_lamps(int num_torches_per_floor, int num_lanterns_per_floor, int num_magic_lamps_per_floor, bool only_place_on_dry_land, bool assure_contrasting_fg_colors)` : Places lamps in rooms, randomly all over the world.
+  - `place_weapons(int num_daggers_per_floor, int num_swords_per_floor, int num_flails_per_floor, int num_morningstars_per_floor, int num_slings_per_floor, int num_bows_per_floor, int num_crossbows_per_floor, bool only_place_on_dry_land, bool assure_contrasting_fg_colors)` : Places weapons in rooms, randomly all over the world.
+  - `place_potions(int num_health_potions_per_floor, int num_poison_potions_per_floor, bool only_place_on_dry_land, bool assure_contrasting_fg_colors)` : Places potions in rooms, randomly all over the world.
+  - `place_armour(int num_shields_per_floor, int num_gambesons_per_floor, int num_cmhs_per_floor, int num_pbas_per_floor, int num_padded_coifs_per_floor, int num_cmcs_per_floor, int num_helmets_per_floor, bool only_place_on_dry_land, bool assure_contrasting_fg_colors)` : Places armour parts in rooms, randomly all over the world. Explanation: `cmh` = chain-maille hauberk, `pba` = plated body armour, `cmc` = chain-maille coif.
   - `place_npcs(int num_npcs_per_floor, bool only_place_on_dry_land)` : Places `num_npcs` NPCs in rooms, randomly all over the world.
   - `set_screen_scrolling_mode(ScreenScrollingMode mode, float t_page = 0.2f)` : Sets the screen scrolling mode to either `AlwaysInCentre`, `PageWise` or `WhenOutsideScreen`. `t_page` is used with `PageWise` mode.
   - `update(int frame_ctr, float fps, double real_time_s, float sim_time_s, float sim_dt_s, float fire_smoke_dt_factor, float projectile_speed_factor, int melee_attack_dice, int ranged_attack_dice, const keyboard::KeyPressDataPair& kpdp, bool* game_over)` : Updating the state of the dungeon engine. Manages things such as the change of direction of the sun for the shadows of rooms that are not under the ground and key-presses for control of the playable character.
@@ -352,10 +352,10 @@ dungeon_engine.configure_sun_rand(20.f, 120.f, dung::Latitude::NorthernHemispher
 dungeon_engine.style_dungeon(dung::WallShadingType::BG_Rand, dung::WallShadingType::BG_Rand);
 if (!dungeon_engine.place_player(sh.size()))
   std::cerr << "ERROR : Unable to place the playable character!" << std::endl;
-dungeon_engine->place_keys(true, true);
-dungeon_engine->place_lamps(20, 5, 3, true);
-dungeon_engine->place_weapons(16, 13, 15, 13, 16, 14, 13, true);
-dungeon_engine->place_potions(10, 90, true);
+dungeon_engine->place_keys(true, true, true);
+dungeon_engine->place_lamps(20, 5, 3, true, true);
+dungeon_engine->place_weapons(16, 13, 15, 13, 16, 14, 13, true, true);
+dungeon_engine->place_potions(10, 90, true, true);
 dungeon_engine.set_screen_scrolling_mode(ScreenScrollingMode::WhenOutsideScreen);
 
 // In game loop:
@@ -430,11 +430,11 @@ dungeon_engine.configure_sun_rand(20.f, 120.f, dung::Latitude::Equator, dung::Lo
 dungeon_engine.style_dungeon(dung::WallShadingType::BG_Light, dung::WallShadingType::BG_Dark);
 if (!dungeon_engine.place_player(sh.size()))
   std::cerr << "ERROR : Unable to place the playable character!" << std::endl;
-dungeon_engine->place_keys(true, false);
-dungeon_engine->place_lamps(20, 15, 5, true);
-dungeon_engine->place_weapons(30, 25, 17, 13, 30, 20, 15, true);
-dungeon_engine->place_potions(20 80, true);
-dungeon_engine->place_armour(25, 30, 20, 10, 40, 15, 10, true);
+dungeon_engine->place_keys(true, true, false);
+dungeon_engine->place_lamps(20, 15, 5, true, true);
+dungeon_engine->place_weapons(30, 25, 17, 13, 30, 20, 15, true, true);
+dungeon_engine->place_potions(20 80, true, true);
+dungeon_engine->place_armour(25, 30, 20, 10, 40, 15, 10, true, true);
 dungeon_engine->place_npcs(100, false);
 dungeon_engine.set_screen_scrolling_mode(ScreenScrollingMode::WhenOutsideScreen);
 
