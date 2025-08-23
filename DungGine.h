@@ -778,6 +778,7 @@ namespace dung
           {
             // PC hits the NPC.
             npc_damage += f_calc_melee_damage(pc_melee_weapon, m_player.get_melee_damage_bonus());
+            npc.melee_weapon_hit = true;
           }
         }
         
@@ -851,6 +852,7 @@ namespace dung
           {
             // NPC hits the PC.
             pc_damage += f_calc_melee_damage(npc_melee_weapon, npc.get_melee_damage_bonus()) + (rnd::dice(6) ? npc.fierceness : 0);
+            m_player.melee_weapon_hit = true;
           }
         }
           
@@ -1047,34 +1049,41 @@ namespace dung
               m_player.cached_fight_offs = f_calc_fight_offs(dp);
             auto offs = m_player.cached_fight_offs;
             if (m_environment->is_inside_any_room(m_player.curr_floor, m_player.pos + offs))
-            {
               f_render_fight(&m_player, npc_scr_pos, offs);
-              if (do_update_fight && rnd::one_in(npc.visible ? melee_blood_prob_visible : melee_blood_prob_invisible))
-                f_render_pc_blood_splats(offs);
-            }
             if (npc.visible)
             {
               if (do_update_fight)
                 npc.cached_fight_offs = f_calc_fight_offs(-dp);
               auto offs = npc.cached_fight_offs;
               if (m_environment->is_inside_any_room(npc.curr_floor, npc.pos + offs))
-              {
                 f_render_fight(&npc, pc_scr_pos, offs);
-                if (do_update_fight && rnd::one_in(npc.visible ? melee_blood_prob_visible : melee_blood_prob_invisible))
-                  f_render_npc_blood_splats(npc, offs);
-              }
             }
           }
-          else if (npc.ranged_weapon_hit)
+
+          if (m_player.melee_weapon_hit)
+          {
+            RC offs = { rnd::rand_int(-1, +1), rnd::rand_int(-1, +1) };
+            if (rnd::one_in(npc.visible ? melee_blood_prob_visible : melee_blood_prob_invisible))
+              f_render_pc_blood_splats(offs);
+            m_player.melee_weapon_hit = false;
+          }
+          if (npc.melee_weapon_hit)
+          {
+            RC offs = { rnd::rand_int(-1, +1), rnd::rand_int(-1, +1) };
+            if (rnd::one_in(npc.visible ? melee_blood_prob_visible : melee_blood_prob_invisible))
+              f_render_npc_blood_splats(npc, offs);
+            npc.melee_weapon_hit = false;
+          }
+          if (npc.ranged_weapon_hit)
           {
             RC offs = { rnd::rand_int(-1, +1), rnd::rand_int(-1, +1) };
             if (m_environment->is_inside_any_room(npc.curr_floor, npc.pos + offs))
               f_render_npc_blood_splats(npc, offs);
-          
             npc.ranged_weapon_hit = false;
           }
         }
       }
+      
       for (const auto& p : active_projectiles)
       {
         char p_char = p.weapon->projectile_characters[p.ang_idx];

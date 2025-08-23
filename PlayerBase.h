@@ -133,6 +133,7 @@ namespace dung
     int weakness = 0;
     int thac0 = 1;
     float weight_strain = 0.f;
+    bool melee_weapon_hit = false;
     bool ranged_weapon_hit = false;
     
     Terrain on_terrain = Terrain::Default;

@@ -315,7 +315,7 @@ Color bg_color = Color::Default;
 dung::DungGine dungeon_engine { "bin/", false, false };
 dungeon_engine.load_dungeon(dungeon);
 dungeon_engine.style_dungeon(dung::WallShadingType::BG_Rand, dung::WallShadingType::BG_Rand);
-dungeon_engine.draw(sh, get_real_time_s(), get_sim_time_s(), 0, 0, 30, 40);
+dungeon_engine.draw(sh, get_real_time_s(), get_sim_time_s(), 0, 0, 5, 5);
 sh.print_screen_buffer(bg_color);
 ```
 
@@ -370,7 +370,7 @@ if (game_over)
   set_state_game_over();
 dungeon_engine->draw(sh, get_real_time_s(), get_sim_time_s(),
   get_anim_count(0), get_anim_count(1),
-  30, 40);
+  5, 5);
 sh.print_screen_buffer(bg_color);
 anim_ctr++;
 ```
@@ -450,7 +450,7 @@ if (game_over)
   set_state_game_over();
 dungeon_engine->draw(sh, get_real_time_s(), get_sim_time_s(),
   get_anim_count(0), get_anim_count(1),
-  30, 40,
+  5, 5,
   ui::VerticalAlignment::BOTTOM, ui::HorizontalAlignment::CENTER,
   -5, 0, false, true);
 sh.print_screen_buffer(bg_color);

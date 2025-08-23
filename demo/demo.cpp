@@ -129,7 +129,7 @@ public:
                              kpdp, &game_over);
       dungeon_engine->draw(sh, get_real_time_s(), get_sim_time_s(),
                            get_anim_count(0), get_anim_count(1),
-                           30, 40);
+                           5, 5);
       sh.print_screen_buffer(Color::Black);
 #endif
     }
@@ -199,7 +199,7 @@ private:
       
       dungeon_engine->draw(sh, get_real_time_s(), get_sim_time_s(),
                            get_anim_count(0), get_anim_count(1),
-                           20, 28,
+                           5, 5,
                            ui::VerticalAlignment::CENTER, ui::HorizontalAlignment::CENTER,
                            4, 0, framed_mode, use_gore);
     }
