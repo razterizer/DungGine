@@ -105,7 +105,7 @@ namespace dung
     bool animal = false; // Animals cannot have weapons nor armour.
     
     static constexpr float c_dist_fight_melee = 2.f + 1e-2f;
-    static constexpr float c_dist_fight_ranged = 7.f + 1e-2f;
+    static constexpr float c_dist_fight_ranged = 10.f + 1e-2f;
     static constexpr float c_dist_pursue = 8.f + 1e-2f;
     static constexpr float c_dist_patroll = 12.f + 1e-2f;
     static constexpr float c_dist_hostile_hyst_on = 2.f + 1e-2f;
