@@ -252,7 +252,7 @@ private:
       texture_params.dt_anim_s = 0.5;
       auto f_tex_path = [this](const auto& filename)
       {
-        return folder::join_path({ project_root_filepath, "textures", filename });
+        return folder::join_path({ get_exe_folder(), "textures", filename });
       };
       texture_params.texture_file_names_surface_level_fill.emplace_back(f_tex_path("texture_sl_fill_0.tex"));
       texture_params.texture_file_names_surface_level_fill.emplace_back(f_tex_path("texture_sl_fill_1.tex"));
