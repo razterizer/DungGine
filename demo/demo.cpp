@@ -311,15 +311,15 @@ int main(int argc, char** argv)
   
   for (int i = 1; i < argc; ++i)
   {
-    if (strcmp(argv[i],  "--suppress_tty_output") == 0)
+    if (std::strcmp(argv[i],  "--suppress_tty_output") == 0)
       params.suppress_tty_output = true;
-    else if (strcmp(argv[i], "--suppress_tty_input") == 0)
+    else if (std::strcmp(argv[i], "--suppress_tty_input") == 0)
       params.suppress_tty_input = true;
-    else if (i + 1 < argc && strcmp(argv[i], "--log_mode") == 0)
+    else if (i + 1 < argc && std::strcmp(argv[i], "--log_mode") == 0)
     {
-      if (strcmp(argv[i + 1], "record") == 0)
+      if (std::strcmp(argv[i + 1], "record") == 0)
         params.log_mode = LogMode::Record;
-      else if (strcmp(argv[i + 1], "replay") == 0)
+      else if (std::strcmp(argv[i + 1], "replay") == 0)
         params.log_mode = LogMode::Replay;
       params.xcode_log_filepath = "../../../../../../../../Documents/xcode/lib/DungGine/demo";
     }
@@ -329,7 +329,7 @@ int main(int argc, char** argv)
   
   for (int i = 1; i < argc; ++i)
   {
-    if (strcmp(argv[i], "--help") == 0)
+    if (std::strcmp(argv[i], "--help") == 0)
     {
       std::cout << "demo --help | [--log_mode (record | replay)] [--suppress_tty_output] [--suppress_tty_input] [--set_fps <fps>] [--set_sim_delay_us <delay_us>]" << std::endl;
       std::cout << "  default values:" << std::endl;
@@ -343,7 +343,7 @@ int main(int argc, char** argv)
   {
     if (i + 1 < argc && std::strcmp(argv[i], "--set_fps") == 0)
       game.set_real_fps(static_cast<float>(std::atof(argv[i + 1])));
-    else if (i + 1 < argc && strcmp(argv[i], "--set_sim_delay_us") == 0)
+    else if (i + 1 < argc && std::strcmp(argv[i], "--set_sim_delay_us") == 0)
       game.set_sim_delay_us(static_cast<float>(std::atof(argv[i + 1])));
   }
 
