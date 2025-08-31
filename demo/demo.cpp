@@ -342,9 +342,9 @@ int main(int argc, char** argv)
   for (int i = 1; i < argc; ++i)
   {
     if (i + 1 < argc && std::strcmp(argv[i], "--set_fps") == 0)
-      game.set_real_fps(std::atof(argv[i + 1]));
+      game.set_real_fps(static_cast<float>(std::atof(argv[i + 1])));
     else if (i + 1 < argc && strcmp(argv[i], "--set_sim_delay_us") == 0)
-      game.set_sim_delay_us(std::atof(argv[i + 1]));
+      game.set_sim_delay_us(static_cast<float>(std::atof(argv[i + 1])));
   }
 
   game.init();
