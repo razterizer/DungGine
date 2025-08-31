@@ -149,7 +149,7 @@ namespace dung
         case State::Pursue:
         case State::FightMelee:
         {
-          const float c_fight_min_dist = state == State::FightRanged ? c_fight_min_dist_ranged : c_fight_min_dist_melee;
+          const int c_fight_min_dist = state == State::FightRanged ? c_fight_min_dist_ranged : c_fight_min_dist_melee;
         
           //vel_r = 0.5f * (pc_pos.r - pos.r);
           //vel_c = 0.5f * (pc_pos.c - pos.c);
