@@ -13,7 +13,7 @@
 #include <Termin8or/Styles.h>
 #include <Termin8or/Color.h>
 #include <string>
-#include <strstream>
+#include <sstream>
 
 #define SG_READ_VAR(var) #var, &var
 #define SG_WRITE_VAR(var) #var, var
