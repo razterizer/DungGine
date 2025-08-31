@@ -387,7 +387,8 @@ namespace dung
               if (lo_angle_rad > hi_angle_rad)
                 hi_angle_rad += math::c_2pi;
                 
-              float curr_angle_rad = static_cast<float>(math::atan2n<float>(-(obj.pos.r - curr_pos.r), obj.pos.c - curr_pos.c));
+              float curr_angle_rad = math::atan2n<float>(-static_cast<float>(obj.pos.r - curr_pos.r),
+                                                          static_cast<float>(obj.pos.c - curr_pos.c));
               if (curr_angle_rad < lo_angle_rad)
                 curr_angle_rad += math::c_2pi;
               if (math::in_range<float>(curr_angle_rad, lo_angle_rad, hi_angle_rad, Range::Closed))
