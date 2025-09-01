@@ -26,6 +26,8 @@ namespace dung
     bool visible = false;
     bool is_underground = false;
     
+    bool shade = false; // Shade with room/corridor light.
+    
     int curr_floor = 0;
     BSPNode* curr_room = nullptr;
     Corridor* curr_corridor = nullptr;

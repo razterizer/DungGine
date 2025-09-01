@@ -1127,8 +1127,11 @@ namespace dung
       const auto& room_style = rs.value();
       item.is_underground = room_style.is_underground;
       if (assure_contrasting_fg_colors)
+      {
+        item.shade = true;
         while (item.style.fg_color == room_style.get_fill_style().bg_color)
           item.change_fg_color();
+      }
     }
     
   public:
@@ -1944,14 +1947,29 @@ namespace dung
       }
       
       // Items and NPCs
-      auto f_render_item = [&](const auto& obj)
+      auto f_render_npc = [&](const auto& npc)
+      {
+        if (npc.curr_floor != m_player.curr_floor)
+          return;
+        if (!npc.visible)
+          return;
+        auto scr_pos = m_screen_helper->get_screen_pos(npc.pos);
+        sh.write_buffer(std::string(1, npc.character), scr_pos, npc.style);
+      };
+      
+      auto f_render_obj = [&](const auto& obj)
       {
         if (obj.curr_floor != m_player.curr_floor)
           return;
         if (!obj.visible)
           return;
         auto scr_pos = m_screen_helper->get_screen_pos(obj.pos);
-        sh.write_buffer(std::string(1, obj.character), scr_pos.r, scr_pos.c, obj.style);
+        auto fg_color = obj.style.fg_color;
+        if (obj.shade && obj.light)
+          fg_color = color::shade_color(obj.style.fg_color,
+                                        color::ShadeType::Dark);
+        sh.write_buffer(std::string(1, obj.character), scr_pos,
+          fg_color, obj.style.bg_color);
       };
       
       for (const auto& npc : all_npcs)
@@ -1961,7 +1979,7 @@ namespace dung
         //bool swimming = is_wet(npc.on_terrain) && npc.can_swim && !npc.can_fly;
         bool dead_on_liquid = npc.health <= 0 && is_wet(npc.on_terrain); //&& swimming;
         if (!dead_on_liquid || sim_time_s - npc.death_time_s < 1.5f + (npc.can_fly ? 0.5f : 0.f))
-          f_render_item(npc);
+          f_render_npc(npc);
         
         if (npc.visible && is_wet(npc.on_terrain))
         {
@@ -2065,19 +2083,19 @@ namespace dung
       }
       
       for (const auto& key : all_keys)
-        f_render_item(key);
+        f_render_obj(key);
       
       for (const auto& lamp : all_lamps)
-        f_render_item(lamp);
+        f_render_obj(lamp);
       
       for (const auto& weapon : all_weapons)
-        f_render_item(*weapon);
+        f_render_obj(*weapon);
         
       for (const auto& potion : all_potions)
-        f_render_item(potion);
+        f_render_obj(potion);
         
       for (const auto& armour : all_armour)
-        f_render_item(*armour);
+        f_render_obj(*armour);
         
       if (gore)
       {
