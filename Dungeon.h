@@ -126,7 +126,7 @@ namespace dung
     // prob_in_room : inverse probability. A value of 10 means probability 1/10 or about once every ten times.
     void create_staircases(int prob_in_room = 10)
     {
-      AABB<int> aabb_A, aabb_B;
+      t8x::AABB<int> aabb_A, aabb_B;
       for (int f_idx = 1; f_idx < m_num_floors; ++f_idx)
       {
         auto* floor_A = bsp_forest[f_idx - 1].get(); // upper floor

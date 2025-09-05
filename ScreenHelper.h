@@ -15,7 +15,7 @@ namespace dung
 
   class ScreenHelper final
   {
-    ttl::Rectangle m_screen_in_world;
+    t8::Rectangle m_screen_in_world;
     // Value between 0 and 1 where 1 means a full screen vertically or horizontally.
     // Fraction of screen that will be scrolled (when in PageWise scroll mode).
     float t_scroll_amount = 0.2f;

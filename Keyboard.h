@@ -19,6 +19,8 @@ using namespace std::string_literals;
 
 namespace dung
 {
+  using MessageHandler = t8x::ui::MessageHandler;
+  
 
   class Keyboard
   {
@@ -44,7 +46,7 @@ namespace dung
     bool& m_trigger_game_load;
     bool& m_trigger_screenshot;
     
-    ui::TextBoxDebug& m_tbd;
+    t8x::ui::TextBoxDebug& m_tbd;
     bool& m_debug;
     
     void drop_item(Item* obj, const RC& curr_pos)
@@ -117,7 +119,7 @@ namespace dung
              bool& trigger_game_save,
              bool& trigger_game_load,
              bool& trigger_screenshot,
-             ui::TextBoxDebug& tbd, bool& debug)
+             t8x::ui::TextBoxDebug& tbd, bool& debug)
       : m_environment(environment)
       , m_inventory(inventory)
       , message_handler(msg_handler)
@@ -135,12 +137,12 @@ namespace dung
       , m_debug(debug)
     {}
   
-    void handle_keyboard(const keyboard::KeyPressDataPair& kpdp, double real_time_s)
+    void handle_keyboard(const t8::input::KeyPressDataPair& kpdp, double real_time_s)
     {
-      auto curr_key = keyboard::get_char_key(kpdp.transient);
-      auto curr_special_key = keyboard::get_special_key(kpdp.transient);
-      //auto curr_key_held = keyboard::get_char_key(kpdp.held);
-      //auto curr_special_key_held = keyboard::get_special_key(kpdp.held);
+      auto curr_key = t8::input::get_char_key(kpdp.transient);
+      auto curr_special_key = t8::input::get_special_key(kpdp.transient);
+      //auto curr_key_held = t8::input::get_char_key(kpdp.held);
+      //auto curr_special_key_held = t8::input::get_special_key(kpdp.held);
     
       auto& curr_pos = m_player.pos;
       
@@ -153,7 +155,7 @@ namespace dung
         return false;
       };
       
-      if (str::to_lower(curr_key) == 'a' || curr_special_key == keyboard::SpecialKey::Left)
+      if (str::to_lower(curr_key) == 'a' || curr_special_key == t8::input::SpecialKey::Left)
       {
         if (m_player.show_inventory)
         {
@@ -163,7 +165,7 @@ namespace dung
                  m_environment->allow_move_to(m_player.curr_floor, curr_pos.r, curr_pos.c - 1))
           curr_pos.c--;
       }
-      else if (str::to_lower(curr_key) == 'd' || curr_special_key == keyboard::SpecialKey::Right)
+      else if (str::to_lower(curr_key) == 'd' || curr_special_key == t8::input::SpecialKey::Right)
       {
         if (m_player.show_inventory && str::to_lower(curr_key) == 'd')
         {
@@ -227,7 +229,7 @@ namespace dung
                  m_environment->allow_move_to(m_player.curr_floor, curr_pos.r, curr_pos.c + 1))
           curr_pos.c++;
       }
-      else if (str::to_lower(curr_key) == 's' || curr_special_key == keyboard::SpecialKey::Down)
+      else if (str::to_lower(curr_key) == 's' || curr_special_key == t8::input::SpecialKey::Down)
       {
         if (m_player.show_inventory)
           m_inventory->inc_hilite();
@@ -236,7 +238,7 @@ namespace dung
                  m_environment->allow_move_to(m_player.curr_floor, curr_pos.r + 1, curr_pos.c))
           curr_pos.r++;
       }
-      else if (str::to_lower(curr_key) == 'w' || curr_special_key == keyboard::SpecialKey::Up)
+      else if (str::to_lower(curr_key) == 'w' || curr_special_key == t8::input::SpecialKey::Up)
       {
         if (m_player.show_inventory)
           m_inventory->dec_hilite();
@@ -372,7 +374,8 @@ namespace dung
                 m_player.key_idcs.emplace_back(static_cast<int>(key_idx));
                 key.picked_up = true;
                 message_handler->add_message(static_cast<float>(real_time_s),
-                                             "You picked up a key!", MessageHandler::Level::Guide);
+                                             "You picked up a key!",
+                                             MessageHandler::Level::Guide);
               }
               else
                 message_handler->add_message(static_cast<float>(real_time_s),
@@ -410,7 +413,8 @@ namespace dung
                 m_player.weapon_idcs.emplace_back(static_cast<int>(wpn_idx));
                 weapon->picked_up = true;
                 message_handler->add_message(static_cast<float>(real_time_s),
-                                             "You picked up " + str::indef_art(weapon->type) + "!", MessageHandler::Level::Guide);
+                                             "You picked up " + str::indef_art(weapon->type) + "!",
+                                             MessageHandler::Level::Guide);
               }
               else
                 message_handler->add_message(static_cast<float>(real_time_s),

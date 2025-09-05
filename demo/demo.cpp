@@ -16,10 +16,12 @@ enum class TestType { DungeonSimple, DungeonRuntime };
 static TestType test_type = TestType::DungeonRuntime;
 
 
-class Game : public GameEngine<>, public dung::DungGineListener
+class Game : public t8x::GameEngine<>, public dung::DungGineListener
 {
+  using Color = t8::Color;
+  
 public:
-  Game(int argc, char** argv, const GameEngineParams& params)
+  Game(int argc, char** argv, const t8x::GameEngineParams& params)
     : GameEngine(argv[0], params)
   {
     GameEngine::set_real_fps(15);
@@ -88,8 +90,8 @@ public:
       
       bsp_tree->print_tree();
       
-      clear_screen();
-      return_cursor();
+      t8::screen::clear_screen();
+      t8::screen::return_cursor();
       
       sh.clear();
       bsp_tree->draw_rooms(sh);
@@ -200,7 +202,7 @@ private:
       dungeon_engine->draw(sh, get_real_time_s(), get_sim_time_s(),
                            get_anim_count(0), get_anim_count(1),
                            5, 5,
-                           ui::VerticalAlignment::CENTER, ui::HorizontalAlignment::CENTER,
+                           t8x::ui::VerticalAlignment::CENTER, t8x::ui::HorizontalAlignment::CENTER,
                            4, 0, framed_mode, use_gore);
     }
   }
@@ -300,7 +302,9 @@ private:
 
 int main(int argc, char** argv)
 {
-  GameEngineParams params;
+  using Color = t8::Color;
+
+  t8x::GameEngineParams params;
   params.enable_title_screen = false;
   params.enable_instructions_screen = false;
   params.enable_quit_confirm_screen = true;

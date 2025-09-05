@@ -14,6 +14,7 @@
 
 namespace dung
 {
+  using BBLocation = t8::BBLocation;
   
   enum class Race { Human, Elf, Half_Elf, Gnome, Halfling, Dwarf, Half_Orc, Ogre, Hobgoblin, Goblin, Orc, Troll, Monster, Lich, Lich_King, Basilisk, Bear, Kobold, Skeleton, Giant, Huge_Spider, Wolf, Wyvern, Griffin, Ghoul, Dragon, NUM_ITEMS };
   enum class Class { Warrior_Fighter, Warrior_Ranger, Warrior_Paladin, Warrior_Barbarian, Priest_Cleric, Priest_Druid, Priest_Monk, Priest_Shaman, Wizard_Mage, Wizard_Sorcerer, Rogue_Thief, Rogue_Bard, NUM_ITEMS };
@@ -175,8 +176,8 @@ namespace dung
       pos_c += vel_c*dt;
       auto r = math::roundI(pos_r);
       auto c = math::roundI(pos_c);
-      auto location_corr = ttl::BBLocation::None;
-      auto location_room = ttl::BBLocation::None;
+      auto location_corr = BBLocation::None;
+      auto location_room = BBLocation::None;
       inside_room = false;
       inside_corr = false;
       if (curr_corridor != nullptr)
@@ -205,17 +206,17 @@ namespace dung
       }
       else if (!wall_coll_resolve && rnd::one_in(6))
       {
-        auto location = ttl::BBLocation::None;
-        if (location_room != ttl::BBLocation::None && location_corr != ttl::BBLocation::None)
+        auto location = BBLocation::None;
+        if (location_room != BBLocation::None && location_corr != BBLocation::None)
         {
           acc_r = 0.f;
           acc_c = 0.f;
           vel_r = 0.f;
           vel_c = 0.f;
         }
-        else if (inside_room && location_room != ttl::BBLocation::None)
+        else if (inside_room && location_room != BBLocation::None)
           location = location_room;
-        else if (inside_corr && location_corr != ttl::BBLocation::None)
+        else if (inside_corr && location_corr != BBLocation::None)
           location = location_corr;
         pos_r = static_cast<float>(pos.r);
         pos_c = static_cast<float>(pos.c);
@@ -223,41 +224,41 @@ namespace dung
         const float c_res_vel = 5.f;
         switch (location)
         {
-          case ttl::BBLocation::OutsideTop:
+          case BBLocation::OutsideTop:
             acc_r = c_res_acc;
             vel_r = c_res_vel;
             break;
-          case ttl::BBLocation::OutsideTopLeft:
+          case BBLocation::OutsideTopLeft:
             acc_r = c_res_acc;
             acc_c = c_res_acc;
             vel_r = c_res_vel;
             vel_c = c_res_vel;
             break;
-          case ttl::BBLocation::OutsideLeft:
+          case BBLocation::OutsideLeft:
             acc_c = c_res_acc;
             vel_c = c_res_vel;
             break;
-          case ttl::BBLocation::OutsideBottomLeft:
+          case BBLocation::OutsideBottomLeft:
             acc_r = -c_res_acc;
             acc_c = c_res_acc;
             vel_r = -c_res_vel;
             vel_c = c_res_vel;
             break;
-          case ttl::BBLocation::OutsideBottom:
+          case BBLocation::OutsideBottom:
             acc_r = -c_res_acc;
             vel_r = -c_res_vel;
             break;
-          case ttl::BBLocation::OutsideBottomRight:
+          case BBLocation::OutsideBottomRight:
             acc_r = -c_res_acc;
             acc_c = -c_res_acc;
             vel_r = -c_res_vel;
             vel_c = -c_res_vel;
             break;
-          case ttl::BBLocation::OutsideRight:
+          case BBLocation::OutsideRight:
             acc_c = -c_res_acc;
             vel_c = -c_res_vel;
             break;
-          case ttl::BBLocation::OutsideTopRight:
+          case BBLocation::OutsideTopRight:
             acc_r = c_res_acc;
             acc_c = -c_res_acc;
             vel_r = c_res_vel;

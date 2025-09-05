@@ -23,6 +23,12 @@
 
 namespace dung
 {
+  using Color = t8::Color;
+  using Style = t8::color::Style;
+  //using RC = t8::RC;
+  using Rectangle = t8::Rectangle;
+  template<int NR, int NC>
+  using ScreenHandler = t8::screen::ScreenHandler<NR, NC>;
 
   struct Staircase;
   
@@ -94,8 +100,8 @@ namespace dung
     int size_rows = 0;
     int size_cols = 0;
     
-    ttl::Rectangle bb_region;
-    ttl::Rectangle bb_leaf_room;
+    Rectangle bb_region;
+    Rectangle bb_leaf_room;
     
     std::array<std::unique_ptr<BSPNode>, 2> children;
         
@@ -112,7 +118,7 @@ namespace dung
     
     bool is_leaf() const { return !children[0] && !children[1]; }
     
-    void generate(ttl::Rectangle bb, int lvl, int min_room_length)
+    void generate(Rectangle bb, int lvl, int min_room_length)
     {
       bb_region = bb;
       level = lvl;
@@ -154,7 +160,7 @@ namespace dung
         f_set_ch_size(ch_0.get(), split_length_0);
         int ch0_r_len = children[0]->size_rows;
         int ch0_c_len = children[0]->size_cols;
-        ttl::Rectangle bb_0 { bb.r, bb.c, ch0_r_len, ch0_c_len };
+        Rectangle bb_0 { bb.r, bb.c, ch0_r_len, ch0_c_len };
         ch_0->generate(bb_0, lvl + 1, min_room_length);
         
         auto& ch_1 = children[1] = std::make_unique<BSPNode>();
@@ -175,7 +181,7 @@ namespace dung
         }
         int ch1_r_len = children[1]->size_rows;
         int ch1_c_len = children[1]->size_cols;
-        ttl::Rectangle bb_1 { ch1_r, ch1_c, ch1_r_len, ch1_c_len };
+        Rectangle bb_1 { ch1_r, ch1_c, ch1_r_len, ch1_c_len };
         ch_1->generate(bb_1, lvl + 1, min_room_length);
       }
     }
@@ -183,9 +189,9 @@ namespace dung
     template<int NR, int NC>
     void draw_regions(ScreenHandler<NR, NC>& sh,
                       int r0, int c0,
-                      const styles::Style& border_style) const
+                      const Style& border_style) const
     {
-      drawing::draw_box_outline(sh, r0 + bb_region.r, c0 + bb_region.c, bb_region.r_len, bb_region.c_len, drawing::OutlineType::Hash, border_style);
+      t8x::drawing::draw_box_outline(sh, r0 + bb_region.r, c0 + bb_region.c, bb_region.r_len, bb_region.c_len, t8x::drawing::OutlineType::Hash, border_style);
       
       if (children[0])
         children[0]->draw_regions(sh, r0, c0, border_style);
@@ -196,13 +202,13 @@ namespace dung
     template<int NR, int NC>
     void draw_rooms(ScreenHandler<NR, NC>& sh,
                     int r0, int c0,
-                    const styles::Style& room_style) const
+                    const Style& room_style) const
     {
       if (!bb_leaf_room.is_empty())
       {
-        drawing::draw_box_outline(sh,
+        t8x::drawing::draw_box_outline(sh,
                  r0 + bb_leaf_room.r, c0 + bb_leaf_room.c, bb_leaf_room.r_len, bb_leaf_room.c_len,
-                 drawing::OutlineType::Hash, room_style);
+                 t8x::drawing::OutlineType::Hash, room_style);
       }
                  
       if (children[0])
@@ -275,7 +281,7 @@ namespace dung
         children[1]->collect_leaves(leaves);
     }
     
-    bool is_inside_room(const RC& pos, ttl::BBLocation* location = nullptr) const
+    bool is_inside_room(const RC& pos, t8::BBLocation* location = nullptr) const
     {
       if (!is_leaf())
         return false;
@@ -283,7 +289,7 @@ namespace dung
       {
         if (d->open_or_no_door() && pos == d->pos)
         {
-          utils::try_set(location, ttl::BBLocation::Inside);
+          utils::try_set(location, t8::BBLocation::Inside);
           return true;
         }
       }
@@ -374,7 +380,7 @@ namespace dung
     std::vector<std::unique_ptr<Door>> doors;
     std::map<std::pair<BSPNode*, BSPNode*>, Corridor*, PtrPairLess<BSPNode>> room_corridor_map;
     
-    ttl::Rectangle bb;
+    Rectangle bb;
     
   public:
     int id = global_bsp_tree_id++;
@@ -405,7 +411,7 @@ namespace dung
       m_root.generate(bb, 0, m_min_room_length);
     }
     
-    const ttl::Rectangle& get_bounding_box() const
+    const Rectangle& get_bounding_box() const
     {
       return bb;
     }
@@ -458,7 +464,7 @@ namespace dung
               if (bb_B.top() < bb_A.top() && bb_B.bottom() - bb_A.top() < 2*min_corridor_half_width)
                 return false;
               bool collided = false;
-              auto collides_with_bb = [r0, r1, c0, c1](const ttl::Rectangle bb) -> bool
+              auto collides_with_bb = [r0, r1, c0, c1](const Rectangle bb) -> bool
               {
                 if (c0 <= bb.left() && bb.right() <= c1)
                 {
@@ -528,7 +534,7 @@ namespace dung
               if (bb_B.left() < bb_A.left() && bb_B.right() - bb_A.left() < 2*min_corridor_half_width)
                 return false;
               bool collided = false;
-              auto collides_with_bb = [r0, r1, c0, c1](const ttl::Rectangle bb) -> bool
+              auto collides_with_bb = [r0, r1, c0, c1](const Rectangle bb) -> bool
               {
                 if (r0 <= bb.top() && bb.bottom() <= r1)
                 {
@@ -720,7 +726,7 @@ namespace dung
     template<int NR, int NC>
     void draw_regions(ScreenHandler<NR, NC>& sh,
                       int r0 = 0, int c0 = 0,
-                      const styles::Style& border_style = { Color::Black, Color::Yellow }) const
+                      const Style& border_style = { Color::Black, Color::Yellow }) const
     {
       m_root.draw_regions(sh, r0, c0, border_style);
     }
@@ -728,7 +734,7 @@ namespace dung
     template<int NR, int NC>
     void draw_rooms(ScreenHandler<NR, NC>& sh,
                     int r0 = 0, int c0 = 0,
-                    const styles::Style& room_style = { Color::White, Color::DarkRed }) const
+                    const Style& room_style = { Color::White, Color::DarkRed }) const
     {
       m_root.draw_rooms(sh, r0, c0, room_style);
     }
@@ -736,14 +742,14 @@ namespace dung
     template<int NR, int NC>
     void draw_corridors(ScreenHandler<NR, NC>& sh,
                         int r0 = 0, int c0 = 0,
-                        const styles::Style& corridor_outline_style = { Color::Green, Color::DarkGreen },
-                        const styles::Style& corridor_fill_style = { Color::Black, Color::Green }) const
+                        const Style& corridor_outline_style = { Color::Green, Color::DarkGreen },
+                        const Style& corridor_fill_style = { Color::Black, Color::Green }) const
     {
       for (const auto& corr : room_corridor_map)
       {
         const auto& bb = corr.second->bb;
-        drawing::draw_box_outline(sh, r0 + bb.r, c0 + bb.c, bb.r_len, bb.c_len, drawing::OutlineType::Hash, corridor_outline_style);
-        drawing::draw_box(sh, r0 + bb.r, c0 + bb.c, bb.r_len, bb.c_len, corridor_fill_style);
+        t8x::drawing::draw_box_outline(sh, r0 + bb.r, c0 + bb.c, bb.r_len, bb.c_len, t8x::drawing::OutlineType::Hash, corridor_outline_style);
+        t8x::drawing::draw_box(sh, r0 + bb.r, c0 + bb.c, bb.r_len, bb.c_len, corridor_fill_style);
       }
     }
     

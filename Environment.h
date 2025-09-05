@@ -18,6 +18,8 @@
 
 namespace dung
 {
+  using Texture = t8::drawing::Texture;
+
 
   struct DungGineTextureParams
   {
@@ -40,11 +42,11 @@ namespace dung
     double dt_texture_anim_s = 0.1;
     double texture_anim_time_stamp = 0.;
     unsigned short texture_anim_ctr = 0;
-    std::vector<drawing::Texture> texture_sl_fill;
-    std::vector<drawing::Texture> texture_sl_shadow;
-    std::vector<drawing::Texture> texture_ug_fill;
-    std::vector<drawing::Texture> texture_ug_shadow;
-    drawing::Texture texture_empty;
+    std::vector<Texture> texture_sl_fill;
+    std::vector<Texture> texture_sl_shadow;
+    std::vector<Texture> texture_ug_fill;
+    std::vector<Texture> texture_ug_shadow;
+    Texture texture_empty;
     
     
   public:
@@ -86,7 +88,7 @@ namespace dung
         // Default long_offs = 0 @ Longitude::F.
         auto long_offs = static_cast<int>(longitude_0);
         
-        auto f_calc_lat_long = [&world_size, lat_offs, long_offs](auto& room_style, const ttl::Rectangle& bb)
+        auto f_calc_lat_long = [&world_size, lat_offs, long_offs](auto& room_style, const t8::Rectangle& bb)
         {
           const auto num_lat = static_cast<int>(Latitude::NUM_ITEMS);
           const auto num_long = static_cast<int>(Longitude::NUM_ITEMS);
@@ -255,21 +257,21 @@ namespace dung
       return std::nullopt;
     }
     
-    std::optional<const drawing::Texture*> fetch_texture(const auto& texture_vector) const
+    std::optional<const Texture*> fetch_texture(const auto& texture_vector) const
     {
       if (texture_vector.empty())
         return std::nullopt; //texture_empty;
       return &texture_vector[texture_anim_ctr % texture_vector.size()];
     };
     
-    std::optional<const drawing::Texture*> fetch_curr_fill_texture(const RoomStyle& room_style) const
+    std::optional<const Texture*> fetch_curr_fill_texture(const RoomStyle& room_style) const
     {
       auto texture_fill = room_style.is_underground ?
         fetch_texture(texture_ug_fill) : fetch_texture(texture_sl_fill);
       return texture_fill;
     }
     
-    std::optional<const drawing::Texture*> fetch_curr_shadow_texture(const RoomStyle& room_style) const
+    std::optional<const Texture*> fetch_curr_shadow_texture(const RoomStyle& room_style) const
     {
       auto texture_shadow = room_style.is_underground ?
       fetch_texture(texture_ug_shadow) : fetch_texture(texture_sl_shadow);
@@ -402,7 +404,7 @@ namespace dung
             }
           }
           
-          drawing::draw_box_outline(sh,
+          t8x::drawing::draw_box_outline(sh,
                                     bb_scr_pos.r, bb_scr_pos.c, bb.r_len, bb.c_len,
                                     room_style.wall_type,
                                     room_style.wall_style,
@@ -410,12 +412,12 @@ namespace dung
           
           if (room_style.is_underground ? texture_ug_fill.empty() : texture_sl_fill.empty())
           {
-            drawing::draw_box(sh,
+            t8x::drawing::draw_box(sh,
                               bb_scr_pos.r, bb_scr_pos.c, bb.r_len, bb.c_len,
                               room_style.get_fill_style(),
                               room_style.get_fill_char(),
                               room_style.is_underground ? SolarDirection::Nadir : shadow_type,
-                              styles::shade_style(room_style.get_fill_style(), color::ShadeType::Dark),
+                              t8::color::shade_style(room_style.get_fill_style(), t8::color::ShadeType::Dark),
                               room_style.get_fill_char(),
                               room->light);
           }
@@ -430,7 +432,7 @@ namespace dung
             const auto& texture_fill = *(fetch_curr_fill_texture(room_style).value_or(&texture_empty));
             const auto& texture_shadow = *(fetch_curr_shadow_texture(room_style).value_or(&texture_empty));
             
-            drawing::draw_box_textured(sh,
+            t8x::drawing::draw_box_textured(sh,
                                        bb_scr_pos.r, bb_scr_pos.c, bb.r_len, bb.c_len,
                                        room_style.is_underground ? SolarDirection::Nadir : shadow_type,
                                        texture_fill,
@@ -468,17 +470,17 @@ namespace dung
           }
           
           
-          drawing::draw_box_outline(sh,
+          t8x::drawing::draw_box_outline(sh,
                                     bb_scr_pos.r, bb_scr_pos.c, bb.r_len, bb.c_len,
                                     corr_style.wall_type,
                                     corr_style.wall_style,
                                     corr->light);
-          drawing::draw_box(sh,
+          t8x::drawing::draw_box(sh,
                             bb_scr_pos.r, bb_scr_pos.c, bb.r_len, bb.c_len,
                             corr_style.get_fill_style(),
                             corr_style.get_fill_char(),
                             corr_style.is_underground ? SolarDirection::Nadir : shadow_type,
-                            styles::shade_style(corr_style.get_fill_style(), color::ShadeType::Dark, true),
+                            t8::color::shade_style(corr_style.get_fill_style(), t8::color::ShadeType::Dark, true),
                             corr_style.get_fill_char(),
                             corr->light);
         }

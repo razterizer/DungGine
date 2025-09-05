@@ -85,14 +85,14 @@ namespace dung
     Key()
     {
       character = 'F';
-      style.fg_color = color::get_random_color(key_fg_palette);
+      style.fg_color = t8::color::get_random_color(key_fg_palette);
       weight = rnd::randn_range_clamp(0.01f, 0.1f);
       price = math::roundI(20*rnd::randn_clamp(20.f, 30.f, 0.f, 1e4f))/20.f;
     }
     
     virtual void change_fg_color() override
     {
-      style.fg_color = color::get_random_color(key_fg_palette);
+      style.fg_color = t8::color::get_random_color(key_fg_palette);
     }
     
     int key_id = 0;
@@ -118,7 +118,7 @@ namespace dung
           style.fg_color = Color::DarkMagenta;
           break;
         case LampType::Lantern:
-          style.fg_color = color::get_random_color({ Color::Red, Color::Green });
+          style.fg_color = t8::color::get_random_color({ Color::Red, Color::Green });
           break;
         case LampType::Torch:
           style.fg_color = Color::DarkYellow;
@@ -152,7 +152,7 @@ namespace dung
           angle_deg = rnd::randn_range_clamp(2.f, 90.f);
           life_time_s = rnd::randn_clamp(400.f, 350.f, 180.f, 900.f); // 3 - 15 min.
           character = 'G';
-          style.fg_color = color::get_random_color({ Color::Red, Color::Green });
+          style.fg_color = t8::color::get_random_color({ Color::Red, Color::Green });
           weight = rnd::randn_range_clamp(0.05f, 0.3f);
           break;
         case LampType::Torch:
@@ -384,7 +384,7 @@ namespace dung
     Crossbow()
     {
       character = rnd::rand_select<char>({ '[', ']' });
-      style.fg_color = color::get_random_color(crossbow_fg_palette);
+      style.fg_color = t8::color::get_random_color(crossbow_fg_palette);
       weight = rnd::randn_range_clamp(1.f, 20.f);
       price = math::roundI(20*rnd::randn_clamp(1e4f, 1500.f, 0.f, 5e5f))/20.f;
       type = "crossbow";
@@ -399,7 +399,7 @@ namespace dung
     
     virtual void change_fg_color() override
     {
-      style.fg_color = color::get_random_color(crossbow_fg_palette);
+      style.fg_color = t8::color::get_random_color(crossbow_fg_palette);
     }
   };
   
@@ -411,7 +411,7 @@ namespace dung
     Potion()
     {
       character = rnd::rand_select<char>({ 'u', 'U', 'b' });
-      style.fg_color = color::get_random_color(potion_fg_palette);
+      style.fg_color = t8::color::get_random_color(potion_fg_palette);
       weight = rnd::randn_range_clamp(0.02f, 0.4f);
       price = math::roundI(20*rnd::randn_clamp(1e3f, 500.f, 0.f, 5e5f))/20.f;
       health = math::roundI(rnd::randn_clamp(.05f, 0.1f, 0, 1.f)*globals::max_health);
@@ -419,7 +419,7 @@ namespace dung
     
     virtual void change_fg_color() override
     {
-      style.fg_color = color::get_random_color(potion_fg_palette);
+      style.fg_color = t8::color::get_random_color(potion_fg_palette);
     }
     
     int get_hp() const

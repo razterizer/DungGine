@@ -12,10 +12,10 @@
 namespace dung
 {
   
-  using WallType = drawing::OutlineType; //{ Hash, Masonry, Masonry1, Masonry2, Masonry3, Temple };
-  using SolarDirection = drawing::SolarDirection;
-  using Style = styles::Style;
-  using HiliteSelectFGStyle = styles::HiliteSelectFGStyle;
+  using WallType = t8x::drawing::OutlineType; //{ Hash, Masonry, Masonry1, Masonry2, Masonry3, Temple };
+  using SolarDirection = t8x::drawing::SolarDirection;
+  using Style = t8::color::Style;
+  using HiliteSelectFGStyle = t8::color::HiliteSelectFGStyle;
   enum class FloorType { None, Sand, Grass, Stone, Stone2, Water, Wood, NUM_ITEMS };
   enum class WallShadingType { BG_Light, BG_Dark, BG_Rand };
   
@@ -112,7 +112,7 @@ namespace dung
           break;
       }
         
-      wall_style = styles::get_random_style(wall_palette[wall_basic_type]);
+      wall_style = t8::color::get_random_style(wall_palette[wall_basic_type]);
     }
     
     char get_fill_char() const
@@ -149,17 +149,17 @@ namespace dung
       switch (floor_type)
       {
         case FloorType::Sand:
-          style = styles::make_shaded_style(Color::Yellow, color::ShadeType::Bright);
+          style = t8::color::make_shaded_style(Color::Yellow, t8::color::ShadeType::Bright);
           break;
         case FloorType::Grass:
-          style = styles::make_shaded_style(Color::Green, color::ShadeType::Bright);
+          style = t8::color::make_shaded_style(Color::Green, t8::color::ShadeType::Bright);
           break;
         case FloorType::Stone:
         case FloorType::Stone2:
-          style = styles::make_shaded_style(Color::LightGray, color::ShadeType::Bright);
+          style = t8::color::make_shaded_style(Color::LightGray, t8::color::ShadeType::Bright);
           break;
         case FloorType::Water:
-          style = styles::make_shaded_style(Color::Blue, color::ShadeType::Bright);
+          style = t8::color::make_shaded_style(Color::Blue, t8::color::ShadeType::Bright);
           break;
         case FloorType::Wood:
           style = { Color::DarkRed, Color::Yellow };

@@ -37,9 +37,9 @@ namespace dung
     float weight_capacity_hard = 70.f;
     float curr_tot_inv_weight = 0.f;
     
-    ParticleHandler fire_smoke_engine { 500 };
+    t8x::physics::ParticleHandler fire_smoke_engine { 500 };
     
-    ParticleGradientGroup smoke_0
+    t8x::physics::ParticleGradientGroup smoke_0
     {
       {
         {
@@ -72,7 +72,7 @@ namespace dung
       }
     };
     
-    ParticleGradientGroup smoke_1
+    t8x::physics::ParticleGradientGroup smoke_1
     {
       {
         {
@@ -106,7 +106,7 @@ namespace dung
     };
     
 
-    std::vector<std::pair<float, ParticleGradientGroup>> smoke_color_gradients;
+    std::vector<std::pair<float, t8x::physics::ParticleGradientGroup>> smoke_color_gradients;
     
     // ////////////////////////////////
     

@@ -15,7 +15,7 @@ namespace dung
   
   enum class WallBasicType { MasonryLight, MasonryDark, TempleLight, TempleDark, OtherLight, OtherDark };
   
-  inline std::map<WallBasicType, std::vector<styles::Style>> wall_palette
+  inline std::map<WallBasicType, std::vector<t8::color::Style>> wall_palette
   {
     { WallBasicType::MasonryLight,
       {

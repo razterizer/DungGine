@@ -143,7 +143,7 @@ namespace dung
     std::vector<BloodSplat> blood_splats;
     
     RC cached_fight_offs { 0, 0 };
-    styles::Style cached_fight_style;
+    t8::color::Style cached_fight_style;
     std::string cached_fight_str;
     Timer attack_timer { 1 };
     

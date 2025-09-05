@@ -11,7 +11,7 @@
 namespace dung
 {
   
-  using SolarDirection = drawing::SolarDirection;
+  using SolarDirection = t8x::drawing::SolarDirection;
   enum class Latitude { NorthPole, NorthernHemisphere, Equator, SouthernHemisphere, SouthPole, NUM_ITEMS };
   enum class Longitude
   {

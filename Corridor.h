@@ -15,6 +15,13 @@
 
 namespace dung
 {
+  //using Color = t8::Color;
+  //using Style = t8::color::Style;
+  //using RC = t8::RC;
+  using Rectangle = t8::Rectangle;
+  using BBLocation = t8::BBLocation;
+  //template<int NR, int NC>
+  //using ScreenHandler = t8::screen::ScreenHandler<NR, NC>;
 
   struct Door;
   
@@ -24,14 +31,14 @@ namespace dung
   {
     int id = global_corridor_id++;
   
-    ttl::Rectangle bb;
+    Rectangle bb;
     Orientation orientation = Orientation::Vertical;
     std::array<Door*, 2> doors;
     
     bool_vector fog_of_war;
     bool_vector light;
     
-    bool is_inside_corridor(const RC& pos, ttl::BBLocation* location = nullptr) const
+    bool is_inside_corridor(const RC& pos, BBLocation* location = nullptr) const
     {
       switch (orientation)
       {
@@ -45,7 +52,7 @@ namespace dung
           int bottom_offs = bottom_door_open ? 0 : -1;
           if (bb.c_len < 3)
           {
-            utils::try_set(location, ttl::BBLocation::Inside);
+            utils::try_set(location, BBLocation::Inside);
             return bb.is_inside_offs(pos, top_offs, bottom_offs, 0, 0);
           }
           utils::try_set(location, bb.find_location_offs(pos, top_offs, bottom_offs, -1, -1));
@@ -61,7 +68,7 @@ namespace dung
           int right_offs = right_door_open ? 0 : -1;
           if (bb.r_len < 3)
           {
-            utils::try_set(location, ttl::BBLocation::Inside);
+            utils::try_set(location, BBLocation::Inside);
             return bb.is_inside_offs(pos, 0, 0, left_offs, right_offs);
           }
           utils::try_set(location, bb.find_location_offs(pos, -1, -1, left_offs, right_offs));

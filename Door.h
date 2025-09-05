@@ -12,6 +12,7 @@
 
 namespace dung
 {
+  using RC = t8::RC;
 
   struct Corridor;
   struct BSPNode;
