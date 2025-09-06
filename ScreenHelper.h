@@ -6,7 +6,7 @@
 //
 
 #pragma once
-#include <Termin8or/Rectangle.h>
+#include <Termin8or/geom/Rectangle.h>
 
 namespace dung
 {

@@ -5,7 +5,7 @@
 //  Created by Rasmus Anthin on 2024-08-05.
 //
 
-#include <Termin8or/GameEngine.h>
+#include <Termin8or/sys/GameEngine.h>
 #include <DungGine/BSPTree.h>
 #include <DungGine/DungGine.h>
 #include <DungGine/DungGineListener.h>
@@ -90,8 +90,8 @@ public:
       
       bsp_tree->print_tree();
       
-      t8::screen::clear_screen();
-      t8::screen::return_cursor();
+      t8::clear_screen();
+      t8::return_cursor();
       
       sh.clear();
       bsp_tree->draw_rooms(sh);
@@ -202,7 +202,7 @@ private:
       dungeon_engine->draw(sh, get_real_time_s(), get_sim_time_s(),
                            get_anim_count(0), get_anim_count(1),
                            5, 5,
-                           t8x::ui::VerticalAlignment::CENTER, t8x::ui::HorizontalAlignment::CENTER,
+                           t8x::VerticalAlignment::CENTER, t8x::HorizontalAlignment::CENTER,
                            4, 0, framed_mode, use_gore);
     }
   }

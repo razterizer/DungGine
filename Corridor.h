@@ -9,19 +9,19 @@
 #include "Orientation.h"
 #include "SaveGame.h"
 #include <Core/Utils.h>
-#include <Termin8or/Rectangle.h>
+#include <Termin8or/geom/Rectangle.h>
 #include <Core/bool_vector.h>
 
 
 namespace dung
 {
   //using Color = t8::Color;
-  //using Style = t8::color::Style;
+  //using Style = t8::Style;
   //using RC = t8::RC;
   using Rectangle = t8::Rectangle;
   using BBLocation = t8::BBLocation;
   //template<int NR, int NC>
-  //using ScreenHandler = t8::screen::ScreenHandler<NR, NC>;
+  //using ScreenHandler = t8::ScreenHandler<NR, NC>;
 
   struct Door;
   

@@ -6,7 +6,7 @@
 //
 
 #pragma once
-#include <Termin8or/Styles.h>
+#include <Termin8or/screen/Styles.h>
 #include <Core/StlUtils.h>
 
 
@@ -15,7 +15,7 @@ namespace dung
   
   enum class WallBasicType { MasonryLight, MasonryDark, TempleLight, TempleDark, OtherLight, OtherDark };
   
-  inline std::map<WallBasicType, std::vector<t8::color::Style>> wall_palette
+  inline std::map<WallBasicType, std::vector<t8::Style>> wall_palette
   {
     { WallBasicType::MasonryLight,
       {

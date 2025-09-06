@@ -10,7 +10,7 @@
 #include "Inventory.h"
 #include "PC.h"
 #include "Items.h"
-#include <Termin8or/MessageHandler.h>
+#include <Termin8or/ui/MessageHandler.h>
 #include <Core/Utils.h>
 #include <functional>
 
@@ -19,7 +19,7 @@ using namespace std::string_literals;
 
 namespace dung
 {
-  using MessageHandler = t8x::ui::MessageHandler;
+  using MessageHandler = t8x::MessageHandler;
   
 
   class Keyboard
@@ -46,7 +46,7 @@ namespace dung
     bool& m_trigger_game_load;
     bool& m_trigger_screenshot;
     
-    t8x::ui::TextBoxDebug& m_tbd;
+    t8x::TextBoxDebug& m_tbd;
     bool& m_debug;
     
     void drop_item(Item* obj, const RC& curr_pos)
@@ -119,7 +119,7 @@ namespace dung
              bool& trigger_game_save,
              bool& trigger_game_load,
              bool& trigger_screenshot,
-             t8x::ui::TextBoxDebug& tbd, bool& debug)
+             t8x::TextBoxDebug& tbd, bool& debug)
       : m_environment(environment)
       , m_inventory(inventory)
       , message_handler(msg_handler)
@@ -137,12 +137,12 @@ namespace dung
       , m_debug(debug)
     {}
   
-    void handle_keyboard(const t8::input::KeyPressDataPair& kpdp, double real_time_s)
+    void handle_keyboard(const t8::KeyPressDataPair& kpdp, double real_time_s)
     {
-      auto curr_key = t8::input::get_char_key(kpdp.transient);
-      auto curr_special_key = t8::input::get_special_key(kpdp.transient);
-      //auto curr_key_held = t8::input::get_char_key(kpdp.held);
-      //auto curr_special_key_held = t8::input::get_special_key(kpdp.held);
+      auto curr_key = t8::get_char_key(kpdp.transient);
+      auto curr_special_key = t8::get_special_key(kpdp.transient);
+      //auto curr_key_held = t8::get_char_key(kpdp.held);
+      //auto curr_special_key_held = t8::get_special_key(kpdp.held);
     
       auto& curr_pos = m_player.pos;
       
@@ -155,7 +155,7 @@ namespace dung
         return false;
       };
       
-      if (str::to_lower(curr_key) == 'a' || curr_special_key == t8::input::SpecialKey::Left)
+      if (str::to_lower(curr_key) == 'a' || curr_special_key == t8::SpecialKey::Left)
       {
         if (m_player.show_inventory)
         {
@@ -165,7 +165,7 @@ namespace dung
                  m_environment->allow_move_to(m_player.curr_floor, curr_pos.r, curr_pos.c - 1))
           curr_pos.c--;
       }
-      else if (str::to_lower(curr_key) == 'd' || curr_special_key == t8::input::SpecialKey::Right)
+      else if (str::to_lower(curr_key) == 'd' || curr_special_key == t8::SpecialKey::Right)
       {
         if (m_player.show_inventory && str::to_lower(curr_key) == 'd')
         {
@@ -229,7 +229,7 @@ namespace dung
                  m_environment->allow_move_to(m_player.curr_floor, curr_pos.r, curr_pos.c + 1))
           curr_pos.c++;
       }
-      else if (str::to_lower(curr_key) == 's' || curr_special_key == t8::input::SpecialKey::Down)
+      else if (str::to_lower(curr_key) == 's' || curr_special_key == t8::SpecialKey::Down)
       {
         if (m_player.show_inventory)
           m_inventory->inc_hilite();
@@ -238,7 +238,7 @@ namespace dung
                  m_environment->allow_move_to(m_player.curr_floor, curr_pos.r + 1, curr_pos.c))
           curr_pos.r++;
       }
-      else if (str::to_lower(curr_key) == 'w' || curr_special_key == t8::input::SpecialKey::Up)
+      else if (str::to_lower(curr_key) == 'w' || curr_special_key == t8::SpecialKey::Up)
       {
         if (m_player.show_inventory)
           m_inventory->dec_hilite();

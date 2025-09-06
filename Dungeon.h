@@ -9,7 +9,7 @@
 #include "BSPTree.h"
 #include "Staircase.h"
 #include "Comparison.h"
-#include <Termin8or/AABB.h>
+#include <Termin8or/geom/AABB.h>
 
 namespace dung
 {

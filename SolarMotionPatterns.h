@@ -6,12 +6,12 @@
 //
 
 #pragma once
-#include <Termin8or/Drawing.h>
+#include <Termin8or/drawing/Drawing.h>
 
 namespace dung
 {
   
-  using SolarDirection = t8x::drawing::SolarDirection;
+  using SolarDirection = t8x::SolarDirection;
   enum class Latitude { NorthPole, NorthernHemisphere, Equator, SouthernHemisphere, SouthPole, NUM_ITEMS };
   enum class Longitude
   {

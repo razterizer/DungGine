@@ -7,7 +7,7 @@
 
 #pragma once
 #include "SaveGame.h"
-#include <Termin8or/RC.h>
+#include <Termin8or/geom/RC.h>
 
 
 namespace dung

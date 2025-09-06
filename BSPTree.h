@@ -10,9 +10,9 @@
 #include "Corridor.h"
 #include "Comparison.h"
 #include "SaveGame.h"
-#include <Termin8or/RC.h>
-#include <Termin8or/ScreenHandler.h>
-#include <Termin8or/Drawing.h>
+#include <Termin8or/geom/RC.h>
+#include <Termin8or/screen/ScreenHandler.h>
+#include <Termin8or/drawing/Drawing.h>
 #include <Core/Rand.h>
 #include <Core/Math.h>
 #include <Core/bool_vector.h>
@@ -24,11 +24,11 @@
 namespace dung
 {
   using Color = t8::Color;
-  using Style = t8::color::Style;
+  using Style = t8::Style;
   //using RC = t8::RC;
   using Rectangle = t8::Rectangle;
   template<int NR, int NC>
-  using ScreenHandler = t8::screen::ScreenHandler<NR, NC>;
+  using ScreenHandler = t8::ScreenHandler<NR, NC>;
 
   struct Staircase;
   
@@ -191,7 +191,7 @@ namespace dung
                       int r0, int c0,
                       const Style& border_style) const
     {
-      t8x::drawing::draw_box_outline(sh, r0 + bb_region.r, c0 + bb_region.c, bb_region.r_len, bb_region.c_len, t8x::drawing::OutlineType::Hash, border_style);
+      t8x::draw_box_outline(sh, r0 + bb_region.r, c0 + bb_region.c, bb_region.r_len, bb_region.c_len, t8x::OutlineType::Hash, border_style);
       
       if (children[0])
         children[0]->draw_regions(sh, r0, c0, border_style);
@@ -206,9 +206,9 @@ namespace dung
     {
       if (!bb_leaf_room.is_empty())
       {
-        t8x::drawing::draw_box_outline(sh,
+        t8x::draw_box_outline(sh,
                  r0 + bb_leaf_room.r, c0 + bb_leaf_room.c, bb_leaf_room.r_len, bb_leaf_room.c_len,
-                 t8x::drawing::OutlineType::Hash, room_style);
+                 t8x::OutlineType::Hash, room_style);
       }
                  
       if (children[0])
@@ -748,8 +748,8 @@ namespace dung
       for (const auto& corr : room_corridor_map)
       {
         const auto& bb = corr.second->bb;
-        t8x::drawing::draw_box_outline(sh, r0 + bb.r, c0 + bb.c, bb.r_len, bb.c_len, t8x::drawing::OutlineType::Hash, corridor_outline_style);
-        t8x::drawing::draw_box(sh, r0 + bb.r, c0 + bb.c, bb.r_len, bb.c_len, corridor_fill_style);
+        t8x::draw_box_outline(sh, r0 + bb.r, c0 + bb.c, bb.r_len, bb.c_len, t8x::OutlineType::Hash, corridor_outline_style);
+        t8x::draw_box(sh, r0 + bb.r, c0 + bb.c, bb.r_len, bb.c_len, corridor_fill_style);
       }
     }
     

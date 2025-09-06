@@ -9,9 +9,9 @@
 
 #include "Terrain.h"
 #include <Core/StringHelper.h>
-#include <Termin8or/StringConversion.h>
-#include <Termin8or/Styles.h>
-#include <Termin8or/Color.h>
+#include <Termin8or/str/StringConversion.h>
+#include <Termin8or/screen/Styles.h>
+#include <Termin8or/screen/Color.h>
 #include <string>
 #include <sstream>
 
@@ -58,7 +58,7 @@ namespace sg
   {
     if (**it_line == var_name)
     {
-      auto ret = t8::str::str_to_rc(*(*it_line + 1));
+      auto ret = t8::str_to_rc(*(*it_line + 1));
       if (ret.has_value())
       {
         *var_ptr = ret.value();
@@ -70,14 +70,14 @@ namespace sg
   }
   
   template<>
-  bool read_var(std::vector<std::string>::iterator* it_line, const std::string& var_name, t8::color::Style* var_ptr)
+  bool read_var(std::vector<std::string>::iterator* it_line, const std::string& var_name, t8::Style* var_ptr)
   {
     if (**it_line == var_name)
     {
       ++(*it_line);
-      var_ptr->fg_color = t8::color::string2color(**it_line);
+      var_ptr->fg_color = t8::string2color(**it_line);
       ++(*it_line);
-      var_ptr->bg_color = t8::color::string2color(**it_line);
+      var_ptr->bg_color = t8::string2color(**it_line);
       return true;
     }
     return false;
@@ -158,15 +158,15 @@ namespace sg
   void write_var(std::vector<std::string>& lines_vec, const std::string& var_name, const t8::RC& var)
   {
     lines_vec.emplace_back(var_name);
-    lines_vec.emplace_back(t8::str::rc_to_str(var));
+    lines_vec.emplace_back(t8::rc_to_str(var));
   };
   
   template<>
-  void write_var(std::vector<std::string>& lines_vec, const std::string& var_name, const t8::color::Style& var)
+  void write_var(std::vector<std::string>& lines_vec, const std::string& var_name, const t8::Style& var)
   {
     lines_vec.emplace_back(var_name);
-    lines_vec.emplace_back(t8::color::color2string(var.fg_color));
-    lines_vec.emplace_back(t8::color::color2string(var.bg_color));
+    lines_vec.emplace_back(t8::color2string(var.fg_color));
+    lines_vec.emplace_back(t8::color2string(var.bg_color));
   };
   
   template<>

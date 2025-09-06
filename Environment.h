@@ -12,13 +12,13 @@
 #include "Terrain.h"
 #include "ScreenHelper.h"
 #include "Comparison.h"
-#include <Termin8or/ScreenHandler.h>
+#include <Termin8or/screen/ScreenHandler.h>
 #include <optional>
 
 
 namespace dung
 {
-  using Texture = t8::drawing::Texture;
+  using Texture = t8::Texture;
 
 
   struct DungGineTextureParams
@@ -404,7 +404,7 @@ namespace dung
             }
           }
           
-          t8x::drawing::draw_box_outline(sh,
+          t8x::draw_box_outline(sh,
                                     bb_scr_pos.r, bb_scr_pos.c, bb.r_len, bb.c_len,
                                     room_style.wall_type,
                                     room_style.wall_style,
@@ -412,12 +412,12 @@ namespace dung
           
           if (room_style.is_underground ? texture_ug_fill.empty() : texture_sl_fill.empty())
           {
-            t8x::drawing::draw_box(sh,
+            t8x::draw_box(sh,
                               bb_scr_pos.r, bb_scr_pos.c, bb.r_len, bb.c_len,
                               room_style.get_fill_style(),
                               room_style.get_fill_char(),
                               room_style.is_underground ? SolarDirection::Nadir : shadow_type,
-                              t8::color::shade_style(room_style.get_fill_style(), t8::color::ShadeType::Dark),
+                              t8::shade_style(room_style.get_fill_style(), t8::ShadeType::Dark),
                               room_style.get_fill_char(),
                               room->light);
           }
@@ -432,7 +432,7 @@ namespace dung
             const auto& texture_fill = *(fetch_curr_fill_texture(room_style).value_or(&texture_empty));
             const auto& texture_shadow = *(fetch_curr_shadow_texture(room_style).value_or(&texture_empty));
             
-            t8x::drawing::draw_box_textured(sh,
+            t8x::draw_box_textured(sh,
                                        bb_scr_pos.r, bb_scr_pos.c, bb.r_len, bb.c_len,
                                        room_style.is_underground ? SolarDirection::Nadir : shadow_type,
                                        texture_fill,
@@ -470,17 +470,17 @@ namespace dung
           }
           
           
-          t8x::drawing::draw_box_outline(sh,
+          t8x::draw_box_outline(sh,
                                     bb_scr_pos.r, bb_scr_pos.c, bb.r_len, bb.c_len,
                                     corr_style.wall_type,
                                     corr_style.wall_style,
                                     corr->light);
-          t8x::drawing::draw_box(sh,
+          t8x::draw_box(sh,
                             bb_scr_pos.r, bb_scr_pos.c, bb.r_len, bb.c_len,
                             corr_style.get_fill_style(),
                             corr_style.get_fill_char(),
                             corr_style.is_underground ? SolarDirection::Nadir : shadow_type,
-                            t8::color::shade_style(corr_style.get_fill_style(), t8::color::ShadeType::Dark, true),
+                            t8::shade_style(corr_style.get_fill_style(), t8::ShadeType::Dark, true),
                             corr_style.get_fill_char(),
                             corr->light);
         }

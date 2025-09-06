@@ -8,9 +8,9 @@
 #pragma once
 #include "Items.h"
 #include "SaveGame.h"
-#include <Termin8or/ScreenHandler.h>
-#include <Termin8or/Drawing.h>
-#include <Termin8or/Rectangle.h>
+#include <Termin8or/screen/ScreenHandler.h>
+#include <Termin8or/drawing/Drawing.h>
+#include <Termin8or/geom/Rectangle.h>
 
 namespace dung
 {
@@ -659,7 +659,7 @@ namespace dung
       {
         auto item = get_item(r);
         auto text = item.text;
-        t8::color::Style style { Color::Default, Color::Transparent2 };
+        t8::Style style { Color::Default, Color::Transparent2 };
         int c_offs = item.level*2;
         switch (item.level)
         {
@@ -688,8 +688,8 @@ namespace dung
           sh.write_buffer(text, m_bb.top() + rb_items, m_bb.left() + cb_items, style);
       }
       
-      t8x::drawing::draw_box_outline(sh, m_bb, t8x::drawing::OutlineType::Line, { Color::White, Color::DarkGray });
-      t8x::drawing::draw_box(sh, m_bb, { Color::White, Color::DarkGray }, ' ');
+      t8x::draw_box_outline(sh, m_bb, t8x::OutlineType::Line, { Color::White, Color::DarkGray });
+      t8x::draw_box(sh, m_bb, { Color::White, Color::DarkGray }, ' ');
     }
     
     std::vector<InvGroup>::iterator begin()

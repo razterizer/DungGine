@@ -21,8 +21,8 @@
 #include "Inventory.h"
 #include "Keyboard.h"
 #include "SaveGame.h"
-#include <Termin8or/Keyboard.h>
-#include <Termin8or/MessageHandler.h>
+#include <Termin8or/input/Keyboard.h>
+#include <Termin8or/ui/MessageHandler.h>
 #include <Core/FolderHelper.h>
 #include <Core/events/EventBroadcaster.h>
 #include <Core/Utils.h>
@@ -100,8 +100,8 @@ namespace dung
     };
     std::vector<Projectile> active_projectiles;
     
-    t8x::ui::TextBox tb_health, tb_strength;
-    t8x::ui::TextBoxDebug tbd;
+    t8x::TextBox tb_health, tb_strength;
+    t8x::TextBoxDebug tbd;
     
     bool stall_game = false;
     
@@ -460,10 +460,10 @@ namespace dung
         switch (src_type)
         {
           case Lamp::LightType::Isotropic:
-            positions = t8x::drawing::filled_circle_positions(local_pos, radius, globals::px_aspect);
+            positions = t8x::filled_circle_positions(local_pos, radius, globals::px_aspect);
             break;
           case Lamp::LightType::Directional:
-            positions = t8x::drawing::filled_arc_positions(local_pos, radius, math::deg2rad(angle_deg), m_player.los_r, m_player.los_c, globals::px_aspect);
+            positions = t8x::filled_arc_positions(local_pos, radius, math::deg2rad(angle_deg), m_player.los_r, m_player.los_c, globals::px_aspect);
             break;
           case Lamp::LightType::NUM_ITEMS:
             break;
@@ -639,9 +639,9 @@ namespace dung
         }
       }
       
-      t8x::ui::TextBoxDrawingArgsAlign tb_args;
-      tb_args.v_align = t8x::ui::VerticalAlignment::TOP;
-      tb_args.h_align = t8x::ui::HorizontalAlignment::LEFT;
+      t8x::TextBoxDrawingArgsAlign tb_args;
+      tb_args.v_align = t8x::VerticalAlignment::TOP;
+      tb_args.h_align = t8x::HorizontalAlignment::LEFT;
       tb_args.base.box_style = { Color::White, Color::DarkBlue };
       tb_args.framed_mode = framed_mode;
       tb_health.set_text(health_bars, styles, per_textel_styles);
@@ -652,7 +652,7 @@ namespace dung
     template<int NR, int NC>
     void draw_strength_bar(ScreenHandler<NR, NC>& sh, bool framed_mode)
     {
-      t8x::ui::TextBoxDrawingArgsPos tb_args;
+      t8x::TextBoxDrawingArgsPos tb_args;
       int offs = framed_mode ? 1 : 0;
       tb_args.pos = { 1 + offs, 12 + offs };
       tb_args.base.box_style = { Color::White, Color::DarkBlue };
@@ -1032,9 +1032,9 @@ namespace dung
               // #FIXME:
               if (do_update_fight)
               {
-                pb->cached_fight_style = t8::color::Style
+                pb->cached_fight_style = t8::Style
                 {
-                  t8::color::get_random_color(c_fight_colors),
+                  t8::get_random_color(c_fight_colors),
                   Color::Transparent2
                 };
                 pb->cached_fight_str = rnd::rand_select(c_fight_strings);
@@ -1717,7 +1717,7 @@ namespace dung
                 double real_time_s, float sim_time_s, float sim_dt_s,
                 float fire_smoke_dt_factor, float projectile_speed_factor,
                 int melee_attack_dice, int ranged_attack_dice,
-                const t8::input::KeyPressDataPair& kpdp, bool* game_over)
+                const t8::KeyPressDataPair& kpdp, bool* game_over)
     {
       utils::try_set(game_over, m_player.health <= 0);
       if (utils::try_get(game_over))
@@ -1864,8 +1864,8 @@ namespace dung
     void draw(ScreenHandler<NR, NC>& sh, double real_time_s, float sim_time_s,
               int anim_ctr_swim, int anim_ctr_fight,
               int melee_blood_prob_visible, int melee_blood_prob_invisible,
-              t8x::ui::VerticalAlignment mb_v_align = t8x::ui::VerticalAlignment::CENTER,
-              t8x::ui::HorizontalAlignment mb_h_align = t8x::ui::HorizontalAlignment::CENTER,
+              t8x::VerticalAlignment mb_v_align = t8x::VerticalAlignment::CENTER,
+              t8x::HorizontalAlignment mb_h_align = t8x::HorizontalAlignment::CENTER,
               int mb_v_align_offs = 0, int mb_h_align_offs = 0,
               bool framed_mode = false,
               bool gore = false)
@@ -1874,7 +1874,7 @@ namespace dung
       const auto& door_vec = m_environment->fetch_doors(m_player.curr_floor);
       const auto& staircase_vec = m_environment->fetch_staircases(m_player.curr_floor);
       
-      t8x::ui::MessageBoxDrawingArgs mb_args;
+      t8x::MessageBoxDrawingArgs mb_args;
       mb_args.v_align = mb_v_align;
       mb_args.h_align = mb_h_align;
       mb_args.v_align_offs = mb_v_align_offs;
@@ -1886,8 +1886,8 @@ namespace dung
       {
         if (!tbd.empty())
         {
-          t8x::ui::TextBoxDrawingArgsAlign tbd_args;
-          tbd_args.v_align = t8x::ui::VerticalAlignment::TOP;
+          t8x::TextBoxDrawingArgsAlign tbd_args;
+          tbd_args.v_align = t8x::VerticalAlignment::TOP;
           tbd_args.base.box_style = { Color::Blue, Color::Yellow };
           tbd_args.framed_mode = framed_mode;
           tbd.calc_pre_draw(str::Adjustment::Left);
@@ -1967,8 +1967,8 @@ namespace dung
         auto scr_pos = m_screen_helper->get_screen_pos(obj.pos);
         auto fg_color = obj.style.fg_color;
         if (obj.shade && obj.light)
-          fg_color = t8::color::shade_color(obj.style.fg_color,
-                                            t8::color::ShadeType::Dark);
+          fg_color = t8::shade_color(obj.style.fg_color,
+                                            t8::ShadeType::Dark);
         sh.write_buffer(std::string(1, obj.character), scr_pos,
           fg_color, obj.style.bg_color);
       };
@@ -2048,13 +2048,13 @@ namespace dung
           if (npc.curr_room != nullptr)
           {
             auto scr_pos_room = m_screen_helper->get_screen_pos(npc.curr_room->bb_leaf_room.center());
-            t8x::drawing::plot_line(sh, scr_pos, scr_pos_room,
+            t8x::plot_line(sh, scr_pos, scr_pos_room,
                     ".", Color::White, Color::Transparent2);
           }
           if (npc.curr_corridor != nullptr)
           {
             auto scr_pos_corr = m_screen_helper->get_screen_pos(npc.curr_corridor->bb.center());
-            t8x::drawing::plot_line(sh, scr_pos, scr_pos_corr,
+            t8x::plot_line(sh, scr_pos, scr_pos_corr,
                     ".", Color::White, Color::Transparent2);
           }
         }
@@ -2114,7 +2114,7 @@ namespace dung
             case 3: str = ":"; break;
             case 4: str = "~"; break;
           }
-          auto style = t8::color::make_shaded_style(Color::Red, bs.visible ? t8::color::ShadeType::Bright : t8::color::ShadeType::Dark);
+          auto style = t8::make_shaded_style(Color::Red, bs.visible ? t8::ShadeType::Bright : t8::ShadeType::Dark);
           sh.write_buffer(str, scr_pos.r, scr_pos.c, style);
         };
         for (const auto& bs : m_player.blood_splats)
