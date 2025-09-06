@@ -309,8 +309,8 @@ floor.allow_passageways = true;
 dung::Dungeon dungeon { false, -1 };
 dungeon.generate(dungeon_floor_params);
 
-ScreenHandler<NR, NC> sh;
-Color bg_color = Color::Default;
+t8::ScreenHandler<NR, NC> sh;
+t8::Color bg_color = t8::Color::Default;
 
 dung::DungGine dungeon_engine { "bin/", false, false };
 dungeon_engine.load_dungeon(dungeon);
@@ -329,8 +329,8 @@ std::vector<dung::DungeonFloorParams> dungeon_floor_params;
 dung::Dungeon dungeon { false, -1 };
 dung::DungGineTextureParams texture_params;
 std::unique_ptr<dung::DungGine> dungeon_engine;
-ScreenHandler<NR, NC> sh;
-Color bg_color = Color::Black;
+t8::ScreenHandler<NR, NC> sh;
+t8::Color bg_color = t8::Color::Black;
 int anim_ctr = 0;
 const float fire_smoke_dt_factor = 0.5f;
 
@@ -388,8 +388,8 @@ std::vector<dung::DungeonFloorParams> dungeon_floor_params;
 dung::Dungeon dungeon { true, -1 }; // First floor is surface level, PC placed at the lowest underground floor.
 dung::DungGineTextureParams texture_params;
 std::unique_ptr<dung::DungGine> dungeon_engine;
-ScreenHandler<NR, NC> sh;
-Color bg_color = Color::Black;
+t8::ScreenHandler<NR, NC> sh;
+t8::Color bg_color = t8::Color::Black;
 int anim_ctr = 0;
 const float fire_smoke_dt_factor = 0.5f;
 
