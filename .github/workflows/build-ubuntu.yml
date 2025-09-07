@@ -95,7 +95,7 @@ jobs:
           mkdir -p valgrind-output
           cd demo
           # rm rec.txt # remove if any checked in.
-          cp rec_valgrind.txt rec.txt
+          cp rec_valgrind.txt bin/rec.txt
           chmod +x bin/demo
           valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes ./bin/demo --log_mode replay --suppress_tty_input --suppress_tty_output 2>&1 | tee ../valgrind-output/valgrind.log
       
