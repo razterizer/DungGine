@@ -31,8 +31,10 @@ public:
     
     // #NOTE: Makes sure we run from the right folder independent of the current pwd the exe is run from.
     //   E.g. "demo> bin/demo" or "bin> demo" should both work.
-    project_root_filepath = folder::join_path({ get_exe_folder(), ".." });
-#ifndef _WIN32
+    project_root_filepath = folder::join_path({ get_exe_folder(), ".." }); // Vanilla CLI on POSIX. (Win: Release/ or Debug/ -> x64)
+#ifdef _WIN32
+    project_root_filepath = folder::join_path({ project_root_filepath, "..", ".." }); // x64 -> demo.vs -> demo.
+#else
     const char* xcode_env = std::getenv("RUNNING_FROM_XCODE");
     if (xcode_env != nullptr)
       project_root_filepath = folder::join_path({ project_root_filepath, "../../../../../../../Documents/xcode/lib/DungGine/demo/" }); // #FIXME: Find a better solution!
