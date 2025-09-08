@@ -2142,14 +2142,14 @@ namespace dung
                                       
       if (trigger_screenshot)
       {
-        auto screenshot = sh.get_screen_buffer_chars();
+        auto screenshot = sh.export_screen_buffers();
         
         std::string filepath = "screenshot_0.txt";
         // Expects just one listener.
         broadcast([&filepath](auto* l)
           { l->on_screenshot_request(filepath); });
         
-        if (TextIO::write_file(filepath, screenshot))
+        if (screenshot.save(filepath))
         {
           message_handler->add_message(static_cast<float>(real_time_s),
                                        "Successfully saved screenshot:\n\"" + filepath + "\"!",
