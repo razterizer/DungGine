@@ -38,6 +38,11 @@ namespace dung
       return world_pos - m_screen_in_world.pos();
     }
     
+    RC get_world_pos(const RC& screen_pos) const
+    {
+      return screen_pos + m_screen_in_world.pos();
+    }
+    
     void set_screen_size(const RC& screen_size)
     {
       m_screen_in_world.set_size(screen_size);
