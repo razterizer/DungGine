@@ -2144,6 +2144,15 @@ namespace dung
       {
         auto screenshot = sh.export_screen_buffers();
         
+        for (int r = 0; r < NR; ++r)
+        {
+          for (int c = 0; c < NC; ++c)
+          {
+            auto terrain = m_environment->get_terrain(m_player.curr_floor, m_screen_helper->get_world_pos({ r, c }));
+            screenshot.set_textel_material(r, c, static_cast<int>(terrain));
+          }
+        }
+        
         std::string filepath = "screenshot_0.txt";
         // Expects just one listener.
         broadcast([&filepath](auto* l)
