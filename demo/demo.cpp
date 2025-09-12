@@ -327,7 +327,7 @@ int main(int argc, char** argv)
         params.log_mode = LogMode::Record;
       else if (std::strcmp(argv[i + 1], "replay") == 0)
         params.log_mode = LogMode::Replay;
-      params.xcode_log_path = "../../../../../../../../Documents/xcode/lib/DungGine/demo";
+      params.xcode_log_path = "../../../../../../../../Documents/xcode/lib/DungGine/demo/bin/";
     }
   }
 
