@@ -108,7 +108,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)\..\..\..</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\..\..\..;$(SolutionDir)\..\..\..\Termin8or\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -116,7 +116,7 @@
     </Link>
     <PostBuildEvent>
       <Command>xcopy "$(SolutionDir)\..\textures\" "$(TargetDir)\textures\" /Y
-xcopy "$(SolutionDir)\..\..\..\Termin8or\title\fonts\*" "$(TargetDir)\fonts\" /Y</Command>
+xcopy "$(SolutionDir)\..\..\..\Termin8or\include\Termin8or\title\fonts\*" "$(TargetDir)\fonts\" /Y</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -128,7 +128,7 @@ xcopy "$(SolutionDir)\..\..\..\Termin8or\title\fonts\*" "$(TargetDir)\fonts\" /Y
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)\..\..\..</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\..\..\..;$(SolutionDir)\..\..\..\Termin8or\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -138,7 +138,7 @@ xcopy "$(SolutionDir)\..\..\..\Termin8or\title\fonts\*" "$(TargetDir)\fonts\" /Y
     </Link>
     <PostBuildEvent>
       <Command>xcopy "$(SolutionDir)\..\textures\" "$(TargetDir)\textures\" /Y
-xcopy "$(SolutionDir)\..\..\..\Termin8or\title\fonts\*" "$(TargetDir)\fonts\" /Y</Command>
+xcopy "$(SolutionDir)\..\..\..\Termin8or\include\Termin8or\title\fonts\*" "$(TargetDir)\fonts\" /Y</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
