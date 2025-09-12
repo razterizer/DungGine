@@ -1,7 +1,7 @@
 #!/bin/bash
 
 
-additional_flags="-I../.."
+additional_flags="-I../.. -I../../Termin8or/include"
 
 ../../Core/build.sh demo "$1" "${additional_flags[@]}"
 
@@ -16,7 +16,7 @@ fi
 ### Post-Build Actions ###
 
 mkdir -p bin/fonts/
-cp ../../Termin8or/title/fonts/* bin/fonts/
+cp ../../Termin8or/include/Termin8or/title/fonts/* bin/fonts/
 
 mkdir -p bin/textures/
 cp textures/* bin/textures/
