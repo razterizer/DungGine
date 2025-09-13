@@ -108,7 +108,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)\..\..\..;$(SolutionDir)\..\..\..\Core\include;$(SolutionDir)\..\..\..\Termin8or\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\..\..\include;$(SolutionDir)\..\..\..\Core\include;$(SolutionDir)\..\..\..\Termin8or\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -128,7 +128,7 @@ xcopy "$(SolutionDir)\..\..\..\Termin8or\include\Termin8or\title\fonts\*" "$(Tar
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)\..\..\..;$(SolutionDir)\..\..\..\Core\include;$(SolutionDir)\..\..\..\Termin8or\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\..\..\include;$(SolutionDir)\..\..\..\Core\include;$(SolutionDir)\..\..\..\Termin8or\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
