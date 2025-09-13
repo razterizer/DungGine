@@ -23,17 +23,10 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		0709B9AB2C6E445100A43834 /* PlayerBase.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PlayerBase.h; sourceTree = "<group>"; };
-		0709B9AF2C700CE900A43834 /* DungGineListener.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DungGineListener.h; sourceTree = "<group>"; };
-		0709B9B12C73B7CD00A43834 /* Inventory.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Inventory.h; sourceTree = "<group>"; };
 		0709B9B32C9374D100A43834 /* build_demo.bat */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = build_demo.bat; sourceTree = "<group>"; };
 		0709B9BB2C95829400A43834 /* build-windows.yml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.yaml; name = "build-windows.yml"; path = ".github/workflows/build-windows.yml"; sourceTree = "<group>"; };
 		0709B9BC2C95829400A43834 /* build-ubuntu.yml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.yaml; name = "build-ubuntu.yml"; path = ".github/workflows/build-ubuntu.yml"; sourceTree = "<group>"; };
 		0709B9BD2C95829400A43834 /* build-macos.yml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.yaml; name = "build-macos.yml"; path = ".github/workflows/build-macos.yml"; sourceTree = "<group>"; };
-		0709B9C62C977C4E00A43834 /* DungObject.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DungObject.h; sourceTree = "<group>"; };
-		0709B9C72C98102400A43834 /* Keyboard.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Keyboard.h; sourceTree = "<group>"; };
-		071942492C458746008BD519 /* SolarMotionPatterns.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SolarMotionPatterns.h; sourceTree = "<group>"; };
-		0719424A2C49D65F008BD519 /* NPC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NPC.h; sourceTree = "<group>"; };
 		072AE8032D0E7BBD004F92D3 /* dependencies */ = {isa = PBXFileReference; lastKnownFileType = text; path = dependencies; sourceTree = SOURCE_ROOT; };
 		072AE8042D0E7BBE004F92D3 /* fetch-dependencies.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = "fetch-dependencies.py"; sourceTree = SOURCE_ROOT; };
 		072AE8052D0E7BFB004F92D3 /* build_demo_ubsan.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = build_demo_ubsan.sh; sourceTree = "<group>"; };
@@ -43,32 +36,39 @@
 		072AE8092D0E7E0F004F92D3 /* run_demo.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = run_demo.sh; sourceTree = "<group>"; };
 		072AE80A2D0E7E0F004F92D3 /* run_demo.bat */ = {isa = PBXFileReference; lastKnownFileType = text; path = run_demo.bat; sourceTree = "<group>"; };
 		075D41962E28B68E005DD356 /* demo */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = demo; sourceTree = BUILT_PRODUCTS_DIR; };
-		075D423C2E2CA41C005DD356 /* Comparison.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Comparison.h; sourceTree = "<group>"; };
-		075D42D92E364B4C005DD356 /* SaveGame.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SaveGame.h; sourceTree = "<group>"; };
-		075D436B2E4204A9005DD356 /* Staircase.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Staircase.h; sourceTree = "<group>"; };
-		075D436C2E420E7D005DD356 /* Dungeon.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Dungeon.h; sourceTree = "<group>"; };
-		07C2A7842C2616FC00869A56 /* RoomStyle.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RoomStyle.h; sourceTree = "<group>"; };
-		07C2A7852C2618A500869A56 /* Items.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Items.h; sourceTree = "<group>"; };
-		07C2A7862C261B3C00869A56 /* PC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PC.h; sourceTree = "<group>"; };
-		07C2A7872C2A28C400869A56 /* Door.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Door.h; sourceTree = "<group>"; };
-		07C2A7882C2A297800869A56 /* Corridor.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Corridor.h; sourceTree = "<group>"; };
-		07C2A7892C2A29CF00869A56 /* Orientation.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Orientation.h; sourceTree = "<group>"; };
-		07D769A62C5FFF3B00BCA669 /* Globals.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Globals.h; sourceTree = "<group>"; };
+		07BDBB6F2E75B257002ACC96 /* BSPTree.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BSPTree.h; sourceTree = "<group>"; };
+		07BDBB702E75B257002ACC96 /* Comparison.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Comparison.h; sourceTree = "<group>"; };
+		07BDBB712E75B257002ACC96 /* Corridor.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Corridor.h; sourceTree = "<group>"; };
+		07BDBB722E75B257002ACC96 /* Door.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Door.h; sourceTree = "<group>"; };
+		07BDBB732E75B257002ACC96 /* Dungeon.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Dungeon.h; sourceTree = "<group>"; };
+		07BDBB742E75B257002ACC96 /* DungGine.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DungGine.h; sourceTree = "<group>"; };
+		07BDBB752E75B257002ACC96 /* DungGineListener.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DungGineListener.h; sourceTree = "<group>"; };
+		07BDBB762E75B257002ACC96 /* DungGineStyles.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DungGineStyles.h; sourceTree = "<group>"; };
+		07BDBB772E75B257002ACC96 /* DungObject.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DungObject.h; sourceTree = "<group>"; };
+		07BDBB782E75B257002ACC96 /* Environment.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Environment.h; sourceTree = "<group>"; };
+		07BDBB792E75B257002ACC96 /* Globals.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Globals.h; sourceTree = "<group>"; };
+		07BDBB7A2E75B257002ACC96 /* Inventory.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Inventory.h; sourceTree = "<group>"; };
+		07BDBB7B2E75B257002ACC96 /* Items.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Items.h; sourceTree = "<group>"; };
+		07BDBB7C2E75B257002ACC96 /* Keyboard.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Keyboard.h; sourceTree = "<group>"; };
+		07BDBB7D2E75B257002ACC96 /* NPC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NPC.h; sourceTree = "<group>"; };
+		07BDBB7E2E75B257002ACC96 /* Orientation.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Orientation.h; sourceTree = "<group>"; };
+		07BDBB7F2E75B257002ACC96 /* PC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PC.h; sourceTree = "<group>"; };
+		07BDBB802E75B257002ACC96 /* PlayerBase.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PlayerBase.h; sourceTree = "<group>"; };
+		07BDBB812E75B257002ACC96 /* RoomStyle.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RoomStyle.h; sourceTree = "<group>"; };
+		07BDBB822E75B257002ACC96 /* SaveGame.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SaveGame.h; sourceTree = "<group>"; };
+		07BDBB832E75B257002ACC96 /* ScreenHelper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ScreenHelper.h; sourceTree = "<group>"; };
+		07BDBB842E75B257002ACC96 /* SolarMotionPatterns.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SolarMotionPatterns.h; sourceTree = "<group>"; };
+		07BDBB852E75B257002ACC96 /* Staircase.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Staircase.h; sourceTree = "<group>"; };
+		07BDBB862E75B257002ACC96 /* Terrain.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Terrain.h; sourceTree = "<group>"; };
 		07D769A82C603CC300BCA669 /* demo.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = demo.cpp; sourceTree = "<group>"; };
 		07D769AC2C6044E000BCA669 /* build_demo.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = build_demo.sh; sourceTree = "<group>"; };
 		07D769AE2C6044FC00BCA669 /* texture_sl_shadow_0.tex */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = texture_sl_shadow_0.tex; path = textures/texture_sl_shadow_0.tex; sourceTree = "<group>"; };
 		07D769AF2C6044FC00BCA669 /* texture_sl_shadow_1.tex */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = texture_sl_shadow_1.tex; path = textures/texture_sl_shadow_1.tex; sourceTree = "<group>"; };
 		07D769B02C6044FC00BCA669 /* texture_sl_fill_0.tex */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = texture_sl_fill_0.tex; path = textures/texture_sl_fill_0.tex; sourceTree = "<group>"; };
 		07D769B12C6044FC00BCA669 /* texture_sl_fill_1.tex */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = texture_sl_fill_1.tex; path = textures/texture_sl_fill_1.tex; sourceTree = "<group>"; };
-		07D769B22C68D06D00BCA669 /* Terrain.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Terrain.h; sourceTree = "<group>"; };
-		07D769B32C69EB9A00BCA669 /* Environment.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Environment.h; sourceTree = "<group>"; };
-		07D769B42C6B422700BCA669 /* ScreenHelper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ScreenHelper.h; sourceTree = "<group>"; };
 		07E6EAC32C14CEA8007BBC6B /* libDungGine.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libDungGine.a; sourceTree = BUILT_PRODUCTS_DIR; };
-		07E6EACA2C14CFD3007BBC6B /* BSPTree.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BSPTree.h; sourceTree = "<group>"; };
 		07E6EACC2C150C23007BBC6B /* LICENSE */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
 		07E6EACD2C150C23007BBC6B /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
-		07E6EAD62C1B53B8007BBC6B /* DungGine.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DungGine.h; sourceTree = "<group>"; };
-		07E6EAD72C1C2657007BBC6B /* DungGineStyles.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DungGineStyles.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -120,6 +120,38 @@
 			name = scripts;
 			sourceTree = "<group>";
 		};
+		07BDBB872E75B257002ACC96 /* DungGine */ = {
+			isa = PBXGroup;
+			children = (
+				07BDBB6F2E75B257002ACC96 /* BSPTree.h */,
+				07BDBB702E75B257002ACC96 /* Comparison.h */,
+				07BDBB712E75B257002ACC96 /* Corridor.h */,
+				07BDBB722E75B257002ACC96 /* Door.h */,
+				07BDBB732E75B257002ACC96 /* Dungeon.h */,
+				07BDBB742E75B257002ACC96 /* DungGine.h */,
+				07BDBB752E75B257002ACC96 /* DungGineListener.h */,
+				07BDBB762E75B257002ACC96 /* DungGineStyles.h */,
+				07BDBB772E75B257002ACC96 /* DungObject.h */,
+				07BDBB782E75B257002ACC96 /* Environment.h */,
+				07BDBB792E75B257002ACC96 /* Globals.h */,
+				07BDBB7A2E75B257002ACC96 /* Inventory.h */,
+				07BDBB7B2E75B257002ACC96 /* Items.h */,
+				07BDBB7C2E75B257002ACC96 /* Keyboard.h */,
+				07BDBB7D2E75B257002ACC96 /* NPC.h */,
+				07BDBB7E2E75B257002ACC96 /* Orientation.h */,
+				07BDBB7F2E75B257002ACC96 /* PC.h */,
+				07BDBB802E75B257002ACC96 /* PlayerBase.h */,
+				07BDBB812E75B257002ACC96 /* RoomStyle.h */,
+				07BDBB822E75B257002ACC96 /* SaveGame.h */,
+				07BDBB832E75B257002ACC96 /* ScreenHelper.h */,
+				07BDBB842E75B257002ACC96 /* SolarMotionPatterns.h */,
+				07BDBB852E75B257002ACC96 /* Staircase.h */,
+				07BDBB862E75B257002ACC96 /* Terrain.h */,
+			);
+			name = DungGine;
+			path = include/DungGine;
+			sourceTree = "<group>";
+		};
 		07D769A72C603C9800BCA669 /* demo */ = {
 			isa = PBXGroup;
 			children = (
@@ -146,32 +178,9 @@
 			children = (
 				07E6EACC2C150C23007BBC6B /* LICENSE */,
 				07E6EACD2C150C23007BBC6B /* README.md */,
+				07BDBB872E75B257002ACC96 /* DungGine */,
 				07D769A72C603C9800BCA669 /* demo */,
 				0709B9BA2C95825200A43834 /* workflows */,
-				07C2A7892C2A29CF00869A56 /* Orientation.h */,
-				07E6EACA2C14CFD3007BBC6B /* BSPTree.h */,
-				075D436C2E420E7D005DD356 /* Dungeon.h */,
-				075D423C2E2CA41C005DD356 /* Comparison.h */,
-				07D769B32C69EB9A00BCA669 /* Environment.h */,
-				07D769B42C6B422700BCA669 /* ScreenHelper.h */,
-				0709B9C72C98102400A43834 /* Keyboard.h */,
-				07E6EAD62C1B53B8007BBC6B /* DungGine.h */,
-				07E6EAD72C1C2657007BBC6B /* DungGineStyles.h */,
-				07C2A7842C2616FC00869A56 /* RoomStyle.h */,
-				0709B9C62C977C4E00A43834 /* DungObject.h */,
-				07C2A7852C2618A500869A56 /* Items.h */,
-				0709B9AB2C6E445100A43834 /* PlayerBase.h */,
-				07C2A7862C261B3C00869A56 /* PC.h */,
-				0719424A2C49D65F008BD519 /* NPC.h */,
-				07C2A7872C2A28C400869A56 /* Door.h */,
-				07C2A7882C2A297800869A56 /* Corridor.h */,
-				075D436B2E4204A9005DD356 /* Staircase.h */,
-				071942492C458746008BD519 /* SolarMotionPatterns.h */,
-				07D769A62C5FFF3B00BCA669 /* Globals.h */,
-				07D769B22C68D06D00BCA669 /* Terrain.h */,
-				0709B9AF2C700CE900A43834 /* DungGineListener.h */,
-				0709B9B12C73B7CD00A43834 /* Inventory.h */,
-				075D42D92E364B4C005DD356 /* SaveGame.h */,
 				075D41972E28B68F005DD356 /* demo */,
 				07E6EAC42C14CEA8007BBC6B /* Products */,
 			);
