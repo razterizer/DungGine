@@ -1,7 +1,7 @@
 #!/bin/bash
 
 
-additional_flags="-I../.. \
+additional_flags="-I../include \
   -I../../Core/include \
   -I../../Termin8or/include"
 
