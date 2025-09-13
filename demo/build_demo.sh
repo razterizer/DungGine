@@ -1,7 +1,8 @@
 #!/bin/bash
 
 
-additional_flags="-I../../Core/include \
+additional_flags="-I../.. \
+  -I../../Core/include \
   -I../../Termin8or/include"
 
 ../../Core/build.sh demo "$1" "${additional_flags[@]}"
