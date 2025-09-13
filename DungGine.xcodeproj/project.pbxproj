@@ -302,8 +302,9 @@
 				DEVELOPMENT_TEAM = HFL2Q84SZB;
 				ENABLE_HARDENED_RUNTIME = YES;
 				HEADER_SEARCH_PATHS = (
-					../Termin8or/include/,
 					..,
+					../Core/include/,
+					../Termin8or/include/,
 				);
 				MACOSX_DEPLOYMENT_TARGET = 15.5;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -320,8 +321,9 @@
 				DEVELOPMENT_TEAM = HFL2Q84SZB;
 				ENABLE_HARDENED_RUNTIME = YES;
 				HEADER_SEARCH_PATHS = (
-					../Termin8or/include/,
 					..,
+					../Core/include/,
+					../Termin8or/include/,
 				);
 				MACOSX_DEPLOYMENT_TARGET = 15.5;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -453,8 +455,9 @@
 				DEVELOPMENT_TEAM = HFL2Q84SZB;
 				EXECUTABLE_PREFIX = lib;
 				HEADER_SEARCH_PATHS = (
-					../../lib,
-					../../lib/Termin8or/include/,
+					..,
+					../Core/include/,
+					../Termin8or/include/,
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -468,8 +471,9 @@
 				DEVELOPMENT_TEAM = HFL2Q84SZB;
 				EXECUTABLE_PREFIX = lib;
 				HEADER_SEARCH_PATHS = (
-					../../lib,
-					../../lib/Termin8or/include/,
+					..,
+					../Core/include/,
+					../Termin8or/include/,
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
