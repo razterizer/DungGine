@@ -1,0 +1,87 @@
+name: release linux
+
+on:
+  push:
+    tags:
+      - 'release-*'
+      - 'v*'
+
+jobs:
+  build-linux-release:
+    runs-on: ubuntu-latest  # Still use Ubuntu runner, but call it "Linux" release.
+    
+    steps:
+      # Step 1: Checkout the repository.
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      # Step 2: Move to the parent directory and fetch dependencies.
+      - name: Fetch dependencies
+        run: |
+          cd ..
+          mkdir lib
+          cd lib
+          git clone https://github.com/razterizer/Core.git
+          git clone https://github.com/razterizer/Termin8or.git
+          git clone https://github.com/razterizer/8Beat.git
+          git clone https://github.com/razterizer/AudioLibSwitcher_applaudio.git --recurse-submodules
+          git clone https://github.com/razterizer/applaudio.git
+          git clone https://github.com/razterizer/TrainOfThought.git
+
+      # Step 3: Install ALSA development packages.
+      - name: Install ALSA development packages
+        run: |
+          sudo apt install libasound2-dev pkg-config
+      
+      # Step 4: Build project.
+      - name: Build project
+        run: |
+          cd demo
+          ./build.sh
+        continue-on-error: false
+
+      # Step 5: Upload build artifact.
+      - name: Upload Linux build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dunggine_demo-linux-build
+          path: demo/bin/
+          retention-days: 1
+
+  create-linux-release:
+    runs-on: ubuntu-latest
+    needs: build-linux-release
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Download Linux build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: dunggine_demo-linux-build
+          path: linux-build
+          
+      - name: Create Linux distribution package
+        run: |
+          cd linux-build
+          mkdir -p dunggine_demo-${{ github.ref_name }}
+          chmod ugo+x demo
+          cp demo dunggine_demo-${{ github.ref_name }}/
+          if [ -d fonts ]; then
+            cp -r fonts dunggine_demo-${{ github.ref_name }}/
+          fi
+          if [ -d textures ]; then
+            cp -r fonts dunggine_demo-${{ github.ref_name }}/
+          fi
+          tar -czf dunggine_demo-${{ github.ref_name }}-linux.tar.gz dunggine_demo-${{ github.ref_name }}/
+          
+      - name: Upload Linux package to release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: ${{ github.ref_name }}  # Note: just the tag name, not refs/tags/
+          artifacts: linux-build/dunggine_demo-${{ github.ref_name }}-linux.tar.gz
+          allowUpdates: true  # ← This is the key!
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
