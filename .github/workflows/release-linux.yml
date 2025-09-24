@@ -70,7 +70,7 @@ jobs:
             cp -r fonts dunggine_demo-${{ github.ref_name }}/
           fi
           if [ -d textures ]; then
-            cp -r fonts dunggine_demo-${{ github.ref_name }}/
+            cp -r textures dunggine_demo-${{ github.ref_name }}/
           fi
           tar -czf dunggine_demo-${{ github.ref_name }}-linux.tar.gz dunggine_demo-${{ github.ref_name }}/
           

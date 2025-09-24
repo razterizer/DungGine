@@ -74,7 +74,7 @@ jobs:
           fi
           # Copy textures directory (if it exists)
           if [ -d textures ]; then
-            cp -r fonts dunggine_demo-${{ github.ref_name }}/
+            cp -r textures dunggine_demo-${{ github.ref_name }}/
           fi
           # Create zip archive
           zip -r dunggine_demo-${{ github.ref_name }}-macos.zip dunggine_demo-${{ github.ref_name }}/
