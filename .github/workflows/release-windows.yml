@@ -42,13 +42,13 @@ jobs:
       - name: Prepare files for upload
         run: |
           New-Item -ItemType Directory -Force -Path "upload-temp"
-          Copy-Item "demo/demo.vs/x64/Release/demo.vs.exe" "upload-temp/"
-          Copy-Item "demo/demo.vs/x64/Release/music.ct" "upload-temp/"
-          if (Test-Path "demo/demo.vs/x64/Release/fonts") {
-              Copy-Item -Recurse "demo/demo.vs/x64/Release/fonts" "upload-temp/"
+          Copy-Item "demo.vs/x64/Release/demo.vs.exe" "upload-temp/"
+          Copy-Item "demo.vs/x64/Release/music.ct" "upload-temp/"
+          if (Test-Path "demo.vs/x64/Release/fonts") {
+              Copy-Item -Recurse "demo.vs/x64/Release/fonts" "upload-temp/"
           }
-          if (Test-Path "demo/demo.vs/x64/Release/textures") {
-              Copy-Item -Recurse "demo/demo.vs/x64/Release/textures" "upload-temp/"
+          if (Test-Path "demo.vs/x64/Release/textures") {
+              Copy-Item -Recurse "demo.vs/x64/Release/textures" "upload-temp/"
           }
 
       # Step 4: Upload build artifact
