@@ -19,8 +19,6 @@ jobs:
       - name: Fetch dependencies
         run: |
           cd ..
-          mkdir lib
-          cd lib
           git clone https://github.com/razterizer/Core.git
           git clone https://github.com/razterizer/Termin8or.git
           git clone https://github.com/razterizer/8Beat.git
