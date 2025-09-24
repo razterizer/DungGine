@@ -42,7 +42,7 @@ jobs:
       - name: Prepare files for upload
         run: |
           New-Item -ItemType Directory -Force -Path "upload-temp"
-          Copy-Item "demo/demo.vs/x64/Release/demo.exe" "upload-temp/"
+          Copy-Item "demo/demo.vs/x64/Release/demo.vs.exe" "upload-temp/"
           Copy-Item "demo/demo.vs/x64/Release/music.ct" "upload-temp/"
           if (Test-Path "demo/demo.vs/x64/Release/fonts") {
               Copy-Item -Recurse "demo/demo.vs/x64/Release/fonts" "upload-temp/"
@@ -85,7 +85,7 @@ jobs:
           # Create a clean distribution folder
           New-Item -ItemType Directory -Force -Path "dunggine_demo-${{ github.ref_name }}"
           # Copy the executable and necessary files
-          Copy-Item "demo.exe" "dunggine_demo-${{ github.ref_name }}/"
+          Copy-Item "demo.vs.exe" "dunggine_demo-${{ github.ref_name }}/"
           # Copy fonts directory (if it exists)
           if (Test-Path "fonts") {
             Copy-Item -Recurse "fonts" "dunggine_demo-${{ github.ref_name }}/"
