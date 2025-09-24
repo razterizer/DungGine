@@ -39,6 +39,7 @@
 		07980BC42E846319007A0EB4 /* release-linux.yml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; name = "release-linux.yml"; path = ".github/workflows/release-linux.yml"; sourceTree = "<group>"; };
 		07980BC52E846319007A0EB4 /* release-macos.yml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; name = "release-macos.yml"; path = ".github/workflows/release-macos.yml"; sourceTree = "<group>"; };
 		07980BC62E846319007A0EB4 /* release-windows.yml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; name = "release-windows.yml"; path = ".github/workflows/release-windows.yml"; sourceTree = "<group>"; };
+		07980BEA2E8465E2007A0EB4 /* retag_release.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = retag_release.sh; sourceTree = SOURCE_ROOT; };
 		07BDBB6F2E75B257002ACC96 /* BSPTree.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BSPTree.h; sourceTree = "<group>"; };
 		07BDBB702E75B257002ACC96 /* Comparison.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Comparison.h; sourceTree = "<group>"; };
 		07BDBB712E75B257002ACC96 /* Corridor.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Corridor.h; sourceTree = "<group>"; };
@@ -112,6 +113,7 @@
 		072AE8022D0E7AEA004F92D3 /* scripts */ = {
 			isa = PBXGroup;
 			children = (
+				07980BEA2E8465E2007A0EB4 /* retag_release.sh */,
 				072AE8082D0E7D3B004F92D3 /* setup_and_build_demo.bat */,
 				072AE8072D0E7D3B004F92D3 /* setup_and_build_demo.sh */,
 				072AE8042D0E7BBE004F92D3 /* fetch-dependencies.py */,
