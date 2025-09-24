@@ -1,0 +1,91 @@
+name: release macos
+
+on:
+  push:
+    tags:
+      - 'release-*'
+      - 'v*'
+
+jobs:
+  build-macos-release:
+    runs-on: macos-latest
+    
+    steps:
+      # Step 1: Checkout the repository
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      # Step 2: Fetch dependencies
+      - name: Fetch dependencies
+        run: |
+          cd ..
+          mkdir lib
+          cd lib
+          git clone https://github.com/razterizer/Core.git
+          git clone https://github.com/razterizer/Termin8or.git
+          git clone https://github.com/razterizer/8Beat.git
+          git clone https://github.com/razterizer/AudioLibSwitcher_applaudio.git --recurse-submodules
+          git clone https://github.com/razterizer/applaudio.git
+          git clone https://github.com/razterizer/TrainOfThought.git
+
+      # Step 3: Install OpenAL (if needed)
+      - name: Install OpenAL
+        if: false  # Set to true if you need OpenAL
+        run: brew install openal-soft
+      
+      # Step 4: Build project
+      - name: Build project
+        run: |
+          cd demo
+          ./build.sh
+        continue-on-error: false
+
+      # Step 5: Upload build artifact
+      - name: Upload macOS build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dunggine_demo-macos-build
+          path: demo/bin/
+          retention-days: 1
+
+  create-macos-release:
+    runs-on: ubuntu-latest
+    needs: build-macos-release
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Download macOS build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: dunggine_demo-macos-build
+          path: macos-build
+          
+      - name: Create macOS distribution package
+        run: |
+          cd macos-build
+          # Create a clean distribution folder
+          mkdir -p dunggine_demo-${{ github.ref_name }}
+          # Copy the executable and necessary files
+          chmod ugo+x demo
+          cp demo dunggine_demo-${{ github.ref_name }}/
+          # Copy fonts directory (if it exists)
+          if [ -d fonts ]; then
+            cp -r fonts dunggine_demo-${{ github.ref_name }}/
+          fi
+          # Copy textures directory (if it exists)
+          if [ -d textures ]; then
+            cp -r fonts dunggine_demo-${{ github.ref_name }}/
+          fi
+          # Create zip archive
+          zip -r dunggine_demo-${{ github.ref_name }}-macos.zip dunggine_demo-${{ github.ref_name }}/
+          
+      - name: Upload MacOS package to release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: ${{ github.ref_name }}  # Note: just the tag name, not refs/tags/
+          artifacts: macos-build/dunggine_demo-${{ github.ref_name }}-macos.zip
+          allowUpdates: true  # ← This is the key!
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
