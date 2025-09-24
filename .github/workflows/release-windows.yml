@@ -1,0 +1,110 @@
+name: release windows
+
+on:
+  push:
+    tags:
+      - 'release-*'
+      - 'v*'
+
+jobs:
+  build-windows-release:
+    runs-on: windows-latest
+  
+    steps:
+      # Step 1: Checkout the repository
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Step 2: Move to the parent directory and fetch dependencies
+      - name: Fetch dependencies
+        run: |
+          cd ..
+          mkdir lib
+          cd lib
+          git clone https://github.com/razterizer/Core.git
+          git clone https://github.com/razterizer/Termin8or.git
+          git clone https://github.com/razterizer/8Beat.git
+          git clone https://github.com/razterizer/AudioLibSwitcher_applaudio.git --recurse-submodules
+          git clone https://github.com/razterizer/applaudio.git
+          git clone https://github.com/razterizer/TrainOfThought.git
+
+      # Step 3: Build project
+      - name: Run build.bat
+        continue-on-error: false
+        run: |
+          cd $env:GITHUB_WORKSPACE\demo
+          ./build.bat
+          
+      - name: Debug - List ALL files after build
+        run: |
+          cd $env:GITHUB_WORKSPACE
+          echo "=== Full directory structure ==="
+          Get-ChildItem -Recurse -File | Select-Object Name, Directory | Format-Table
+          
+      - name: Prepare files for upload
+        run: |
+          New-Item -ItemType Directory -Force -Path "upload-temp"
+          Copy-Item "demo/x64/Release/demo.exe" "upload-temp/"
+          Copy-Item "demo/x64/Release/music.ct" "upload-temp/"
+          if (Test-Path "demo/x64/Release/fonts") {
+              Copy-Item -Recurse "demo/x64/Release/fonts" "upload-temp/"
+          }
+          if (Test-Path "demo/x64/Release/textures") {
+              Copy-Item -Recurse "demo/x64/Release/textures" "upload-temp/"
+          }
+
+      # Step 4: Upload build artifact
+      - name: Upload Windows build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dunggine_demo-windows-build
+          path: upload-temp/
+          retention-days: 1
+
+  create-windows-release:
+    runs-on: windows-latest
+    needs: build-windows-release
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Download Windows build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: dunggine_demo-windows-build
+          path: windows-build
+          
+      - name: Debug - List downloaded files
+        run: |
+          cd windows-build
+          echo "=== Downloaded files ==="
+          Get-ChildItem -Recurse
+          
+      - name: Create Windows distribution package
+        run: |
+          cd windows-build
+          # Create a clean distribution folder
+          New-Item -ItemType Directory -Force -Path "dunggine_demo-${{ github.ref_name }}"
+          # Copy the executable and necessary files
+          Copy-Item "demo.exe" "dunggine_demo-${{ github.ref_name }}/"
+          # Copy fonts directory (if it exists)
+          if (Test-Path "fonts") {
+            Copy-Item -Recurse "fonts" "dunggine_demo-${{ github.ref_name }}/"
+          }
+          # Copy textures directory (if it exists)
+          if (Test-Path "textures") {
+            Copy-Item -Recurse "textures" "dunggine_demo-${{ github.ref_name }}/"
+          }
+          # Create zip archive
+          Compress-Archive -Path "dunggine_demo-${{ github.ref_name }}" -DestinationPath "dunggine_demo-${{ github.ref_name }}-windows.zip"
+          
+      - name: Upload Windows package to release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: ${{ github.ref_name }}  # Note: just the tag name, not refs/tags/
+          artifacts: windows-build/dunggine_demo-${{ github.ref_name }}-windows.zip
+          allowUpdates: true  # ← This is the key!
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
