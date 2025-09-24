@@ -31,7 +31,7 @@ jobs:
         continue-on-error: false
         run: |
           cd $env:GITHUB_WORKSPACE\demo
-          ./build.bat
+          ./build_demo.bat
           
       - name: Debug - List ALL files after build
         run: |

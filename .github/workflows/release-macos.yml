@@ -35,7 +35,7 @@ jobs:
       - name: Build project
         run: |
           cd demo
-          ./build.sh
+          ./build_demo.sh
         continue-on-error: false
 
       # Step 5: Upload build artifact
