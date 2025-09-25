@@ -88,8 +88,8 @@ jobs:
       - name: Create combined Linux distribution package
         run: |
           mkdir dunggine_demo-${{ github.ref_name }}
-          cp glibc2.38/dunggine_demo dunggine_demo-${{ github.ref_name }}/dunggine_demo-glibc2.38
-          cp glibc2.35/dunggine_demo dunggine_demo-${{ github.ref_name }}/dunggine_demo-glibc2.35
+          cp glibc2.38/demo dunggine_demo-${{ github.ref_name }}/dunggine_demo-glibc2.38
+          cp glibc2.35/demo dunggine_demo-${{ github.ref_name }}/dunggine_demo-glibc2.35
           if [ -d glibc2.38/fonts ]; then
             cp -r glibc2.38/fonts dunggine_demo-${{ github.ref_name }}/
           fi
