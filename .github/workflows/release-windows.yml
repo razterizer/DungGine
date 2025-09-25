@@ -98,8 +98,7 @@ jobs:
           tag: ${{ github.ref_name }}  # Note: just the tag name, not refs/tags/
           artifacts: windows-build/dunggine_demo-${{ github.ref_name }}-windows.zip
           allowUpdates: true  # ← This is the key!
-          body: |
-            $(git for-each-ref refs/tags/${{ github.ref_name }} --format='%(contents)' || echo "${{ github.event.head_commit.message }}")
+          body: ${{ github.event.release.body || github.event.head_commit.message }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
