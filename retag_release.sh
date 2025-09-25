@@ -3,11 +3,8 @@ set -euo pipefail
 
 usage() {
   echo "Usage:"
-  echo "  $0 <version> [message]          # e.g. $0 1.0.2.5 \"Bugfix release\""
-  echo "  $0 bump <major|minor|patch|build> [message]"
-  echo "Examples:"
-  echo "  $0 2.1.0.0 \"New AI feature\""
-  echo "  $0 bump patch \"Small bug fixes\""
+  echo "  $0 <version> [message]"
+  echo "  $0 bump <major|minor|patch> [message]"
   exit 1
 }
 
@@ -23,12 +20,13 @@ bump_version() {
   IFS='.' read -r major minor patch build <<<"$current"
 
   case "$part" in
-    major) ((major++)); minor=0; patch=0; build=0 ;;
-    minor) ((minor++)); patch=0; build=0 ;;
-    patch) ((patch++)); build=0 ;;
-    build) ((build++)) ;;
+    major) ((major++)); minor=0; patch=0 ;;
+    minor) ((minor++)); patch=0 ;;
+    patch) ((patch++)) ;;
     *) echo "Unknown bump type: $part"; exit 1 ;;
   esac
+
+  ((build++))  # always increment build number
 
   echo "$major.$minor.$patch.$build"
 }
@@ -56,6 +54,9 @@ fi
 # Remaining args are the message
 MESSAGE="$*"
 
+# Convert literal \n to real newlines
+MESSAGE="${MESSAGE//\\n/$'\n'}"
+
 if [ -z "$MESSAGE" ]; then
   read -rp "Enter release message for $VERSION: " MESSAGE
 fi
@@ -75,8 +76,9 @@ if git ls-remote --tags origin | grep -q "refs/tags/$TAG"; then
 fi
 
 # Create and push new annotated tag
-echo "Creating annotated tag $TAG with message: $MESSAGE"
+echo "Creating annotated tag $TAG with message:"
+echo "$MESSAGE"
 git tag -a "$TAG" -m "$MESSAGE"
 git push origin "$TAG"
 
-echo "✅ Done — created $TAG with message: $MESSAGE"
+echo "✅ Done — created $TAG"
