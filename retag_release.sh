@@ -3,7 +3,7 @@ set -euo pipefail
 
 usage() {
   echo "Usage:"
-  echo "  $0 <version> [message]"
+  echo "  $0 <version> [message]          # e.g. $0 1.0.2.5 \"Bugfix release\""
   echo "  $0 bump <major|minor|patch> [message]"
   exit 1
 }
@@ -54,12 +54,13 @@ fi
 # Remaining args are the message
 MESSAGE="$*"
 
+# If no message provided, default to last commit message
+if [ -z "$MESSAGE" ]; then
+  MESSAGE=$(git log -1 --pretty=%B)
+fi
+
 # Convert literal \n to real newlines
 MESSAGE="${MESSAGE//\\n/$'\n'}"
-
-if [ -z "$MESSAGE" ]; then
-  read -rp "Enter release message for $VERSION: " MESSAGE
-fi
 
 TAG="release-$VERSION"
 
@@ -71,7 +72,6 @@ fi
 
 # Delete remote tag if it exists
 if git ls-remote --tags origin | grep -q "refs/tags/$TAG"; then
-  echo "Deleting remote tag $TAG..."
   git push --delete origin "$TAG"
 fi
 
