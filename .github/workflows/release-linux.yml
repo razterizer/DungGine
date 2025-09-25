@@ -21,20 +21,15 @@ jobs:
           cd ..
           git clone https://github.com/razterizer/Core.git
           git clone https://github.com/razterizer/Termin8or.git
-
-      # Step 3: Install ALSA development packages.
-      - name: Install ALSA development packages
-        run: |
-          sudo apt install libasound2-dev pkg-config
       
-      # Step 4: Build project.
+      # Step 3: Build project.
       - name: Build project
         run: |
           cd demo
           ./build_demo.sh
         continue-on-error: false
 
-      # Step 5: Upload build artifact.
+      # Step 4: Upload build artifact.
       - name: Upload Linux build artifact
         uses: actions/upload-artifact@v4
         with:
