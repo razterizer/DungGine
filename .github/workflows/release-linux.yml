@@ -8,7 +8,7 @@ on:
 
 jobs:
   build-linux-release:
-    runs-on: ubuntu-latest  # Still use Ubuntu runner, but call it "Linux" release.
+    runs-on: ubuntu-latest
     
     steps:
       # Step 1: Checkout the repository.
@@ -33,45 +33,82 @@ jobs:
       - name: Upload Linux build artifact
         uses: actions/upload-artifact@v4
         with:
-          name: dunggine_demo-linux-build
+          name: dunggine_demo-glibc2.38
+          path: demo/bin/
+          retention-days: 1
+
+  build-legacy-linux-release:
+    runs-on: ubuntu-22.04
+    
+    steps:
+      # Step 1: Checkout the repository.
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Step 2: Move to the parent directory and fetch dependencies.
+      - name: Fetch dependencies
+        run: |
+          cd ..
+          git clone https://github.com/razterizer/Core.git
+          git clone https://github.com/razterizer/Termin8or.git
+
+      # Step 3: Build project.
+      - name: Build project
+        run: |
+          cd demo
+          ./build_demo.sh
+        continue-on-error: false
+
+      - name: Upload Legacy Linux build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dunggine_demo-glibc2.35
           path: demo/bin/
           retention-days: 1
 
   create-linux-release:
     runs-on: ubuntu-latest
-    needs: build-linux-release
-    
+    needs: [build-linux-release, build-legacy-linux-release]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        
-      - name: Download Linux build artifact
+
+      - name: Download GLIBC 2.38 build
         uses: actions/download-artifact@v4
         with:
-          name: dunggine_demo-linux-build
-          path: linux-build
-          
-      - name: Create Linux distribution package
+          name: dunggine_demo-glibc2.38
+          path: glibc2.38
+
+      - name: Download GLIBC 2.35 build
+        uses: actions/download-artifact@v4
+        with:
+          name: dunggine_demo-glibc2.35
+          path: glibc2.35
+
+      - name: Create combined Linux distribution package
         run: |
-          cd linux-build
-          mkdir -p dunggine_demo-${{ github.ref_name }}
-          chmod ugo+x demo
-          cp demo dunggine_demo-${{ github.ref_name }}/
-          if [ -d fonts ]; then
-            cp -r fonts dunggine_demo-${{ github.ref_name }}/
+          mkdir dunggine_demo-${{ github.ref_name }}
+          cp glibc2.38/dunggine_demo dunggine_demo-${{ github.ref_name }}/dunggine_demo-glibc2.38
+          cp glibc2.35/dunggine_demo dunggine_demo-${{ github.ref_name }}/dunggine_demo-glibc2.35
+          if [ -d glibc2.38/fonts ]; then
+            cp -r glibc2.38/fonts dunggine_demo-${{ github.ref_name }}/
           fi
-          if [ -d textures ]; then
-            cp -r textures dunggine_demo-${{ github.ref_name }}/
+          if [ -d glibc2.38/textures ]; then
+            cp -r glibc2.38/textures dunggine_demo-${{ github.ref_name }}/
           fi
+          echo "This package contains two binaries:" > dunggine_demo-${{ github.ref_name }}/README.txt
+          echo "- dunggine_demo-glibc2.38: for modern systems (Ubuntu 24.04+, Arch Linux)" >> dunggine_demo-${{ github.ref_name }}/README.txt
+          echo "- dunggine_demo-glibc2.35: for legacy systems (WSL, Ubuntu 22.04)" >> dunggine_demo-${{ github.ref_name }}/README.txt
+          echo "" >> dunggine_demo-${{ github.ref_name }}/README.txt
+          echo "Run the binary that matches your system's glibc version." >> dunggine_demo-${{ github.ref_name }}/README.txt
           tar -czf dunggine_demo-${{ github.ref_name }}-linux.tar.gz dunggine_demo-${{ github.ref_name }}/
-          
+
       - name: Upload Linux package to release
         uses: ncipollo/release-action@v1
         with:
-          tag: ${{ github.ref_name }}  # Note: just the tag name, not refs/tags/
-          artifacts: linux-build/dunggine_demo-${{ github.ref_name }}-linux.tar.gz
-          allowUpdates: true  # ← This is the key!
+          tag: ${{ github.ref_name }}
+          artifacts: dunggine_demo-${{ github.ref_name }}-linux.tar.gz
+          allowUpdates: true
           body: ${{ github.event.release.body || github.event.head_commit.message }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
