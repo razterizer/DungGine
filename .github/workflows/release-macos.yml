@@ -67,6 +67,12 @@ jobs:
           if [ -d textures ]; then
             cp -r textures dunggine_demo-${{ github.ref_name }}/
           fi
+          echo "Unblock instructions:" > dunggine_demo-${{ github.ref_name }}/README.txt
+          echo "=====================" >> dunggine_demo-${{ github.ref_name }}/README.txt
+          echo "To tell the gatekeeper that this executable is fine" >> dunggine_demo-${{ github.ref_name }}/README.txt
+          echo " you can unblock the executable with" >> dunggine_demo-${{ github.ref_name }}/README.txt
+          echo " the following command:" >> dunggine_demo-${{ github.ref_name }}/README.txt
+          echo "   xattr -dr com.apple.quarantine dunggine_demo" >> dunggine_demo-${{ github.ref_name }}/README.txt
           # Create zip archive
           zip -r dunggine_demo-${{ github.ref_name }}-macos.zip dunggine_demo-${{ github.ref_name }}/
           

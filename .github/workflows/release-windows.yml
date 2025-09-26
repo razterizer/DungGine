@@ -89,6 +89,12 @@ jobs:
           if (Test-Path "textures") {
             Copy-Item -Recurse "textures" "dunggine_demo-${{ github.ref_name }}/"
           }
+          echo "Unblock instructions:" > dunggine_demo-${{ github.ref_name }}/README.txt
+          echo "=====================" >> dunggine_demo-${{ github.ref_name }}/README.txt
+          echo "To tell Windows that this executable is fine" >> dunggine_demo-${{ github.ref_name }}/README.txt
+          echo " you can unblock the executable by" >> dunggine_demo-${{ github.ref_name }}/README.txt
+          echo " rightclicking the exe, then:" >> dunggine_demo-${{ github.ref_name }}/README.txt
+          echo "   Properties -> Unblock (check this)." >> dunggine_demo-${{ github.ref_name }}/README.txt
           # Create zip archive
           Compress-Archive -Path "dunggine_demo-${{ github.ref_name }}" -DestinationPath "dunggine_demo-${{ github.ref_name }}-windows.zip"
           

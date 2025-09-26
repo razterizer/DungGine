@@ -102,6 +102,11 @@ jobs:
           echo "- demo-glibc2.35: for legacy systems (WSL, Ubuntu 22.04)" >> dunggine_demo-${{ github.ref_name }}/README.txt
           echo "" >> dunggine_demo-${{ github.ref_name }}/README.txt
           echo "Run the binary that matches your system's glibc version." >> dunggine_demo-${{ github.ref_name }}/README.txt
+          echo "" >> dunggine_demo-${{ github.ref_name }}/README.txt
+          echo "To run either executable, you might have to first do:" >> dunggine_demo-${{ github.ref_name }}/README.txt
+          echo "  chmod ugo+x dunggine_demo-glibc2.38" >> dunggine_demo-${{ github.ref_name }}/README.txt
+          echo " or:" >> dunggine_demo-${{ github.ref_name }}/README.txt
+          echo "  chmod ugo+x dunggine_demo-glibc2.35" >> dunggine_demo-${{ github.ref_name }}/README.txt
           tar -czf dunggine_demo-${{ github.ref_name }}-linux.tar.gz dunggine_demo-${{ github.ref_name }}/
 
       - name: Upload Linux package to release
