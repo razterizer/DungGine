@@ -97,8 +97,8 @@ jobs:
             cp -r glibc2.38/textures dunggine_demo-${{ github.ref_name }}/
           fi
           echo "This package contains two binaries:" > dunggine_demo-${{ github.ref_name }}/README.txt
-          echo "- dunggine_demo-glibc2.38: for modern systems (Ubuntu 24.04+, Arch Linux)" >> dunggine_demo-${{ github.ref_name }}/README.txt
-          echo "- dunggine_demo-glibc2.35: for legacy systems (WSL, Ubuntu 22.04)" >> dunggine_demo-${{ github.ref_name }}/README.txt
+          echo "- demo-glibc2.38: for modern systems (Ubuntu 24.04+, Arch Linux)" >> dunggine_demo-${{ github.ref_name }}/README.txt
+          echo "- demo-glibc2.35: for legacy systems (WSL, Ubuntu 22.04)" >> dunggine_demo-${{ github.ref_name }}/README.txt
           echo "" >> dunggine_demo-${{ github.ref_name }}/README.txt
           echo "Run the binary that matches your system's glibc version." >> dunggine_demo-${{ github.ref_name }}/README.txt
           tar -czf dunggine_demo-${{ github.ref_name }}-linux.tar.gz dunggine_demo-${{ github.ref_name }}/
