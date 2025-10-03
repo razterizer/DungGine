@@ -315,6 +315,8 @@ int main(int argc, char** argv)
   params.screen_bg_color_title = Color::DarkYellow;
   params.screen_bg_color_instructions = Color::Black;
   
+  bool show_help = false;
+  
   for (int i = 1; i < argc; ++i)
   {
     if (std::strcmp(argv[i],  "--suppress_tty_output") == 0)
@@ -329,20 +331,19 @@ int main(int argc, char** argv)
         params.log_mode = LogMode::Replay;
       params.xcode_log_path = "../../../../../../../../Documents/xcode/lib/DungGine/demo/bin/";
     }
+    else if (std::strcmp(argv[i], "--help") == 0)
+      show_help = true;
   }
 
   Game game(argc, argv, params);
   
-  for (int i = 1; i < argc; ++i)
+  if (show_help)
   {
-    if (std::strcmp(argv[i], "--help") == 0)
-    {
-      std::cout << "demo --help | [--log_mode (record | replay)] [--suppress_tty_output] [--suppress_tty_input] [--set_fps <fps>] [--set_sim_delay_us <delay_us>]" << std::endl;
-      std::cout << "  default values:" << std::endl;
-      std::cout << "    <fps>      : " << game.get_real_fps() << std::endl;
-      std::cout << "    <delay_us> : " << game.get_sim_delay_us() << std::endl;
-      return EXIT_SUCCESS;
-    }
+    std::cout << "demo --help | [--log_mode (record | replay)] [--suppress_tty_output] [--suppress_tty_input] [--set_fps <fps>] [--set_sim_delay_us <delay_us>]" << std::endl;
+    std::cout << "  default values:" << std::endl;
+    std::cout << "    <fps>      : " << game.get_real_fps() << std::endl;
+    std::cout << "    <delay_us> : " << game.get_sim_delay_us() << std::endl;
+    return EXIT_SUCCESS;
   }
   
   for (int i = 1; i < argc; ++i)
