@@ -468,10 +468,10 @@ auto f_tex_path = [](const auto& filename)
 {
   return folder::join_path({ "textures", filename });
 };
-texture_params.texture_file_names_surface_level_fill.emplace_back(f_tex_path("texture_sl_fill_0.tex"));
-texture_params.texture_file_names_surface_level_fill.emplace_back(f_tex_path("texture_sl_fill_1.tex"));
-texture_params.texture_file_names_surface_level_shadow.emplace_back(f_tex_path("texture_sl_shadow_0.tex"));
-texture_params.texture_file_names_surface_level_shadow.emplace_back(f_tex_path("texture_sl_shadow_1.tex"));
+texture_params.texture_file_names_surface_level_fill.emplace_back(f_tex_path("texture_sl_fill_0.tx"));
+texture_params.texture_file_names_surface_level_fill.emplace_back(f_tex_path("texture_sl_fill_1.tx"));
+texture_params.texture_file_names_surface_level_shadow.emplace_back(f_tex_path("texture_sl_shadow_0.tx"));
+texture_params.texture_file_names_surface_level_shadow.emplace_back(f_tex_path("texture_sl_shadow_1.tx"));
 
 dungeon_engine = std::make_unique<dung::DungGine>(true, true, texture_params); // arguments: exe_folder, use_fow, sorted_inventory_items, texture_params.
 dungeon_engine.load_dungeon(dungeon);

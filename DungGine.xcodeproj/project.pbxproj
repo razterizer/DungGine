@@ -66,10 +66,10 @@
 		07BDBB862E75B257002ACC96 /* Terrain.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Terrain.h; sourceTree = "<group>"; };
 		07D769A82C603CC300BCA669 /* demo.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = demo.cpp; sourceTree = "<group>"; };
 		07D769AC2C6044E000BCA669 /* build_demo.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = build_demo.sh; sourceTree = "<group>"; };
-		07D769AE2C6044FC00BCA669 /* texture_sl_shadow_0.tex */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = texture_sl_shadow_0.tex; path = textures/texture_sl_shadow_0.tex; sourceTree = "<group>"; };
-		07D769AF2C6044FC00BCA669 /* texture_sl_shadow_1.tex */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = texture_sl_shadow_1.tex; path = textures/texture_sl_shadow_1.tex; sourceTree = "<group>"; };
-		07D769B02C6044FC00BCA669 /* texture_sl_fill_0.tex */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = texture_sl_fill_0.tex; path = textures/texture_sl_fill_0.tex; sourceTree = "<group>"; };
-		07D769B12C6044FC00BCA669 /* texture_sl_fill_1.tex */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = texture_sl_fill_1.tex; path = textures/texture_sl_fill_1.tex; sourceTree = "<group>"; };
+		07D769AE2C6044FC00BCA669 /* texture_sl_shadow_0.tx */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = texture_sl_shadow_0.tx; path = textures/texture_sl_shadow_0.tx; sourceTree = "<group>"; };
+		07D769AF2C6044FC00BCA669 /* texture_sl_shadow_1.tx */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = texture_sl_shadow_1.tx; path = textures/texture_sl_shadow_1.tx; sourceTree = "<group>"; };
+		07D769B02C6044FC00BCA669 /* texture_sl_fill_0.tx */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = texture_sl_fill_0.tx; path = textures/texture_sl_fill_0.tx; sourceTree = "<group>"; };
+		07D769B12C6044FC00BCA669 /* texture_sl_fill_1.tx */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = texture_sl_fill_1.tx; path = textures/texture_sl_fill_1.tx; sourceTree = "<group>"; };
 		07E6EAC32C14CEA8007BBC6B /* libDungGine.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libDungGine.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		07E6EACC2C150C23007BBC6B /* LICENSE */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
 		07E6EACD2C150C23007BBC6B /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
@@ -173,10 +173,10 @@
 		07D769AD2C6044E800BCA669 /* textures */ = {
 			isa = PBXGroup;
 			children = (
-				07D769B02C6044FC00BCA669 /* texture_sl_fill_0.tex */,
-				07D769B12C6044FC00BCA669 /* texture_sl_fill_1.tex */,
-				07D769AE2C6044FC00BCA669 /* texture_sl_shadow_0.tex */,
-				07D769AF2C6044FC00BCA669 /* texture_sl_shadow_1.tex */,
+				07D769B02C6044FC00BCA669 /* texture_sl_fill_0.tx */,
+				07D769B12C6044FC00BCA669 /* texture_sl_fill_1.tx */,
+				07D769AE2C6044FC00BCA669 /* texture_sl_shadow_0.tx */,
+				07D769AF2C6044FC00BCA669 /* texture_sl_shadow_1.tx */,
 			);
 			name = textures;
 			sourceTree = "<group>";
