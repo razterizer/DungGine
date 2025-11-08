@@ -1,5 +1,10 @@
 # Release Notes
 
+## 1.1.2.3
+- Slightly improved way to show the help text.
+- Renaming texture file extensions *.tex -> *.tx so as to not getting confused with LaTeX/TeX files.
+- Bumping minor instead of patch because of accidental bump of minor in 1.1.1.2.
+
 ## 1.1.1.2
 - Added unblocking instructions in readme for macos and windows and added additional chmodding instructions in readme for linux.
 
