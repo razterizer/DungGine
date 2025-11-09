@@ -295,13 +295,18 @@ git tag release-1.0.0.0
 git push origin release-1.0.0.0
 ```
 
-But it is best to use the script `retag_release.sh` for such tasks. E.g.:
+But it is best to use the script `tag_release.sh` for such tasks. E.g.:
 ```sh
-./retag_release bump patch "Some tag message."
+./tag_release bump patch "Some tag message."
 ```
-or e.g.:
 ```sh
-./retag_release 1.1.5.7 "Some tag message."
+./tag_release 1.1.5.7 "Some tag message."
+```
+```sh
+./tag_release -f RELEASE_NOTES.md"
+```
+```sh
+./tag_release 1.1.5.7 -f RELEASE_NOTES.md"
 ```
 
 Note that the tag message is currently not used as release notes, but the last commit message is. I will change this in the future.
