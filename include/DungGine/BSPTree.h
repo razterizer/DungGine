@@ -14,7 +14,7 @@
 #include <Termin8or/screen/ScreenHandler.h>
 #include <Termin8or/drawing/Drawing.h>
 #include <Core/Rand.h>
-#include <Core/Math.h>
+#include <Core/MathUtils.h>
 #include <Core/bool_vector.h>
 #include <Core/Utils.h>
 #include <array>
