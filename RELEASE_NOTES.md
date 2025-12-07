@@ -1,5 +1,8 @@
 # Release Notes
 
+## 2.0.0.4
+- DungGine now uses Termin8or 2.0.0.2.
+
 ## 1.1.2.3
 - Slightly improved way to show the help text.
 - Renaming texture file extensions *.tex -> *.tx so as to not getting confused with LaTeX/TeX files.
