@@ -22,7 +22,7 @@ namespace dung
   struct RoomStyle
   {
     WallType wall_type = WallType::Hash;
-    Style wall_style { Color::DarkGray, Color::LightGray };
+    Style wall_style { Color16::DarkGray, Color16::LightGray };
     FloorType floor_type = FloorType::None;
     bool is_underground = true;
     RC tex_pos;
@@ -149,24 +149,24 @@ namespace dung
       switch (floor_type)
       {
         case FloorType::Sand:
-          style = t8::make_shaded_style(Color::Yellow, t8::ShadeType::Bright);
+          style = t8::make_shaded_style(Color16::Yellow, t8::ShadeType::Bright);
           break;
         case FloorType::Grass:
-          style = t8::make_shaded_style(Color::Green, t8::ShadeType::Bright);
+          style = t8::make_shaded_style(Color16::Green, t8::ShadeType::Bright);
           break;
         case FloorType::Stone:
         case FloorType::Stone2:
-          style = t8::make_shaded_style(Color::LightGray, t8::ShadeType::Bright);
+          style = t8::make_shaded_style(Color16::LightGray, t8::ShadeType::Bright);
           break;
         case FloorType::Water:
-          style = t8::make_shaded_style(Color::Blue, t8::ShadeType::Bright);
+          style = t8::make_shaded_style(Color16::Blue, t8::ShadeType::Bright);
           break;
         case FloorType::Wood:
-          style = { Color::DarkRed, Color::Yellow };
+          style = { Color16::DarkRed, Color16::Yellow };
           break;
         case FloorType::None:
         default:
-          style = { Color::DarkGray, Color::LightGray };
+          style = { Color16::DarkGray, Color16::LightGray };
           break;
       }
       if (is_underground)

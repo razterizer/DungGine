@@ -43,21 +43,21 @@ namespace dung
     {
       {
         {
-          { 0.00f, Color::White },
-          { 0.27f, Color::Red },
-          { 0.60f, Color::Yellow },
-          { 0.75f, Color::LightGray },
-          { 0.88f, Color::DarkGray },
+          { 0.00f, Color16::White },
+          { 0.27f, Color16::Red },
+          { 0.60f, Color16::Yellow },
+          { 0.75f, Color16::LightGray },
+          { 0.88f, Color16::DarkGray },
         }
       },
       {
         {
-          { 0.12f, Color::Blue },
-          { 0.20f, Color::White },
-          { 0.30f, Color::Yellow },   // 0.125f
-          { 0.55f, Color::DarkRed },  // 0.375f
-          { 0.70f, Color::DarkGray }, // 0.625f
-          { 0.85f, Color::Black },    // 0.875f
+          { 0.12f, Color16::Blue },
+          { 0.20f, Color16::White },
+          { 0.30f, Color16::Yellow },   // 0.125f
+          { 0.55f, Color16::DarkRed },  // 0.375f
+          { 0.70f, Color16::DarkGray }, // 0.625f
+          { 0.85f, Color16::Black },    // 0.875f
         }
       },
       {
@@ -76,21 +76,21 @@ namespace dung
     {
       {
         {
-          { 0.10f, Color::White },
-          { 0.37f, Color::Red },
-          { 0.70f, Color::Yellow },
-          { 0.85f, Color::LightGray },
-          { 0.98f, Color::DarkGray },
+          { 0.10f, Color16::White },
+          { 0.37f, Color16::Red },
+          { 0.70f, Color16::Yellow },
+          { 0.85f, Color16::LightGray },
+          { 0.98f, Color16::DarkGray },
         }
       },
       {
         {
-          { 0.12f, Color::Blue },
-          { 0.30f, Color::White },
-          { 0.50f, Color::Yellow },   // 0.125f
-          { 0.74f, Color::DarkRed },  // 0.375f
-          { 0.86f, Color::DarkGray }, // 0.625f
-          { 1.00f, Color::Black },    // 0.875f
+          { 0.12f, Color16::Blue },
+          { 0.30f, Color16::White },
+          { 0.50f, Color16::Yellow },   // 0.125f
+          { 0.74f, Color16::DarkRed },  // 0.375f
+          { 0.86f, Color16::DarkGray }, // 0.625f
+          { 1.00f, Color16::Black },    // 0.875f
         }
       },
       {
@@ -136,7 +136,7 @@ namespace dung
     PC()
     {
       character = '@';
-      style = { Color::Magenta, Color::White };
+      style = { Color16::Magenta, Color16::White };
       smoke_color_gradients.emplace_back(0.5f, smoke_0);
       smoke_color_gradients.emplace_back(0.6f, smoke_1);
     }
@@ -170,7 +170,7 @@ namespace dung
           float t = static_cast<float>(i)/(NR - 1);
           sh.write_buffer(g.string_gradient(t), i, 30 + c_offs, g.fg_color_gradient(t), g.bg_color_gradient(t));
           if (std::floor(t*4) - std::floor(t_prev*4) == 1)
-            sh.write_buffer("#", i, 29, Color::White);
+            sh.write_buffer("#", i, 29, Color16::White);
           t_prev = t;
         }
         c_offs++;

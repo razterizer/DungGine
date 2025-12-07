@@ -75,9 +75,9 @@ namespace sg
     if (**it_line == var_name)
     {
       ++(*it_line);
-      var_ptr->fg_color = t8::string2color(**it_line);
+      var_ptr->fg_color = t8::string_to_color16(**it_line);
       ++(*it_line);
-      var_ptr->bg_color = t8::string2color(**it_line);
+      var_ptr->bg_color = t8::string_to_color16(**it_line);
       return true;
     }
     return false;
@@ -165,8 +165,8 @@ namespace sg
   void write_var(std::vector<std::string>& lines_vec, const std::string& var_name, const t8::Style& var)
   {
     lines_vec.emplace_back(var_name);
-    lines_vec.emplace_back(t8::color2string(var.fg_color));
-    lines_vec.emplace_back(t8::color2string(var.bg_color));
+    lines_vec.emplace_back(var.fg_color.str(false));
+    lines_vec.emplace_back(var.bg_color.str(false));
   };
   
   template<>

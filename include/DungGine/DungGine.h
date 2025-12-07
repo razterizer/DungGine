@@ -79,7 +79,7 @@ namespace dung
     bool use_fog_of_war = false;
     
     const std::vector<std::string> c_fight_strings { "(", "#", ")", "%", "*" };
-    const std::vector<Color> c_fight_colors { Color::Red, Color::Yellow, Color::Blue, Color::Magenta, Color::White, Color::Black, Color::LightGray, Color::DarkGray };
+    const std::vector<Color> c_fight_colors { Color16::Red, Color16::Yellow, Color16::Blue, Color16::Magenta, Color16::White, Color16::Black, Color16::LightGray, Color16::DarkGray };
     enum class FightDir { NW, W, SW, S, SE, E, NE, N, NUM_ITEMS };
     const std::vector<int> fight_r_offs = { 1, 0, -1, -1, -1, 0, 1, 1 };
     const std::vector<int> fight_c_offs = { 1, 1, 1, 0, -1, -1, -1, 0 };
@@ -620,7 +620,7 @@ namespace dung
       pc_hb = std::string(1, m_player.character) + ' ' + pc_hb;
       per_textel_styles.emplace_back(RC { 0, 0 }, m_player.style);
       health_bars.emplace_back(pc_hb);
-      styles.emplace_back(Style { Color::Magenta, Color::Transparent2 });
+      styles.emplace_back(Style { Color16::Magenta, Color16::Transparent2 });
       
       int line = 1;
       for (const auto& npc : all_npcs)
@@ -633,16 +633,16 @@ namespace dung
           for (int i = 0; i < 10; ++i)
             npc_hb[i] = npc.health > static_cast<int>(i*npc_ratio) ? 'O' : ' ';
           npc_hb = std::string(1, npc.visible ? npc.character : '?') + ' ' + npc_hb;
-          per_textel_styles.emplace_back(RC { line++, 0 }, npc.visible ? npc.style : Style { Color::White, Color::Transparent2 });
+          per_textel_styles.emplace_back(RC { line++, 0 }, npc.visible ? npc.style : Style { Color16::White, Color16::Transparent2 });
           health_bars.emplace_back(npc_hb);
-          styles.emplace_back(Style { Color::Red, Color::Transparent2 });
+          styles.emplace_back(Style { Color16::Red, Color16::Transparent2 });
         }
       }
       
       t8x::TextBoxDrawingArgsAlign tb_args;
       tb_args.v_align = t8x::VerticalAlignment::TOP;
       tb_args.h_align = t8x::HorizontalAlignment::LEFT;
-      tb_args.base.box_style = { Color::White, Color::DarkBlue };
+      tb_args.base.box_style = { Color16::White, Color16::DarkBlue };
       tb_args.framed_mode = framed_mode;
       tb_health.set_text(health_bars, styles, per_textel_styles);
       tb_health.calc_pre_draw(str::Adjustment::Left);
@@ -655,14 +655,14 @@ namespace dung
       t8x::TextBoxDrawingArgsPos tb_args;
       int offs = framed_mode ? 1 : 0;
       tb_args.pos = { 1 + offs, 12 + offs };
-      tb_args.base.box_style = { Color::White, Color::DarkBlue };
+      tb_args.base.box_style = { Color16::White, Color16::DarkBlue };
     
       std::string strength_bar = str::rep_char(' ', 10);
       float pc_ratio = m_player.strength / 10.f;
       for (int i = 0; i < 10; ++i)
         strength_bar[i] = (m_player.strength - m_player.weakness) > static_cast<int>(i*pc_ratio)
         ? '=' : ' ';
-      Style style { Color::Green, Color::Transparent2 };
+      Style style { Color16::Green, Color16::Transparent2 };
       tb_strength.set_text(strength_bar, style);
       tb_strength.calc_pre_draw(str::Adjustment::Left);
       tb_strength.draw(sh, tb_args);
@@ -1035,7 +1035,7 @@ namespace dung
                 pb->cached_fight_style = t8::Style
                 {
                   t8::get_random_color(c_fight_colors),
-                  Color::Transparent2
+                  Color16::Transparent2
                 };
                 pb->cached_fight_str = rnd::rand_select(c_fight_strings);
               }
@@ -1113,7 +1113,7 @@ namespace dung
         bool visible = !((use_fog_of_war && fog_of_war) ||
                       ((m_environment->is_underground(p.curr_floor, p.curr_room) || calc_night(p)) && !light)); // #FIXME: add fow term.
         if (visible)
-          sh.write_buffer(std::string(1, p_char), wpn_scr_pos, p.weapon->projectile_fg_color, Color::Transparent2);
+          sh.write_buffer(std::string(1, p_char), wpn_scr_pos, p.weapon->projectile_fg_color, Color16::Transparent2);
       }
       stlutils::erase_if(active_projectiles, [sim_time_s](const auto& p)
       {
@@ -1888,7 +1888,7 @@ namespace dung
         {
           t8x::TextBoxDrawingArgsAlign tbd_args;
           tbd_args.v_align = t8x::VerticalAlignment::TOP;
-          tbd_args.base.box_style = { Color::Blue, Color::Yellow };
+          tbd_args.base.box_style = { Color16::Blue, Color16::Yellow };
           tbd_args.framed_mode = framed_mode;
           tbd.calc_pre_draw(str::Adjustment::Left);
           tbd.draw(sh, tbd_args);
@@ -1917,8 +1917,8 @@ namespace dung
 
       if (debug)
       {
-        sh.write_buffer(terrain2str(m_player.on_terrain), 5, 1, Color::Black, Color::White);
-        sh.write_buffer("Floor: " + std::to_string(m_player.curr_floor), 6, 1, Color::Black, Color::White);
+        sh.write_buffer(terrain2str(m_player.on_terrain), 5, 1, Color16::Black, Color16::White);
+        sh.write_buffer("Floor: " + std::to_string(m_player.curr_floor), 6, 1, Color16::Black, Color16::White);
       }
       
       auto f_draw_swim_anim = [anim_ctr_swim, &sh, this](bool is_moving, int curr_floor,
@@ -1931,7 +1931,7 @@ namespace dung
           if (m_environment->is_inside_any_room(curr_floor, swim_pos))
           {
             RC swim_pos_scr { math::roundI(scr_pos.r - los_r), math::roundI(scr_pos.c - los_c) };
-            sh.write_buffer("*", swim_pos_scr.r, swim_pos_scr.c, Color::White, Color::Transparent2);
+            sh.write_buffer("*", swim_pos_scr.r, swim_pos_scr.c, Color16::White, Color16::Transparent2);
           }
         }
       };
@@ -2010,7 +2010,7 @@ namespace dung
                     RC npc_scr_offs_pos = npc_scr_pos + offs_pos;
                     RC npc_world_offs_pos = npc.pos + offs_pos;
                     if (m_environment->is_inside_any_room(npc.curr_floor, npc_world_offs_pos))
-                      sh.write_buffer("*", npc_scr_offs_pos.r, npc_scr_offs_pos.c, Color::White, Color::Transparent2);
+                      sh.write_buffer("*", npc_scr_offs_pos.r, npc_scr_offs_pos.c, Color16::White, Color16::Transparent2);
                   }
               }
             }
@@ -2025,7 +2025,7 @@ namespace dung
                   RC npc_scr_offs_pos = npc_scr_pos + offs_pos;
                   RC npc_world_offs_pos = npc.pos + offs_pos;
                   if (m_environment->is_inside_any_room(npc.curr_floor, npc_world_offs_pos))
-                    sh.write_buffer("*", npc_scr_offs_pos.r, npc_scr_offs_pos.c, Color::White, Color::Transparent2);
+                    sh.write_buffer("*", npc_scr_offs_pos.r, npc_scr_offs_pos.c, Color16::White, Color16::Transparent2);
                 }
             }
           }
@@ -2036,26 +2036,26 @@ namespace dung
           auto scr_pos = m_screen_helper->get_screen_pos(npc.pos);
           
           if (npc.vel_r < 0.f)
-            sh.write_buffer("^", scr_pos.r - 1, scr_pos.c, Color::Black, Color::White);
+            sh.write_buffer("^", scr_pos.r - 1, scr_pos.c, Color16::Black, Color16::White);
           else if (npc.vel_r > 0.f)
-            sh.write_buffer("v", scr_pos.r + 1, scr_pos.c, Color::Black, Color::White);
+            sh.write_buffer("v", scr_pos.r + 1, scr_pos.c, Color16::Black, Color16::White);
           
           if (npc.vel_c < 0.f)
-            sh.write_buffer("<", scr_pos.r, scr_pos.c - 1, Color::Black, Color::White);
+            sh.write_buffer("<", scr_pos.r, scr_pos.c - 1, Color16::Black, Color16::White);
           else if (npc.vel_c > 0.f)
-            sh.write_buffer(">", scr_pos.r, scr_pos.c + 1, Color::Black, Color::White);
+            sh.write_buffer(">", scr_pos.r, scr_pos.c + 1, Color16::Black, Color16::White);
           
           if (npc.curr_room != nullptr)
           {
             auto scr_pos_room = m_screen_helper->get_screen_pos(npc.curr_room->bb_leaf_room.center());
             t8x::plot_line(sh, scr_pos, scr_pos_room,
-                    ".", Color::White, Color::Transparent2);
+                    ".", Color16::White, Color16::Transparent2);
           }
           if (npc.curr_corridor != nullptr)
           {
             auto scr_pos_corr = m_screen_helper->get_screen_pos(npc.curr_corridor->bb.center());
             t8x::plot_line(sh, scr_pos, scr_pos_corr,
-                    ".", Color::White, Color::Transparent2);
+                    ".", Color16::White, Color16::Transparent2);
           }
         }
       }
@@ -2074,13 +2074,13 @@ namespace dung
           else
             door_ch = "D";
         }
-        sh.write_buffer(door_ch, door_scr_pos.r, door_scr_pos.c, Color::Black, (use_fog_of_war && door->fog_of_war) ? Color::Black : (door->light ? Color::Yellow : Color::DarkYellow));
+        sh.write_buffer(door_ch, door_scr_pos.r, door_scr_pos.c, Color16::Black, (use_fog_of_war && door->fog_of_war) ? Color16::Black : (door->light ? Color16::Yellow : Color16::DarkYellow));
       }
       
       for (const auto* staircase : staircase_vec)
       {
         auto staircase_scr_pos = m_screen_helper->get_screen_pos(staircase->pos);
-        sh.write_buffer("B", staircase_scr_pos.r, staircase_scr_pos.c, (use_fog_of_war && staircase->fog_of_war) ? Color::Black : (staircase->light ? Color::LightGray : Color::DarkGray), Color::Black);
+        sh.write_buffer("B", staircase_scr_pos.r, staircase_scr_pos.c, (use_fog_of_war && staircase->fog_of_war) ? Color16::Black : (staircase->light ? Color16::LightGray : Color16::DarkGray), Color16::Black);
       }
       
       for (const auto& key : all_keys)
@@ -2114,7 +2114,7 @@ namespace dung
             case 3: str = ":"; break;
             case 4: str = "~"; break;
           }
-          auto style = t8::make_shaded_style(Color::Red, bs.visible ? t8::ShadeType::Bright : t8::ShadeType::Dark);
+          auto style = t8::make_shaded_style(Color16::Red, bs.visible ? t8::ShadeType::Bright : t8::ShadeType::Dark);
           sh.write_buffer(str, scr_pos.r, scr_pos.c, style);
         };
         for (const auto& bs : m_player.blood_splats)

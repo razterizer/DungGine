@@ -647,7 +647,7 @@ namespace dung
     template<int NR, int NC>
     void draw(ScreenHandler<NR, NC>& sh) const
     {
-      sh.write_buffer(str::adjust_str("Inventory", str::Adjustment::Center, m_bb.c_len), m_bb.top() + rb0_title, m_bb.left(), Color::White, Color::Transparent2);
+      sh.write_buffer(str::adjust_str("Inventory", str::Adjustment::Center, m_bb.c_len), m_bb.top() + rb0_title, m_bb.left(), Color16::White, Color16::Transparent2);
       
       int num_lines = size();
       
@@ -659,26 +659,26 @@ namespace dung
       {
         auto item = get_item(r);
         auto text = item.text;
-        t8::Style style { Color::Default, Color::Transparent2 };
+        t8::Style style { Color16::Default, Color16::Transparent2 };
         int c_offs = item.level*2;
         switch (item.level)
         {
-          case 0: style.fg_color = Color::White; break;
-          case 1: style.fg_color = Color::Yellow; break;
+          case 0: style.fg_color = Color16::White; break;
+          case 1: style.fg_color = Color16::Yellow; break;
           case 2:
             if (item.selected)
             {
               if (item.hilited)
-                style.fg_color = Color::Blue;
+                style.fg_color = Color16::Blue;
               else
-                style.fg_color = Color::DarkBlue;
+                style.fg_color = Color16::DarkBlue;
             }
             else
             {
               if (item.hilited)
-                style.fg_color = Color::Green;
+                style.fg_color = Color16::Green;
               else
-                style.fg_color = Color::DarkGreen;
+                style.fg_color = Color16::DarkGreen;
             }
             break;
         }
@@ -688,8 +688,8 @@ namespace dung
           sh.write_buffer(text, m_bb.top() + rb_items, m_bb.left() + cb_items, style);
       }
       
-      t8x::draw_box_outline(sh, m_bb, t8x::OutlineType::Line, { Color::White, Color::DarkGray });
-      t8x::draw_box(sh, m_bb, { Color::White, Color::DarkGray }, ' ');
+      t8x::draw_box_outline(sh, m_bb, t8x::OutlineType::Line, { Color16::White, Color16::DarkGray });
+      t8x::draw_box(sh, m_bb, { Color16::White, Color16::DarkGray }, ' ');
     }
     
     std::vector<InvGroup>::iterator begin()

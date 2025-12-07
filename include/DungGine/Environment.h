@@ -134,7 +134,7 @@ namespace dung
           RoomStyle room_style;
           room_style.is_underground = is_underground(f_idx, cp.first.first) || is_underground(f_idx, cp.first.second);
           room_style.wall_type = WallType::Masonry4;
-          room_style.wall_style = { Color::LightGray, Color::Black }; //wall_palette[WallBasicType::Masonry]
+          room_style.wall_style = { Color16::LightGray, Color16::Black }; //wall_palette[WallBasicType::Masonry]
           room_style.floor_type = FloorType::Stone2;
           
           f_calc_lat_long(room_style, cp.second->bb);
@@ -388,7 +388,7 @@ namespace dung
           
           if (debug)
           {
-            sh.write_buffer(std::to_string(room_style.is_underground), bb_scr_pos.r + 1, bb_scr_pos.c + 1, Color::White, Color::Black);
+            sh.write_buffer(std::to_string(room_style.is_underground), bb_scr_pos.r + 1, bb_scr_pos.c + 1, Color16::White, Color16::Black);
           }
           
           // Fog of war
@@ -399,7 +399,7 @@ namespace dung
               for (int c = 0; c < bb.c_len; ++c)
               {
                 if (room->fog_of_war[r * bb.c_len + c])
-                  sh.write_buffer(".", bb_scr_pos.r + r, bb_scr_pos.c + c, Color::Black, Color::Black);
+                  sh.write_buffer(".", bb_scr_pos.r + r, bb_scr_pos.c + c, Color16::Black, Color16::Black);
               }
             }
           }
@@ -464,7 +464,7 @@ namespace dung
               for (int c = 0; c < bb.c_len; ++c)
               {
                 if (corr->fog_of_war[r * bb.c_len + c])
-                  sh.write_buffer(".", bb_scr_pos.r + r, bb_scr_pos.c + c, Color::Black, Color::Black);
+                  sh.write_buffer(".", bb_scr_pos.r + r, bb_scr_pos.c + c, Color16::Black, Color16::Black);
               }
             }
           }

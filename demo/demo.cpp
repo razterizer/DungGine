@@ -18,7 +18,7 @@ static TestType test_type = TestType::DungeonRuntime;
 
 class Game : public t8x::GameEngine<>, public dung::DungGineListener
 {
-  using Color = t8::Color;
+  using Color16 = t8::Color16;
   
 public:
   Game(int argc, char** argv, const t8x::GameEngineParams& params)
@@ -134,7 +134,7 @@ public:
       dungeon_engine->draw(sh, get_real_time_s(), get_sim_time_s(),
                            get_anim_count(0), get_anim_count(1),
                            5, 5);
-      sh.print_screen_buffer(Color::Black);
+      sh.print_screen_buffer(Color16::Black);
 #endif
     }
     else if (test_type == TestType::DungeonRuntime)
@@ -199,7 +199,7 @@ private:
         set_state_game_over();
       
       if (framed_mode)
-        draw_frame(sh, Color::White);
+        draw_frame(sh, Color16::White);
       
       dungeon_engine->draw(sh, get_real_time_s(), get_sim_time_s(),
                            get_anim_count(0), get_anim_count(1),
@@ -304,16 +304,16 @@ private:
 
 int main(int argc, char** argv)
 {
-  using Color = t8::Color;
+  using Color16 = t8::Color16;
 
   t8x::GameEngineParams params;
   params.enable_title_screen = false;
   params.enable_instructions_screen = false;
   params.enable_quit_confirm_screen = true;
   params.enable_hiscores = false;
-  params.screen_bg_color_default = Color::Black;
-  params.screen_bg_color_title = Color::DarkYellow;
-  params.screen_bg_color_instructions = Color::Black;
+  params.screen_bg_color_default = Color16::Black;
+  params.screen_bg_color_title = Color16::DarkYellow;
+  params.screen_bg_color_instructions = Color16::Black;
   
   bool show_help = false;
   

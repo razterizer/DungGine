@@ -140,9 +140,9 @@ There is currently no visual distiction between upwards or downwards going stair
   - `pad_rooms(int min_rnd_wall_padding = 1, int max_rnd_wall_padding = 4)` : Pads the regions into rooms.
   - `create_corridors(int min_corridor_half_width = 1)` : Non-recursive method of creating corridors on leaf-level.
   - `create_doors(int max_num_locked_doors, bool allow_passageways)` : Creates doors between rooms and corridors. You need to first have called `generate()`, `pad_rooms()` and `create_corridors()` before calling this function.
-  - `draw_regions(ScreenHandler<NR, NC>& sh, int r0 = 0, int c0 = 0, const styles::Style& border_style = { Color::Black, Color::Yellow })` : Draws the regions.
-  - `draw_rooms(ScreenHandler<NR, NC>& sh, int r0 = 0, int c0 = 0, const styles::Style& room_style = { Color::White, Color::DarkRed })` : Draws the rooms.
-  - `draw_corridors(ScreenHandler<NR, NC>& sh, int r0 = 0, int c0 = 0, const styles::Style& corridor_outline_style = { Color::Green, Color::DarkGreen }, const styles::Style& corridor_fill_style = { Color::Black, Color::Green })` : Draws the non-recursive corridors.
+  - `draw_regions(ScreenHandler<NR, NC>& sh, int r0 = 0, int c0 = 0, const styles::Style& border_style = { Color16::Black, Color16::Yellow })` : Draws the regions.
+  - `draw_rooms(ScreenHandler<NR, NC>& sh, int r0 = 0, int c0 = 0, const styles::Style& room_style = { Color16::White, Color16::DarkRed })` : Draws the rooms.
+  - `draw_corridors(ScreenHandler<NR, NC>& sh, int r0 = 0, int c0 = 0, const styles::Style& corridor_outline_style = { Color16::Green, Color16::DarkGreen }, const styles::Style& corridor_fill_style = { Color16::Black, Color16::Green })` : Draws the non-recursive corridors.
   - `print_tree()` : Debug printing of the tree.
   - `fetch_leaves()` : Fetches the leaves of the BSP tree where the rooms are stored.
   - `get_room_corridor_map()` : Function that retrieves the room and corridor relationship data structure.
@@ -364,7 +364,7 @@ dung::Dungeon dungeon { false, -1 };
 dungeon.generate(dungeon_floor_params);
 
 t8::ScreenHandler<NR, NC> sh;
-t8::Color bg_color = t8::Color::Default;
+t8::Color bg_color = t8::Color16::Default;
 
 dung::DungGine dungeon_engine { "bin/", false, false };
 dungeon_engine.load_dungeon(dungeon);
@@ -384,7 +384,7 @@ dung::Dungeon dungeon { false, -1 };
 dung::DungGineTextureParams texture_params;
 std::unique_ptr<dung::DungGine> dungeon_engine;
 t8::ScreenHandler<NR, NC> sh;
-t8::Color bg_color = t8::Color::Black;
+t8::Color bg_color = t8::Color16::Black;
 int anim_ctr = 0;
 const float fire_smoke_dt_factor = 0.5f;
 
@@ -443,7 +443,7 @@ dung::Dungeon dungeon { true, -1 }; // First floor is surface level, PC placed a
 dung::DungGineTextureParams texture_params;
 std::unique_ptr<dung::DungGine> dungeon_engine;
 t8::ScreenHandler<NR, NC> sh;
-t8::Color bg_color = t8::Color::Black;
+t8::Color bg_color = t8::Color16::Black;
 int anim_ctr = 0;
 const float fire_smoke_dt_factor = 0.5f;
 

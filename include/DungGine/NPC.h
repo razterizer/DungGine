@@ -280,7 +280,7 @@ namespace dung
     NPC()
     {
       character = 'O';
-      style = { Color::Green, Color::DarkYellow };
+      style = { Color16::Green, Color16::DarkYellow };
     }
   
     void init(const std::vector<std::unique_ptr<Weapon>>& all_weapons,
@@ -315,7 +315,7 @@ namespace dung
       {
         case Race::Human:
           character = '@';
-          style = { Color::Magenta, Color::LightGray };
+          style = { Color16::Magenta, Color16::LightGray };
           acc_step = rand_acc_step(2.f, 20.f);
           acc_lim = rand_acc_lim(20.f, 50.f);
           vel_lim = rand_vel_lim(4.f, 15.f);
@@ -329,7 +329,7 @@ namespace dung
           break;
         case Race::Elf:
           character = '@';
-          style = { Color::Magenta, Color::DarkGreen };
+          style = { Color16::Magenta, Color16::DarkGreen };
           acc_step = rand_acc_step(4.f, 40.f);
           acc_lim = rand_acc_lim(25.f, 70.f);
           vel_lim = rand_vel_lim(6.f, 20.f);
@@ -343,7 +343,7 @@ namespace dung
           break;
         case Race::Half_Elf:
           character = '@';
-          style = { Color::Magenta, Color::DarkYellow };
+          style = { Color16::Magenta, Color16::DarkYellow };
           acc_step = rand_acc_step(3.f, 30.f);
           acc_lim = rand_acc_lim(25.f, 60.f);
           vel_lim = rand_vel_lim(5.f, 17.f);
@@ -357,7 +357,7 @@ namespace dung
           break;
         case Race::Gnome:
           character = 'b';
-          style = { Color::Magenta, Color::LightGray };
+          style = { Color16::Magenta, Color16::LightGray };
           acc_step = rand_acc_step(1.f, 10.f);
           acc_lim = rand_acc_lim(10.f, 20.f);
           vel_lim = rand_vel_lim(0.5f, 2.5f);
@@ -371,7 +371,7 @@ namespace dung
           break;
         case Race::Halfling:
           character = 'b';
-          style = { Color::Magenta, Color::LightGray };
+          style = { Color16::Magenta, Color16::LightGray };
           acc_step = rand_acc_step(1.f, 15.f);
           acc_lim = rand_acc_lim(11.f, 25.f);
           vel_lim = rand_vel_lim(0.7f, 3.f);
@@ -385,7 +385,7 @@ namespace dung
           break;
         case Race::Dwarf:
           character = '0';
-          style = { Color::White, Color::DarkGray };
+          style = { Color16::White, Color16::DarkGray };
           acc_step = rand_acc_step(1.5f, 18.f);
           acc_lim = rand_acc_lim(12.f, 30.f);
           vel_lim = rand_vel_lim(0.4f, 4.f);
@@ -399,7 +399,7 @@ namespace dung
           break;
         case Race::Half_Orc:
           character = '3';
-          style = { Color::Yellow, Color::Green };
+          style = { Color16::Yellow, Color16::Green };
           acc_step = rand_acc_step(1.5f, 20.f);
           acc_lim = rand_acc_lim(30.f, 80.f);
           vel_lim = rand_vel_lim(1.5f, 5.f);
@@ -413,7 +413,7 @@ namespace dung
           break;
         case Race::Ogre:
           character = 'O';
-          style = { Color::Green, Color::DarkYellow };
+          style = { Color16::Green, Color16::DarkYellow };
           acc_step = rand_acc_step(4.f, 10.f);
           acc_lim = rand_acc_lim(2.f, 8.f);
           vel_lim = rand_vel_lim(1.f, 6.f);
@@ -427,7 +427,7 @@ namespace dung
           break;
         case Race::Hobgoblin:
           character = 'a';
-          style = { Color::Yellow, Color::Cyan };
+          style = { Color16::Yellow, Color16::Cyan };
           acc_step = rand_acc_step(5.f, 15.f);
           acc_lim = rand_acc_lim(10.f, 50.f);
           vel_lim = rand_vel_lim(4.f, 9.f);
@@ -441,7 +441,7 @@ namespace dung
           break;
         case Race::Goblin:
           character = 'G';
-          style = { Color::Green, Color::DarkCyan };
+          style = { Color16::Green, Color16::DarkCyan };
           acc_step = rand_acc_step(5.f, 15.f);
           acc_lim = rand_acc_lim(8.f, 45.f);
           vel_lim = rand_vel_lim(4.5f, 10.f);
@@ -455,7 +455,7 @@ namespace dung
           break;
         case Race::Orc:
           character = '2';
-          style = { Color::DarkYellow, Color::Cyan };
+          style = { Color16::DarkYellow, Color16::Cyan };
           acc_step = rand_acc_step(5.f, 25.f);
           acc_lim = rand_acc_lim(50.f, 80.f);
           vel_lim = rand_vel_lim(6.f, 18.f);
@@ -469,7 +469,7 @@ namespace dung
           break;
         case Race::Troll:
           character = 'R';
-          style = { Color::LightGray, Color::DarkRed };
+          style = { Color16::LightGray, Color16::DarkRed };
           acc_step = rand_acc_step(1.f, 14.f);
           acc_lim = rand_acc_lim(5.f, 15.f);
           vel_lim = rand_vel_lim(2.f, 12.f);
@@ -483,7 +483,7 @@ namespace dung
           break;
         case Race::Monster:
           character = 'M';
-          style = { Color::Cyan, Color::DarkGreen };
+          style = { Color16::Cyan, Color16::DarkGreen };
           acc_step = rand_acc_step(0.5f, 25.f);
           acc_lim = rand_acc_lim(2.f, 25.f);
           vel_lim = rand_vel_lim(1.f, 8.f);
@@ -497,7 +497,7 @@ namespace dung
           break;
         case Race::Lich:
           character = 'z';
-          style = { Color::DarkYellow, Color::DarkBlue };
+          style = { Color16::DarkYellow, Color16::DarkBlue };
           acc_step = rand_acc_step(4.f, 30.f);
           acc_lim = rand_acc_lim(25.f, 55.f);
           vel_lim = rand_vel_lim(2.f, 9.f);
@@ -511,7 +511,7 @@ namespace dung
           break;
         case Race::Lich_King:
           character = 'Z';
-          style = { Color::Yellow, Color::DarkBlue };
+          style = { Color16::Yellow, Color16::DarkBlue };
           acc_step = rand_acc_step(5.f, 35.f);
           acc_lim = rand_acc_lim(25.f, 60.f);
           vel_lim = rand_vel_lim(2.5f, 10.f);
@@ -525,7 +525,7 @@ namespace dung
           break;
         case Race::Basilisk:
           character = 'S';
-          style = { Color::Green, Color::DarkGray };
+          style = { Color16::Green, Color16::DarkGray };
           acc_step = rand_acc_step(5.f, 18.f);
           acc_lim = rand_acc_lim(2.f, 25.f);
           vel_lim = rand_vel_lim(4.f, 8.f);
@@ -539,7 +539,7 @@ namespace dung
           break;
         case Race::Bear:
           character = 'B';
-          style = { Color::Red, Color::DarkRed };
+          style = { Color16::Red, Color16::DarkRed };
           acc_step = rand_acc_step(10.f, 25.f);
           acc_lim = rand_acc_lim(3.f, 10.f);
           vel_lim = rand_vel_lim(3.f, 18.f);
@@ -553,7 +553,7 @@ namespace dung
           break;
         case Race::Kobold:
           character = 'x';
-          style = { Color::Blue, Color::LightGray };
+          style = { Color16::Blue, Color16::LightGray };
           acc_step = rand_acc_step(5.f, 15.f);
           acc_lim = rand_acc_lim(25.f, 40.f);
           vel_lim = rand_vel_lim(2.f, 10.f);
@@ -567,7 +567,7 @@ namespace dung
           break;
         case Race::Skeleton:
           character = '%';
-          style = { Color::White, Color::DarkGray };
+          style = { Color16::White, Color16::DarkGray };
           acc_step = rand_acc_step(5.f, 15.f);
           acc_lim = rand_acc_lim(10.f, 60.f);
           vel_lim = rand_vel_lim(1.f, 4.f);
@@ -581,7 +581,7 @@ namespace dung
           break;
         case Race::Giant:
           character = 'O';
-          style = { Color::DarkMagenta, Color::LightGray };
+          style = { Color16::DarkMagenta, Color16::LightGray };
           acc_step = rand_acc_step(5.f, 15.f);
           acc_lim = rand_acc_lim(1.f, 5.f);
           vel_lim = rand_vel_lim(0.5f, 4.5f);
@@ -595,7 +595,7 @@ namespace dung
           break;
         case Race::Huge_Spider:
           character = 'W';
-          style = { Color::DarkGray, Color::White };
+          style = { Color16::DarkGray, Color16::White };
           acc_step = rand_acc_step(5.f, 15.f);
           acc_lim = rand_acc_lim(10.f, 70.f);
           vel_lim = rand_vel_lim(3.f, 20.f);
@@ -609,7 +609,7 @@ namespace dung
           break;
         case Race::Wolf:
           character = 'm';
-          style = { Color::LightGray, Color::DarkGray };
+          style = { Color16::LightGray, Color16::DarkGray };
           acc_step = rand_acc_step(15.f, 35.f);
           acc_lim = rand_acc_lim(15.f, 60.f);
           vel_lim = rand_vel_lim(10.f, 24.f);
@@ -623,7 +623,7 @@ namespace dung
           break;
         case Race::Wyvern:
           character = 'w';
-          style = { Color::DarkMagenta, Color::Blue };
+          style = { Color16::DarkMagenta, Color16::Blue };
           acc_step = rand_acc_step(5.f, 15.f);
           acc_lim = rand_acc_lim(2.f, 15.f);
           vel_lim = rand_vel_lim(8.f, 20.f);
@@ -637,7 +637,7 @@ namespace dung
           break;
         case Race::Griffin:
           character = 'g';
-          style = { Color::DarkRed, Color::Blue };
+          style = { Color16::DarkRed, Color16::Blue };
           acc_step = rand_acc_step(5.f, 15.f);
           acc_lim = rand_acc_lim(10.f, 25.f);
           vel_lim = rand_vel_lim(9.f, 21.f);
@@ -651,7 +651,7 @@ namespace dung
           break;
         case Race::Ghoul:
           character = 'h';
-          style = { Color::LightGray, Color::Yellow };
+          style = { Color16::LightGray, Color16::Yellow };
           acc_step = rand_acc_step(5.f, 15.f);
           acc_lim = rand_acc_lim(30.f, 60.f);
           vel_lim = rand_vel_lim(10.f, 20.f);
@@ -665,7 +665,7 @@ namespace dung
           break;
         case Race::Dragon:
           character = 'R';
-          style = { Color::Red, Color::DarkMagenta };
+          style = { Color16::Red, Color16::DarkMagenta };
           acc_step = rand_acc_step(5.f, 45.f);
           acc_lim = rand_acc_lim(7.f, 30.f);
           vel_lim = rand_vel_lim(11.f, 29.f);
@@ -759,7 +759,7 @@ namespace dung
         if (trg_death.once())
           death_time_s = time;
         character = '&';
-        style = { Color::Red, Color::DarkGray };
+        style = { Color16::Red, Color16::DarkGray };
         return;
       }
       
@@ -855,23 +855,23 @@ namespace dung
       if (debug)
       {
         if (wall_coll_resolve)
-          style.fg_color = Color::Black;
+          style.fg_color = Color16::Black;
         else
-          style.fg_color = Color::White;
+          style.fg_color = Color16::White;
           
         switch (state)
         {
           case State::Patroll:
-            style.bg_color = Color::DarkGreen;
+            style.bg_color = Color16::DarkGreen;
             break;
           case State::Pursue:
-            style.bg_color = Color::DarkYellow;
+            style.bg_color = Color16::DarkYellow;
             break;
           case State::FightMelee:
-            style.bg_color = Color::DarkRed;
+            style.bg_color = Color16::DarkRed;
             break;
           case State::FightRanged:
-            style.bg_color = Color::DarkCyan;
+            style.bg_color = Color16::DarkCyan;
             break;
           case State::NUM_ITEMS:
             break;

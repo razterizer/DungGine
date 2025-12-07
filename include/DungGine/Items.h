@@ -24,7 +24,7 @@ namespace dung
     bool exists = true;
     
     bool picked_up = false;
-    Style style = { Color::White, Color::Transparent2 };
+    Style style = { Color16::White, Color16::Transparent2 };
     char character = '?';
     bool visible_near = false;
     float weight = 0.f; // kg-ish.
@@ -105,7 +105,7 @@ namespace dung
     Lamp()
     {
       character = 'Y';
-      style.fg_color = Color::Yellow;
+      style.fg_color = Color16::Yellow;
       weight = 0.4f;
       price = math::roundI(20*rnd::randn_clamp(200.f, 100.f, 0.f, 1e4f))/20.f;
     }
@@ -115,13 +115,13 @@ namespace dung
       switch (lamp_type)
       {
         case LampType::MagicLamp:
-          style.fg_color = Color::DarkMagenta;
+          style.fg_color = Color16::DarkMagenta;
           break;
         case LampType::Lantern:
-          style.fg_color = t8::get_random_color({ Color::Red, Color::Green });
+          style.fg_color = t8::get_random_color({ Color16::Red, Color16::Green });
           break;
         case LampType::Torch:
-          style.fg_color = Color::DarkYellow;
+          style.fg_color = Color16::DarkYellow;
           break;
         default:
           break;
@@ -144,7 +144,7 @@ namespace dung
           angle_deg = 0.f;
           life_time_s = rnd::randn_clamp(800.f, 350.f, 420.f, 1800.f); // 7 - 30 min.
           character = '*';
-          style.fg_color = Color::Magenta;
+          style.fg_color = Color16::Magenta;
           weight = rnd::randn_range_clamp(0.05f, 0.2f);
           break;
         case LampType::Lantern:
@@ -152,7 +152,7 @@ namespace dung
           angle_deg = rnd::randn_range_clamp(2.f, 90.f);
           life_time_s = rnd::randn_clamp(400.f, 350.f, 180.f, 900.f); // 3 - 15 min.
           character = 'G';
-          style.fg_color = t8::get_random_color({ Color::Red, Color::Green });
+          style.fg_color = t8::get_random_color({ Color16::Red, Color16::Green });
           weight = rnd::randn_range_clamp(0.05f, 0.3f);
           break;
         case LampType::Torch:
@@ -160,7 +160,7 @@ namespace dung
           angle_deg = rnd::randn_range_clamp(80.f, 358.f);
           life_time_s = rnd::randn_clamp(150.f, 350.f, 30.f, 300.f); // 0.5 - 5 min.
           character = 'Y';
-          style.fg_color = Color::Yellow;
+          style.fg_color = Color16::Yellow;
           weight = rnd::randn_range_clamp(0.4f, 1.5f);
           break;
         default:
@@ -248,7 +248,7 @@ namespace dung
     float projectile_speed = 15.f; // max 15 aps (demo fps).
     float spread_sigma_rad = 0.f;
     std::array<char, 8> projectile_characters; // { 0, 45, 90, 135, 180, 225, 270, 315 } degrees.
-    Color projectile_fg_color = Color::Transparent2;
+    Color projectile_fg_color = Color16::Transparent2;
   };
   
   struct Dagger : Weapon
@@ -256,7 +256,7 @@ namespace dung
     Dagger()
     {
       character = 'V';
-      style.fg_color = Color::LightGray;
+      style.fg_color = Color16::LightGray;
       weight = rnd::randn_range_clamp(0.02f, 0.7f);
       price = math::roundI(20*rnd::randn_clamp(5e2f, 500.f, 0.f, 1e4f))/20.f;
       type = "dagger";
@@ -267,7 +267,7 @@ namespace dung
     
     virtual void change_fg_color() override
     {
-      style.fg_color = Color::DarkGray;
+      style.fg_color = Color16::DarkGray;
     }
   };
   
@@ -276,7 +276,7 @@ namespace dung
     Sword()
     {
       character = 'T';
-      style.fg_color = Color::LightGray;
+      style.fg_color = Color16::LightGray;
       weight = rnd::randn_range_clamp(1.f, 5.f);
       price = math::roundI(20*rnd::randn_clamp(4e3f, 500.f, 0.f, 5e6f))/20.f;
       type = "sword";
@@ -287,7 +287,7 @@ namespace dung
     
     virtual void change_fg_color() override
     {
-      style.fg_color = Color::DarkGray;
+      style.fg_color = Color16::DarkGray;
     }
   };
   
@@ -296,7 +296,7 @@ namespace dung
     Flail()
     {
       character = 'J';
-      style.fg_color = Color::DarkGray;
+      style.fg_color = Color16::DarkGray;
       weight = rnd::randn_range_clamp(1.f, 1.8f);
       price = math::roundI(20*rnd::randn_clamp(1e3f, 500.f, 0.f, 5e5f))/20.f;
       type = "flail";
@@ -307,7 +307,7 @@ namespace dung
     
     virtual void change_fg_color() override
     {
-      style.fg_color = Color::LightGray;
+      style.fg_color = Color16::LightGray;
     }
   };
   
@@ -316,7 +316,7 @@ namespace dung
     MorningStar()
     {
       character = 'i';
-      style.fg_color = Color::DarkGray;
+      style.fg_color = Color16::DarkGray;
       weight = rnd::randn_range_clamp(1.5f, 2.8f);
       price = math::roundI(20*rnd::randn_clamp(1e3f, 500.f, 0.f, 5e5f))/20.f;
       type = "morning star";
@@ -327,7 +327,7 @@ namespace dung
     
     virtual void change_fg_color() override
     {
-      style.fg_color = Color::LightGray;
+      style.fg_color = Color16::LightGray;
     }
   };
   
@@ -336,7 +336,7 @@ namespace dung
     Sling()
     {
       character = 's';
-      style.fg_color = Color::DarkRed;
+      style.fg_color = Color16::DarkRed;
       weight = rnd::randn_range_clamp(0.02f, 0.5f);
       price = math::roundI(20*rnd::randn_clamp(200.f, 150.f, 0.f, 5e2f))/20.f;
       type = "sling";
@@ -346,12 +346,12 @@ namespace dung
       spread_sigma_rad = 0.4f;
       dist_type = WeaponDistType_Ranged;
       stlutils::fill(projectile_characters, '*');
-      projectile_fg_color = Color::DarkGray;
+      projectile_fg_color = Color16::DarkGray;
     }
     
     virtual void change_fg_color() override
     {
-      style.fg_color = Color::DarkGray;
+      style.fg_color = Color16::DarkGray;
     }
   };
   
@@ -360,7 +360,7 @@ namespace dung
     Bow()
     {
       character = rnd::rand_select<char>({ '(', ')', '{', '}' });;
-      style.fg_color = Color::DarkRed;
+      style.fg_color = Color16::DarkRed;
       weight = rnd::randn_range_clamp(0.4f, 4.f);
       price = math::roundI(20*rnd::randn_clamp(3e3f, 1500.f, 0.f, 5e5f))/20.f;
       type = "bow";
@@ -370,12 +370,12 @@ namespace dung
       spread_sigma_rad = 0.1f;
       dist_type = WeaponDistType_Ranged;
       projectile_characters = { '-', '/', '|', '\\', '-', '/', '|', '\\' };
-      projectile_fg_color = Color::Yellow;
+      projectile_fg_color = Color16::Yellow;
     }
     
     virtual void change_fg_color() override
     {
-      style.fg_color = Color::DarkYellow;
+      style.fg_color = Color16::DarkYellow;
     }
   };
   
@@ -394,7 +394,7 @@ namespace dung
       spread_sigma_rad = 0.02f;
       dist_type = WeaponDistType_Ranged;
       projectile_characters = { '-', '/', '|', '\\', '-', '/', '|', '\\' };
-      projectile_fg_color = Color::LightGray;
+      projectile_fg_color = Color16::LightGray;
     }
     
     virtual void change_fg_color() override
@@ -451,7 +451,7 @@ namespace dung
     Shield()
     {
       character = 'D';
-      style.fg_color = Color::LightGray;
+      style.fg_color = Color16::LightGray;
       type = "shield";
       price = math::roundI(20*rnd::randn_clamp(1e3f, 500.f, 0.f, 5e4f))/20.f;
       protection = rnd::randn_clamp_int(2.f, 15.f, 0, 50);
@@ -460,7 +460,7 @@ namespace dung
     
     virtual void change_fg_color() override
     {
-      style.fg_color = Color::Blue;
+      style.fg_color = Color16::Blue;
     }
   };
   
@@ -469,7 +469,7 @@ namespace dung
     Gambeson()
     {
       character = 'H';
-      style.fg_color = Color::White;
+      style.fg_color = Color16::White;
       type = "gambeson";
       price = math::roundI(20*rnd::randn_clamp(5e2f, 200.f, 0.f, 5e3f))/20.f;
       protection = rnd::randn_clamp_int(0.5f, 12.f, 0, 10);
@@ -478,7 +478,7 @@ namespace dung
     
     virtual void change_fg_color() override
     {
-      style.fg_color = Color::LightGray;
+      style.fg_color = Color16::LightGray;
     }
   };
   
@@ -487,7 +487,7 @@ namespace dung
     ChainMailleHauberk()
     {
       character = '#';
-      style.fg_color = Color::LightGray;
+      style.fg_color = Color16::LightGray;
       type = "chain maille hauberk";
       protection = rnd::randn_clamp_int(5.f, 18.f, 0, 40);
       weight = protection * 0.62f * (1.f + 0.5f*(rnd::rand() - 0.6f));
@@ -495,7 +495,7 @@ namespace dung
     
     virtual void change_fg_color() override
     {
-      style.fg_color = Color::Cyan;
+      style.fg_color = Color16::Cyan;
     }
   };
   
@@ -504,7 +504,7 @@ namespace dung
     PlatedBodyArmour()
     {
       character = 'M';
-      style.fg_color = Color::LightGray;
+      style.fg_color = Color16::LightGray;
       type = "plated body armour";
       price = math::roundI(20*rnd::randn_clamp(2e4f, 5000.f, 0.f, 1e6f))/20.f;
       protection = rnd::randn_clamp_int(10.f, 20.f, 0, 100);
@@ -513,7 +513,7 @@ namespace dung
     
     virtual void change_fg_color() override
     {
-      style.fg_color = Color::Cyan;
+      style.fg_color = Color16::Cyan;
     }
   };
   
@@ -522,7 +522,7 @@ namespace dung
     PaddedCoif()
     {
       character = 'C';
-      style.fg_color = Color::White;
+      style.fg_color = Color16::White;
       type = "padded coif";
       protection = rnd::randn_clamp_int(0.5f, 12.f, 0, 10);
       weight = protection * 0.016f * (1.f + 0.4f*(rnd::rand() - 0.6f));
@@ -530,7 +530,7 @@ namespace dung
     
     virtual void change_fg_color() override
     {
-      style.fg_color = Color::LightGray;
+      style.fg_color = Color16::LightGray;
     }
   };
   
@@ -539,7 +539,7 @@ namespace dung
     ChainMailleCoif()
     {
       character = '2';
-      style.fg_color = Color::LightGray;
+      style.fg_color = Color16::LightGray;
       type = "chain maille coif";
       protection = rnd::randn_clamp_int(5.f, 18.f, 0, 40);
       weight = protection * 0.061f * (1.f + 0.3f*(rnd::rand() - 0.6f));
@@ -547,7 +547,7 @@ namespace dung
     
     virtual void change_fg_color() override
     {
-      style.fg_color = Color::Cyan;
+      style.fg_color = Color16::Cyan;
     }
   };
   
@@ -556,7 +556,7 @@ namespace dung
     Helmet()
     {
       character = 'Q';
-      style.fg_color = Color::LightGray;
+      style.fg_color = Color16::LightGray;
       type = "helmet";
       protection = rnd::randn_clamp_int(10.f, 20.f, 0, 100);
       weight = protection * 0.087f * (1.f + 0.4f*(rnd::rand() - 0.6f));
@@ -564,7 +564,7 @@ namespace dung
     
     virtual void change_fg_color() override
     {
-      style.fg_color = Color::Cyan;
+      style.fg_color = Color16::Cyan;
     }
   };
 }
