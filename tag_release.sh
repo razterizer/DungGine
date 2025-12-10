@@ -125,6 +125,10 @@ cat > "$VERSION_HEADER_FILE" <<EOF
 #define DUNGGINE_VERSION_BUILD $(echo "$VERSION" | cut -d. -f4)
 EOF
 
+git add "$VERSION_HEADER_FILE"
+git commit -m "Automatic bumping of version in version.h."
+git push
+
 # --- Determine message ---
 if [ -n "$FILE" ]; then
   if [ -n "$VERSION" ]; then
