@@ -126,8 +126,14 @@ cat > "$VERSION_HEADER_FILE" <<EOF
 EOF
 
 git add "$VERSION_HEADER_FILE"
-git commit -m "Automatic bumping of version in version.h."
-git push
+
+if ! git diff --cached --quiet; then
+  git commit -m "Automatic bumping of version in version.h."
+  git push
+else
+  echo "No changes in $VERSION_HEADER_FILE; skipping commit/push and continuing to retag..."
+fi
+
 
 # --- Determine message ---
 if [ -n "$FILE" ]; then
