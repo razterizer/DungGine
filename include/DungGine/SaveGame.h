@@ -38,25 +38,6 @@ namespace sg
     return true;
   };
   
-  //template<>
-  //bool read_var(std::vector<std::string>::iterator* it_line, const std::string& var_name, char32_t* var_ptr)
-  //{
-  //  auto curr_line = **it_line;
-  //  if (var_ptr == nullptr || !curr_line.starts_with(var_name))
-  //    return false;
-  //
-  //  auto tokens = str::tokenize(curr_line, { '=', ' ' }, { '\"' });
-  //  if (tokens.size() != 2)
-  //    return false;
-  //
-  //  std::istringstream iss(tokens[1]);
-  //  std::string enc_char;
-  //  iss >> enc_char;
-  //  size_t byte_idx = 0;
-  //  utf8::decode_next_utf8_char32(enc_char, *var_ptr, byte_idx);
-  //  return true;
-  //};
-  
   template<>
   bool read_var(std::vector<std::string>::iterator* it_line, const std::string& var_name, t8::Glyph* var_ptr)
   {
@@ -198,12 +179,6 @@ namespace sg
   {
     lines_vec.emplace_back(var_name + " = \"" + var + "\"");
   };
-  
-  //template<>
-  //void write_var(std::vector<std::string>& lines_vec, const std::string& var_name, const char32_t& var)
-  //{
-  //  lines_vec.emplace_back(var_name + " = " + utf8::encode_char32_utf8(var));
-  //};
   
   template<>
   void write_var(std::vector<std::string>& lines_vec, const std::string& var_name, const t8::Glyph& var)
