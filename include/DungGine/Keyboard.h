@@ -19,7 +19,7 @@ using namespace std::string_literals;
 
 namespace dung
 {
-  using MessageHandler = t8x::MessageHandler;
+  using MessageHandler = t8x::MessageHandler<t8::GlyphString>;
   
 
   class Keyboard
