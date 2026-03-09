@@ -644,6 +644,7 @@ namespace dung
       tb_args.v_align = t8x::VerticalAlignment::TOP;
       tb_args.h_align = t8x::HorizontalAlignment::LEFT;
       tb_args.base.box_style = { Color16::White, Color16::DarkBlue };
+      tb_args.base.outline_type = t8x::OutlineType::UTF8_SingleLineRounded;
       tb_args.framed_mode = framed_mode;
       tb_health.set_text(health_bars, styles, per_textel_styles);
       tb_health.calc_pre_draw(str::Adjustment::Left);
