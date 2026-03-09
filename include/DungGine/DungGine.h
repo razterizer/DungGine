@@ -1883,6 +1883,7 @@ namespace dung
       mb_args.v_align_offs = mb_v_align_offs;
       mb_args.h_align_offs = mb_h_align_offs;
       mb_args.framed_mode = framed_mode;
+      mb_args.outline_type = t8x::OutlineType::UTF8_SingleLine;
       message_handler->update(sh, static_cast<float>(real_time_s), mb_args);
       
       if (debug)
