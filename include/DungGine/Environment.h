@@ -415,10 +415,10 @@ namespace dung
             t8x::draw_box(sh,
                               bb_scr_pos.r, bb_scr_pos.c, bb.r_len, bb.c_len,
                               room_style.get_fill_style(),
-                              room_style.get_fill_char(),
+                              room_style.get_fill_glyph(),
                               room_style.is_underground ? SolarDirection::Nadir : shadow_type,
                               t8::shade_style(room_style.get_fill_style(), t8::ShadeType::Dark),
-                              room_style.get_fill_char(),
+                              room_style.get_fill_glyph(),
                               room->light);
           }
           else
@@ -478,10 +478,10 @@ namespace dung
           t8x::draw_box(sh,
                             bb_scr_pos.r, bb_scr_pos.c, bb.r_len, bb.c_len,
                             corr_style.get_fill_style(),
-                            corr_style.get_fill_char(),
+                            corr_style.get_fill_glyph(),
                             corr_style.is_underground ? SolarDirection::Nadir : shadow_type,
                             t8::shade_style(corr_style.get_fill_style(), t8::ShadeType::Dark, true),
-                            corr_style.get_fill_char(),
+                            corr_style.get_fill_glyph(),
                             corr->light);
         }
       }

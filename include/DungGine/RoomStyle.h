@@ -115,7 +115,7 @@ namespace dung
       wall_style = t8::get_random_style(wall_palette[wall_basic_type]);
     }
     
-    t8::Glyph get_fill_char() const
+    t8::Glyph get_fill_glyph() const
     {
       switch (floor_type)
       {
@@ -138,9 +138,9 @@ namespace dung
       }
     }
     
-    t8::Glyph get_shadow_char() const
+    t8::Glyph get_shadow_glyph() const
     {
-      return get_fill_char();
+      return get_fill_glyph();
     }
     
     Style get_fill_style() const
