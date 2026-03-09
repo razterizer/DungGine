@@ -1176,7 +1176,7 @@ namespace dung
                                    wall_shading_underground);
     }
     
-    void set_player_character(char ch) { m_player.character = ch; }
+    void set_player_character(t8::Glyph ch) { m_player.character = ch; }
     void set_player_style(const Style& style) { m_player.style = style; }
     bool place_player(const RC& screen_size, std::optional<RC> world_pos = std::nullopt)
     {
