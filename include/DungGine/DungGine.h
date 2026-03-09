@@ -1114,7 +1114,7 @@ namespace dung
         bool visible = !((use_fog_of_war && fog_of_war) ||
                       ((m_environment->is_underground(p.curr_floor, p.curr_room) || calc_night(p)) && !light)); // #FIXME: add fow term.
         if (visible)
-          sh.write_buffer(std::string(1, p_char), wpn_scr_pos, p.weapon->projectile_fg_color, Color16::Transparent2);
+          sh.write_buffer(p_char, wpn_scr_pos, p.weapon->projectile_fg_color, Color16::Transparent2);
       }
       stlutils::erase_if(active_projectiles, [sim_time_s](const auto& p)
       {
@@ -1940,7 +1940,7 @@ namespace dung
       // PC
       if (m_player.is_spawned)
       {
-        sh.write_buffer(std::string(1, m_player.character), pc_scr_pos.r, pc_scr_pos.c, m_player.style);
+        sh.write_buffer(m_player.character, pc_scr_pos.r, pc_scr_pos.c, m_player.style);
         
         if (is_wet(m_player.on_terrain))
           f_draw_swim_anim(m_player.is_moving, m_player.curr_floor, m_player.pos, pc_scr_pos, m_player.los_r, m_player.los_c);
@@ -1956,7 +1956,7 @@ namespace dung
         if (!npc.visible)
           return;
         auto scr_pos = m_screen_helper->get_screen_pos(npc.pos);
-        sh.write_buffer(std::string(1, npc.character), scr_pos, npc.style);
+        sh.write_buffer(npc.character, scr_pos, npc.style);
       };
       
       auto f_render_obj = [&](const auto& obj)
@@ -1970,7 +1970,7 @@ namespace dung
         if (obj.shade && obj.light)
           fg_color = t8::shade_color(obj.style.fg_color,
                                             t8::ShadeType::Dark);
-        sh.write_buffer(std::string(1, obj.character), scr_pos,
+        sh.write_buffer(obj.character, scr_pos,
           fg_color, obj.style.bg_color);
       };
       
