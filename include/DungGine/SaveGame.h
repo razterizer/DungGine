@@ -45,7 +45,7 @@ namespace sg
     if (var_ptr == nullptr || !curr_line.starts_with(var_name))
       return false;
   
-    auto tokens = str::tokenize(curr_line, { '=', ' ', ',' });
+    auto tokens = str::tokenize(curr_line, { '=', ' '});
     if (tokens.size() != 3)
       return false;
   
