@@ -632,8 +632,8 @@ namespace dung
           t8::GlyphString npc_hb = str::rep_char(' ', 10);
           float npc_ratio = globals::max_health / 10.f;
           for (int i = 0; i < 10; ++i)
-            npc_hb[i] = npc.health > static_cast<int>(i*npc_ratio) ? 'O' : ' ';
-          npc_hb = std::string(1, npc.visible ? npc.character : '?') + ' ' + npc_hb;
+            npc_hb[i] = npc.health > static_cast<int>(i*npc_ratio) ? t8::Glyph { 0x2592, 'O' } : ' ';
+          npc_hb = (npc.visible ? npc.character : '?') + ' ' + npc_hb;
           per_textel_styles.emplace_back(RC { line++, 0 }, npc.visible ? npc.style : Style { Color16::White, Color16::Transparent2 });
           health_bars.emplace_back(npc_hb);
           styles.emplace_back(Style { Color16::Red, Color16::Transparent2 });
