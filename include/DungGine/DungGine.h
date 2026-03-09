@@ -658,6 +658,7 @@ namespace dung
       int offs = framed_mode ? 1 : 0;
       tb_args.pos = { 1 + offs, 12 + offs };
       tb_args.base.box_style = { Color16::White, Color16::DarkBlue };
+      tb_args.base.outline_type = t8x::OutlineType::UTF8_SingleLineRounded;
     
       std::string strength_bar = str::rep_char(' ', 10);
       float pc_ratio = m_player.strength / 10.f;
