@@ -49,22 +49,7 @@ namespace sg
     if (tokens.size() != 3)
       return false;
   
-    std::istringstream iss(tokens[1]);
-    std::string enc_char;
-    iss >> enc_char;
-    size_t byte_idx = 0;
-    char32_t preferred = utf8::none;
-    utf8::decode_next_utf8_char32(enc_char, preferred, byte_idx);
-    
-    iss.str(tokens[2]);
-    iss.clear();
-    iss >> enc_char;
-    byte_idx = 0;
-    char32_t fallback = utf8::none;
-    utf8::decode_next_utf8_char32(enc_char, fallback, byte_idx);
-    
-    var_ptr->preferred = preferred;
-    var_ptr->fallback = fallback;
+    var_ptr->parse(tokens[1]);
     
     return true;
   };
@@ -183,7 +168,7 @@ namespace sg
   template<>
   void write_var(std::vector<std::string>& lines_vec, const std::string& var_name, const t8::Glyph& var)
   {
-    lines_vec.emplace_back(var_name + " = " + utf8::encode_char32_utf8(var.preferred) + ", " + utf8::encode_char32_utf8(var.fallback));
+    lines_vec.emplace_back(var_name + " = " + var.str());
   };
   
   template<>
