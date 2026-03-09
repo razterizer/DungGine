@@ -212,11 +212,11 @@ namespace dung
             m_inventory->reset_hilite();
             message_handler->add_message(static_cast<float>(real_time_s),
                                          msg,
-                                         t8x::Level::Guide);
+                                         t8x::MessageHandlerLevel::Guide);
             if (dropped_over_liquid)
               message_handler->add_message(static_cast<float>(real_time_s),
                                            "Item was dropped over the " + terrain2str(m_player.on_terrain) + " and is now forever lost.",
-                                           t8x::Level::Warning);
+                                           t8x::MessageHandlerLevel::Warning);
           }
           else
           {
@@ -292,20 +292,20 @@ namespace dung
                   
                   message_handler->add_message(static_cast<float>(real_time_s),
                                                "The door is unlocked!",
-                                               t8x::Level::Guide);
+                                               t8x::MessageHandlerLevel::Guide);
                   
                   m_inventory->cache_hilited_index();
                   m_player.remove_key_by_key_id(m_inventory, m_all_keys, door->key_id);
                   m_inventory->reset_hilite();
                   message_handler->add_message(static_cast<float>(real_time_s),
                                                "You cast a vanishing spell on the key!",
-                                               t8x::Level::Guide);
+                                               t8x::MessageHandlerLevel::Guide);
                 }
                 else
                 {
                   message_handler->add_message(static_cast<float>(real_time_s),
                                                "The door is locked. You need key:" + std::to_string(door->key_id) + "!",
-                                               t8x::Level::Guide);
+                                               t8x::MessageHandlerLevel::Guide);
                 }
               }
               else
@@ -351,12 +351,12 @@ namespace dung
               {
                 message_handler->add_message(static_cast<float>(real_time_s),
                                              "You walked "s + (floor_dir == -1 ? "up" : "down") + " one floor",
-                                             t8x::Level::Guide);
+                                             t8x::MessageHandlerLevel::Guide);
                 if (m_player.curr_floor == 0)
                 {
                   message_handler->add_message(static_cast<float>(real_time_s),
                                                "You are now at surface level!",
-                                               t8x::Level::Guide);
+                                               t8x::MessageHandlerLevel::Guide);
                 }
               }
             }
@@ -375,12 +375,12 @@ namespace dung
                 key.picked_up = true;
                 message_handler->add_message(static_cast<float>(real_time_s),
                                              "You picked up a key!",
-                                             t8x::Level::Guide);
+                                             t8x::MessageHandlerLevel::Guide);
               }
               else
                 message_handler->add_message(static_cast<float>(real_time_s),
                                              "Key" + too_heavy_msg_template,
-                                             t8x::Level::Warning);
+                                             t8x::MessageHandlerLevel::Warning);
             }
           }
           for (size_t lamp_idx = 0; lamp_idx < m_all_lamps.size(); ++lamp_idx)
@@ -395,12 +395,12 @@ namespace dung
                 lamp.picked_up = true;
                 message_handler->add_message(static_cast<float>(real_time_s),
                                              "You picked up " + str::indef_art(lamp_type) + "!",
-                                             t8x::Level::Guide);
+                                             t8x::MessageHandlerLevel::Guide);
               }
               else
                 message_handler->add_message(static_cast<float>(real_time_s),
                                              str::anfangify(lamp_type) + too_heavy_msg_template,
-                                             t8x::Level::Warning);
+                                             t8x::MessageHandlerLevel::Warning);
             }
           }
           for (size_t wpn_idx = 0; wpn_idx < m_all_weapons.size(); ++wpn_idx)
@@ -414,12 +414,12 @@ namespace dung
                 weapon->picked_up = true;
                 message_handler->add_message(static_cast<float>(real_time_s),
                                              "You picked up " + str::indef_art(weapon->type) + "!",
-                                             t8x::Level::Guide);
+                                             t8x::MessageHandlerLevel::Guide);
               }
               else
                 message_handler->add_message(static_cast<float>(real_time_s),
                                              str::anfangify(weapon->type) + too_heavy_msg_template,
-                                             t8x::Level::Warning);
+                                             t8x::MessageHandlerLevel::Warning);
             }
           }
           for (size_t pot_idx = 0; pot_idx < m_all_potions.size(); ++pot_idx)
@@ -432,12 +432,12 @@ namespace dung
                 m_player.potion_idcs.emplace_back(static_cast<int>(pot_idx));
                 potion.picked_up = true;
                 message_handler->add_message(static_cast<float>(real_time_s),
-                                             "You picked up a potion!", t8x::Level::Guide);
+                                             "You picked up a potion!", t8x::MessageHandlerLevel::Guide);
               }
               else
                 message_handler->add_message(static_cast<float>(real_time_s),
                                              "Potion" + too_heavy_msg_template,
-                                             t8x::Level::Warning);
+                                             t8x::MessageHandlerLevel::Warning);
             }
           }
           for (size_t a_idx = 0; a_idx < m_all_armour.size(); ++a_idx)
@@ -451,12 +451,12 @@ namespace dung
                 armour->picked_up = true;
                 message_handler->add_message(static_cast<float>(real_time_s),
                                              "You picked up " + str::indef_art(armour->type) + "!",
-                                             t8x::Level::Guide);
+                                             t8x::MessageHandlerLevel::Guide);
               }
               else
                 message_handler->add_message(static_cast<float>(real_time_s),
                                              str::anfangify(armour->type) + too_heavy_msg_template,
-                                             t8x::Level::Warning);
+                                             t8x::MessageHandlerLevel::Warning);
             }
           }
         }
@@ -478,7 +478,7 @@ namespace dung
         {
           if (key.visible_near)
             message_handler->add_message(static_cast<float>(real_time_s),
-                                         "You see a key nearby!", t8x::Level::Guide);
+                                         "You see a key nearby!", t8x::MessageHandlerLevel::Guide);
         }
         for (const auto& lamp : m_all_lamps)
         {
@@ -486,26 +486,26 @@ namespace dung
           {
             auto lamp_type = lamp.get_type_str();
             message_handler->add_message(static_cast<float>(real_time_s),
-                                         "You see " + str::indef_art(lamp_type) + " nearby!", t8x::Level::Guide);
+                                         "You see " + str::indef_art(lamp_type) + " nearby!", t8x::MessageHandlerLevel::Guide);
           }
         }
         for (const auto& weapon : m_all_weapons)
         {
           if (weapon->visible_near)
             message_handler->add_message(static_cast<float>(real_time_s),
-                                         "You can see " + str::indef_art(weapon->type) + " nearby!", t8x::Level::Guide);
+                                         "You can see " + str::indef_art(weapon->type) + " nearby!", t8x::MessageHandlerLevel::Guide);
         }
         for (const auto& potion : m_all_potions)
         {
           if (potion.visible_near)
             message_handler->add_message(static_cast<float>(real_time_s),
-                                         "You can see a potion nearby!", t8x::Level::Guide);
+                                         "You can see a potion nearby!", t8x::MessageHandlerLevel::Guide);
         }
         for (const auto& armour : m_all_armour)
         {
           if (armour->visible_near)
             message_handler->add_message(static_cast<float>(real_time_s),
-                                         "You can see " + str::indef_art(armour->type) + " nearby!", t8x::Level::Guide);
+                                         "You can see " + str::indef_art(armour->type) + " nearby!", t8x::MessageHandlerLevel::Guide);
         }
         for (const auto& npc : m_all_npcs)
         {
@@ -515,7 +515,7 @@ namespace dung
             if (npc.health <= 0)
               race = "dead " + race;
             message_handler->add_message(static_cast<float>(real_time_s),
-                                         "You can see " + str::indef_art(race) + " nearby!", t8x::Level::Guide);
+                                         "You can see " + str::indef_art(race) + " nearby!", t8x::MessageHandlerLevel::Guide);
           }
         }
       }
@@ -534,20 +534,20 @@ namespace dung
             case -1:
               message_handler->add_message(static_cast<float>(real_time_s),
                                            "You drank poison! Your health decreased by " + std::to_string(-hp) + " hp.",
-                                           t8x::Level::Warning);
+                                           t8x::MessageHandlerLevel::Warning);
               break;
             case 0:
               message_handler->add_message(static_cast<float>(real_time_s),
                                            "You drank a potion, but nothing appeared to happen.",
-                                           t8x::Level::Guide);
+                                           t8x::MessageHandlerLevel::Guide);
             case +1:
               message_handler->add_message(static_cast<float>(real_time_s),
                                            "You drank a health potion. Your health increased by " + std::to_string(hp) + " hp.",
-                                           t8x::Level::Guide);
+                                           t8x::MessageHandlerLevel::Guide);
               if (m_player.health == globals::max_health)
                 message_handler->add_message(static_cast<float>(real_time_s),
                                              "Your health is now fully restored.",
-                                             t8x::Level::Guide);
+                                             t8x::MessageHandlerLevel::Guide);
               break;
           }
           m_inventory->cache_hilited_index();
@@ -555,7 +555,7 @@ namespace dung
           m_inventory->reset_hilite();
           message_handler->add_message(static_cast<float>(real_time_s),
                                        "You throw away the empty vial.",
-                                       t8x::Level::Guide);
+                                       t8x::MessageHandlerLevel::Guide);
         }
       }
       else if (str::to_lower(curr_key) == 'f')
