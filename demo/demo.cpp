@@ -179,9 +179,10 @@ protected:
     GameEngine::set_curr_rnd_seed(rnd_seed);
   }
   
-  virtual void on_screenshot_request(std::string& filepath) override
+  virtual void on_screenshot_request(std::string& filepath, t8::TxGlyphEncoding& encoding) override
   {
     filepath = screenshot_filepath;
+    encoding = t8::TxGlyphEncoding::UnicodePreferredAndFallback;
   }
   
 private:

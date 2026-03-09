@@ -2158,11 +2158,12 @@ namespace dung
         }
         
         std::string filepath = "screenshot_0.tx";
+        auto encoding = t8::TxGlyphEncoding::UnicodePreferredAndFallback;
         // Expects just one listener.
-        broadcast([&filepath](auto* l)
-          { l->on_screenshot_request(filepath); });
+        broadcast([&filepath, &encoding](auto* l)
+          { l->on_screenshot_request(filepath, encoding); });
         
-        if (screenshot.save(filepath))
+        if (screenshot.save(filepath, encoding))
         {
           message_handler->add_message(static_cast<float>(real_time_s),
                                        "Successfully saved screenshot:\n\"" + filepath + "\"!",
