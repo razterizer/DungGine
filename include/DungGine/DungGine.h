@@ -660,11 +660,11 @@ namespace dung
       tb_args.base.box_style = { Color16::White, Color16::DarkBlue };
       tb_args.base.outline_type = t8x::OutlineType::UTF8_SingleLineRounded;
     
-      std::string strength_bar = str::rep_char(' ', 10);
+      t8::GlyphString strength_bar = str::rep_char(' ', 10);
       float pc_ratio = m_player.strength / 10.f;
       for (int i = 0; i < 10; ++i)
         strength_bar[i] = (m_player.strength - m_player.weakness) > static_cast<int>(i*pc_ratio)
-        ? '=' : ' ';
+        ? t8::Glyph { 0x2550, '=' } : ' ';
       Style style { Color16::Green, Color16::Transparent2 };
       tb_strength.set_text(strength_bar, style);
       tb_strength.calc_pre_draw(str::Adjustment::Left);
