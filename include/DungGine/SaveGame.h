@@ -9,6 +9,7 @@
 
 #include "Terrain.h"
 #include <Core/StringHelper.h>
+#include <Core/Utf8.h>
 #include <Termin8or/str/StringConversion.h>
 #include <Termin8or/screen/Styles.h>
 #include <Termin8or/screen/Color.h>
@@ -34,6 +35,56 @@ namespace sg
     
     std::istringstream iss(tokens[1]);
     iss >> *var_ptr;
+    return true;
+  };
+  
+  //template<>
+  //bool read_var(std::vector<std::string>::iterator* it_line, const std::string& var_name, char32_t* var_ptr)
+  //{
+  //  auto curr_line = **it_line;
+  //  if (var_ptr == nullptr || !curr_line.starts_with(var_name))
+  //    return false;
+  //
+  //  auto tokens = str::tokenize(curr_line, { '=', ' ' }, { '\"' });
+  //  if (tokens.size() != 2)
+  //    return false;
+  //
+  //  std::istringstream iss(tokens[1]);
+  //  std::string enc_char;
+  //  iss >> enc_char;
+  //  size_t byte_idx = 0;
+  //  utf8::decode_next_utf8_char32(enc_char, *var_ptr, byte_idx);
+  //  return true;
+  //};
+  
+  template<>
+  bool read_var(std::vector<std::string>::iterator* it_line, const std::string& var_name, t8::Glyph* var_ptr)
+  {
+    auto curr_line = **it_line;
+    if (var_ptr == nullptr || !curr_line.starts_with(var_name))
+      return false;
+  
+    auto tokens = str::tokenize(curr_line, { '=', ' ', ',' });
+    if (tokens.size() != 3)
+      return false;
+  
+    std::istringstream iss(tokens[1]);
+    std::string enc_char;
+    iss >> enc_char;
+    size_t byte_idx = 0;
+    char32_t preferred = utf8::none;
+    utf8::decode_next_utf8_char32(enc_char, preferred, byte_idx);
+    
+    iss.str(tokens[2]);
+    iss.clear();
+    iss >> enc_char;
+    byte_idx = 0;
+    char32_t fallback = utf8::none;
+    utf8::decode_next_utf8_char32(enc_char, fallback, byte_idx);
+    
+    var_ptr->preferred = preferred;
+    var_ptr->fallback = fallback;
+    
     return true;
   };
   
@@ -148,10 +199,16 @@ namespace sg
     lines_vec.emplace_back(var_name + " = \"" + var + "\"");
   };
   
+  //template<>
+  //void write_var(std::vector<std::string>& lines_vec, const std::string& var_name, const char32_t& var)
+  //{
+  //  lines_vec.emplace_back(var_name + " = " + utf8::encode_char32_utf8(var));
+  //};
+  
   template<>
-  void write_var(std::vector<std::string>& lines_vec, const std::string& var_name, const char& var)
+  void write_var(std::vector<std::string>& lines_vec, const std::string& var_name, const t8::Glyph& var)
   {
-    lines_vec.emplace_back(var_name + " = " + std::string(1, var));
+    lines_vec.emplace_back(var_name + " = " + utf8::encode_char32_utf8(var.preferred) + ", " + utf8::encode_char32_utf8(var.fallback));
   };
   
   template<>
