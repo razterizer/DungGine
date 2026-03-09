@@ -25,7 +25,7 @@ namespace dung
     
     bool picked_up = false;
     Style style = { Color16::White, Color16::Transparent2 };
-    char character = '?';
+    t8::Glyph character = '?';
     bool visible_near = false;
     float weight = 0.f; // kg-ish.
     float price = 0.f;  // SEK-ish.
@@ -359,7 +359,7 @@ namespace dung
   {
     Bow()
     {
-      character = rnd::rand_select<char>({ '(', ')', '{', '}' });;
+      character = rnd::rand_select<t8::Glyph>({ '(', ')', '{', '}' });;
       style.fg_color = Color16::DarkRed;
       weight = rnd::randn_range_clamp(0.4f, 4.f);
       price = math::roundI(20*rnd::randn_clamp(3e3f, 1500.f, 0.f, 5e5f))/20.f;
@@ -383,7 +383,7 @@ namespace dung
   {
     Crossbow()
     {
-      character = rnd::rand_select<char>({ '[', ']' });
+      character = rnd::rand_select<t8::Glyph>({ '[', ']' });
       style.fg_color = t8::get_random_color(crossbow_fg_palette);
       weight = rnd::randn_range_clamp(1.f, 20.f);
       price = math::roundI(20*rnd::randn_clamp(1e4f, 1500.f, 0.f, 5e5f))/20.f;
@@ -410,7 +410,7 @@ namespace dung
     
     Potion()
     {
-      character = rnd::rand_select<char>({ 'u', 'U', 'b' });
+      character = rnd::rand_select<t8::Glyph>({ 'u', 'U', 'b' });
       style.fg_color = t8::get_random_color(potion_fg_palette);
       weight = rnd::randn_range_clamp(0.02f, 0.4f);
       price = math::roundI(20*rnd::randn_clamp(1e3f, 500.f, 0.f, 5e5f))/20.f;
