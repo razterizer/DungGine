@@ -2053,13 +2053,13 @@ namespace dung
           {
             auto scr_pos_room = m_screen_helper->get_screen_pos(npc.curr_room->bb_leaf_room.center());
             t8x::plot_line(sh, scr_pos, scr_pos_room,
-                    ".", Color16::White, Color16::Transparent2);
+                    "."_gs, Color16::White, Color16::Transparent2);
           }
           if (npc.curr_corridor != nullptr)
           {
             auto scr_pos_corr = m_screen_helper->get_screen_pos(npc.curr_corridor->bb.center());
             t8x::plot_line(sh, scr_pos, scr_pos_corr,
-                    ".", Color16::White, Color16::Transparent2);
+                    "."_gs, Color16::White, Color16::Transparent2);
           }
         }
       }
