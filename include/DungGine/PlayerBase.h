@@ -112,7 +112,7 @@ namespace dung
 
   struct PlayerBase
   {
-    char character;
+    t8::Glyph character;
     Style style;
   
     RC pos, last_pos;
