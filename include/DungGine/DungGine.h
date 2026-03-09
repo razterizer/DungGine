@@ -629,8 +629,8 @@ namespace dung
         auto [pc_melee_attack, pc_ranged_attack] = get_pc_attack_modes(npc);
         if (npc.health > 0 && (npc.state == State::FightMelee || npc.state == State::FightRanged || pc_melee_attack || pc_ranged_attack))
         {
-          std::string npc_hb = str::rep_char(' ', 10);
-          float npc_ratio = globals::max_health / 10;
+          t8::GlyphString npc_hb = str::rep_char(' ', 10);
+          float npc_ratio = globals::max_health / 10.f;
           for (int i = 0; i < 10; ++i)
             npc_hb[i] = npc.health > static_cast<int>(i*npc_ratio) ? 'O' : ' ';
           npc_hb = std::string(1, npc.visible ? npc.character : '?') + ' ' + npc_hb;
