@@ -614,8 +614,8 @@ namespace dung
       std::vector<t8::GlyphString> health_bars;
       std::vector<Style> styles;
       std::vector<std::pair<RC, Style>> per_textel_styles;
-      std::string pc_hb = str::rep_char(' ', 10);
-      float pc_ratio = globals::max_health / 10;
+      t8::GlyphString pc_hb = str::rep_char(' ', 10);
+      float pc_ratio = globals::max_health / 10.f;
       for (int i = 0; i < 10; ++i)
         pc_hb[i] = m_player.health > static_cast<int>(i*pc_ratio) ? '#' : ' ';
       pc_hb = std::string(1, m_player.character) + ' ' + pc_hb;
