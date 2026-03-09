@@ -40,7 +40,7 @@ public:
       project_root_filepath = folder::join_path({ project_root_filepath, "../../../../../../../Documents/xcode/lib/DungGine/demo/" }); // #FIXME: Find a better solution!
 #endif
     savegame_filepath = folder::join_path({ project_root_filepath, "savegame_0.dsg" });
-    screenshot_filepath = folder::join_path({ project_root_filepath, "screenshot_0.txt" });
+    screenshot_filepath = folder::join_path({ project_root_filepath, "screenshot_0.tx" });
   }
   
   virtual ~Game() override

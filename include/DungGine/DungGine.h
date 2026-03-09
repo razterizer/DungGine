@@ -2157,7 +2157,7 @@ namespace dung
           }
         }
         
-        std::string filepath = "screenshot_0.txt";
+        std::string filepath = "screenshot_0.tx";
         // Expects just one listener.
         broadcast([&filepath](auto* l)
           { l->on_screenshot_request(filepath); });
