@@ -155,8 +155,8 @@ namespace dung
       weight_strain = math::value_to_param_clamped(curr_tot_inv_weight, weight_capacity_soft, weight_capacity_hard);
     }
     
-    template<int NR, int NC>
-    void draw(ScreenHandler<NR, NC>& sh, float sim_time)
+    template<int NR, int NC, typename CharT>
+    void draw(ScreenHandler<NR, NC, CharT>& sh, float sim_time)
     {
       fire_smoke_engine.draw(sh, smoke_color_gradients, sim_time);
 #ifdef DEBUG_FIRE_SMOKE

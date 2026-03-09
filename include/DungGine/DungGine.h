@@ -607,10 +607,10 @@ namespace dung
       return { pc_melee_attack, pc_ranged_attack };
     }
     
-    template<int NR, int NC>
-    void draw_health_bars(ScreenHandler<NR, NC>& sh, bool framed_mode)
+    template<int NR, int NC, typename CharT>
+    void draw_health_bars(ScreenHandler<NR, NC, CharT>& sh, bool framed_mode)
     {
-      std::vector<std::string> health_bars;
+      std::vector<t8::GlyphString> health_bars;
       std::vector<Style> styles;
       std::vector<std::pair<RC, Style>> per_textel_styles;
       std::string pc_hb = str::rep_char(' ', 10);
@@ -649,8 +649,8 @@ namespace dung
       tb_health.draw(sh, tb_args);
     }
     
-    template<int NR, int NC>
-    void draw_strength_bar(ScreenHandler<NR, NC>& sh, bool framed_mode)
+    template<int NR, int NC, typename CharT>
+    void draw_strength_bar(ScreenHandler<NR, NC, CharT>& sh, bool framed_mode)
     {
       t8x::TextBoxDrawingArgsPos tb_args;
       int offs = framed_mode ? 1 : 0;
@@ -882,8 +882,8 @@ namespace dung
       }
     }
     
-    template<int NR, int NC>
-    void draw_fighting(ScreenHandler<NR, NC>& sh, const RC& pc_scr_pos, bool do_update_fight, float real_time_s, float sim_time_s,
+    template<int NR, int NC, typename CharT>
+    void draw_fighting(ScreenHandler<NR, NC, CharT>& sh, const RC& pc_scr_pos, bool do_update_fight, float real_time_s, float sim_time_s,
                        int melee_blood_prob_visible, int melee_blood_prob_invisible)
     {
       auto f_render_pc_blood_splats = [&](const RC& offs)
@@ -1860,8 +1860,8 @@ namespace dung
     }
     
     
-    template<int NR, int NC>
-    void draw(ScreenHandler<NR, NC>& sh, double real_time_s, float sim_time_s,
+    template<int NR, int NC, typename CharT>
+    void draw(ScreenHandler<NR, NC, CharT>& sh, double real_time_s, float sim_time_s,
               int anim_ctr_swim, int anim_ctr_fight,
               int melee_blood_prob_visible, int melee_blood_prob_invisible,
               t8x::VerticalAlignment mb_v_align = t8x::VerticalAlignment::CENTER,

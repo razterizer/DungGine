@@ -644,8 +644,8 @@ namespace dung
       };
     }
       
-    template<int NR, int NC>
-    void draw(ScreenHandler<NR, NC>& sh) const
+    template<int NR, int NC, typename CharT>
+    void draw(ScreenHandler<NR, NC, CharT>& sh) const
     {
       sh.write_buffer(str::adjust_str("Inventory", str::Adjustment::Center, m_bb.c_len), m_bb.top() + rb0_title, m_bb.left(), Color16::White, Color16::Transparent2);
       

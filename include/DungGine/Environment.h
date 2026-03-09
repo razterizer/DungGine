@@ -365,8 +365,8 @@ namespace dung
       return dung::allow_move_to(terrain);
     }
     
-    template<int NR, int NC>
-    void draw_environment(ScreenHandler<NR, NC>& sh, double real_time_s,
+    template<int NR, int NC, typename CharT>
+    void draw_environment(ScreenHandler<NR, NC, CharT>& sh, double real_time_s,
                           int curr_floor, bool use_fog_of_war,
                           SolarDirection sun_dir, SolarMotionPatterns& solar_motion,
                           float t_solar_period, Season season,
