@@ -135,7 +135,7 @@ namespace dung
     
     PC()
     {
-      character = { 0x2603, '@' }; // 0x2591
+      glyph = { 0x2603, '@' }; // 0x2591
       style = { Color16::Magenta, Color16::White };
       smoke_color_gradients.emplace_back(0.5f, smoke_0);
       smoke_color_gradients.emplace_back(0.6f, smoke_1);

@@ -618,7 +618,7 @@ namespace dung
       float pc_ratio = globals::max_health / 10.f;
       for (int i = 0; i < 10; ++i)
         pc_hb[i] = m_player.health > static_cast<int>(i*pc_ratio) ? t8::Glyph { 0x2592, '#' } : ' ';
-      pc_hb = m_player.character + ' ' + pc_hb;
+      pc_hb = m_player.glyph + ' ' + pc_hb;
       per_textel_styles.emplace_back(RC { 0, 0 }, m_player.style);
       health_bars.emplace_back(pc_hb);
       styles.emplace_back(Style { Color16::Magenta, Color16::Transparent2 });
@@ -633,7 +633,7 @@ namespace dung
           float npc_ratio = globals::max_health / 10.f;
           for (int i = 0; i < 10; ++i)
             npc_hb[i] = npc.health > static_cast<int>(i*npc_ratio) ? t8::Glyph { 0x2592, 'O' } : ' ';
-          npc_hb = (npc.visible ? npc.character : '?') + ' ' + npc_hb;
+          npc_hb = (npc.visible ? npc.glyph : '?') + ' ' + npc_hb;
           per_textel_styles.emplace_back(RC { line++, 0 }, npc.visible ? npc.style : Style { Color16::White, Color16::Transparent2 });
           health_bars.emplace_back(npc_hb);
           styles.emplace_back(Style { Color16::Red, Color16::Transparent2 });
@@ -1091,7 +1091,7 @@ namespace dung
       
       for (const auto& p : active_projectiles)
       {
-        t8::Glyph p_char = p.weapon->projectile_characters[p.ang_idx];
+        t8::Glyph p_char = p.weapon->projectile_glyphs[p.ang_idx];
         
         const RC& wpn_pos = t8::to_RC_round(p.pos);
         
@@ -1176,7 +1176,7 @@ namespace dung
                                    wall_shading_underground);
     }
     
-    void set_player_character(t8::Glyph ch) { m_player.character = ch; }
+    void set_player_glyph(t8::Glyph g) { m_player.glyph = g; }
     void set_player_style(const Style& style) { m_player.style = style; }
     bool place_player(const RC& screen_size, std::optional<RC> world_pos = std::nullopt)
     {
@@ -1943,7 +1943,7 @@ namespace dung
       // PC
       if (m_player.is_spawned)
       {
-        sh.write_buffer(m_player.character, pc_scr_pos.r, pc_scr_pos.c, m_player.style);
+        sh.write_buffer(m_player.glyph, pc_scr_pos.r, pc_scr_pos.c, m_player.style);
         
         if (is_wet(m_player.on_terrain))
           f_draw_swim_anim(m_player.is_moving, m_player.curr_floor, m_player.pos, pc_scr_pos, m_player.los_r, m_player.los_c);
@@ -1959,7 +1959,7 @@ namespace dung
         if (!npc.visible)
           return;
         auto scr_pos = m_screen_helper->get_screen_pos(npc.pos);
-        sh.write_buffer(npc.character, scr_pos, npc.style);
+        sh.write_buffer(npc.glyph, scr_pos, npc.style);
       };
       
       auto f_render_obj = [&](const auto& obj)
@@ -1973,7 +1973,7 @@ namespace dung
         if (obj.shade && obj.light)
           fg_color = t8::shade_color(obj.style.fg_color,
                                             t8::ShadeType::Dark);
-        sh.write_buffer(obj.character, scr_pos,
+        sh.write_buffer(obj.glyph, scr_pos,
           fg_color, obj.style.bg_color);
       };
       

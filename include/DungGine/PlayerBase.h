@@ -112,7 +112,7 @@ namespace dung
 
   struct PlayerBase
   {
-    t8::Glyph character;
+    t8::Glyph glyph;
     Style style;
   
     RC pos, last_pos;
@@ -169,7 +169,7 @@ namespace dung
     
     virtual void serialize(std::vector<std::string>& lines) const
     {
-      sg::write_var(lines, SG_WRITE_VAR(character));
+      sg::write_var(lines, SG_WRITE_VAR(glyph));
       sg::write_var(lines, SG_WRITE_VAR(style));
       sg::write_var(lines, SG_WRITE_VAR(pos));
       sg::write_var(lines, SG_WRITE_VAR(last_pos));
@@ -210,7 +210,7 @@ namespace dung
     {
       for (auto it_line = it_line_begin; it_line != it_line_end; ++it_line)
       {
-        if (sg::read_var(&it_line, SG_READ_VAR(character))) {}
+        if (sg::read_var(&it_line, SG_READ_VAR(glyph))) {}
         else if (sg::read_var(&it_line, SG_READ_VAR(style))) {}
         else if (sg::read_var(&it_line, SG_READ_VAR(pos))) {}
         else if (sg::read_var(&it_line, SG_READ_VAR(last_pos))) {}

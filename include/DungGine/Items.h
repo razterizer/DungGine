@@ -25,7 +25,7 @@ namespace dung
     
     bool picked_up = false;
     Style style = { Color16::White, Color16::Transparent2 };
-    t8::Glyph character = '?';
+    t8::Glyph glyph = '?';
     bool visible_near = false;
     float weight = 0.f; // kg-ish.
     float price = 0.f;  // SEK-ish.
@@ -51,7 +51,7 @@ namespace dung
       sg::write_var(lines, SG_WRITE_VAR(exists));
       sg::write_var(lines, SG_WRITE_VAR(picked_up));
       sg::write_var(lines, SG_WRITE_VAR(style));
-      sg::write_var(lines, SG_WRITE_VAR(character));
+      sg::write_var(lines, SG_WRITE_VAR(glyph));
       sg::write_var(lines, SG_WRITE_VAR(visible_near));
       sg::write_var(lines, SG_WRITE_VAR(weight));
       sg::write_var(lines, SG_WRITE_VAR(price));
@@ -67,7 +67,7 @@ namespace dung
         if (sg::read_var(&it_line, SG_READ_VAR(exists))) {}
         else if (sg::read_var(&it_line, SG_READ_VAR(picked_up))) {}
         else if (sg::read_var(&it_line, SG_READ_VAR(style))) {}
-        else if (sg::read_var(&it_line, SG_READ_VAR(character))) {}
+        else if (sg::read_var(&it_line, SG_READ_VAR(glyph))) {}
         else if (sg::read_var(&it_line, SG_READ_VAR(visible_near))) {}
         else if (sg::read_var(&it_line, SG_READ_VAR(weight))) {}
         else if (sg::read_var(&it_line, SG_READ_VAR(price)))
@@ -84,7 +84,7 @@ namespace dung
   {
     Key()
     {
-      character = 'F';
+      glyph = 'F';
       style.fg_color = t8::get_random_color(key_fg_palette);
       weight = rnd::randn_range_clamp(0.01f, 0.1f);
       price = math::roundI(20*rnd::randn_clamp(20.f, 30.f, 0.f, 1e4f))/20.f;
@@ -104,7 +104,7 @@ namespace dung
   
     Lamp()
     {
-      character = 'Y';
+      glyph = 'Y';
       style.fg_color = Color16::Yellow;
       weight = 0.4f;
       price = math::roundI(20*rnd::randn_clamp(200.f, 100.f, 0.f, 1e4f))/20.f;
@@ -143,7 +143,7 @@ namespace dung
           light_type = LightType::Isotropic;
           angle_deg = 0.f;
           life_time_s = rnd::randn_clamp(800.f, 350.f, 420.f, 1800.f); // 7 - 30 min.
-          character = '*';
+          glyph = '*';
           style.fg_color = Color16::Magenta;
           weight = rnd::randn_range_clamp(0.05f, 0.2f);
           break;
@@ -151,7 +151,7 @@ namespace dung
           light_type = LightType::Directional;
           angle_deg = rnd::randn_range_clamp(2.f, 90.f);
           life_time_s = rnd::randn_clamp(400.f, 350.f, 180.f, 900.f); // 3 - 15 min.
-          character = 'G';
+          glyph = 'G';
           style.fg_color = t8::get_random_color({ Color16::Red, Color16::Green });
           weight = rnd::randn_range_clamp(0.05f, 0.3f);
           break;
@@ -159,7 +159,7 @@ namespace dung
           light_type = LightType::Directional;
           angle_deg = rnd::randn_range_clamp(80.f, 358.f);
           life_time_s = rnd::randn_clamp(150.f, 350.f, 30.f, 300.f); // 0.5 - 5 min.
-          character = 'Y';
+          glyph = 'Y';
           style.fg_color = Color16::Yellow;
           weight = rnd::randn_range_clamp(0.4f, 1.5f);
           break;
@@ -247,7 +247,7 @@ namespace dung
     float attack_speed = 15.f; // max 15 aps (demo fps).
     float projectile_speed = 15.f; // max 15 aps (demo fps).
     float spread_sigma_rad = 0.f;
-    std::array<t8::Glyph, 8> projectile_characters; // { 0, 45, 90, 135, 180, 225, 270, 315 } degrees.
+    std::array<t8::Glyph, 8> projectile_glyphs; // { 0, 45, 90, 135, 180, 225, 270, 315 } degrees.
     Color projectile_fg_color = Color16::Transparent2;
   };
   
@@ -255,7 +255,7 @@ namespace dung
   {
     Dagger()
     {
-      character = 'V';
+      glyph = 'V';
       style.fg_color = Color16::LightGray;
       weight = rnd::randn_range_clamp(0.02f, 0.7f);
       price = math::roundI(20*rnd::randn_clamp(5e2f, 500.f, 0.f, 1e4f))/20.f;
@@ -275,7 +275,7 @@ namespace dung
   {
     Sword()
     {
-      character = 'T';
+      glyph = 'T';
       style.fg_color = Color16::LightGray;
       weight = rnd::randn_range_clamp(1.f, 5.f);
       price = math::roundI(20*rnd::randn_clamp(4e3f, 500.f, 0.f, 5e6f))/20.f;
@@ -295,7 +295,7 @@ namespace dung
   {
     Flail()
     {
-      character = 'J';
+      glyph = 'J';
       style.fg_color = Color16::DarkGray;
       weight = rnd::randn_range_clamp(1.f, 1.8f);
       price = math::roundI(20*rnd::randn_clamp(1e3f, 500.f, 0.f, 5e5f))/20.f;
@@ -315,7 +315,7 @@ namespace dung
   {
     MorningStar()
     {
-      character = 'i';
+      glyph = 'i';
       style.fg_color = Color16::DarkGray;
       weight = rnd::randn_range_clamp(1.5f, 2.8f);
       price = math::roundI(20*rnd::randn_clamp(1e3f, 500.f, 0.f, 5e5f))/20.f;
@@ -335,7 +335,7 @@ namespace dung
   {
     Sling()
     {
-      character = 's';
+      glyph = 's';
       style.fg_color = Color16::DarkRed;
       weight = rnd::randn_range_clamp(0.02f, 0.5f);
       price = math::roundI(20*rnd::randn_clamp(200.f, 150.f, 0.f, 5e2f))/20.f;
@@ -345,7 +345,7 @@ namespace dung
       projectile_speed = rnd::randn_clamp(8.5f, 0.6f, 8.f, 9.f);
       spread_sigma_rad = 0.4f;
       dist_type = WeaponDistType_Ranged;
-      stlutils::fill(projectile_characters, '*');
+      stlutils::fill(projectile_glyphs, '*');
       projectile_fg_color = Color16::DarkGray;
     }
     
@@ -359,7 +359,7 @@ namespace dung
   {
     Bow()
     {
-      character = rnd::rand_select<t8::Glyph>({ '(', ')', '{', '}' });;
+      glyph = rnd::rand_select<t8::Glyph>({ '(', ')', '{', '}' });;
       style.fg_color = Color16::DarkRed;
       weight = rnd::randn_range_clamp(0.4f, 4.f);
       price = math::roundI(20*rnd::randn_clamp(3e3f, 1500.f, 0.f, 5e5f))/20.f;
@@ -369,7 +369,7 @@ namespace dung
       projectile_speed = rnd::randn_clamp(9.5f, 0.6f, 9.f, 10.f);
       spread_sigma_rad = 0.1f;
       dist_type = WeaponDistType_Ranged;
-      projectile_characters = { '-', '/', '|', '\\', '-', '/', '|', '\\' };
+      projectile_glyphs = { '-', '/', '|', '\\', '-', '/', '|', '\\' };
       projectile_fg_color = Color16::Yellow;
     }
     
@@ -383,7 +383,7 @@ namespace dung
   {
     Crossbow()
     {
-      character = rnd::rand_select<t8::Glyph>({ '[', ']' });
+      glyph = rnd::rand_select<t8::Glyph>({ '[', ']' });
       style.fg_color = t8::get_random_color(crossbow_fg_palette);
       weight = rnd::randn_range_clamp(1.f, 20.f);
       price = math::roundI(20*rnd::randn_clamp(1e4f, 1500.f, 0.f, 5e5f))/20.f;
@@ -393,7 +393,7 @@ namespace dung
       projectile_speed = rnd::randn_clamp(8.5f, 0.6f, 8.f, 10.f);
       spread_sigma_rad = 0.02f;
       dist_type = WeaponDistType_Ranged;
-      projectile_characters = { '-', '/', '|', '\\', '-', '/', '|', '\\' };
+      projectile_glyphs = { '-', '/', '|', '\\', '-', '/', '|', '\\' };
       projectile_fg_color = Color16::LightGray;
     }
     
@@ -410,7 +410,7 @@ namespace dung
     
     Potion()
     {
-      character = rnd::rand_select<t8::Glyph>({ 'u', 'U', 'b' });
+      glyph = rnd::rand_select<t8::Glyph>({ 'u', 'U', 'b' });
       style.fg_color = t8::get_random_color(potion_fg_palette);
       weight = rnd::randn_range_clamp(0.02f, 0.4f);
       price = math::roundI(20*rnd::randn_clamp(1e3f, 500.f, 0.f, 5e5f))/20.f;
@@ -450,7 +450,7 @@ namespace dung
   {
     Shield()
     {
-      character = 'D';
+      glyph = 'D';
       style.fg_color = Color16::LightGray;
       type = "shield";
       price = math::roundI(20*rnd::randn_clamp(1e3f, 500.f, 0.f, 5e4f))/20.f;
@@ -468,7 +468,7 @@ namespace dung
   {
     Gambeson()
     {
-      character = 'H';
+      glyph = 'H';
       style.fg_color = Color16::White;
       type = "gambeson";
       price = math::roundI(20*rnd::randn_clamp(5e2f, 200.f, 0.f, 5e3f))/20.f;
@@ -486,7 +486,7 @@ namespace dung
   {
     ChainMailleHauberk()
     {
-      character = '#';
+      glyph = '#';
       style.fg_color = Color16::LightGray;
       type = "chain maille hauberk";
       protection = rnd::randn_clamp_int(5.f, 18.f, 0, 40);
@@ -503,7 +503,7 @@ namespace dung
   {
     PlatedBodyArmour()
     {
-      character = 'M';
+      glyph = 'M';
       style.fg_color = Color16::LightGray;
       type = "plated body armour";
       price = math::roundI(20*rnd::randn_clamp(2e4f, 5000.f, 0.f, 1e6f))/20.f;
@@ -521,7 +521,7 @@ namespace dung
   {
     PaddedCoif()
     {
-      character = 'C';
+      glyph = 'C';
       style.fg_color = Color16::White;
       type = "padded coif";
       protection = rnd::randn_clamp_int(0.5f, 12.f, 0, 10);
@@ -538,7 +538,7 @@ namespace dung
   {
     ChainMailleCoif()
     {
-      character = '2';
+      glyph = '2';
       style.fg_color = Color16::LightGray;
       type = "chain maille coif";
       protection = rnd::randn_clamp_int(5.f, 18.f, 0, 40);
@@ -555,7 +555,7 @@ namespace dung
   {
     Helmet()
     {
-      character = 'Q';
+      glyph = 'Q';
       style.fg_color = Color16::LightGray;
       type = "helmet";
       protection = rnd::randn_clamp_int(10.f, 20.f, 0, 100);
