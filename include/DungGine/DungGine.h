@@ -794,7 +794,7 @@ namespace dung
           {
             message_handler->add_message(real_time_s,
                                          "You killed the " + race2str(npc.npc_race) + "!",
-                                         MessageHandler::Level::Guide);
+                                         t8x::Level::Guide);
             broadcast([](auto* listener) { listener->on_npc_death(); });
           }
         }
@@ -868,7 +868,7 @@ namespace dung
           {
             message_handler->add_message(real_time_s,
                                          "You were killed!",
-                                         MessageHandler::Level::Fatal);
+                                         t8x::Level::Fatal);
             broadcast([](auto* listener) { listener->on_pc_death(); });
           }
         }
@@ -932,7 +932,7 @@ namespace dung
                 message += " by " + str::indef_art(race);
               message += "!";
               message_handler->add_message(real_time_s,
-                                           message, MessageHandler::Level::Warning);
+                                           message, t8x::Level::Warning);
             }
           }
           else
@@ -1796,7 +1796,7 @@ namespace dung
       {
         message_handler->add_message(static_cast<float>(real_time_s),
                                      "You died!",
-                                     MessageHandler::Level::Fatal);
+                                     t8x::Level::Fatal);
         broadcast([](auto* listener) { listener->on_pc_death(); });
       }
       
@@ -2163,14 +2163,14 @@ namespace dung
         {
           message_handler->add_message(static_cast<float>(real_time_s),
                                        "Successfully saved screenshot:\n\"" + filepath + "\"!",
-                                       MessageHandler::Level::Guide,
+                                       t8x::Level::Guide,
                                        3.f);
         }
         else
         {
           message_handler->add_message(static_cast<float>(real_time_s),
                                        "ERROR : Unable to save screenshot to file:\n\"" + filepath + "\"!",
-                                       MessageHandler::Level::Fatal,
+                                       t8x::Level::Fatal,
                                        3.f);
         }
         
@@ -2250,14 +2250,14 @@ namespace dung
       {
         message_handler->add_message(static_cast<float>(real_time_s),
                                      "Successfully saved save-game:\n\"" + savegame_filename + "\"!",
-                                     MessageHandler::Level::Guide,
+                                     t8x::Level::Guide,
                                      3.f);
       }
       else
       {
         message_handler->add_message(static_cast<float>(real_time_s),
                                      "ERROR : Unable to save save-game file:\n\"" + savegame_filename + "\"!",
-                                     MessageHandler::Level::Fatal,
+                                     t8x::Level::Fatal,
                                      3.f);
       }
     }
@@ -2272,7 +2272,7 @@ namespace dung
       {
         message_handler->add_message(static_cast<float>(real_time_s),
                                      "ERROR : Unable to load save-game file:\n\"" + savegame_filename + "\"!",
-                                     MessageHandler::Level::Fatal,
+                                     t8x::Level::Fatal,
                                      3.f);
         return false;
       }
@@ -2282,7 +2282,7 @@ namespace dung
       {
         message_handler->add_message(static_cast<float>(real_time_s),
                                      "ERROR : Tried to load a saved game\nbut the git hash of the save-game\ndoesn't match the git hash of the\nlast commit of DungGine!",
-                                      MessageHandler::Level::Fatal,
+                                      t8x::Level::Fatal,
                                       5.f);
         return false;
       }
@@ -2350,7 +2350,7 @@ namespace dung
         {
           message_handler->add_message(static_cast<float>(real_time_s),
                                        "Successfully loaded save-game:\n\"" + savegame_filename + "\"!",
-                                       MessageHandler::Level::Guide,
+                                       t8x::Level::Guide,
                                        3.f);
           return;
         }
