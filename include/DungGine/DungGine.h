@@ -617,8 +617,8 @@ namespace dung
       t8::GlyphString pc_hb = str::rep_char(' ', 10);
       float pc_ratio = globals::max_health / 10.f;
       for (int i = 0; i < 10; ++i)
-        pc_hb[i] = m_player.health > static_cast<int>(i*pc_ratio) ? '#' : ' ';
-      pc_hb = std::string(1, m_player.character) + ' ' + pc_hb;
+        pc_hb[i] = m_player.health > static_cast<int>(i*pc_ratio) ? t8::Glyph { 0x2592, '#' } : ' ';
+      pc_hb = m_player.character + ' ' + pc_hb;
       per_textel_styles.emplace_back(RC { 0, 0 }, m_player.style);
       health_bars.emplace_back(pc_hb);
       styles.emplace_back(Style { Color16::Magenta, Color16::Transparent2 });
