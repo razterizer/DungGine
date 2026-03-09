@@ -120,17 +120,17 @@ namespace dung
       switch (floor_type)
       {
         case FloorType::Sand:
-          return ':';
+          return { 0x287D, ':' };
         case FloorType::Grass:
-          return '|';
+          return { 0x142, '|' };
         case FloorType::Stone:
           return 'H';
         case FloorType::Stone2:
           return '8';
         case FloorType::Water:
-          return '~';
+          return { 0x3B6, '~' }; // 0x2248 doesn't look that good on it's own.
         case FloorType::Wood:
-          return 'W';
+          return { 0x222C, 'W' };
         case FloorType::None:
         default:
           return ' ';
