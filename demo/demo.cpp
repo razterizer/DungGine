@@ -16,7 +16,7 @@ enum class TestType { DungeonSimple, DungeonRuntime };
 static TestType test_type = TestType::DungeonRuntime;
 
 
-class Game : public t8x::GameEngine<>, public dung::DungGineListener
+class Game : public t8x::GameEngine<30, 80, char32_t>, public dung::DungGineListener
 {
   using Color16 = t8::Color16;
   
