@@ -101,7 +101,7 @@ namespace dung
     };
     std::vector<Projectile> active_projectiles;
     
-    t8x::TextBox tb_health, tb_strength;
+    t8x::TextBox<t8::GlyphString> tb_health, tb_strength;
     t8x::TextBoxDebug tbd;
     
     bool stall_game = false;
