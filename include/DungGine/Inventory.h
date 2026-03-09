@@ -688,7 +688,7 @@ namespace dung
           sh.write_buffer(text, m_bb.top() + rb_items, m_bb.left() + cb_items, style);
       }
       
-      t8x::draw_box_outline(sh, m_bb, t8x::OutlineType::Line, { Color16::White, Color16::DarkGray });
+      t8x::draw_box_outline(sh, m_bb, t8x::OutlineType::UTF8_SingleLine, { Color16::White, Color16::DarkGray });
       t8x::draw_box(sh, m_bb, { Color16::White, Color16::DarkGray }, ' ');
     }
     
