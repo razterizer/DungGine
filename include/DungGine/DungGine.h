@@ -1091,7 +1091,7 @@ namespace dung
       
       for (const auto& p : active_projectiles)
       {
-        char p_char = p.weapon->projectile_characters[p.ang_idx];
+        t8::Glyph p_char = p.weapon->projectile_characters[p.ang_idx];
         
         const RC& wpn_pos = t8::to_RC_round(p.pos);
         

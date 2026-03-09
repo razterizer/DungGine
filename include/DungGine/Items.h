@@ -247,7 +247,7 @@ namespace dung
     float attack_speed = 15.f; // max 15 aps (demo fps).
     float projectile_speed = 15.f; // max 15 aps (demo fps).
     float spread_sigma_rad = 0.f;
-    std::array<char, 8> projectile_characters; // { 0, 45, 90, 135, 180, 225, 270, 315 } degrees.
+    std::array<t8::Glyph, 8> projectile_characters; // { 0, 45, 90, 135, 180, 225, 270, 315 } degrees.
     Color projectile_fg_color = Color16::Transparent2;
   };
   
