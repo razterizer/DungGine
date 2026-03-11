@@ -39,7 +39,7 @@ namespace dung
     
     t8x::ParticleHandler fire_smoke_engine { 500 };
     
-    t8x::ParticleGradientGroup smoke_0
+    t8x::ParticleGradientGroup<t8::GlyphString> smoke_0
     {
       {
         {
@@ -62,17 +62,17 @@ namespace dung
       },
       {
         {
-          { 0.0000f, "o" },
-          { 0.25f, "v" },
-          { 0.45f, "s" },
-          { 0.65f, "%" },
-          { 0.6667f, "&" },
-          { 0.8333f, "@" }
+          { 0.0000f, t8::Glyph { 0x44A, 'o' } }, // ъ
+          { 0.25f,   t8::Glyph { 0x574, 'v' } }, // մ
+          { 0.45f,   t8::Glyph { 0x1B9, 's' } }, // ƹ
+          { 0.65f,   t8::Glyph { 0x63F, '%' } }, // ؿ
+          { 0.6667f, t8::Glyph { 0x569, '&' } }, // թ
+          { 0.8333f, { '@' } }
         }
       }
     };
     
-    t8x::ParticleGradientGroup smoke_1
+    t8x::ParticleGradientGroup<t8::GlyphString> smoke_1
     {
       {
         {
@@ -95,18 +95,18 @@ namespace dung
       },
       {
         {
-          { 0.0000f, "." },
-          { 0.1667f, "*" },
-          { 0.3333f, "s" },
-          { 0.5000f, "%" },
-          { 0.6667f, "&" },
-          { 0.8333f, "@" }
+          { 0.0000f, t8::Glyph { 0xC6C, '.' } }, // ౬
+          { 0.1667f, t8::Glyph { 0x999, '*' } }, // ঙ
+          { 0.3333f, t8::Glyph { 0x1B9, 's' } }, // ƹ
+          { 0.5000f, t8::Glyph { 0xA14, '%' } }, // ਔ
+          { 0.6667f, t8::Glyph { 0x569, '&' } }, // թ
+          { 0.8333f, t8::Glyph { 0xBEB, '@' } } // ௫
         }
       }
     };
     
 
-    std::vector<std::pair<float, t8x::ParticleGradientGroup>> smoke_color_gradients;
+    std::vector<std::pair<float, t8x::ParticleGradientGroup<t8::GlyphString>>> smoke_color_gradients;
     
     // ////////////////////////////////
     
