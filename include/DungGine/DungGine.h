@@ -101,7 +101,8 @@ namespace dung
     };
     std::vector<Projectile> active_projectiles;
     
-    t8x::TextBox<t8::GlyphString> tb_health, tb_strength;
+    t8x::TextBox<t8::GlyphString> tb_health { str::Adjustment::Left };
+    t8x::TextBox<t8::GlyphString> tb_strength { str::Adjustment::Left };
     t8x::TextBoxDebug tbd;
     
     bool stall_game = false;
@@ -647,7 +648,6 @@ namespace dung
       tb_args.base.outline_type = t8x::OutlineType::UTF8_SingleLineRounded;
       tb_args.framed_mode = framed_mode;
       tb_health.set_text(health_bars, styles, per_textel_styles);
-      tb_health.calc_pre_draw(str::Adjustment::Left);
       tb_health.draw(sh, tb_args);
     }
     
@@ -667,7 +667,6 @@ namespace dung
         ? t8::Glyph { 0x2550, '=' } : ' ';
       Style style { Color16::Green, Color16::Transparent2 };
       tb_strength.set_text(strength_bar, style);
-      tb_strength.calc_pre_draw(str::Adjustment::Left);
       tb_strength.draw(sh, tb_args);
     }
     
@@ -1894,7 +1893,6 @@ namespace dung
           tbd_args.v_align = t8x::VerticalAlignment::TOP;
           tbd_args.base.box_style = { Color16::Blue, Color16::Yellow };
           tbd_args.framed_mode = framed_mode;
-          tbd.calc_pre_draw(str::Adjustment::Left);
           tbd.draw(sh, tbd_args);
         }
       }
