@@ -645,7 +645,7 @@ namespace dung
       tb_args.v_align = t8x::VerticalAlignment::TOP;
       tb_args.h_align = t8x::HorizontalAlignment::LEFT;
       tb_args.base.box_style = { Color16::White, Color16::DarkBlue };
-      tb_args.base.outline_type = t8x::OutlineType::UTF8_SingleLineRounded;
+      tb_args.base.outline_type = t8x::OutlineType::Unicode_SingleLineRounded;
       tb_args.framed_mode = framed_mode;
       tb_health.set_text(health_bars, styles, per_textel_styles);
       tb_health.draw(sh, tb_args);
@@ -658,7 +658,7 @@ namespace dung
       int offs = framed_mode ? 1 : 0;
       tb_args.pos = { 1 + offs, 12 + offs };
       tb_args.base.box_style = { Color16::White, Color16::DarkBlue };
-      tb_args.base.outline_type = t8x::OutlineType::UTF8_SingleLineRounded;
+      tb_args.base.outline_type = t8x::OutlineType::Unicode_SingleLineRounded;
     
       t8::GlyphString strength_bar = str::rep_char(' ', 10);
       float pc_ratio = m_player.strength / 10.f;
@@ -1882,7 +1882,7 @@ namespace dung
       mb_args.v_align_offs = mb_v_align_offs;
       mb_args.h_align_offs = mb_h_align_offs;
       mb_args.framed_mode = framed_mode;
-      mb_args.outline_type = t8x::OutlineType::UTF8_SingleLine;
+      mb_args.outline_type = t8x::OutlineType::Unicode_SingleLine;
       message_handler->update(sh, static_cast<float>(real_time_s), mb_args);
       
       if (debug)
