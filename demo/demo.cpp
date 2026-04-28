@@ -182,7 +182,7 @@ protected:
   virtual void on_screenshot_request(std::string& filepath, t8::TxGlyphEncoding& encoding) override
   {
     filepath = screenshot_filepath;
-    encoding = t8::TxGlyphEncoding::UnicodePreferredAndFallback;
+    encoding = t8::TxGlyphEncoding::TryUnicodePreferredAndFallbackElseAsciiOnly;
   }
   
 private:
