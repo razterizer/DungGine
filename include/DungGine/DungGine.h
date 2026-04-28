@@ -2156,7 +2156,7 @@ namespace dung
         }
         
         std::string filepath = "screenshot_0.tx";
-        auto encoding = t8::TxGlyphEncoding::UnicodePreferredAndFallback;
+        auto encoding = t8::TxGlyphEncoding::TryUnicodePreferredAndFallbackElseAsciiOnly;
         // Expects just one listener.
         broadcast([&filepath, &encoding](auto* l)
           { l->on_screenshot_request(filepath, encoding); });
