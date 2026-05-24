@@ -301,7 +301,7 @@ namespace dung
         auto texture = fetch_curr_fill_texture(room_style);
         if (texture.has_value())
         {
-          int curr_mat = (*texture.value())(tex_pos).mat;
+          int curr_mat = (*texture.value())(tex_pos).decode_raw_mat();
           // #FIXME: Canonize material idcs.
           switch (curr_mat)
           {
