@@ -56,14 +56,21 @@ namespace dung
     
     void load_textures(DungGineTextureParams texture_params)
     {
+      auto f_load_texture = [](std::vector<Texture>& texture_vec, const std::string& fn)
+      {
+        Texture tex;
+        if (t8::TextureFile::load(tex, fn, true))
+          texture_vec.emplace_back(std::move(tex));
+      };
+    
       for (const auto& fn : texture_params.texture_file_names_surface_level_fill)
-        texture_sl_fill.emplace_back().load(fn);
+        f_load_texture(texture_sl_fill, fn);
       for (const auto& fn : texture_params.texture_file_names_surface_level_shadow)
-        texture_sl_shadow.emplace_back().load(fn);
+        f_load_texture(texture_sl_shadow, fn);
       for (const auto& fn : texture_params.texture_file_names_underground_fill)
-        texture_ug_fill.emplace_back().load(fn);
+        f_load_texture(texture_ug_fill, fn);
       for (const auto& fn : texture_params.texture_file_names_underground_shadow)
-        texture_ug_shadow.emplace_back().load(fn);
+        f_load_texture(texture_ug_shadow, fn);
         
       dt_texture_anim_s = texture_params.dt_anim_s;
     }
