@@ -11,6 +11,7 @@
 #include "PC.h"
 #include "Items.h"
 #include <Termin8or/ui/MessageHandler.h>
+#include <Termin8or/ui/widget/TextBoxDebug.h>
 #include <Core/Utils.h>
 #include <functional>
 
@@ -211,11 +212,11 @@ namespace dung
           {
             m_inventory->reset_hilite();
             message_handler->add_message(static_cast<float>(real_time_s),
-                                         msg,
+                                         t8::GlyphString::from_ascii(msg),
                                          t8x::MessageHandlerLevel::Guide);
             if (dropped_over_liquid)
               message_handler->add_message(static_cast<float>(real_time_s),
-                                           "Item was dropped over the " + terrain2str(m_player.on_terrain) + " and is now forever lost.",
+                                           t8::GlyphString::from_ascii("Item was dropped over the " + terrain2str(m_player.on_terrain) + " and is now forever lost."),
                                            t8x::MessageHandlerLevel::Warning);
           }
           else
@@ -291,20 +292,20 @@ namespace dung
                   door->is_locked = false;
                   
                   message_handler->add_message(static_cast<float>(real_time_s),
-                                               "The door is unlocked!",
+                                               t8::GlyphString::from_ascii("The door is unlocked!"),
                                                t8x::MessageHandlerLevel::Guide);
                   
                   m_inventory->cache_hilited_index();
                   m_player.remove_key_by_key_id(m_inventory, m_all_keys, door->key_id);
                   m_inventory->reset_hilite();
                   message_handler->add_message(static_cast<float>(real_time_s),
-                                               "You cast a vanishing spell on the key!",
+                                               t8::GlyphString::from_ascii("You cast a vanishing spell on the key!"),
                                                t8x::MessageHandlerLevel::Guide);
                 }
                 else
                 {
                   message_handler->add_message(static_cast<float>(real_time_s),
-                                               "The door is locked. You need key:" + std::to_string(door->key_id) + "!",
+                                               t8::GlyphString::from_ascii("The door is locked. You need key:" + std::to_string(door->key_id) + "!"),
                                                t8x::MessageHandlerLevel::Guide);
                 }
               }
@@ -350,19 +351,20 @@ namespace dung
               if (floor_dir != 0)
               {
                 message_handler->add_message(static_cast<float>(real_time_s),
-                                             "You walked "s + (floor_dir == -1 ? "up" : "down") + " one floor",
+                                             t8::GlyphString::from_ascii("You walked "s + (floor_dir == -1 ? "up" : "down") + " one floor"),
                                              t8x::MessageHandlerLevel::Guide);
                 if (m_player.curr_floor == 0)
                 {
                   message_handler->add_message(static_cast<float>(real_time_s),
-                                               "You are now at surface level!",
+                                               t8::GlyphString::from_ascii("You are now at surface level!"),
                                                t8x::MessageHandlerLevel::Guide);
                 }
               }
             }
           }
           
-          std::string too_heavy_msg_template = " is too heavy to carry.\nYou need to drop items from your inventory!";
+          auto too_heavy_msg_template_1 = t8::GlyphString::from_ascii(" is too heavy to carry.");
+          auto too_heavy_msg_template_2 = t8::GlyphString::from_ascii("You need to drop items from your inventory!");
           
           for (size_t key_idx = 0; key_idx < m_all_keys.size(); ++key_idx)
           {
@@ -374,13 +376,15 @@ namespace dung
                 m_player.key_idcs.emplace_back(static_cast<int>(key_idx));
                 key.picked_up = true;
                 message_handler->add_message(static_cast<float>(real_time_s),
-                                             "You picked up a key!",
+                                             t8::GlyphString::from_ascii("You picked up a key!"),
                                              t8x::MessageHandlerLevel::Guide);
               }
               else
-                message_handler->add_message(static_cast<float>(real_time_s),
-                                             "Key" + too_heavy_msg_template,
-                                             t8x::MessageHandlerLevel::Warning);
+                message_handler->add_message_multi_line(static_cast<float>(real_time_s),
+                                                        { t8::GlyphString::from_ascii("Key"),
+                                                          too_heavy_msg_template_1,
+                                                          too_heavy_msg_template_2 },
+                                                        t8x::MessageHandlerLevel::Warning);
             }
           }
           for (size_t lamp_idx = 0; lamp_idx < m_all_lamps.size(); ++lamp_idx)
@@ -394,13 +398,15 @@ namespace dung
                 m_player.lamp_idcs.emplace_back(static_cast<int>(lamp_idx));
                 lamp.picked_up = true;
                 message_handler->add_message(static_cast<float>(real_time_s),
-                                             "You picked up " + str::indef_art(lamp_type) + "!",
+                                             t8::GlyphString::from_ascii("You picked up " + str::indef_art(lamp_type) + "!"),
                                              t8x::MessageHandlerLevel::Guide);
               }
               else
-                message_handler->add_message(static_cast<float>(real_time_s),
-                                             str::anfangify(lamp_type) + too_heavy_msg_template,
-                                             t8x::MessageHandlerLevel::Warning);
+                message_handler->add_message_multi_line(static_cast<float>(real_time_s),
+                                                        { t8::GlyphString::from_ascii(str::anfangify(lamp_type)),
+                                                          too_heavy_msg_template_1,
+                                                          too_heavy_msg_template_2 },
+                                                        t8x::MessageHandlerLevel::Warning);
             }
           }
           for (size_t wpn_idx = 0; wpn_idx < m_all_weapons.size(); ++wpn_idx)
@@ -413,13 +419,15 @@ namespace dung
                 m_player.weapon_idcs.emplace_back(static_cast<int>(wpn_idx));
                 weapon->picked_up = true;
                 message_handler->add_message(static_cast<float>(real_time_s),
-                                             "You picked up " + str::indef_art(weapon->type) + "!",
+                                             t8::GlyphString::from_ascii("You picked up " + str::indef_art(weapon->type) + "!"),
                                              t8x::MessageHandlerLevel::Guide);
               }
               else
-                message_handler->add_message(static_cast<float>(real_time_s),
-                                             str::anfangify(weapon->type) + too_heavy_msg_template,
-                                             t8x::MessageHandlerLevel::Warning);
+                message_handler->add_message_multi_line(static_cast<float>(real_time_s),
+                                                        { t8::GlyphString::from_ascii(str::anfangify(weapon->type)),
+                                                          too_heavy_msg_template_1,
+                                                          too_heavy_msg_template_2 },
+                                                        t8x::MessageHandlerLevel::Warning);
             }
           }
           for (size_t pot_idx = 0; pot_idx < m_all_potions.size(); ++pot_idx)
@@ -432,12 +440,15 @@ namespace dung
                 m_player.potion_idcs.emplace_back(static_cast<int>(pot_idx));
                 potion.picked_up = true;
                 message_handler->add_message(static_cast<float>(real_time_s),
-                                             "You picked up a potion!", t8x::MessageHandlerLevel::Guide);
+                                             t8::GlyphString::from_ascii("You picked up a potion!"),
+                                             t8x::MessageHandlerLevel::Guide);
               }
               else
-                message_handler->add_message(static_cast<float>(real_time_s),
-                                             "Potion" + too_heavy_msg_template,
-                                             t8x::MessageHandlerLevel::Warning);
+                message_handler->add_message_multi_line(static_cast<float>(real_time_s),
+                                                        { t8::GlyphString::from_ascii("Potion"),
+                                                          too_heavy_msg_template_1,
+                                                          too_heavy_msg_template_2 },
+                                                        t8x::MessageHandlerLevel::Warning);
             }
           }
           for (size_t a_idx = 0; a_idx < m_all_armour.size(); ++a_idx)
@@ -450,13 +461,15 @@ namespace dung
                 m_player.armour_idcs.emplace_back(static_cast<int>(a_idx));
                 armour->picked_up = true;
                 message_handler->add_message(static_cast<float>(real_time_s),
-                                             "You picked up " + str::indef_art(armour->type) + "!",
+                                             t8::GlyphString::from_ascii("You picked up " + str::indef_art(armour->type) + "!"),
                                              t8x::MessageHandlerLevel::Guide);
               }
               else
-                message_handler->add_message(static_cast<float>(real_time_s),
-                                             str::anfangify(armour->type) + too_heavy_msg_template,
-                                             t8x::MessageHandlerLevel::Warning);
+                message_handler->add_message_multi_line(static_cast<float>(real_time_s),
+                                                        { t8::GlyphString::from_ascii(str::anfangify(armour->type)),
+                                                          too_heavy_msg_template_1,
+                                                          too_heavy_msg_template_2 },
+                                                        t8x::MessageHandlerLevel::Warning);
             }
           }
         }
@@ -478,7 +491,8 @@ namespace dung
         {
           if (key.visible_near)
             message_handler->add_message(static_cast<float>(real_time_s),
-                                         "You see a key nearby!", t8x::MessageHandlerLevel::Guide);
+                                         t8::GlyphString::from_ascii("You see a key nearby!"),
+                                         t8x::MessageHandlerLevel::Guide);
         }
         for (const auto& lamp : m_all_lamps)
         {
@@ -486,26 +500,30 @@ namespace dung
           {
             auto lamp_type = lamp.get_type_str();
             message_handler->add_message(static_cast<float>(real_time_s),
-                                         "You see " + str::indef_art(lamp_type) + " nearby!", t8x::MessageHandlerLevel::Guide);
+                                         t8::GlyphString::from_ascii("You see " + str::indef_art(lamp_type) + " nearby!"),
+                                         t8x::MessageHandlerLevel::Guide);
           }
         }
         for (const auto& weapon : m_all_weapons)
         {
           if (weapon->visible_near)
             message_handler->add_message(static_cast<float>(real_time_s),
-                                         "You can see " + str::indef_art(weapon->type) + " nearby!", t8x::MessageHandlerLevel::Guide);
+                                         t8::GlyphString::from_ascii("You can see " + str::indef_art(weapon->type) + " nearby!"),
+                                         t8x::MessageHandlerLevel::Guide);
         }
         for (const auto& potion : m_all_potions)
         {
           if (potion.visible_near)
             message_handler->add_message(static_cast<float>(real_time_s),
-                                         "You can see a potion nearby!", t8x::MessageHandlerLevel::Guide);
+                                         t8::GlyphString::from_ascii("You can see a potion nearby!"),
+                                         t8x::MessageHandlerLevel::Guide);
         }
         for (const auto& armour : m_all_armour)
         {
           if (armour->visible_near)
             message_handler->add_message(static_cast<float>(real_time_s),
-                                         "You can see " + str::indef_art(armour->type) + " nearby!", t8x::MessageHandlerLevel::Guide);
+                                         t8::GlyphString::from_ascii("You can see " + str::indef_art(armour->type) + " nearby!"),
+                                         t8x::MessageHandlerLevel::Guide);
         }
         for (const auto& npc : m_all_npcs)
         {
@@ -515,7 +533,8 @@ namespace dung
             if (npc.health <= 0)
               race = "dead " + race;
             message_handler->add_message(static_cast<float>(real_time_s),
-                                         "You can see " + str::indef_art(race) + " nearby!", t8x::MessageHandlerLevel::Guide);
+                                         t8::GlyphString::from_ascii("You can see " + str::indef_art(race) + " nearby!"),
+                                         t8x::MessageHandlerLevel::Guide);
           }
         }
       }
@@ -533,20 +552,20 @@ namespace dung
           {
             case -1:
               message_handler->add_message(static_cast<float>(real_time_s),
-                                           "You drank poison! Your health decreased by " + std::to_string(-hp) + " hp.",
+                                           t8::GlyphString::from_ascii("You drank poison! Your health decreased by " + std::to_string(-hp) + " hp."),
                                            t8x::MessageHandlerLevel::Warning);
               break;
             case 0:
               message_handler->add_message(static_cast<float>(real_time_s),
-                                           "You drank a potion, but nothing appeared to happen.",
+                                           t8::GlyphString::from_ascii("You drank a potion, but nothing appeared to happen."),
                                            t8x::MessageHandlerLevel::Guide);
             case +1:
               message_handler->add_message(static_cast<float>(real_time_s),
-                                           "You drank a health potion. Your health increased by " + std::to_string(hp) + " hp.",
+                                           t8::GlyphString::from_ascii("You drank a health potion. Your health increased by " + std::to_string(hp) + " hp."),
                                            t8x::MessageHandlerLevel::Guide);
               if (m_player.health == globals::max_health)
                 message_handler->add_message(static_cast<float>(real_time_s),
-                                             "Your health is now fully restored.",
+                                             t8::GlyphString::from_ascii("Your health is now fully restored."),
                                              t8x::MessageHandlerLevel::Guide);
               break;
           }
@@ -554,7 +573,7 @@ namespace dung
           m_player.remove_selected_potion(m_inventory, m_all_potions);
           m_inventory->reset_hilite();
           message_handler->add_message(static_cast<float>(real_time_s),
-                                       "You throw away the empty vial.",
+                                       t8::GlyphString::from_ascii("You throw away the empty vial."),
                                        t8x::MessageHandlerLevel::Guide);
         }
       }

@@ -13,6 +13,7 @@
 #include "ScreenHelper.h"
 #include "Comparison.h"
 #include <Termin8or/screen/ScreenHandler.h>
+#include <Termin8or/drawing/TextureFile.h>
 #include <optional>
 
 

@@ -101,8 +101,8 @@ namespace dung
     };
     std::vector<Projectile> active_projectiles;
     
-    t8x::TextBox<t8::GlyphString> tb_health { str::Adjustment::Left };
-    t8x::TextBox<t8::GlyphString> tb_strength { str::Adjustment::Left };
+    t8x::TextBox<t8::GlyphString> tb_health { str::Adjustment::Left, true };
+    t8x::TextBox<t8::GlyphString> tb_strength { str::Adjustment::Left, true };
     t8x::TextBoxDebug tbd;
     
     bool stall_game = false;
@@ -615,7 +615,7 @@ namespace dung
       std::vector<t8::GlyphString> health_bars;
       std::vector<Style> styles;
       std::vector<std::pair<RC, Style>> per_textel_styles;
-      t8::GlyphString pc_hb = str::rep_char(' ', 10);
+      auto pc_hb = t8::GlyphString::from_ascii(str::rep_char(' ', 10));
       float pc_ratio = globals::max_health / 10.f;
       for (int i = 0; i < 10; ++i)
         pc_hb[i] = m_player.health > static_cast<int>(i*pc_ratio) ? t8::Glyph { 0x2592, '#' } : ' ';
@@ -630,7 +630,7 @@ namespace dung
         auto [pc_melee_attack, pc_ranged_attack] = get_pc_attack_modes(npc);
         if (npc.health > 0 && (npc.state == State::FightMelee || npc.state == State::FightRanged || pc_melee_attack || pc_ranged_attack))
         {
-          t8::GlyphString npc_hb = str::rep_char(' ', 10);
+          auto npc_hb = t8::GlyphString::from_ascii(str::rep_char(' ', 10));
           float npc_ratio = globals::max_health / 10.f;
           for (int i = 0; i < 10; ++i)
             npc_hb[i] = npc.health > static_cast<int>(i*npc_ratio) ? t8::Glyph { 0x2592, 'O' } : ' ';
@@ -660,7 +660,7 @@ namespace dung
       tb_args.base.box_style = { Color16::White, Color16::DarkBlue };
       tb_args.base.outline_type = t8x::OutlineType::Unicode_SingleLineRounded;
     
-      t8::GlyphString strength_bar = str::rep_char(' ', 10);
+      auto strength_bar = t8::GlyphString::from_ascii(str::rep_char(' ', 10));
       float pc_ratio = m_player.strength / 10.f;
       for (int i = 0; i < 10; ++i)
         strength_bar[i] = (m_player.strength - m_player.weakness) > static_cast<int>(i*pc_ratio)
@@ -794,7 +794,7 @@ namespace dung
           if (was_alive && npc.health <= 0)
           {
             message_handler->add_message(real_time_s,
-                                         "You killed the " + race2str(npc.npc_race) + "!",
+                                         t8::GlyphString::from_ascii("You killed the " + race2str(npc.npc_race) + "!"),
                                          t8x::MessageHandlerLevel::Guide);
             broadcast([](auto* listener) { listener->on_npc_death(); });
           }
@@ -868,7 +868,7 @@ namespace dung
           if (was_alive && m_player.health <= 0)
           {
             message_handler->add_message(real_time_s,
-                                         "You were killed!",
+                                         t8::GlyphString::from_ascii("You were killed!"),
                                          t8x::MessageHandlerLevel::Fatal);
             broadcast([](auto* listener) { listener->on_pc_death(); });
           }
@@ -933,7 +933,8 @@ namespace dung
                 message += " by " + str::indef_art(race);
               message += "!";
               message_handler->add_message(real_time_s,
-                                           message, t8x::MessageHandlerLevel::Warning);
+                                           t8::GlyphString::from_ascii(message),
+                                           t8x::MessageHandlerLevel::Warning);
             }
           }
           else
@@ -1796,7 +1797,7 @@ namespace dung
       if (was_alive && m_player.health <= 0)
       {
         message_handler->add_message(static_cast<float>(real_time_s),
-                                     "You died!",
+                                     t8::GlyphString::from_ascii("You died!"),
                                      t8x::MessageHandlerLevel::Fatal);
         broadcast([](auto* listener) { listener->on_pc_death(); });
       }
@@ -2161,19 +2162,21 @@ namespace dung
         broadcast([&filepath, &encoding](auto* l)
           { l->on_screenshot_request(filepath, encoding); });
         
-        if (screenshot.save(filepath, encoding))
+        if (t8::TextureFile::save(screenshot, filepath, true, encoding))
         {
-          message_handler->add_message(static_cast<float>(real_time_s),
-                                       "Successfully saved screenshot:\n\"" + filepath + "\"!",
-                                       t8x::MessageHandlerLevel::Guide,
-                                       3.f);
+          message_handler->add_message_multi_line(static_cast<float>(real_time_s),
+                                                  { t8::GlyphString::from_ascii("Successfully saved screenshot:"),
+                                                    t8::GlyphString::from_ascii("\"" + filepath + "\"!") },
+                                                  t8x::MessageHandlerLevel::Guide,
+                                                  3.f);
         }
         else
         {
-          message_handler->add_message(static_cast<float>(real_time_s),
-                                       "ERROR : Unable to save screenshot to file:\n\"" + filepath + "\"!",
-                                       t8x::MessageHandlerLevel::Fatal,
-                                       3.f);
+          message_handler->add_message_multi_line(static_cast<float>(real_time_s),
+                                                  { t8::GlyphString::from_ascii("ERROR : Unable to save screenshot to file:"),
+                                                    t8::GlyphString::from_ascii("\"" + filepath + "\"!") },
+                                                  t8x::MessageHandlerLevel::Fatal,
+                                                  3.f);
         }
         
         trigger_screenshot = false;
@@ -2250,17 +2253,19 @@ namespace dung
       
       if (TextIO::write_file(savegame_filename, lines))
       {
-        message_handler->add_message(static_cast<float>(real_time_s),
-                                     "Successfully saved save-game:\n\"" + savegame_filename + "\"!",
-                                     t8x::MessageHandlerLevel::Guide,
-                                     3.f);
+        message_handler->add_message_multi_line(static_cast<float>(real_time_s),
+                                                { t8::GlyphString::from_ascii("Successfully saved save-game:"),
+                                                  t8::GlyphString::from_ascii("\"" + savegame_filename + "\"!") },
+                                                t8x::MessageHandlerLevel::Guide,
+                                                3.f);
       }
       else
       {
-        message_handler->add_message(static_cast<float>(real_time_s),
-                                     "ERROR : Unable to save save-game file:\n\"" + savegame_filename + "\"!",
-                                     t8x::MessageHandlerLevel::Fatal,
-                                     3.f);
+        message_handler->add_message_multi_line(static_cast<float>(real_time_s),
+                                                { t8::GlyphString::from_ascii("ERROR : Unable to save save-game file:"),
+                                                  t8::GlyphString::from_ascii("\"" + savegame_filename + "\"!") },
+                                                t8x::MessageHandlerLevel::Fatal,
+                                                3.f);
       }
     }
     
@@ -2272,20 +2277,24 @@ namespace dung
       
       if (!TextIO::read_file(savegame_filename, lines))
       {
-        message_handler->add_message(static_cast<float>(real_time_s),
-                                     "ERROR : Unable to load save-game file:\n\"" + savegame_filename + "\"!",
-                                     t8x::MessageHandlerLevel::Fatal,
-                                     3.f);
+        message_handler->add_message_multi_line(static_cast<float>(real_time_s),
+                                                { t8::GlyphString::from_ascii("ERROR : Unable to load save-game file:"),
+                                                  t8::GlyphString::from_ascii("\"" + savegame_filename + "\"!") },
+                                                t8x::MessageHandlerLevel::Fatal,
+                                                3.f);
         return false;
       }
       
       if (use_save_game_git_hash_check &&
           lines[0] != get_latest_git_commit_hash())
       {
-        message_handler->add_message(static_cast<float>(real_time_s),
-                                     "ERROR : Tried to load a saved game\nbut the git hash of the save-game\ndoesn't match the git hash of the\nlast commit of DungGine!",
-                                      t8x::MessageHandlerLevel::Fatal,
-                                      5.f);
+        message_handler->add_message_multi_line(static_cast<float>(real_time_s),
+                                                { t8::GlyphString::from_ascii("ERROR : Tried to load a saved game"),
+                                                  t8::GlyphString::from_ascii("but the git hash of the save-game"),
+                                                  t8::GlyphString::from_ascii("doesn't match the git hash of the"),
+                                                  t8::GlyphString::from_ascii("last commit of DungGine!") },
+                                                t8x::MessageHandlerLevel::Fatal,
+                                                5.f);
         return false;
       }
       std::istringstream iss(lines[1]);
@@ -2350,10 +2359,11 @@ namespace dung
         
         else if (sg::read_var(&it_line, SG_READ_VAR(use_fog_of_war)))
         {
-          message_handler->add_message(static_cast<float>(real_time_s),
-                                       "Successfully loaded save-game:\n\"" + savegame_filename + "\"!",
-                                       t8x::MessageHandlerLevel::Guide,
-                                       3.f);
+          message_handler->add_message_multi_line(static_cast<float>(real_time_s),
+                                                  { t8::GlyphString::from_ascii("Successfully loaded save-game:"),
+                                                    t8::GlyphString::from_ascii("\"" + savegame_filename + "\"!") },
+                                                  t8x::MessageHandlerLevel::Guide,
+                                                  3.f);
           return;
         }
         else
