@@ -355,8 +355,6 @@ int main(int argc, char** argv)
       game.set_sim_delay_us(static_cast<float>(std::atof(argv[i + 1])));
   }
 
-  game.init();
-  game.generate_data();
   if (test_type != TestType::DungeonSimple)
     game.run();
 
