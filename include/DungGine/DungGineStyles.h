@@ -152,8 +152,7 @@ namespace dung
         { Color16::White, Color16::White },
       }
     },
-    {
-      WallBasicType::MasonryDark,
+    { WallBasicType::MasonryDark,
       {
         { Color16::Black, Color16::Black },
         { Color16::Black, Color16::DarkRed },

@@ -1,5 +1,9 @@
 # Release Notes
 
+## 2.1.0.6
+- Bumped Termin8or dependency to 3.0.0.6.
+- Updated compatibility with Termin8or's Unicode/glyph API changes.
+
 ## 2.0.1.5
 - Fixed lagging version in released version.h issue.
 

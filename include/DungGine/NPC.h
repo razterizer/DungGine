@@ -279,7 +279,7 @@ namespace dung
   public:
     NPC()
     {
-      character = 'O';
+      glyph = 'O';
       style = { Color16::Green, Color16::DarkYellow };
     }
   
@@ -314,7 +314,7 @@ namespace dung
       switch (npc_race)
       {
         case Race::Human:
-          character = '@';
+          glyph = '@';
           style = { Color16::Magenta, Color16::LightGray };
           acc_step = rand_acc_step(2.f, 20.f);
           acc_lim = rand_acc_lim(20.f, 50.f);
@@ -328,7 +328,7 @@ namespace dung
           animal = false;
           break;
         case Race::Elf:
-          character = '@';
+          glyph = '@';
           style = { Color16::Magenta, Color16::DarkGreen };
           acc_step = rand_acc_step(4.f, 40.f);
           acc_lim = rand_acc_lim(25.f, 70.f);
@@ -342,7 +342,7 @@ namespace dung
           animal = false;
           break;
         case Race::Half_Elf:
-          character = '@';
+          glyph = '@';
           style = { Color16::Magenta, Color16::DarkYellow };
           acc_step = rand_acc_step(3.f, 30.f);
           acc_lim = rand_acc_lim(25.f, 60.f);
@@ -356,7 +356,7 @@ namespace dung
           animal = false;
           break;
         case Race::Gnome:
-          character = 'b';
+          glyph = 'b';
           style = { Color16::Magenta, Color16::LightGray };
           acc_step = rand_acc_step(1.f, 10.f);
           acc_lim = rand_acc_lim(10.f, 20.f);
@@ -370,7 +370,7 @@ namespace dung
           animal = false;
           break;
         case Race::Halfling:
-          character = 'b';
+          glyph = 'b';
           style = { Color16::Magenta, Color16::LightGray };
           acc_step = rand_acc_step(1.f, 15.f);
           acc_lim = rand_acc_lim(11.f, 25.f);
@@ -384,7 +384,7 @@ namespace dung
           animal = false;
           break;
         case Race::Dwarf:
-          character = '0';
+          glyph = '0';
           style = { Color16::White, Color16::DarkGray };
           acc_step = rand_acc_step(1.5f, 18.f);
           acc_lim = rand_acc_lim(12.f, 30.f);
@@ -398,7 +398,7 @@ namespace dung
           animal = false;
           break;
         case Race::Half_Orc:
-          character = '3';
+          glyph = '3';
           style = { Color16::Yellow, Color16::Green };
           acc_step = rand_acc_step(1.5f, 20.f);
           acc_lim = rand_acc_lim(30.f, 80.f);
@@ -412,7 +412,7 @@ namespace dung
           animal = false;
           break;
         case Race::Ogre:
-          character = 'O';
+          glyph = 'O';
           style = { Color16::Green, Color16::DarkYellow };
           acc_step = rand_acc_step(4.f, 10.f);
           acc_lim = rand_acc_lim(2.f, 8.f);
@@ -426,7 +426,7 @@ namespace dung
           animal = false;
           break;
         case Race::Hobgoblin:
-          character = 'a';
+          glyph = 'a';
           style = { Color16::Yellow, Color16::Cyan };
           acc_step = rand_acc_step(5.f, 15.f);
           acc_lim = rand_acc_lim(10.f, 50.f);
@@ -440,7 +440,7 @@ namespace dung
           animal = false;
           break;
         case Race::Goblin:
-          character = 'G';
+          glyph = 'G';
           style = { Color16::Green, Color16::DarkCyan };
           acc_step = rand_acc_step(5.f, 15.f);
           acc_lim = rand_acc_lim(8.f, 45.f);
@@ -454,7 +454,7 @@ namespace dung
           animal = false;
           break;
         case Race::Orc:
-          character = '2';
+          glyph = '2';
           style = { Color16::DarkYellow, Color16::Cyan };
           acc_step = rand_acc_step(5.f, 25.f);
           acc_lim = rand_acc_lim(50.f, 80.f);
@@ -468,7 +468,7 @@ namespace dung
           animal = false;
           break;
         case Race::Troll:
-          character = 'R';
+          glyph = 'R';
           style = { Color16::LightGray, Color16::DarkRed };
           acc_step = rand_acc_step(1.f, 14.f);
           acc_lim = rand_acc_lim(5.f, 15.f);
@@ -482,7 +482,7 @@ namespace dung
           animal = false;
           break;
         case Race::Monster:
-          character = 'M';
+          glyph = 'M';
           style = { Color16::Cyan, Color16::DarkGreen };
           acc_step = rand_acc_step(0.5f, 25.f);
           acc_lim = rand_acc_lim(2.f, 25.f);
@@ -496,7 +496,7 @@ namespace dung
           animal = rnd::rand_bool();
           break;
         case Race::Lich:
-          character = 'z';
+          glyph = 'z';
           style = { Color16::DarkYellow, Color16::DarkBlue };
           acc_step = rand_acc_step(4.f, 30.f);
           acc_lim = rand_acc_lim(25.f, 55.f);
@@ -510,7 +510,7 @@ namespace dung
           animal = false;
           break;
         case Race::Lich_King:
-          character = 'Z';
+          glyph = 'Z';
           style = { Color16::Yellow, Color16::DarkBlue };
           acc_step = rand_acc_step(5.f, 35.f);
           acc_lim = rand_acc_lim(25.f, 60.f);
@@ -524,7 +524,7 @@ namespace dung
           animal = false;
           break;
         case Race::Basilisk:
-          character = 'S';
+          glyph = 'S';
           style = { Color16::Green, Color16::DarkGray };
           acc_step = rand_acc_step(5.f, 18.f);
           acc_lim = rand_acc_lim(2.f, 25.f);
@@ -538,7 +538,7 @@ namespace dung
           animal = true;
           break;
         case Race::Bear:
-          character = 'B';
+          glyph = 'B';
           style = { Color16::Red, Color16::DarkRed };
           acc_step = rand_acc_step(10.f, 25.f);
           acc_lim = rand_acc_lim(3.f, 10.f);
@@ -552,7 +552,7 @@ namespace dung
           animal = true;
           break;
         case Race::Kobold:
-          character = 'x';
+          glyph = 'x';
           style = { Color16::Blue, Color16::LightGray };
           acc_step = rand_acc_step(5.f, 15.f);
           acc_lim = rand_acc_lim(25.f, 40.f);
@@ -566,7 +566,7 @@ namespace dung
           animal = false;
           break;
         case Race::Skeleton:
-          character = '%';
+          glyph = '%';
           style = { Color16::White, Color16::DarkGray };
           acc_step = rand_acc_step(5.f, 15.f);
           acc_lim = rand_acc_lim(10.f, 60.f);
@@ -580,7 +580,7 @@ namespace dung
           animal = false;
           break;
         case Race::Giant:
-          character = 'O';
+          glyph = 'O';
           style = { Color16::DarkMagenta, Color16::LightGray };
           acc_step = rand_acc_step(5.f, 15.f);
           acc_lim = rand_acc_lim(1.f, 5.f);
@@ -594,7 +594,7 @@ namespace dung
           animal = false;
           break;
         case Race::Huge_Spider:
-          character = 'W';
+          glyph = 'W';
           style = { Color16::DarkGray, Color16::White };
           acc_step = rand_acc_step(5.f, 15.f);
           acc_lim = rand_acc_lim(10.f, 70.f);
@@ -608,7 +608,7 @@ namespace dung
           animal = true;
           break;
         case Race::Wolf:
-          character = 'm';
+          glyph = 'm';
           style = { Color16::LightGray, Color16::DarkGray };
           acc_step = rand_acc_step(15.f, 35.f);
           acc_lim = rand_acc_lim(15.f, 60.f);
@@ -622,7 +622,7 @@ namespace dung
           animal = true;
           break;
         case Race::Wyvern:
-          character = 'w';
+          glyph = 'w';
           style = { Color16::DarkMagenta, Color16::Blue };
           acc_step = rand_acc_step(5.f, 15.f);
           acc_lim = rand_acc_lim(2.f, 15.f);
@@ -636,7 +636,7 @@ namespace dung
           animal = true;
           break;
         case Race::Griffin:
-          character = 'g';
+          glyph = 'g';
           style = { Color16::DarkRed, Color16::Blue };
           acc_step = rand_acc_step(5.f, 15.f);
           acc_lim = rand_acc_lim(10.f, 25.f);
@@ -650,7 +650,7 @@ namespace dung
           animal = true;
           break;
         case Race::Ghoul:
-          character = 'h';
+          glyph = 'h';
           style = { Color16::LightGray, Color16::Yellow };
           acc_step = rand_acc_step(5.f, 15.f);
           acc_lim = rand_acc_lim(30.f, 60.f);
@@ -664,7 +664,7 @@ namespace dung
           animal = false;
           break;
         case Race::Dragon:
-          character = 'R';
+          glyph = 'R';
           style = { Color16::Red, Color16::DarkMagenta };
           acc_step = rand_acc_step(5.f, 45.f);
           acc_lim = rand_acc_lim(7.f, 30.f);
@@ -758,7 +758,7 @@ namespace dung
       {
         if (trg_death.once())
           death_time_s = time;
-        character = '&';
+        glyph = '&';
         style = { Color16::Red, Color16::DarkGray };
         return;
       }

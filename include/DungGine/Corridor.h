@@ -20,8 +20,8 @@ namespace dung
   //using RC = t8::RC;
   using Rectangle = t8::Rectangle;
   using BBLocation = t8::BBLocation;
-  //template<int NR, int NC>
-  //using ScreenHandler = t8::ScreenHandler<NR, NC>;
+  //template<int NR, int NC, typename CharT>
+  //using ScreenHandler = t8::ScreenHandler<NR, NC, CharT>;
 
   struct Door;
   

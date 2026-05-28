@@ -9,6 +9,7 @@
 
 #include "Terrain.h"
 #include <Core/StringHelper.h>
+#include <Core/Utf8.h>
 #include <Termin8or/str/StringConversion.h>
 #include <Termin8or/screen/Styles.h>
 #include <Termin8or/screen/Color.h>
@@ -34,6 +35,22 @@ namespace sg
     
     std::istringstream iss(tokens[1]);
     iss >> *var_ptr;
+    return true;
+  };
+  
+  template<>
+  bool read_var(std::vector<std::string>::iterator* it_line, const std::string& var_name, t8::Glyph* var_ptr)
+  {
+    auto curr_line = **it_line;
+    if (var_ptr == nullptr || !curr_line.starts_with(var_name))
+      return false;
+  
+    auto tokens = str::tokenize(curr_line, { '=', ' '});
+    if (tokens.size() != 3)
+      return false;
+  
+    var_ptr->parse(tokens[1]);
+    
     return true;
   };
   
@@ -149,9 +166,9 @@ namespace sg
   };
   
   template<>
-  void write_var(std::vector<std::string>& lines_vec, const std::string& var_name, const char& var)
+  void write_var(std::vector<std::string>& lines_vec, const std::string& var_name, const t8::Glyph& var)
   {
-    lines_vec.emplace_back(var_name + " = " + std::string(1, var));
+    lines_vec.emplace_back(var_name + " = " + var.str());
   };
   
   template<>

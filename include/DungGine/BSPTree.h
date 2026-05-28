@@ -27,8 +27,8 @@ namespace dung
   using Style = t8::Style;
   //using RC = t8::RC;
   using Rectangle = t8::Rectangle;
-  template<int NR, int NC>
-  using ScreenHandler = t8::ScreenHandler<NR, NC>;
+  template<int NR, int NC, typename CharT>
+  using ScreenHandler = t8::ScreenHandler<NR, NC, CharT>;
 
   struct Staircase;
   
@@ -186,8 +186,8 @@ namespace dung
       }
     }
     
-    template<int NR, int NC>
-    void draw_regions(ScreenHandler<NR, NC>& sh,
+    template<int NR, int NC, typename CharT>
+    void draw_regions(ScreenHandler<NR, NC, CharT>& sh,
                       int r0, int c0,
                       const Style& border_style) const
     {
@@ -199,8 +199,8 @@ namespace dung
         children[1]->draw_regions(sh, r0, c0, border_style);
     }
     
-    template<int NR, int NC>
-    void draw_rooms(ScreenHandler<NR, NC>& sh,
+    template<int NR, int NC, typename CharT>
+    void draw_rooms(ScreenHandler<NR, NC, CharT>& sh,
                     int r0, int c0,
                     const Style& room_style) const
     {
@@ -723,24 +723,24 @@ namespace dung
       return doors_raw;
     }
     
-    template<int NR, int NC>
-    void draw_regions(ScreenHandler<NR, NC>& sh,
+    template<int NR, int NC, typename CharT>
+    void draw_regions(ScreenHandler<NR, NC, CharT>& sh,
                       int r0 = 0, int c0 = 0,
                       const Style& border_style = { Color16::Black, Color16::Yellow }) const
     {
       m_root.draw_regions(sh, r0, c0, border_style);
     }
     
-    template<int NR, int NC>
-    void draw_rooms(ScreenHandler<NR, NC>& sh,
+    template<int NR, int NC, typename CharT>
+    void draw_rooms(ScreenHandler<NR, NC, CharT>& sh,
                     int r0 = 0, int c0 = 0,
                     const Style& room_style = { Color16::White, Color16::DarkRed }) const
     {
       m_root.draw_rooms(sh, r0, c0, room_style);
     }
     
-    template<int NR, int NC>
-    void draw_corridors(ScreenHandler<NR, NC>& sh,
+    template<int NR, int NC, typename CharT>
+    void draw_corridors(ScreenHandler<NR, NC, CharT>& sh,
                         int r0 = 0, int c0 = 0,
                         const Style& corridor_outline_style = { Color16::Green, Color16::DarkGreen },
                         const Style& corridor_fill_style = { Color16::Black, Color16::Green }) const

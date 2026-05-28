@@ -13,6 +13,7 @@
 #include "ScreenHelper.h"
 #include "Comparison.h"
 #include <Termin8or/screen/ScreenHandler.h>
+#include <Termin8or/drawing/TextureFile.h>
 #include <optional>
 
 
@@ -55,14 +56,21 @@ namespace dung
     
     void load_textures(DungGineTextureParams texture_params)
     {
+      auto f_load_texture = [](std::vector<Texture>& texture_vec, const std::string& fn)
+      {
+        Texture tex;
+        if (t8::TextureFile::load(tex, fn, true))
+          texture_vec.emplace_back(std::move(tex));
+      };
+    
       for (const auto& fn : texture_params.texture_file_names_surface_level_fill)
-        texture_sl_fill.emplace_back().load(fn);
+        f_load_texture(texture_sl_fill, fn);
       for (const auto& fn : texture_params.texture_file_names_surface_level_shadow)
-        texture_sl_shadow.emplace_back().load(fn);
+        f_load_texture(texture_sl_shadow, fn);
       for (const auto& fn : texture_params.texture_file_names_underground_fill)
-        texture_ug_fill.emplace_back().load(fn);
+        f_load_texture(texture_ug_fill, fn);
       for (const auto& fn : texture_params.texture_file_names_underground_shadow)
-        texture_ug_shadow.emplace_back().load(fn);
+        f_load_texture(texture_ug_shadow, fn);
         
       dt_texture_anim_s = texture_params.dt_anim_s;
     }
@@ -300,7 +308,7 @@ namespace dung
         auto texture = fetch_curr_fill_texture(room_style);
         if (texture.has_value())
         {
-          int curr_mat = (*texture.value())(tex_pos).mat;
+          int curr_mat = (*texture.value())(tex_pos).decode_raw_mat();
           // #FIXME: Canonize material idcs.
           switch (curr_mat)
           {
@@ -365,8 +373,8 @@ namespace dung
       return dung::allow_move_to(terrain);
     }
     
-    template<int NR, int NC>
-    void draw_environment(ScreenHandler<NR, NC>& sh, double real_time_s,
+    template<int NR, int NC, typename CharT>
+    void draw_environment(ScreenHandler<NR, NC, CharT>& sh, double real_time_s,
                           int curr_floor, bool use_fog_of_war,
                           SolarDirection sun_dir, SolarMotionPatterns& solar_motion,
                           float t_solar_period, Season season,
@@ -415,10 +423,10 @@ namespace dung
             t8x::draw_box(sh,
                               bb_scr_pos.r, bb_scr_pos.c, bb.r_len, bb.c_len,
                               room_style.get_fill_style(),
-                              room_style.get_fill_char(),
+                              room_style.get_fill_glyph(),
                               room_style.is_underground ? SolarDirection::Nadir : shadow_type,
                               t8::shade_style(room_style.get_fill_style(), t8::ShadeType::Dark),
-                              room_style.get_fill_char(),
+                              room_style.get_fill_glyph(),
                               room->light);
           }
           else
@@ -478,10 +486,10 @@ namespace dung
           t8x::draw_box(sh,
                             bb_scr_pos.r, bb_scr_pos.c, bb.r_len, bb.c_len,
                             corr_style.get_fill_style(),
-                            corr_style.get_fill_char(),
+                            corr_style.get_fill_glyph(),
                             corr_style.is_underground ? SolarDirection::Nadir : shadow_type,
                             t8::shade_style(corr_style.get_fill_style(), t8::ShadeType::Dark, true),
-                            corr_style.get_fill_char(),
+                            corr_style.get_fill_glyph(),
                             corr->light);
         }
       }

@@ -30,6 +30,7 @@
 #include <Core/Timer.h>
 
 using namespace utils::literals;
+using namespace t8::literals;
 
 namespace dung
 {
@@ -100,7 +101,8 @@ namespace dung
     };
     std::vector<Projectile> active_projectiles;
     
-    t8x::TextBox tb_health, tb_strength;
+    t8x::TextBox<t8::GlyphString> tb_health { str::Adjustment::Left, true };
+    t8x::TextBox<t8::GlyphString> tb_strength { str::Adjustment::Left, true };
     t8x::TextBoxDebug tbd;
     
     bool stall_game = false;
@@ -607,17 +609,17 @@ namespace dung
       return { pc_melee_attack, pc_ranged_attack };
     }
     
-    template<int NR, int NC>
-    void draw_health_bars(ScreenHandler<NR, NC>& sh, bool framed_mode)
+    template<int NR, int NC, typename CharT>
+    void draw_health_bars(ScreenHandler<NR, NC, CharT>& sh, bool framed_mode)
     {
-      std::vector<std::string> health_bars;
+      std::vector<t8::GlyphString> health_bars;
       std::vector<Style> styles;
       std::vector<std::pair<RC, Style>> per_textel_styles;
-      std::string pc_hb = str::rep_char(' ', 10);
-      float pc_ratio = globals::max_health / 10;
+      auto pc_hb = t8::GlyphString::from_ascii(str::rep_char(' ', 10));
+      float pc_ratio = globals::max_health / 10.f;
       for (int i = 0; i < 10; ++i)
-        pc_hb[i] = m_player.health > static_cast<int>(i*pc_ratio) ? '#' : ' ';
-      pc_hb = std::string(1, m_player.character) + ' ' + pc_hb;
+        pc_hb[i] = m_player.health > static_cast<int>(i*pc_ratio) ? t8::Glyph { 0x2592, '#' } : ' ';
+      pc_hb = m_player.glyph + ' ' + pc_hb;
       per_textel_styles.emplace_back(RC { 0, 0 }, m_player.style);
       health_bars.emplace_back(pc_hb);
       styles.emplace_back(Style { Color16::Magenta, Color16::Transparent2 });
@@ -628,11 +630,11 @@ namespace dung
         auto [pc_melee_attack, pc_ranged_attack] = get_pc_attack_modes(npc);
         if (npc.health > 0 && (npc.state == State::FightMelee || npc.state == State::FightRanged || pc_melee_attack || pc_ranged_attack))
         {
-          std::string npc_hb = str::rep_char(' ', 10);
-          float npc_ratio = globals::max_health / 10;
+          auto npc_hb = t8::GlyphString::from_ascii(str::rep_char(' ', 10));
+          float npc_ratio = globals::max_health / 10.f;
           for (int i = 0; i < 10; ++i)
-            npc_hb[i] = npc.health > static_cast<int>(i*npc_ratio) ? 'O' : ' ';
-          npc_hb = std::string(1, npc.visible ? npc.character : '?') + ' ' + npc_hb;
+            npc_hb[i] = npc.health > static_cast<int>(i*npc_ratio) ? t8::Glyph { 0x2592, 'O' } : ' ';
+          npc_hb = (npc.visible ? npc.glyph : '?') + ' ' + npc_hb;
           per_textel_styles.emplace_back(RC { line++, 0 }, npc.visible ? npc.style : Style { Color16::White, Color16::Transparent2 });
           health_bars.emplace_back(npc_hb);
           styles.emplace_back(Style { Color16::Red, Color16::Transparent2 });
@@ -643,28 +645,28 @@ namespace dung
       tb_args.v_align = t8x::VerticalAlignment::TOP;
       tb_args.h_align = t8x::HorizontalAlignment::LEFT;
       tb_args.base.box_style = { Color16::White, Color16::DarkBlue };
+      tb_args.base.outline_type = t8x::OutlineType::Unicode_SingleLineRounded;
       tb_args.framed_mode = framed_mode;
       tb_health.set_text(health_bars, styles, per_textel_styles);
-      tb_health.calc_pre_draw(str::Adjustment::Left);
       tb_health.draw(sh, tb_args);
     }
     
-    template<int NR, int NC>
-    void draw_strength_bar(ScreenHandler<NR, NC>& sh, bool framed_mode)
+    template<int NR, int NC, typename CharT>
+    void draw_strength_bar(ScreenHandler<NR, NC, CharT>& sh, bool framed_mode)
     {
       t8x::TextBoxDrawingArgsPos tb_args;
       int offs = framed_mode ? 1 : 0;
       tb_args.pos = { 1 + offs, 12 + offs };
       tb_args.base.box_style = { Color16::White, Color16::DarkBlue };
+      tb_args.base.outline_type = t8x::OutlineType::Unicode_SingleLineRounded;
     
-      std::string strength_bar = str::rep_char(' ', 10);
+      auto strength_bar = t8::GlyphString::from_ascii(str::rep_char(' ', 10));
       float pc_ratio = m_player.strength / 10.f;
       for (int i = 0; i < 10; ++i)
         strength_bar[i] = (m_player.strength - m_player.weakness) > static_cast<int>(i*pc_ratio)
-        ? '=' : ' ';
+        ? t8::Glyph { 0x2550, '=' } : ' ';
       Style style { Color16::Green, Color16::Transparent2 };
       tb_strength.set_text(strength_bar, style);
-      tb_strength.calc_pre_draw(str::Adjustment::Left);
       tb_strength.draw(sh, tb_args);
     }
     
@@ -792,8 +794,8 @@ namespace dung
           if (was_alive && npc.health <= 0)
           {
             message_handler->add_message(real_time_s,
-                                         "You killed the " + race2str(npc.npc_race) + "!",
-                                         MessageHandler::Level::Guide);
+                                         t8::GlyphString::from_ascii("You killed the " + race2str(npc.npc_race) + "!"),
+                                         t8x::MessageHandlerLevel::Guide);
             broadcast([](auto* listener) { listener->on_npc_death(); });
           }
         }
@@ -866,8 +868,8 @@ namespace dung
           if (was_alive && m_player.health <= 0)
           {
             message_handler->add_message(real_time_s,
-                                         "You were killed!",
-                                         MessageHandler::Level::Fatal);
+                                         t8::GlyphString::from_ascii("You were killed!"),
+                                         t8x::MessageHandlerLevel::Fatal);
             broadcast([](auto* listener) { listener->on_pc_death(); });
           }
         }
@@ -882,8 +884,8 @@ namespace dung
       }
     }
     
-    template<int NR, int NC>
-    void draw_fighting(ScreenHandler<NR, NC>& sh, const RC& pc_scr_pos, bool do_update_fight, float real_time_s, float sim_time_s,
+    template<int NR, int NC, typename CharT>
+    void draw_fighting(ScreenHandler<NR, NC, CharT>& sh, const RC& pc_scr_pos, bool do_update_fight, float real_time_s, float sim_time_s,
                        int melee_blood_prob_visible, int melee_blood_prob_invisible)
     {
       auto f_render_pc_blood_splats = [&](const RC& offs)
@@ -931,7 +933,8 @@ namespace dung
                 message += " by " + str::indef_art(race);
               message += "!";
               message_handler->add_message(real_time_s,
-                                           message, MessageHandler::Level::Warning);
+                                           t8::GlyphString::from_ascii(message),
+                                           t8x::MessageHandlerLevel::Warning);
             }
           }
           else
@@ -1088,7 +1091,7 @@ namespace dung
       
       for (const auto& p : active_projectiles)
       {
-        char p_char = p.weapon->projectile_characters[p.ang_idx];
+        t8::Glyph p_char = p.weapon->projectile_glyphs[p.ang_idx];
         
         const RC& wpn_pos = t8::to_RC_round(p.pos);
         
@@ -1113,7 +1116,7 @@ namespace dung
         bool visible = !((use_fog_of_war && fog_of_war) ||
                       ((m_environment->is_underground(p.curr_floor, p.curr_room) || calc_night(p)) && !light)); // #FIXME: add fow term.
         if (visible)
-          sh.write_buffer(std::string(1, p_char), wpn_scr_pos, p.weapon->projectile_fg_color, Color16::Transparent2);
+          sh.write_buffer(p_char, wpn_scr_pos, p.weapon->projectile_fg_color, Color16::Transparent2);
       }
       stlutils::erase_if(active_projectiles, [sim_time_s](const auto& p)
       {
@@ -1173,7 +1176,7 @@ namespace dung
                                    wall_shading_underground);
     }
     
-    void set_player_character(char ch) { m_player.character = ch; }
+    void set_player_glyph(t8::Glyph g) { m_player.glyph = g; }
     void set_player_style(const Style& style) { m_player.style = style; }
     bool place_player(const RC& screen_size, std::optional<RC> world_pos = std::nullopt)
     {
@@ -1794,8 +1797,8 @@ namespace dung
       if (was_alive && m_player.health <= 0)
       {
         message_handler->add_message(static_cast<float>(real_time_s),
-                                     "You died!",
-                                     MessageHandler::Level::Fatal);
+                                     t8::GlyphString::from_ascii("You died!"),
+                                     t8x::MessageHandlerLevel::Fatal);
         broadcast([](auto* listener) { listener->on_pc_death(); });
       }
       
@@ -1860,8 +1863,8 @@ namespace dung
     }
     
     
-    template<int NR, int NC>
-    void draw(ScreenHandler<NR, NC>& sh, double real_time_s, float sim_time_s,
+    template<int NR, int NC, typename CharT>
+    void draw(ScreenHandler<NR, NC, CharT>& sh, double real_time_s, float sim_time_s,
               int anim_ctr_swim, int anim_ctr_fight,
               int melee_blood_prob_visible, int melee_blood_prob_invisible,
               t8x::VerticalAlignment mb_v_align = t8x::VerticalAlignment::CENTER,
@@ -1880,6 +1883,7 @@ namespace dung
       mb_args.v_align_offs = mb_v_align_offs;
       mb_args.h_align_offs = mb_h_align_offs;
       mb_args.framed_mode = framed_mode;
+      mb_args.outline_type = t8x::OutlineType::Unicode_SingleLine;
       message_handler->update(sh, static_cast<float>(real_time_s), mb_args);
       
       if (debug)
@@ -1890,7 +1894,6 @@ namespace dung
           tbd_args.v_align = t8x::VerticalAlignment::TOP;
           tbd_args.base.box_style = { Color16::Blue, Color16::Yellow };
           tbd_args.framed_mode = framed_mode;
-          tbd.calc_pre_draw(str::Adjustment::Left);
           tbd.draw(sh, tbd_args);
         }
       }
@@ -1939,7 +1942,7 @@ namespace dung
       // PC
       if (m_player.is_spawned)
       {
-        sh.write_buffer(std::string(1, m_player.character), pc_scr_pos.r, pc_scr_pos.c, m_player.style);
+        sh.write_buffer(m_player.glyph, pc_scr_pos.r, pc_scr_pos.c, m_player.style);
         
         if (is_wet(m_player.on_terrain))
           f_draw_swim_anim(m_player.is_moving, m_player.curr_floor, m_player.pos, pc_scr_pos, m_player.los_r, m_player.los_c);
@@ -1955,7 +1958,7 @@ namespace dung
         if (!npc.visible)
           return;
         auto scr_pos = m_screen_helper->get_screen_pos(npc.pos);
-        sh.write_buffer(std::string(1, npc.character), scr_pos, npc.style);
+        sh.write_buffer(npc.glyph, scr_pos, npc.style);
       };
       
       auto f_render_obj = [&](const auto& obj)
@@ -1969,7 +1972,7 @@ namespace dung
         if (obj.shade && obj.light)
           fg_color = t8::shade_color(obj.style.fg_color,
                                             t8::ShadeType::Dark);
-        sh.write_buffer(std::string(1, obj.character), scr_pos,
+        sh.write_buffer(obj.glyph, scr_pos,
           fg_color, obj.style.bg_color);
       };
       
@@ -2049,13 +2052,13 @@ namespace dung
           {
             auto scr_pos_room = m_screen_helper->get_screen_pos(npc.curr_room->bb_leaf_room.center());
             t8x::plot_line(sh, scr_pos, scr_pos_room,
-                    ".", Color16::White, Color16::Transparent2);
+                    "."_gs, Color16::White, Color16::Transparent2);
           }
           if (npc.curr_corridor != nullptr)
           {
             auto scr_pos_corr = m_screen_helper->get_screen_pos(npc.curr_corridor->bb.center());
             t8x::plot_line(sh, scr_pos, scr_pos_corr,
-                    ".", Color16::White, Color16::Transparent2);
+                    "."_gs, Color16::White, Color16::Transparent2);
           }
         }
       }
@@ -2153,24 +2156,27 @@ namespace dung
           }
         }
         
-        std::string filepath = "screenshot_0.txt";
+        std::string filepath = "screenshot_0.tx";
+        auto encoding = t8::TxGlyphEncoding::TryUnicodePreferredAndFallbackElseAsciiOnly;
         // Expects just one listener.
-        broadcast([&filepath](auto* l)
-          { l->on_screenshot_request(filepath); });
+        broadcast([&filepath, &encoding](auto* l)
+          { l->on_screenshot_request(filepath, encoding); });
         
-        if (screenshot.save(filepath))
+        if (t8::TextureFile::save(screenshot, filepath, true, encoding))
         {
-          message_handler->add_message(static_cast<float>(real_time_s),
-                                       "Successfully saved screenshot:\n\"" + filepath + "\"!",
-                                       MessageHandler::Level::Guide,
-                                       3.f);
+          message_handler->add_message_multi_line(static_cast<float>(real_time_s),
+                                                  { t8::GlyphString::from_ascii("Successfully saved screenshot:"),
+                                                    t8::GlyphString::from_ascii("\"" + filepath + "\"!") },
+                                                  t8x::MessageHandlerLevel::Guide,
+                                                  3.f);
         }
         else
         {
-          message_handler->add_message(static_cast<float>(real_time_s),
-                                       "ERROR : Unable to save screenshot to file:\n\"" + filepath + "\"!",
-                                       MessageHandler::Level::Fatal,
-                                       3.f);
+          message_handler->add_message_multi_line(static_cast<float>(real_time_s),
+                                                  { t8::GlyphString::from_ascii("ERROR : Unable to save screenshot to file:"),
+                                                    t8::GlyphString::from_ascii("\"" + filepath + "\"!") },
+                                                  t8x::MessageHandlerLevel::Fatal,
+                                                  3.f);
         }
         
         trigger_screenshot = false;
@@ -2247,17 +2253,19 @@ namespace dung
       
       if (TextIO::write_file(savegame_filename, lines))
       {
-        message_handler->add_message(static_cast<float>(real_time_s),
-                                     "Successfully saved save-game:\n\"" + savegame_filename + "\"!",
-                                     MessageHandler::Level::Guide,
-                                     3.f);
+        message_handler->add_message_multi_line(static_cast<float>(real_time_s),
+                                                { t8::GlyphString::from_ascii("Successfully saved save-game:"),
+                                                  t8::GlyphString::from_ascii("\"" + savegame_filename + "\"!") },
+                                                t8x::MessageHandlerLevel::Guide,
+                                                3.f);
       }
       else
       {
-        message_handler->add_message(static_cast<float>(real_time_s),
-                                     "ERROR : Unable to save save-game file:\n\"" + savegame_filename + "\"!",
-                                     MessageHandler::Level::Fatal,
-                                     3.f);
+        message_handler->add_message_multi_line(static_cast<float>(real_time_s),
+                                                { t8::GlyphString::from_ascii("ERROR : Unable to save save-game file:"),
+                                                  t8::GlyphString::from_ascii("\"" + savegame_filename + "\"!") },
+                                                t8x::MessageHandlerLevel::Fatal,
+                                                3.f);
       }
     }
     
@@ -2269,20 +2277,24 @@ namespace dung
       
       if (!TextIO::read_file(savegame_filename, lines))
       {
-        message_handler->add_message(static_cast<float>(real_time_s),
-                                     "ERROR : Unable to load save-game file:\n\"" + savegame_filename + "\"!",
-                                     MessageHandler::Level::Fatal,
-                                     3.f);
+        message_handler->add_message_multi_line(static_cast<float>(real_time_s),
+                                                { t8::GlyphString::from_ascii("ERROR : Unable to load save-game file:"),
+                                                  t8::GlyphString::from_ascii("\"" + savegame_filename + "\"!") },
+                                                t8x::MessageHandlerLevel::Fatal,
+                                                3.f);
         return false;
       }
       
       if (use_save_game_git_hash_check &&
           lines[0] != get_latest_git_commit_hash())
       {
-        message_handler->add_message(static_cast<float>(real_time_s),
-                                     "ERROR : Tried to load a saved game\nbut the git hash of the save-game\ndoesn't match the git hash of the\nlast commit of DungGine!",
-                                      MessageHandler::Level::Fatal,
-                                      5.f);
+        message_handler->add_message_multi_line(static_cast<float>(real_time_s),
+                                                { t8::GlyphString::from_ascii("ERROR : Tried to load a saved game"),
+                                                  t8::GlyphString::from_ascii("but the git hash of the save-game"),
+                                                  t8::GlyphString::from_ascii("doesn't match the git hash of the"),
+                                                  t8::GlyphString::from_ascii("last commit of DungGine!") },
+                                                t8x::MessageHandlerLevel::Fatal,
+                                                5.f);
         return false;
       }
       std::istringstream iss(lines[1]);
@@ -2347,10 +2359,11 @@ namespace dung
         
         else if (sg::read_var(&it_line, SG_READ_VAR(use_fog_of_war)))
         {
-          message_handler->add_message(static_cast<float>(real_time_s),
-                                       "Successfully loaded save-game:\n\"" + savegame_filename + "\"!",
-                                       MessageHandler::Level::Guide,
-                                       3.f);
+          message_handler->add_message_multi_line(static_cast<float>(real_time_s),
+                                                  { t8::GlyphString::from_ascii("Successfully loaded save-game:"),
+                                                    t8::GlyphString::from_ascii("\"" + savegame_filename + "\"!") },
+                                                  t8x::MessageHandlerLevel::Guide,
+                                                  3.f);
           return;
         }
         else

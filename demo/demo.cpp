@@ -16,7 +16,7 @@ enum class TestType { DungeonSimple, DungeonRuntime };
 static TestType test_type = TestType::DungeonRuntime;
 
 
-class Game : public t8x::GameEngine<>, public dung::DungGineListener
+class Game : public t8x::GameEngine<30, 80, char32_t>, public dung::DungGineListener
 {
   using Color16 = t8::Color16;
   
@@ -40,7 +40,7 @@ public:
       project_root_filepath = folder::join_path({ project_root_filepath, "../../../../../../../Documents/xcode/lib/DungGine/demo/" }); // #FIXME: Find a better solution!
 #endif
     savegame_filepath = folder::join_path({ project_root_filepath, "savegame_0.dsg" });
-    screenshot_filepath = folder::join_path({ project_root_filepath, "screenshot_0.txt" });
+    screenshot_filepath = folder::join_path({ project_root_filepath, "screenshot_0.tx" });
   }
   
   virtual ~Game() override
@@ -179,9 +179,10 @@ protected:
     GameEngine::set_curr_rnd_seed(rnd_seed);
   }
   
-  virtual void on_screenshot_request(std::string& filepath) override
+  virtual void on_screenshot_request(std::string& filepath, t8::TxGlyphEncoding& encoding) override
   {
     filepath = screenshot_filepath;
+    encoding = t8::TxGlyphEncoding::TryUnicodePreferredAndFallbackElseAsciiOnly;
   }
   
 private:
@@ -331,6 +332,8 @@ int main(int argc, char** argv)
         params.log_mode = LogMode::Replay;
       params.xcode_log_path = "../../../../../../../../Documents/xcode/lib/DungGine/demo/bin/";
     }
+    else if (std::strcmp(argv[i], "--display_ascii_only") == 0)
+      params.ascii_fallback_policy = t8::AsciiFallbackPolicy::FORCE_ASCII;
     else if (std::strcmp(argv[i], "--help") == 0)
       show_help = true;
   }
@@ -339,7 +342,14 @@ int main(int argc, char** argv)
   
   if (show_help)
   {
-    std::cout << "demo --help | [--log_mode (record | replay)] [--suppress_tty_output] [--suppress_tty_input] [--set_fps <fps>] [--set_sim_delay_us <delay_us>]" << std::endl;
+    std::cout << "demo --help |" << std::endl;
+    std::cout << "   [--log_mode (record | replay)]" << std::endl;
+    std::cout << "   [--suppress_tty_output]" << std::endl;
+    std::cout << "   [--suppress_tty_input]" << std::endl;
+    std::cout << "   [--set_fps <fps>]" << std::endl;
+    std::cout << "   [--set_sim_delay_us <delay_us>]" << std::endl;
+    std::cout << "   [--display_ascii_only]" << std::endl;
+    std::cout << std::endl;
     std::cout << "  default values:" << std::endl;
     std::cout << "    <fps>      : " << game.get_real_fps() << std::endl;
     std::cout << "    <delay_us> : " << game.get_sim_delay_us() << std::endl;
@@ -354,8 +364,6 @@ int main(int argc, char** argv)
       game.set_sim_delay_us(static_cast<float>(std::atof(argv[i + 1])));
   }
 
-  game.init();
-  game.generate_data();
   if (test_type != TestType::DungeonSimple)
     game.run();
 

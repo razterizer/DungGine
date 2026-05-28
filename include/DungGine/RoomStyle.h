@@ -115,22 +115,22 @@ namespace dung
       wall_style = t8::get_random_style(wall_palette[wall_basic_type]);
     }
     
-    char get_fill_char() const
+    t8::Glyph get_fill_glyph() const
     {
       switch (floor_type)
       {
         case FloorType::Sand:
-          return ':';
+          return { 0x287D, ':' };
         case FloorType::Grass:
-          return '|';
+          return { 0x142, '|' };
         case FloorType::Stone:
           return 'H';
         case FloorType::Stone2:
           return '8';
         case FloorType::Water:
-          return '~';
+          return { 0x3B6, '~' }; // 0x2248 doesn't look that good on it's own.
         case FloorType::Wood:
-          return 'W';
+          return { 0x222C, 'W' };
         case FloorType::None:
         default:
           return ' ';
@@ -138,9 +138,9 @@ namespace dung
       }
     }
     
-    char get_shadow_char() const
+    t8::Glyph get_shadow_glyph() const
     {
-      return get_fill_char();
+      return get_fill_glyph();
     }
     
     Style get_fill_style() const

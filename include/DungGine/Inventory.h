@@ -644,8 +644,8 @@ namespace dung
       };
     }
       
-    template<int NR, int NC>
-    void draw(ScreenHandler<NR, NC>& sh) const
+    template<int NR, int NC, typename CharT>
+    void draw(ScreenHandler<NR, NC, CharT>& sh) const
     {
       sh.write_buffer(str::adjust_str("Inventory", str::Adjustment::Center, m_bb.c_len), m_bb.top() + rb0_title, m_bb.left(), Color16::White, Color16::Transparent2);
       
@@ -688,7 +688,7 @@ namespace dung
           sh.write_buffer(text, m_bb.top() + rb_items, m_bb.left() + cb_items, style);
       }
       
-      t8x::draw_box_outline(sh, m_bb, t8x::OutlineType::Line, { Color16::White, Color16::DarkGray });
+      t8x::draw_box_outline(sh, m_bb, t8x::OutlineType::Unicode_SingleLine, { Color16::White, Color16::DarkGray });
       t8x::draw_box(sh, m_bb, { Color16::White, Color16::DarkGray }, ' ');
     }
     
