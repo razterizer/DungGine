@@ -340,7 +340,13 @@ int main(int argc, char** argv)
   
   if (show_help)
   {
-    std::cout << "demo --help | [--log_mode (record | replay)] [--suppress_tty_output] [--suppress_tty_input] [--set_fps <fps>] [--set_sim_delay_us <delay_us>]" << std::endl;
+    std::cout << "demo --help |" << std::endl;
+    std::cout << "   [--log_mode (record | replay)]" << std::endl;
+    std::cout << "   [--suppress_tty_output]" << std::endl;
+    std::cout << "   [--suppress_tty_input]" << std::endl;
+    std::cout << "   [--set_fps <fps>]" << std::endl;
+    std::cout << "   [--set_sim_delay_us <delay_us>]" << std::endl;
+    std::cout << std::endl;
     std::cout << "  default values:" << std::endl;
     std::cout << "    <fps>      : " << game.get_real_fps() << std::endl;
     std::cout << "    <delay_us> : " << game.get_sim_delay_us() << std::endl;
