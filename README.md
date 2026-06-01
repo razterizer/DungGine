@@ -281,26 +281,26 @@ To make a new release, you first have to update the `RELEASE_NOTES.md` document.
 
 Then to make a new release you should use the `tag_release.sh` script:
 ```sh
-./tag_release -f RELEASE_NOTES.md
+./tag_release.sh -f RELEASE_NOTES.md
 ```
 
 or if you want to re-upload an existing release, e.g.:
 ```sh
-./tag_release 1.1.5.7. -f RELEASE_NOTES.md
+./tag_release.sh 1.1.5.7. -f RELEASE_NOTES.md
 ```
 
 you can also use these commands:
 ```sh
-./tag_release bump patch "Release notes."
+./tag_release.sh bump patch "Release notes."
 ```
 ```sh
-./tag_release bump minor "Release notes."
+./tag_release.sh bump minor "Release notes."
 ```
 ```sh
-./tag_release bump major "Release notes."
+./tag_release.sh bump major "Release notes."
 ```
 ```sh
-./tag_release 1.1.5.7 "Release notes."
+./tag_release.sh 1.1.5.7 "Release notes."
 ```
 
 If you want to remove a release for some reason, you can do so by running the following git commands:
