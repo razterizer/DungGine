@@ -225,6 +225,7 @@
 				075D41922E28B68E005DD356 /* Sources */,
 				075D41932E28B68E005DD356 /* Frameworks */,
 				075D41942E28B68E005DD356 /* CopyFiles */,
+				07C80E332FCD500100106C83 /* Copy Runtime Assets */,
 			);
 			buildRules = (
 			);
@@ -294,6 +295,32 @@
 		};
 /* End PBXProject section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		07C80E332FCD500100106C83 /* Copy Runtime Assets */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"$(SRCROOT)/demo/textures",
+				"$(SRCROOT)/../Termin8or/include/Termin8or/title/fonts",
+			);
+			name = "Copy Runtime Assets";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(TARGET_BUILD_DIR)/textures",
+				"$(TARGET_BUILD_DIR)/fonts",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "set -e\nmkdir -p \"$TARGET_BUILD_DIR/fonts\"\nmkdir -p \"$TARGET_BUILD_DIR/textures\"\ncp \"$SRCROOT/../Termin8or/include/Termin8or/title/fonts/\"* \"$TARGET_BUILD_DIR/fonts/\"\ncp \"$SRCROOT/demo/textures/\"* \"$TARGET_BUILD_DIR/textures/\"\nif [ -f \"$SRCROOT/demo/bin/rec.txt\" ]; then\n  cp \"$SRCROOT/demo/bin/rec.txt\" \"$TARGET_BUILD_DIR/\"\nelif [ -f \"$SRCROOT/demo/rec.txt\" ]; then\n  cp \"$SRCROOT/demo/rec.txt\" \"$TARGET_BUILD_DIR/\"\nfi\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		075D41922E28B68E005DD356 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -320,6 +347,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = HFL2Q84SZB;
 				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				HEADER_SEARCH_PATHS = (
 					include/,
 					../Core/include/,
@@ -339,6 +367,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = HFL2Q84SZB;
 				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				HEADER_SEARCH_PATHS = (
 					include/,
 					../Core/include/,
