@@ -97,15 +97,15 @@ class CheckoutStatus(NamedTuple):
 def parse_dependencies(f) -> Iterator[Dependency]:
     """Parses a set of dependency lines. Lines starting with `#` are ignored."""
     for i, d in enumerate(map(str.split, f), 1):
-        match d:
-            case [] | ['#', *_]:
-                pass
-            case [path, repo, ref, *os]:
-                os = os[0] if os else "any"
-                yield Dependency(Path(path), repo, ref, os)
-            case _:
-                print(f'Error in dependencies file. I do not understand line {i}.', file=sys.stderr)
-                sys.exit(1)
+        if not d or d[0] == '#':
+            continue
+        if len(d) >= 3:
+            path, repo, ref, *platforms = d
+            platform = platforms[0] if platforms else "any"
+            yield Dependency(Path(path), repo, ref, platform)
+            continue
+        print(f'Error in dependencies file. I do not understand line {i}.', file=sys.stderr)
+        sys.exit(1)
 
 
 ####################################################################################################
@@ -159,13 +159,10 @@ if __name__ == '__main__':
     for d in deps:
         skip = False;
         # os = 'nt' | 'posix' | 'any'
-        match d.os:
-            case 'win':
-                if not os.name == 'nt':
-                    skip = True;
-            case 'posix':
-                if not os.name == 'posix':
-                    skip = True;
+        if d.os == 'win' and os.name != 'nt':
+            skip = True
+        elif d.os == 'posix' and os.name != 'posix':
+            skip = True
         if skip:
           continue;
     
@@ -279,4 +276,3 @@ if __name__ == '__main__':
 #
 #                                  (in case you did not notice)
 ####################################################################################################
-
