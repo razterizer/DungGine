@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 REPO_DIR="DungGine"
 BUILD_DIR="demo"
 
