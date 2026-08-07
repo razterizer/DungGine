@@ -15,7 +15,7 @@
 ![Commit Activity](https://img.shields.io/github/commit-activity/t/razterizer/DungGine)
 ![Last Commit](https://img.shields.io/github/last-commit/razterizer/DungGine?color=blue)
 ![Contributors](https://img.shields.io/github/contributors/razterizer/DungGine?color=blue)
-![Static Badge](https://img.shields.io/badge/ai_usage-barely_any_(advisory_only)-lightblue)
+<!-- ![Static Badge](https://img.shields.io/badge/ai_usage-barely_any_(advisory_only)-lightblue) -->
 
 ![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/razterizer/DungGine/total)
 
