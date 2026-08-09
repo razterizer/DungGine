@@ -124,6 +124,7 @@ jobs:
           tag: ${{ github.ref_name }}
           artifacts: dunggine_demo-${{ github.ref_name }}-linux.tar.gz
           allowUpdates: true
+          replacesArtifacts: false
           bodyFile: RELEASE_NOTES.txt
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
